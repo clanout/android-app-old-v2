@@ -1,128 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
+              android:layout_height="match_parent"
+              android:background="@color/background_default"
+              android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:orientation="vertical">
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:paddingBottom="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp">
 
             <LinearLayout
-                android:layout_width="50dp"
-                android:layout_height="match_parent"
-                android:layout_marginRight="12dp"
-                android:gravity="center_vertical|center_horizontal">
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-                <ImageView
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/tv_event_details_title"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/iv_event_details_icon"/>
+                    android:layout_marginLeft="16dp"
+                    android:maxLines="2"
+                    android:text="Movie at Forum"
+                    android:textColor="@color/text_title"
+                    android:textSize="24sp"
+                    android:layout_marginBottom="4dp"
+                    />
 
+                <TextView
+                    android:id="@+id/tv_event_details_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:text="Public"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_subtitle_light"
+                    />
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:layout_marginRight="16dp">
 
-                <TextView
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:id="@+id/iv_event_details_icon"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:maxLines="2"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp"
-                    android:id="@+id/tv_event_details_title"
-                    />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:maxLines="2"
-                        android:layout_height="wrap_content"
-                        android:textSize="16sp"
-                        android:layout_marginRight="4dp"
-                        android:id="@+id/tv_event_details_location"/>
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/ic_pin_drop_black_24dp"
-                        android:layout_marginRight="4dp"
-                        android:id="@+id/iv_event_details_location"/>
-                </LinearLayout>
+                    android:src="@drawable/ic_local_attraction_black_48dp"/>
             </LinearLayout>
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:layout_marginTop="8dp"
-            android:gravity="center_vertical|center_horizontal">
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp">
 
-            <TextView
+            <ImageView
+                android:id="@+id/iv_event_details_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_event_eetails_start_date_time"/>
+                android:src="@drawable/ic_place_black_18dp"/>
+
+            <TextView
+                android:id="@+id/tv_event_details_location"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:maxLines="1"
+                android:text="Forum Mall, Koramangla"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="56dp"
+            android:background="@color/divider"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_access_time_black_24dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginLeft="8dp"/>
+                android:src="@drawable/ic_access_time_black_18dp"/>
 
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/tv_event_details_date_time"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_event_details_end_date_time"/>
-
+                android:layout_marginLeft="16dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:maxLines="1"
+                android:text="19:00 (12 June) - 19:00 (13 June)"
+                android:textSize="14sp"/>
         </LinearLayout>
 
-        <TextView
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="56dp"
+            android:background="@color/divider"/>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_marginTop="8dp"
-            android:textStyle="italic"
-            android:gravity="center_horizontal"
-            android:id="@+id/tv_event_details_description"/>
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:src="@drawable/ic_my_library_books_black_18dp"/>
+
+            <TextView
+                android:id="@+id/tv_event_details_description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:maxLines="3"
+                android:text="See the License for the specific language governing permissions and limitations"
+                android:textSize="14sp"/>
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical"
-        android:layout_marginTop="8dp"
-        android:background="#FAFAFA">
+        android:orientation="vertical">
 
         <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_event_details_attendees"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/rv_event_details_attendees"/>
+            android:layout_height="match_parent"/>
 
         <TextView
+            android:id="@+id/tv_event_details_no_attendees"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center_vertical|center_horizontal"
-            android:id="@+id/tv_event_details_no_attendees"/>
+            android:gravity="center_vertical|center_horizontal"/>
     </LinearLayout>
 </LinearLayout>

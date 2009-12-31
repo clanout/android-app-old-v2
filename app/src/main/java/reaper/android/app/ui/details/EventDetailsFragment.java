@@ -1,9 +1,14 @@
 package reaper.android.app.ui.details;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,7 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,14 +32,15 @@ import java.util.ArrayList;
 
 import reaper.android.R;
 import reaper.android.app.model.Event;
+import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
-import reaper.android.app.trigger.EventDetailsFetchTrigger;
+import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.ui.util.EventUtils;
 import reaper.android.common.communicator.Communicator;
 
-public class EventDetailsFragment extends Fragment
+public class EventDetailsFragment extends Fragment implements View.OnClickListener
 {
     private FragmentManager fragmentManager;
     private Bus bus;
@@ -50,7 +55,7 @@ public class EventDetailsFragment extends Fragment
 
     // UI Elements
     private ImageView icon, locationIcon;
-    private TextView title, description, location, startDateTime, endDateTime;
+    private TextView title, type, description, location, dateTime;
     private RecyclerView attendeeList;
     private TextView noAttendeeMessage;
 
@@ -71,10 +76,10 @@ public class EventDetailsFragment extends Fragment
         icon = (ImageView) view.findViewById(R.id.iv_event_details_icon);
         locationIcon = (ImageView) view.findViewById(R.id.iv_event_details_location);
         title = (TextView) view.findViewById(R.id.tv_event_details_title);
+        type = (TextView) view.findViewById(R.id.tv_event_details_type);
         description = (TextView) view.findViewById(R.id.tv_event_details_description);
         location = (TextView) view.findViewById(R.id.tv_event_details_location);
-        startDateTime = (TextView) view.findViewById(R.id.tv_event_eetails_start_date_time);
-        endDateTime = (TextView) view.findViewById(R.id.tv_event_details_end_date_time);
+        dateTime = (TextView) view.findViewById(R.id.tv_event_details_date_time);
         attendeeList = (RecyclerView) view.findViewById(R.id.rv_event_details_attendees);
         noAttendeeMessage = (TextView) view.findViewById(R.id.tv_event_details_no_attendees);
 
@@ -135,6 +140,10 @@ public class EventDetailsFragment extends Fragment
 //        chat.setOnClickListener(this);
 //        location.setOnClickListener(this);
 
+        location.setOnClickListener(this);
+        description.setOnClickListener(this);
+        dateTime.setOnClickListener(this);
+
         renderEventSummary();
 
         initRecyclerView();
@@ -159,10 +168,10 @@ public class EventDetailsFragment extends Fragment
     @Subscribe
     public void onEventDetailsFetchTrigger(EventDetailsFetchTrigger trigger)
     {
-        eventDetails = trigger.getEventDetails();
-
-        if (eventDetails.getId().equals(event.getId()))
+        if (trigger.getEventDetails().getId().equals(event.getId()))
         {
+            eventDetails = trigger.getEventDetails();
+
             if (eventDetails.getDescription() == null || eventDetails.getDescription().isEmpty())
             {
                 description.setText(R.string.event_details_no_description);
@@ -219,13 +228,46 @@ public class EventDetailsFragment extends Fragment
 
     private void renderEventSummary()
     {
-        icon.setImageResource(R.drawable.ic_local_bar_black_48dp);
+        EventCategory category = EventCategory.valueOf(event.getCategory());
+        switch (category)
+        {
+            case GENERAL:
+                icon.setImageResource(R.drawable.ic_event_black_48dp);
+                break;
+            case EAT_OUT:
+                icon.setImageResource(R.drawable.ic_local_restaurant_black_48dp);
+                break;
+            case DRINKS:
+                icon.setImageResource(R.drawable.ic_local_bar_black_48dp);
+                break;
+            case CAFE:
+                icon.setImageResource(R.drawable.ic_local_cafe_black_48dp);
+                break;
+            case MOVIES:
+                icon.setImageResource(R.drawable.ic_local_movies_black_48dp);
+                break;
+            case OUTDOORS:
+                icon.setImageResource(R.drawable.ic_directions_bike_black_48dp);
+                break;
+            case PARTY:
+                icon.setImageResource(R.drawable.ic_location_city_black_48dp);
+                break;
+            case LOCAL_EVENTS:
+                icon.setImageResource(R.drawable.ic_local_attraction_black_48dp);
+                break;
+            case SHOPPING:
+                icon.setImageResource(R.drawable.ic_local_mall_black_48dp);
+                break;
+            default:
+                icon.setImageResource(R.drawable.ic_event_black_48dp);
+        }
+
+
         title.setText(event.getTitle());
 
         if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty())
         {
             location.setText(R.string.event_details_no_location);
-            locationIcon.setVisibility(View.INVISIBLE);
             location.setOnClickListener(null);
         }
         else
@@ -237,11 +279,26 @@ public class EventDetailsFragment extends Fragment
 
         DateTime start = event.getStartTime();
         DateTime end = event.getEndTime();
-        DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("MMM dd");
+        DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("dd MMM");
         DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("HH:mm");
 
-        startDateTime.setText(start.toString(timeFormatter) + ", " + start.toString(dateFormatter));
-        endDateTime.setText(end.toString(timeFormatter) + ", " + end.toString(dateFormatter));
+        if (start.toString(dateFormatter).equals(end.toString(dateFormatter)))
+        {
+            dateTime.setText(start.toString(timeFormatter) + " - " + end.toString(timeFormatter) + " (" + start.toString(dateFormatter) + ")");
+        }
+        else
+        {
+            dateTime.setText(start.toString(timeFormatter) + " (" + start.toString(dateFormatter) + ") - " + end.toString(timeFormatter) + " (" + end.toString(dateFormatter) + ")");
+        }
+
+        if (event.getType() == Event.Type.PUBLIC)
+        {
+            type.setText(R.string.event_details_type_public);
+        }
+        else
+        {
+            type.setText(R.string.event_details_type_invite_only);
+        }
     }
 
     @Override
@@ -254,7 +311,6 @@ public class EventDetailsFragment extends Fragment
 
         menu.findItem(R.id.action_account).setVisible(false);
         menu.findItem(R.id.action_create_event).setVisible(false);
-        menu.findItem(R.id.action_refresh_events).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_search).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
@@ -276,6 +332,36 @@ public class EventDetailsFragment extends Fragment
         else
         {
             menu.findItem(R.id.action_edit_event).setVisible(false);
+        }
+    }
+
+    @Override
+    public void onClick(View view)
+    {
+        if (view.getId() == R.id.tv_event_details_location)
+        {
+            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                    Uri.parse("http://maps.google.com/maps?daddr=" + event.getLocation().getLatitude() + "," + event.getLocation().getLongitude()));
+            startActivity(intent);
+        }
+        else if (view.getId() == R.id.tv_event_details_description)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.Base_Theme_AppCompat_Light_Dialog_Alert)
+                    .setTitle("Description")
+                    .setMessage(eventDetails.getDescription())
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i)
+                        {
+                            dialogInterface.dismiss();
+                        }
+                    });
+            builder.create().show();
+        }
+        else if (view.getId() == R.id.tv_event_details_date_time)
+        {
+            Snackbar.make(this.getView(), "Set Reminder", Snackbar.LENGTH_LONG).setAction("OK", null).show();
         }
     }
 }

@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import reaper.android.R;
-import reaper.android.app.trigger.CacheCommitTrigger;
+import reaper.android.app.trigger.common.CacheCommitTrigger;
 import reaper.android.app.ui.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.communicator.Communicator;

@@ -30,4 +30,7 @@
     <string name="event_details_no_description">No description</string>
     <string name="event_details_no_attendees">No attendees</string>
     <string name="event_details_no_location">Location not specified</string>
+
+    <string name="event_details_type_public">Public</string>
+    <string name="event_details_type_invite_only">Invite Only</string>
 </resources>

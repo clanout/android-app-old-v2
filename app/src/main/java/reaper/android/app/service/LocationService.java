@@ -15,9 +15,9 @@ import java.util.Locale;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Location;
-import reaper.android.app.trigger.CacheCommitTrigger;
-import reaper.android.app.trigger.GenericErrorTrigger;
-import reaper.android.app.trigger.UserLocationRefreshTrigger;
+import reaper.android.app.trigger.common.CacheCommitTrigger;
+import reaper.android.app.trigger.common.GenericErrorTrigger;
+import reaper.android.app.trigger.user.UserLocationRefreshTrigger;
 import reaper.android.common.cache.Cache;
 
 public class LocationService
@@ -88,6 +88,8 @@ public class LocationService
             location.setLatitude(googleApiLocation.getLatitude());
             location.setZone(zone);
 
+            Log.d("reap3r", "Location updated (Zone = " + zone + "; Co-ordinates = " + location.getLongitude() + "," + location.getLatitude() + ")");
+
             Cache cache = Cache.getInstance();
 
             String oldZone = (String) cache.get(CacheKeys.LOCATION_ZONE);
@@ -108,6 +110,26 @@ public class LocationService
         else
         {
             bus.post(new GenericErrorTrigger(ErrorCode.GOOGLE_API_CLIENT_NOT_CONNECTED, null));
+        }
+
+        apiClient.disconnect();
+    }
+
+    public boolean locationExists()
+    {
+        Double latitude = (Double) Cache.getInstance().get(CacheKeys.LOCATION_LATITUDE);
+        Double longitude = (Double) Cache.getInstance().get(CacheKeys.LOCATION_LONGITUDE);
+        String zone = (String) Cache.getInstance().get(CacheKeys.LOCATION_ZONE);
+
+        Log.d("reap3r", "" + latitude + "," + longitude + "," + zone);
+
+        if (latitude == null || longitude == null || zone == null)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
         }
     }
 }

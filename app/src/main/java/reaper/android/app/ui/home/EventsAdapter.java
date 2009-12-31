@@ -21,8 +21,9 @@ import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.model.Event;
-import reaper.android.app.trigger.EventClickTrigger;
-import reaper.android.app.trigger.RsvpChangeTrigger;
+import reaper.android.app.model.EventCategory;
+import reaper.android.app.trigger.event.EventClickTrigger;
+import reaper.android.app.trigger.event.RsvpChangeTrigger;
 
 public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewHolder>
 {
@@ -82,7 +83,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
     {
         final ViewPager viewPager = holder.viewPager;
         viewPager.setCurrentItem(state.get(position).getPosition());
-        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener()
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
         {
             int previousPagePosition = 0;
 
@@ -180,7 +181,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 @Override
                 public void onClick(View view)
                 {
-                    bus.post(new EventClickTrigger(events.get(getPosition())));
+                    bus.post(new EventClickTrigger(events.get(getAdapterPosition())));
                 }
             });
 
@@ -189,10 +190,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 @Override
                 public void onClick(View view)
                 {
-                    state.set(getPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
-                    viewPager.setCurrentItem(state.get(getPosition()).getPosition());
+                    state.set(getAdapterPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
+                    viewPager.setCurrentItem(state.get(getAdapterPosition()).getPosition());
 
-                    Event event = events.get(getPosition());
+                    Event event = events.get(getAdapterPosition());
                     Event.RSVP oldRsvp = event.getRsvp();
                     event.setRsvp(Event.RSVP.YES);
                     render(event);
@@ -206,10 +207,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 @Override
                 public void onClick(View view)
                 {
-                    state.set(getPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
-                    viewPager.setCurrentItem(state.get(getPosition()).getPosition());
+                    state.set(getAdapterPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
+                    viewPager.setCurrentItem(state.get(getAdapterPosition()).getPosition());
 
-                    Event event = events.get(getPosition());
+                    Event event = events.get(getAdapterPosition());
                     Event.RSVP oldRsvp = event.getRsvp();
                     event.setRsvp(Event.RSVP.MAYBE);
                     render(event);
@@ -223,10 +224,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 @Override
                 public void onClick(View view)
                 {
-                    state.set(getPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
-                    viewPager.setCurrentItem(state.get(getPosition()).getPosition());
+                    state.set(getAdapterPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
+                    viewPager.setCurrentItem(state.get(getAdapterPosition()).getPosition());
 
-                    Event event = events.get(getPosition());
+                    Event event = events.get(getAdapterPosition());
                     Event.RSVP oldRsvp = event.getRsvp();
                     event.setRsvp(Event.RSVP.NO);
                     render(event);
@@ -250,10 +251,49 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             }
 
             // Title
-            title.setText(event.getTitle());
+            if (event.getTitle().length() <= 20)
+            {
+                title.setText(event.getTitle());
+            }
+            else
+            {
+                title.setText(event.getTitle().substring(0, 18) + "...");
+            }
 
             // Icon
-            eventIcon.setImageResource(R.drawable.ic_local_bar_black_36dp);
+            EventCategory category = EventCategory.valueOf(event.getCategory());
+            switch (category)
+            {
+                case GENERAL:
+                    eventIcon.setImageResource(R.drawable.ic_event_black_36dp);
+                    break;
+                case EAT_OUT:
+                    eventIcon.setImageResource(R.drawable.ic_local_restaurant_black_36dp);
+                    break;
+                case DRINKS:
+                    eventIcon.setImageResource(R.drawable.ic_local_bar_black_36dp);
+                    break;
+                case CAFE:
+                    eventIcon.setImageResource(R.drawable.ic_local_cafe_black_36dp);
+                    break;
+                case MOVIES:
+                    eventIcon.setImageResource(R.drawable.ic_local_movies_black_36dp);
+                    break;
+                case OUTDOORS:
+                    eventIcon.setImageResource(R.drawable.ic_directions_bike_black_36dp);
+                    break;
+                case PARTY:
+                    eventIcon.setImageResource(R.drawable.ic_location_city_black_36dp);
+                    break;
+                case LOCAL_EVENTS:
+                    eventIcon.setImageResource(R.drawable.ic_local_attraction_black_36dp);
+                    break;
+                case SHOPPING:
+                    eventIcon.setImageResource(R.drawable.ic_local_mall_black_36dp);
+                    break;
+                default:
+                    eventIcon.setImageResource(R.drawable.ic_event_black_36dp);
+            }
 
             // Date, Time and Location
             DateTime dateTime = event.getStartTime();
@@ -267,7 +307,14 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             }
             else
             {
-                timeLocation.setText(dateTime.toString(timeFormatter) + ", " + event.getLocation().getName());
+                if (event.getLocation().getName().length() <= 23)
+                {
+                    timeLocation.setText(dateTime.toString(timeFormatter) + ", " + event.getLocation().getName());
+                }
+                else
+                {
+                    timeLocation.setText(dateTime.toString(timeFormatter) + ", " + event.getLocation().getName().substring(0, 22) + "..");
+                }
             }
 
             // Friends Attending

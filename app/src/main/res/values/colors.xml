@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Theme -->
-    <!--<color name="primary">#2196F3</color>-->
-    <color name="primary">#673AB7</color>
-    <color name="primary_dark">#512DA8</color>
-    <color name="primary_light">#D1C4E9</color>
+    <color name="primary">#3F51B5</color>
+    <color name="primary_dark">#303F9F</color>
+    <color name="primary_light">#C5CAE9</color>
     <color name="accent">#F44336</color>
     <color name="accent_secondary">#EF9A9A</color>
 
     <!-- Background -->
     <color name="background_default">#FAFAFA</color>
     <color name="background_bar">#E0E0E0</color>
+
+    <!-- Miscellaneous -->
+    <color name="white">#FFFFFF</color>
+    <color name="divider">#FAFAFA</color>
+
+    <!-- Fonts -->
+    <color name="text_title">#AA000000</color>
+    <color name="text_subtitle_light">#AA777777</color>
 </resources>

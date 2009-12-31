@@ -42,10 +42,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:background="@null"
-                android:text="All Events"
+                android:text="Relevance"
                 android:textColor="@color/primary_text_default_material_dark"
                 android:drawableLeft="@drawable/ic_sort_white_24dp"
                 android:drawablePadding="8dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp">
+
+            <ImageButton
+                android:id="@+id/ibtn_home_refresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_refresh"
+                android:background="@null"
+                android:layout_gravity="center_vertical"/>
         </LinearLayout>
 
         <LinearLayout

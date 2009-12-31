@@ -2,10 +2,8 @@ package reaper.android.app.ui.home;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -42,11 +41,11 @@ import reaper.android.app.model.Location;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
-import reaper.android.app.trigger.EventClickTrigger;
-import reaper.android.app.trigger.EventUpdatesFetchTrigger;
-import reaper.android.app.trigger.EventsFetchTrigger;
-import reaper.android.app.trigger.GenericErrorTrigger;
-import reaper.android.app.trigger.RsvpChangeTrigger;
+import reaper.android.app.trigger.common.GenericErrorTrigger;
+import reaper.android.app.trigger.event.EventClickTrigger;
+import reaper.android.app.trigger.event.EventUpdatesFetchTrigger;
+import reaper.android.app.trigger.event.EventsFetchTrigger;
+import reaper.android.app.trigger.event.RsvpChangeTrigger;
 import reaper.android.app.ui.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.cache.Cache;
@@ -77,7 +76,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     private RecyclerView eventList;
     private LinearLayout buttonBar;
     private Button filterButton, sortButton;
-    private MenuItem refresh;
+    private ImageButton refresh;
 
     private EventsAdapter eventsAdapter;
 
@@ -96,8 +95,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("reap3r");
     }
 
     @Nullable
@@ -111,6 +108,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         buttonBar = (LinearLayout) view.findViewById(R.id.ll_home_btn_bar);
         filterButton = (Button) view.findViewById(R.id.btn_home_filter);
         sortButton = (Button) view.findViewById(R.id.btn_home_sort);
+        refresh = (ImageButton) view.findViewById(R.id.ibtn_home_refresh);
 
         return view;
     }
@@ -131,6 +129,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
 
         sortButton.setOnClickListener(this);
         filterButton.setOnClickListener(this);
+        refresh.setOnClickListener(this);
 
         events = new ArrayList<>();
         eventUpdates = new ArrayList<>();
@@ -206,24 +205,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener
             events = eventUpdatesFetchTrigger.getEventUpdates();
             eventUpdates = eventService.getUpdatedEvents();
 
-            Snackbar.make(this.getView(), "New Events", Snackbar.LENGTH_LONG).setAction("Update", new View.OnClickListener()
+            if (refresh != null)
             {
-                @Override
-                public void onClick(View view)
-                {
-                    refreshRecyclerView();
-                }
-            }).show();
-
-//
-//            if (refresh != null)
-//            {
-//                refresh.setVisible(true);
-//            }
-//            else
-//            {
-//                refreshRecyclerView();
-//            }
+                refresh.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                refreshRecyclerView();
+            }
         }
     }
 
@@ -274,7 +263,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     {
         if (refresh != null)
         {
-            refresh.setVisible(false);
+            refresh.setVisibility(View.INVISIBLE);
         }
 
         if (events.size() == 0)
@@ -349,7 +338,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener
 
         menu.findItem(R.id.action_account).setVisible(true);
         menu.findItem(R.id.action_create_event).setVisible(true);
-        menu.findItem(R.id.action_refresh_events).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_search).setVisible(false);
@@ -375,17 +363,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener
                 return true;
             }
         });
-
-        refresh = menu.findItem(R.id.action_refresh_events);
-        refresh.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem)
-            {
-                refreshRecyclerView();
-                return true;
-            }
-        });
     }
 
     @Override
@@ -394,7 +371,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         if (view.getId() == R.id.btn_home_filter)
         {
             PopupMenu filterMenu = new PopupMenu(getActivity(), filterButton);
-            filterMenu.getMenuInflater().inflate(R.menu.popup_filter_menu, filterMenu.getMenu());
+            filterMenu.getMenuInflater().inflate(R.menu.popup_filter, filterMenu.getMenu());
 
             filterMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
             {
@@ -407,8 +384,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
                         filter = Filter.TODAY;
                         refreshRecyclerView();
                     }
-
-                    if (menuItem.getItemId() == R.id.menu_filter_all)
+                    else if (menuItem.getItemId() == R.id.menu_filter_all)
                     {
                         filterButton.setText(menuItem.getTitle().toString());
                         filter = Filter.ALL;
@@ -420,11 +396,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener
 
             filterMenu.show();
         }
-
-        if (view.getId() == R.id.btn_home_sort)
+        else if (view.getId() == R.id.btn_home_sort)
         {
             PopupMenu sortMenu = new PopupMenu(getActivity(), sortButton);
-            sortMenu.getMenuInflater().inflate(R.menu.popup_sort_menu, sortMenu.getMenu());
+            sortMenu.getMenuInflater().inflate(R.menu.popup_sort, sortMenu.getMenu());
 
             sortMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
             {
@@ -437,15 +412,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener
                         sort = Sort.RELEVANCE;
                         refreshRecyclerView();
                     }
-
-                    if (menuItem.getItemId() == R.id.menu_sort_time)
+                    else if (menuItem.getItemId() == R.id.menu_sort_time)
                     {
                         sortButton.setText(menuItem.getTitle().toString());
                         sort = Sort.DATE_TIME;
                         refreshRecyclerView();
                     }
-
-                    if (menuItem.getItemId() == R.id.menu_sort_distance)
+                    else if (menuItem.getItemId() == R.id.menu_sort_distance)
                     {
                         sortButton.setText(menuItem.getTitle().toString());
                         sort = Sort.DISTANCE;
@@ -456,6 +429,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener
             });
 
             sortMenu.show();
+        }
+        else if (view.getId() == R.id.ibtn_home_refresh)
+        {
+            refreshRecyclerView();
         }
     }
 }

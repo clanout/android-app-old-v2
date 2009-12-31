@@ -1,7 +1,5 @@
 package reaper.android.app.service;
 
-import android.util.Log;
-
 import com.squareup.otto.Bus;
 
 import org.joda.time.DateTime;
@@ -26,11 +24,11 @@ import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventAttendeeComparator;
 import reaper.android.app.model.EventDetails;
-import reaper.android.app.trigger.CacheCommitTrigger;
-import reaper.android.app.trigger.EventDetailsFetchTrigger;
-import reaper.android.app.trigger.EventUpdatesFetchTrigger;
-import reaper.android.app.trigger.EventsFetchTrigger;
-import reaper.android.app.trigger.GenericErrorTrigger;
+import reaper.android.app.trigger.common.CacheCommitTrigger;
+import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
+import reaper.android.app.trigger.event.EventUpdatesFetchTrigger;
+import reaper.android.app.trigger.event.EventsFetchTrigger;
+import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.common.cache.Cache;
 import retrofit.Callback;
 import retrofit.RetrofitError;
