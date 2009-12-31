@@ -1,6 +1,7 @@
 package reaper.android.app.root;
 
 import android.app.Application;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,9 +16,11 @@ import com.squareup.otto.ThreadEnforcer;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.trigger.common.CacheCommitTrigger;
+import reaper.android.app.trigger.gcm.GcmregistrationIntentTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshRequestTrigger;
 import reaper.android.common.cache.Cache;
 import reaper.android.common.communicator.Communicator;
+import reaper.android.common.gcm.RegistrationIntentService;
 
 public class Reaper extends Application implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {
@@ -72,6 +75,13 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         {
             googleApiClient.connect();
         }
+    }
+
+    @Subscribe
+    public void onGcmRegistrationIntentTriggerReceived(GcmregistrationIntentTrigger trigger)
+    {
+        Intent intent = new Intent(this, RegistrationIntentService.class);
+        startService(intent);
     }
 
 

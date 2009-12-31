@@ -14,4 +14,7 @@ public class AppConstants
     // Google API
     public static final String GOOGLE_API_KEY = "AIzaSyDBX362r-1isovteBR3tGN3QQtDcQn-jyg";
     public static final String GOOGLE_PLACES_API_URL = "https://maps.googleapis.com/maps/api/place/";
+
+    //GCM
+    public static final String GCM_SENDER_ID = "1014674558116";
 }

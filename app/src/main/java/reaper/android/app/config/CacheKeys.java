@@ -21,4 +21,6 @@ public class CacheKeys
     }
 
     public static final String ACTIVE_FRAGMENT = "active_fragment";
+
+    public static final String GCM_TOKEN = "gcm_token";
 }

@@ -1,32 +1,43 @@
 package reaper.android.app.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import reaper.android.R;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.CacheKeys;
+import reaper.android.app.service.GCMService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.common.CacheCommitTrigger;
+import reaper.android.app.trigger.gcm.GcmRegistrationCompleteTrigger;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.chat.ChatHelper;
 import reaper.android.common.communicator.Communicator;
+import reaper.android.common.gcm.RegistrationIntentService;
 
 public class MainActivity extends AppCompatActivity
 {
     private FragmentManager fragmentManager;
     private Bus bus;
     private UserService userService;
+    private GCMService gcmService;
+
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -40,11 +51,22 @@ public class MainActivity extends AppCompatActivity
 
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
+        gcmService = new GCMService(bus);
 
-        ChatHelper.init(userService.getActiveUserId());
+        if (AppPreferences.get(this, CacheKeys.GCM_TOKEN) == null)
+        {
+            if (checkPlayServices())
+            {
+                gcmService.register();
+            }
+        }
+        else
+        {
+            ChatHelper.init(userService.getActiveUserId());
 
-        fragmentManager = getSupportFragmentManager();
-        FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
+            fragmentManager = getSupportFragmentManager();
+            FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
+        }
     }
 
     @Override
@@ -116,5 +138,42 @@ public class MainActivity extends AppCompatActivity
         {
             bus.post(new BackPressedTrigger(BackstackTags.CHAT));
         }
+    }
+
+    private boolean checkPlayServices()
+    {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS)
+        {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode))
+            {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            }
+            else
+            {
+                Toast.makeText(this, "This device does not support Google Play Services.", Toast.LENGTH_LONG).show();
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    @Subscribe
+    public void onGcmRegistrationComplete(GcmRegistrationCompleteTrigger trigger)
+    {
+        ChatHelper.init(userService.getActiveUserId());
+
+        runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                fragmentManager = getSupportFragmentManager();
+                FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
+            }
+        });
+
     }
 }
