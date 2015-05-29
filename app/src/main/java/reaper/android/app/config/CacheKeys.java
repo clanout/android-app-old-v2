@@ -4,6 +4,7 @@ public class CacheKeys
 {
     public static final String EVENTS = "events";
     public static final String EVENTS_TIMESTAMP = "events_timestamp";
+    public static final String EVENTS_UPDATES = "events_updates";
 
     public static final String EVENT_DETAILS_PREFIX = "event_details_";
 

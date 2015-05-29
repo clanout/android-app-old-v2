@@ -18,14 +18,20 @@ import android.widget.Toast;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import reaper.android.R;
 import reaper.android.app.config.AppConstants;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
 import reaper.android.app.trigger.EventClickTrigger;
+import reaper.android.app.trigger.EventUpdatesFetchTrigger;
 import reaper.android.app.trigger.EventsFetchTrigger;
 import reaper.android.app.trigger.RsvpChangeTrigger;
 import reaper.android.common.cache.Cache;
@@ -36,6 +42,7 @@ public class HomeFragment extends Fragment
     private FragmentManager fragmentManager;
     private Bus bus;
     private EventService eventService;
+    private Timer timer;
 
     // Data
     private List<Event> events;
@@ -74,9 +81,7 @@ public class HomeFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
 
         bus = Communicator.getInstance().getBus();
-
         fragmentManager = getActivity().getSupportFragmentManager();
-
         eventService = new EventService(bus);
 
         filter.setText("All Events");
@@ -96,20 +101,25 @@ public class HomeFragment extends Fragment
 
         bus.register(this);
         eventService.fetchEvents("Bengaluru");
+
+        timer = new Timer();
+        timer.schedule(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                DateTime lastUpdated = (DateTime) Cache.getInstance().get(CacheKeys.EVENTS_TIMESTAMP);
+                eventService.fetchEventUpdates("Bengaluru", lastUpdated);
+            }
+        }, AppConstants.EVENTS_REFRESH_RATE_MILLISECONDS, AppConstants.EVENTS_REFRESH_RATE_MILLISECONDS);
     }
 
     @Override
     public void onPause()
     {
         super.onPause();
+        timer.cancel();
         bus.unregister(this);
-    }
-
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-        Cache.commit(getActivity(), AppConstants.CACHE_FILE);
     }
 
     @Subscribe
@@ -134,6 +144,12 @@ public class HomeFragment extends Fragment
         Event.RSVP rsvp = rsvpChangeTrigger.getRsvp();
 
         Toast.makeText(getActivity(), event.getTitle() + " -> " + String.valueOf(rsvp), Toast.LENGTH_LONG).show();
+    }
+
+    @Subscribe
+    public void onEventUpdatesFetchTrigger(EventUpdatesFetchTrigger eventUpdatesFetchTrigger)
+    {
+        Log.d("reap3r", "Received updated events list");
     }
 
     private void initRecyclerView()

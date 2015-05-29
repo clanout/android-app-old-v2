@@ -1,5 +1,6 @@
 package reaper.android.app.api.core;
 
+import com.fatboyindustrial.gsonjodatime.Converters;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -28,7 +29,7 @@ public class ApiManager
 
     static
     {
-        gson = (new GsonBuilder()).registerTypeAdapter(DateTime.class, new DateTimeParser()).create();
+        gson = (Converters.registerAll(new GsonBuilder())).registerTypeAdapter(DateTime.class, new DateTimeParser()).create();
 
         restAdapter = new RestAdapter.Builder().setClient(new OkClient(new OkHttpClient())).setConverter(new
                 GsonConverter(gson)).setEndpoint(AppConstants.SERVER_URL).build();
