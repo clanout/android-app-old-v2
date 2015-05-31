@@ -8,15 +8,33 @@ public class EventComparator
     {
         private static final double FRIEND_COUNT_COEFF = 0.4;
         private static final double INVITER_COUNT_COEFF = 0.6;
-        private static final double ORGANISER_CONSTANT = 10;
+        private static final double ORGANISER_COEFF = 10;
         private static final double GOING_COEFF = 2;
         private static final double MAYBE_COEFF = 1;
+
+        private String activeUser;
+
+        public Relevance(String activeUser)
+        {
+            this.activeUser = activeUser;
+        }
 
         @Override
         public int compare(Event event, Event event2)
         {
             Double importanceEvent1 = ((FRIEND_COUNT_COEFF * event.getFriendCount()) + (INVITER_COUNT_COEFF * event.getInviterCount())) + getConstant(event);
             Double importanceEvent2 = ((FRIEND_COUNT_COEFF * event2.getFriendCount()) + (INVITER_COUNT_COEFF * event2.getInviterCount())) + getConstant(event2);
+
+            if (event.getOrganizerId().equals(activeUser))
+            {
+                importanceEvent1 += ORGANISER_COEFF;
+            }
+
+            if (event2.getOrganizerId().equals(activeUser))
+            {
+                importanceEvent2 += ORGANISER_COEFF;
+            }
+
             return importanceEvent2.compareTo(importanceEvent1);
         }
 

@@ -125,30 +125,47 @@
         android:orientation="horizontal"
         android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/btn_list_item_event_going"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_gravity="center"
-            android:layout_height="wrap_content"
-            android:text="Going"/>
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal|center_vertical">
 
-        <Button
-            android:id="@+id/btn_list_item_event_maybe"
+            <ImageButton
+                android:id="@+id/btn_list_item_event_going"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_btn_rsvp_going"
+                android:background="@null"/>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_gravity="center"
-            android:layout_height="wrap_content"
-            android:text="Maybe"/>
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal|center_vertical">
 
-        <Button
-            android:id="@+id/btn_list_item_event_not_going"
+            <ImageButton
+                android:id="@+id/btn_list_item_event_maybe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_btn_rsvp_maybe"
+                android:background="@null"/>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_gravity="center"
-            android:layout_height="wrap_content"
-            android:text="Not Going"/>
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal|center_vertical">
 
+            <ImageButton
+                android:id="@+id/btn_list_item_event_not_going"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_btn_rsvp_no"
+                android:background="@null"/>
+        </LinearLayout>
 
     </LinearLayout>
 </android.support.v4.view.ViewPager>

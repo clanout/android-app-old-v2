@@ -1,15 +1,13 @@
 package reaper.android.app.ui.home;
 
-import android.app.ActionBar;
-import android.content.res.Resources;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -156,7 +154,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         private CardView cardView;
         private ImageView eventIcon, rsvpIcon, chatIcon, updatesIcon;
         private TextView title, timeLocation, attendees, date;
-        private Button going, mayBe, notGoing;
+        private ImageButton going, mayBe, notGoing;
 
         public EventViewHolder(View itemView)
         {
@@ -174,9 +172,9 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             timeLocation = (TextView) itemView.findViewById(R.id.tv_list_item_event_time_location);
             attendees = (TextView) itemView.findViewById(R.id.tv_list_item_event_attendees);
             date = (TextView) itemView.findViewById(R.id.tv_list_item_event_date);
-            going = (Button) itemView.findViewById(R.id.btn_list_item_event_going);
-            mayBe = (Button) itemView.findViewById(R.id.btn_list_item_event_maybe);
-            notGoing = (Button) itemView.findViewById(R.id.btn_list_item_event_not_going);
+            going = (ImageButton) itemView.findViewById(R.id.btn_list_item_event_going);
+            mayBe = (ImageButton) itemView.findViewById(R.id.btn_list_item_event_maybe);
+            notGoing = (ImageButton) itemView.findViewById(R.id.btn_list_item_event_not_going);
 
             cardView.setOnClickListener(new View.OnClickListener()
             {

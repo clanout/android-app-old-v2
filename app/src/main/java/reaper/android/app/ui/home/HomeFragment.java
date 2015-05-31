@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,6 +38,7 @@ import reaper.android.app.model.EventComparator;
 import reaper.android.app.model.Location;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
+import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.EventClickTrigger;
 import reaper.android.app.trigger.EventUpdatesFetchTrigger;
 import reaper.android.app.trigger.EventsFetchTrigger;
@@ -57,6 +57,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     private Filter filter;
 
     // Services
+    private UserService userService;
     private EventService eventService;
     private LocationService locationService;
 
@@ -117,6 +118,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
 
         bus = Communicator.getInstance().getBus();
         fragmentManager = getActivity().getSupportFragmentManager();
+        userService = new UserService(bus);
         eventService = new EventService(bus);
         locationService = new LocationService(bus);
 
@@ -174,14 +176,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     @Subscribe
     public void onEventUpdatesFetchTrigger(EventUpdatesFetchTrigger eventUpdatesFetchTrigger)
     {
-        if (eventUpdatesFetchTrigger.getEventUpdates() == null)
+        if (eventUpdatesFetchTrigger.getEventUpdates() != null)
         {
-            Log.d("reap3r", "No event updates");
-        }
-        else
-        {
-            Log.d("reap3r", "Received updated events list");
-
             events = eventUpdatesFetchTrigger.getEventUpdates();
             eventUpdates = eventService.getUpdatedEvents();
 
@@ -256,7 +252,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         switch (sort)
         {
             case RELEVANCE:
-                Collections.sort(events, new EventComparator.Relevance());
+                Collections.sort(events, new EventComparator.Relevance(userService.getActiveUser()));
                 break;
             case DATE_TIME:
                 Collections.sort(events, new EventComparator.DateTime());
