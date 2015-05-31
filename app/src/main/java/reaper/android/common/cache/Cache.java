@@ -67,7 +67,7 @@ public class Cache implements Serializable
         }
         catch (IOException | ClassNotFoundException e)
         {
-            Log.d("[reaper] cache", "Unable to initialize cache [" + e.getMessage() + "]");
+            Log.d("[reap3r] cache", "Unable to initialize cache [" + e.getMessage() + "]");
             e.printStackTrace();
         }
     }

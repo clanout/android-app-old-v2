@@ -70,6 +70,7 @@ public class LauncherActivity extends FragmentActivity implements GoogleApiClien
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
     // GOOGLE API CLIENT CALLBACKS

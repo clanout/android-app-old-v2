@@ -44,6 +44,8 @@ import reaper.android.app.trigger.EventUpdatesFetchTrigger;
 import reaper.android.app.trigger.EventsFetchTrigger;
 import reaper.android.app.trigger.GenericErrorTrigger;
 import reaper.android.app.trigger.RsvpChangeTrigger;
+import reaper.android.app.ui.details.EventDetailsFragment;
+import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.cache.Cache;
 import reaper.android.common.communicator.Communicator;
 
@@ -105,9 +107,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         filterButton = (Button) view.findViewById(R.id.btn_home_filter);
         sortButton = (Button) view.findViewById(R.id.btn_home_sort);
 
-        sortButton.setOnClickListener(this);
-        filterButton.setOnClickListener(this);
-
         return view;
     }
 
@@ -124,6 +123,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener
 
         filterButton.setText("All Events");
         sortButton.setText("Relevance");
+
+        sortButton.setOnClickListener(this);
+        filterButton.setOnClickListener(this);
 
         events = new ArrayList<>();
         eventUpdates = new ArrayList<>();
@@ -196,13 +198,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     public void onEventClickTrigger(EventClickTrigger eventClickTrigger)
     {
         Event event = eventClickTrigger.getEvent();
-        Toast.makeText(getActivity(), event.getTitle(), Toast.LENGTH_LONG).show();
 
-        if (eventUpdates.remove(event.getId()))
-        {
-            Cache.getInstance().put(CacheKeys.EVENTS_UPDATES, eventUpdates);
-            refreshRecyclerView();
-        }
+        EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("event", event);
+        eventDetailsFragment.setArguments(bundle);
+
+        FragmentUtils.changeFragment(fragmentManager, eventDetailsFragment);
     }
 
     @Subscribe
@@ -287,14 +289,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         }
     }
 
-    public void setNormalView()
+    private void setNormalView()
     {
         noEventsMessage.setVisibility(View.GONE);
         eventList.setVisibility(View.VISIBLE);
         buttonBar.setVisibility(View.VISIBLE);
     }
 
-    public void setNoEventsView()
+    private void setNoEventsView()
     {
         noEventsMessage.setText("No events to show");
         noEventsMessage.setVisibility(View.VISIBLE);

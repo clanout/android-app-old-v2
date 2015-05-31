@@ -7,21 +7,27 @@ import com.squareup.otto.Bus;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import reaper.android.app.api.core.ApiManager;
 import reaper.android.app.api.event.EventApi;
+import reaper.android.app.api.event.request.EventDetailsApiRequest;
 import reaper.android.app.api.event.request.EventUpdatesApiRequest;
 import reaper.android.app.api.event.request.EventsApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
+import reaper.android.app.api.event.response.EventDetailsApiResponse;
 import reaper.android.app.api.event.response.EventUpdatesApiResponse;
 import reaper.android.app.api.event.response.EventsApiResponse;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
+import reaper.android.app.model.EventAttendeeComparator;
+import reaper.android.app.model.EventDetails;
 import reaper.android.app.trigger.CacheCommitTrigger;
+import reaper.android.app.trigger.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.EventUpdatesFetchTrigger;
 import reaper.android.app.trigger.EventsFetchTrigger;
 import reaper.android.app.trigger.GenericErrorTrigger;
@@ -33,11 +39,13 @@ import retrofit.client.Response;
 public class EventService
 {
     private Bus bus;
+    private UserService userService;
     private EventApi eventApi;
 
     public EventService(Bus bus)
     {
         this.bus = bus;
+        userService = new UserService(bus);
         eventApi = ApiManager.getInstance().getApi(EventApi.class);
     }
 
@@ -54,28 +62,55 @@ public class EventService
         }
         else
         {
-            fetchEventsFromCloud(zone);
+            EventsApiRequest request = new EventsApiRequest(zone);
+            eventApi.getEvents(request, new Callback<EventsApiResponse>()
+            {
+                @Override
+                public void success(EventsApiResponse eventsApiResponse, Response response)
+                {
+                    List<Event> events = updateEventsCache(eventsApiResponse.getEvents(), false);
+                    bus.post(new EventsFetchTrigger(events));
+                }
+
+                @Override
+                public void failure(RetrofitError retrofitError)
+                {
+                    bus.post(new GenericErrorTrigger(ErrorCode.EVENTS_FETCH_FAILURE, retrofitError));
+                }
+            });
         }
     }
 
-    public void fetchEventsFromCloud(String zone)
+    public void fetchEventDetails(String eventId)
     {
-        EventsApiRequest request = new EventsApiRequest(zone);
-        eventApi.getEvents(request, new Callback<EventsApiResponse>()
+        Cache cache = Cache.getInstance();
+        EventDetails eventDetails = (EventDetails) cache.get(CacheKeys.eventDetails(eventId));
+        List<String> updatedEvents = getUpdatedEvents();
+        if (eventDetails != null && !updatedEvents.contains(eventId))
         {
-            @Override
-            public void success(EventsApiResponse eventsApiResponse, Response response)
+            bus.post(new EventDetailsFetchTrigger(eventDetails));
+        }
+        else
+        {
+            EventDetailsApiRequest request = new EventDetailsApiRequest(eventId);
+            eventApi.getEventDetails(request, new Callback<EventDetailsApiResponse>()
             {
-                List<Event> events = updateEventsCache(eventsApiResponse.getEvents(), false);
-                bus.post(new EventsFetchTrigger(events));
-            }
+                @Override
+                public void success(EventDetailsApiResponse eventDetailsApiResponse, Response response)
+                {
+                    EventDetails eventDetails = eventDetailsApiResponse.getEventDetails();
+                    Collections.sort(eventDetails.getAttendees(), new EventAttendeeComparator(userService.getActiveUser()));
+                    updateCacheFor(eventDetails);
+                    bus.post(new EventDetailsFetchTrigger(eventDetails));
+                }
 
-            @Override
-            public void failure(RetrofitError retrofitError)
-            {
-                bus.post(new GenericErrorTrigger(ErrorCode.EVENTS_FETCH_FAILURE, retrofitError));
-            }
-        });
+                @Override
+                public void failure(RetrofitError error)
+                {
+                    bus.post(new GenericErrorTrigger(ErrorCode.EVENT_DETAILS_FETCH_FAILURE, error));
+                }
+            });
+        }
     }
 
     public void fetchEventUpdates(String zone, DateTime lastUpdated)
@@ -150,6 +185,13 @@ public class EventService
             bus.post(new CacheCommitTrigger());
         }
 
+    }
+
+    public void updateCacheFor(EventDetails eventDetails)
+    {
+        Cache cache = Cache.getInstance();
+        cache.put(CacheKeys.eventDetails(eventDetails.getId()), eventDetails);
+        bus.post(new CacheCommitTrigger());
     }
 
     private List<Event> updateEventsCache(List<Event> events, boolean append)

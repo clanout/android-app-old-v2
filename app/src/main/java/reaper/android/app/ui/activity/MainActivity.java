@@ -26,6 +26,13 @@ public class MainActivity extends FragmentActivity
     }
 
     @Override
+    protected void onStart()
+    {
+        super.onStart();
+        getActionBar().setTitle("reap3r");
+    }
+
+    @Override
     protected void onStop()
     {
         super.onStop();
