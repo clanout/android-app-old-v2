@@ -4,22 +4,22 @@ import reaper.android.app.model.Event;
 
 public class RsvpChangeTrigger
 {
-    private Event event;
-    private Event.RSVP rsvp;
+    private Event updatedEvent;
+    private Event.RSVP oldRsvp;
 
-    public RsvpChangeTrigger(Event event, Event.RSVP rsvp)
+    public RsvpChangeTrigger(Event updatedEvent, Event.RSVP oldRsvp)
     {
-        this.event = event;
-        this.rsvp = rsvp;
+        this.updatedEvent = updatedEvent;
+        this.oldRsvp = oldRsvp;
     }
 
-    public Event getEvent()
+    public Event getUpdatedEvent()
     {
-        return event;
+        return updatedEvent;
     }
 
-    public Event.RSVP getRsvp()
+    public Event.RSVP getOldRsvp()
     {
-        return rsvp;
+        return oldRsvp;
     }
 }

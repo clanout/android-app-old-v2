@@ -13,13 +13,14 @@
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/rv_event_list">
+            android:id="@+id/rv_home_events"
+            android:background="#eeeeee">
         </android.support.v7.widget.RecyclerView>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/tv_event_list_empty"
+            android:id="@+id/tv_home_no_events"
             android:gravity="center_vertical|center_horizontal"/>
     </LinearLayout>
 
@@ -27,19 +28,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:id="@+id/ll_event_list_btn_bar">
+        android:id="@+id/ll_home_btn_bar">
 
         <Button
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:id="@+id/btn_event_list_filter"/>
+            android:id="@+id/btn_home_filter"/>
 
         <Button
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:id="@+id/btn_event_list_sort"/>
+            android:id="@+id/btn_home_sort"/>
     </LinearLayout>
 
 </LinearLayout>

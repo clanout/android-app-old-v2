@@ -15,11 +15,13 @@ import reaper.android.app.api.core.ApiManager;
 import reaper.android.app.api.event.EventApi;
 import reaper.android.app.api.event.request.EventUpdatesApiRequest;
 import reaper.android.app.api.event.request.EventsApiRequest;
+import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
 import reaper.android.app.api.event.response.EventUpdatesApiResponse;
 import reaper.android.app.api.event.response.EventsApiResponse;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
+import reaper.android.app.trigger.CacheCommitTrigger;
 import reaper.android.app.trigger.EventUpdatesFetchTrigger;
 import reaper.android.app.trigger.EventsFetchTrigger;
 import reaper.android.app.trigger.GenericErrorTrigger;
@@ -84,8 +86,16 @@ public class EventService
             @Override
             public void success(EventUpdatesApiResponse eventUpdatesApiResponse, Response response)
             {
-                List<Event> events = updateEventsCache(eventUpdatesApiResponse.getUpdates(), true);
-                bus.post(new EventUpdatesFetchTrigger(events));
+                List<Event> updates = eventUpdatesApiResponse.getUpdates();
+                if (updates.size() > 0)
+                {
+                    List<Event> events = updateEventsCache(updates, true);
+                    bus.post(new EventUpdatesFetchTrigger(events));
+                }
+                else
+                {
+                    bus.post(new EventUpdatesFetchTrigger(null));
+                }
             }
 
             @Override
@@ -94,6 +104,52 @@ public class EventService
                 bus.post(new GenericErrorTrigger(ErrorCode.EVENT_UPDATES_FETCH_FAILURE, error));
             }
         });
+    }
+
+    public List<String> getUpdatedEvents()
+    {
+        Cache cache = Cache.getInstance();
+        List<String> updatedEvents = (List<String>) cache.get(CacheKeys.EVENTS_UPDATES);
+        if (updatedEvents == null)
+        {
+            updatedEvents = new ArrayList<>();
+        }
+
+        return updatedEvents;
+    }
+
+    public void updateRsvp(final Event updatedEvent, final Event.RSVP oldRsvp)
+    {
+        RsvpUpdateApiRequest request = new RsvpUpdateApiRequest(updatedEvent.getId(), updatedEvent.getRsvp());
+        eventApi.updateRsvp(request, new Callback<Response>()
+        {
+            @Override
+            public void success(Response response, Response response2)
+            {
+                updateCacheFor(updatedEvent);
+            }
+
+            @Override
+            public void failure(RetrofitError error)
+            {
+                updatedEvent.setRsvp(oldRsvp);
+                updateCacheFor(updatedEvent);
+                bus.post(new GenericErrorTrigger(ErrorCode.RSVP_UPDATE_FAILURE, error));
+            }
+        });
+    }
+
+    public void updateCacheFor(Event event)
+    {
+        Cache cache = Cache.getInstance();
+        Map<String, Event> eventMap = (Map<String, Event>) cache.get(CacheKeys.EVENTS);
+        if (eventMap != null)
+        {
+            eventMap.put(event.getId(), event);
+            cache.put(CacheKeys.EVENTS, eventMap);
+            bus.post(new CacheCommitTrigger());
+        }
+
     }
 
     private List<Event> updateEventsCache(List<Event> events, boolean append)
@@ -125,11 +181,13 @@ public class EventService
                 eventMap.put(eventId, event);
             }
 
-            DateTime time = DateTime.now().minusSeconds(10);
+            DateTime time = DateTime.now();
 
             cache.put(CacheKeys.EVENTS, eventMap);
             cache.put(CacheKeys.EVENTS_UPDATES, eventUpdates);
             cache.put(CacheKeys.EVENTS_TIMESTAMP, time);
+
+            bus.post(new CacheCommitTrigger());
 
             return new ArrayList<>(eventMap.values());
         }
@@ -141,11 +199,13 @@ public class EventService
                 eventMap.put(event.getId(), event);
             }
 
-            DateTime time = DateTime.now().minusSeconds(10);
+            DateTime time = DateTime.now();
 
             cache.put(CacheKeys.EVENTS, eventMap);
             cache.put(CacheKeys.EVENTS_UPDATES, new ArrayList<String>());
             cache.put(CacheKeys.EVENTS_TIMESTAMP, time);
+
+            bus.post(new CacheCommitTrigger());
 
             return events;
         }

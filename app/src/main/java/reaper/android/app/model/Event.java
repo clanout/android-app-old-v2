@@ -2,6 +2,8 @@ package reaper.android.app.model;
 
 import org.joda.time.DateTime;
 
+import java.util.Comparator;
+
 import reaper.android.app.model.core.Model;
 
 public class Event implements Model

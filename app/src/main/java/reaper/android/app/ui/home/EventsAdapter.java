@@ -1,5 +1,6 @@
 package reaper.android.app.ui.home;
 
+import android.app.ActionBar;
 import android.content.res.Resources;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
@@ -71,9 +72,9 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         //Perhaps the first most crucial part. The ViewPager loses its width information when it is put
         //inside a RecyclerView. It needs to be explicitly resized, in this case to the width of the
         //screen. The height must be provided as a fixed value.
-        DisplayMetrics displayMetrics = Resources.getSystem().getDisplayMetrics();
-        v.getLayoutParams().width = displayMetrics.widthPixels;
-        v.requestLayout();
+//        DisplayMetrics displayMetrics = Resources.getSystem().getDisplayMetrics();
+//        v.getLayoutParams().width = displayMetrics.widthPixels;
+//        v.requestLayout();
 
         EventViewHolder vh = new EventViewHolder(v);
         return vh;
@@ -83,18 +84,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
     public void onBindViewHolder(final EventViewHolder holder, final int position)
     {
         final ViewPager viewPager = holder.viewPager;
-        final Event event = events.get(position);
-        boolean isUpdated = false;
-        boolean isChatUpdated = false;
-        if (updates.contains(event.getId()))
-        {
-            isUpdated = true;
-        }
-        if (chatUpdates.contains(event.getId()))
-        {
-            isChatUpdated = true;
-        }
-
         viewPager.setCurrentItem(state.get(position).getPosition());
         viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener()
         {
@@ -133,78 +122,8 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             }
         });
 
-        // Title
-        holder.title.setText(event.getTitle());
-
-        // Icon
-        holder.eventIcon.setImageResource(R.drawable.ic_local_bar_black_36dp);
-
-        // Date, Time and Location
-        DateTime dateTime = event.getStartTime();
-        DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("MMM dd");
-        DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("HH:mm");
-
-        holder.date.setText(dateTime.toString(dateFormatter));
-        if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty())
-        {
-            holder.timeLocation.setText(dateTime.toString(timeFormatter) + ", (Location Not Specified)");
-        }
-        else
-        {
-            holder.timeLocation.setText(dateTime.toString(timeFormatter) + ", " + event.getLocation().getName());
-        }
-
-        // Friends Attending
-        if (event.getFriendCount() == 0)
-        {
-            holder.attendees.setText("No friends are going");
-        }
-        else if (event.getFriendCount() == 1)
-        {
-            holder.attendees.setText("1 friend is going");
-        }
-        else
-        {
-            holder.attendees.setText(event.getFriendCount() + " friends are going");
-        }
-
-        // RSVP
-        if (event.getRsvp() == Event.RSVP.YES)
-        {
-            holder.rsvpIcon.setVisibility(View.VISIBLE);
-            holder.rsvpIcon.setImageResource(R.drawable.ic_check_circle_black_24dp);
-        }
-        else if (event.getRsvp() == Event.RSVP.MAYBE)
-        {
-            holder.rsvpIcon.setVisibility(View.VISIBLE);
-            holder.rsvpIcon.setImageResource(R.drawable.ic_help_black_24dp);
-        }
-        else
-        {
-            holder.rsvpIcon.setVisibility(View.INVISIBLE);
-        }
-
-        // Chat Updates
-        if (isChatUpdated)
-        {
-            holder.chatIcon.setVisibility(View.VISIBLE);
-            holder.chatIcon.setImageResource(R.drawable.ic_chat_black_18dp);
-        }
-        else
-        {
-            holder.chatIcon.setVisibility(View.INVISIBLE);
-        }
-
-        // Event Updates
-        if (isUpdated)
-        {
-            holder.updatesIcon.setVisibility(View.VISIBLE);
-            holder.updatesIcon.setImageResource(R.drawable.ic_info_black_18dp);
-        }
-        else
-        {
-            holder.updatesIcon.setVisibility(View.INVISIBLE);
-        }
+        Event event = events.get(position);
+        holder.render(event);
     }
 
     @Override
@@ -273,15 +192,15 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 @Override
                 public void onClick(View view)
                 {
-                    rsvpIcon.setVisibility(View.VISIBLE);
-                    rsvpIcon.setImageResource(R.drawable.ic_check_circle_black_24dp);
-
                     state.set(getPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
                     viewPager.setCurrentItem(state.get(getPosition()).getPosition());
 
                     Event event = events.get(getPosition());
+                    Event.RSVP oldRsvp = event.getRsvp();
                     event.setRsvp(Event.RSVP.YES);
-                    bus.post(new RsvpChangeTrigger(event, Event.RSVP.YES));
+                    render(event);
+
+                    bus.post(new RsvpChangeTrigger(event, oldRsvp));
                 }
             });
 
@@ -290,15 +209,15 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 @Override
                 public void onClick(View view)
                 {
-                    rsvpIcon.setVisibility(View.VISIBLE);
-                    rsvpIcon.setImageResource(R.drawable.ic_help_black_24dp);
-
                     state.set(getPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
                     viewPager.setCurrentItem(state.get(getPosition()).getPosition());
 
                     Event event = events.get(getPosition());
+                    Event.RSVP oldRsvp = event.getRsvp();
                     event.setRsvp(Event.RSVP.MAYBE);
-                    bus.post(new RsvpChangeTrigger(event, Event.RSVP.MAYBE));
+                    render(event);
+
+                    bus.post(new RsvpChangeTrigger(event, oldRsvp));
                 }
             });
 
@@ -307,16 +226,112 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 @Override
                 public void onClick(View view)
                 {
-                    rsvpIcon.setVisibility(View.INVISIBLE);
-
                     state.set(getPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
                     viewPager.setCurrentItem(state.get(getPosition()).getPosition());
 
                     Event event = events.get(getPosition());
+                    Event.RSVP oldRsvp = event.getRsvp();
                     event.setRsvp(Event.RSVP.NO);
-                    bus.post(new RsvpChangeTrigger(event, Event.RSVP.NO));
+                    render(event);
+
+                    bus.post(new RsvpChangeTrigger(event, oldRsvp));
                 }
             });
+        }
+
+        public void render(Event event)
+        {
+            boolean isUpdated = false;
+            boolean isChatUpdated = false;
+            if (updates.contains(event.getId()))
+            {
+                isUpdated = true;
+            }
+            if (chatUpdates.contains(event.getId()))
+            {
+                isChatUpdated = true;
+            }
+
+            // Title
+            title.setText(event.getTitle());
+
+            // Icon
+            eventIcon.setImageResource(R.drawable.ic_local_bar_black_36dp);
+
+            // Date, Time and Location
+            DateTime dateTime = event.getStartTime();
+            DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("MMM dd");
+            DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("HH:mm");
+
+            date.setText(dateTime.toString(dateFormatter));
+            if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty())
+            {
+                timeLocation.setText(dateTime.toString(timeFormatter) + ", (Location Not Specified)");
+            }
+            else
+            {
+                timeLocation.setText(dateTime.toString(timeFormatter) + ", " + event.getLocation().getName());
+            }
+
+            // Friends Attending
+            if (event.getFriendCount() == 0)
+            {
+                attendees.setText("No friends are going");
+            }
+            else if (event.getFriendCount() == 1)
+            {
+                attendees.setText("1 friend is going");
+            }
+            else
+            {
+                attendees.setText(event.getFriendCount() + " friends are going");
+            }
+
+            // RSVP
+            if (event.getRsvp() == Event.RSVP.YES)
+            {
+                rsvpIcon.setVisibility(View.VISIBLE);
+                rsvpIcon.setImageResource(R.drawable.ic_check_circle_black_24dp);
+            }
+            else if (event.getRsvp() == Event.RSVP.MAYBE)
+            {
+                rsvpIcon.setVisibility(View.VISIBLE);
+                rsvpIcon.setImageResource(R.drawable.ic_help_black_24dp);
+            }
+            else
+            {
+                rsvpIcon.setVisibility(View.INVISIBLE);
+            }
+
+            if (event.getRsvp() == Event.RSVP.YES || event.getRsvp() == Event.RSVP.MAYBE)
+            {
+                // Chat Updates
+                if (isChatUpdated)
+                {
+                    chatIcon.setVisibility(View.VISIBLE);
+                    chatIcon.setImageResource(R.drawable.ic_chat_black_18dp);
+                }
+                else
+                {
+                    chatIcon.setVisibility(View.INVISIBLE);
+                }
+
+                // Event Updates
+                if (isUpdated)
+                {
+                    updatesIcon.setVisibility(View.VISIBLE);
+                    updatesIcon.setImageResource(R.drawable.ic_info_black_18dp);
+                }
+                else
+                {
+                    updatesIcon.setVisibility(View.INVISIBLE);
+                }
+            }
+            else
+            {
+                chatIcon.setVisibility(View.INVISIBLE);
+                updatesIcon.setVisibility(View.INVISIBLE);
+            }
         }
     }
 }
