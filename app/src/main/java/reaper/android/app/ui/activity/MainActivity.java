@@ -22,7 +22,7 @@ public class MainActivity extends FragmentActivity
         setContentView(R.layout.activity_main);
 
         fragmentManager = getSupportFragmentManager();
-        FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
+        FragmentUtils.changeFragment(fragmentManager, new HomeFragment(), false);
     }
 
     @Override

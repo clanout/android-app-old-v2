@@ -65,10 +65,11 @@ public class Cache implements Serializable
                 instance = new Cache();
             }
         }
-        catch (IOException | ClassNotFoundException e)
+        catch (Exception e)
         {
             Log.d("[reap3r] cache", "Unable to initialize cache [" + e.getMessage() + "]");
             e.printStackTrace();
+            instance = new Cache();
         }
     }
 

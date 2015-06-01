@@ -44,7 +44,7 @@ import reaper.android.app.trigger.EventUpdatesFetchTrigger;
 import reaper.android.app.trigger.EventsFetchTrigger;
 import reaper.android.app.trigger.GenericErrorTrigger;
 import reaper.android.app.trigger.RsvpChangeTrigger;
-import reaper.android.app.ui.details.EventDetailsFragment;
+import reaper.android.app.ui.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.cache.Cache;
 import reaper.android.common.communicator.Communicator;
@@ -156,6 +156,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener
                 eventService.fetchEventUpdates(userLocation.getZone(), lastUpdated);
             }
         }, AppConstants.EVENTS_REFRESH_RATE_MILLISECONDS, AppConstants.EVENTS_REFRESH_RATE_MILLISECONDS);
+
+        FragmentUtils.clearBackStack(fragmentManager);
     }
 
     @Override
@@ -198,13 +200,22 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     public void onEventClickTrigger(EventClickTrigger eventClickTrigger)
     {
         Event event = eventClickTrigger.getEvent();
+        int activePosition = events.indexOf(event);
 
-        EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
+        EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
         Bundle bundle = new Bundle();
-        bundle.putSerializable("event", event);
-        eventDetailsFragment.setArguments(bundle);
+        bundle.putSerializable("events", (ArrayList<Event>) events);
+        bundle.putInt("active_event", activePosition);
+        eventDetailsContainerFragment.setArguments(bundle);
 
-        FragmentUtils.changeFragment(fragmentManager, eventDetailsFragment);
+        FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment, true);
+
+//        EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
+//        Bundle bundle = new Bundle();
+//        bundle.putSerializable("event", event);
+//        eventDetailsFragment.setArguments(bundle);
+//
+//        FragmentUtils.changeFragment(fragmentManager, eventDetailsFragment, true);
     }
 
     @Subscribe
@@ -308,6 +319,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         super.onCreateOptionsMenu(menu, inflater);
+
+        menu.clear();
         inflater.inflate(R.menu.action_button, menu);
 
         menu.findItem(R.id.abbAccounts).setVisible(true);

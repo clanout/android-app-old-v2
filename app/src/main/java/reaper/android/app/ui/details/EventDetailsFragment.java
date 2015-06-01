@@ -7,11 +7,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -28,6 +32,7 @@ import reaper.android.app.model.EventDetails;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.EventDetailsFetchTrigger;
+import reaper.android.app.ui.util.EventUtils;
 import reaper.android.common.communicator.Communicator;
 
 public class EventDetailsFragment extends Fragment
@@ -85,15 +90,8 @@ public class EventDetailsFragment extends Fragment
     {
         super.onActivityCreated(savedInstanceState);
 
-        if (savedInstanceState != null)
-        {
-            event = (Event) savedInstanceState.get("event");
-        }
-        else
-        {
-            Bundle bundle = getArguments();
-            event = (Event) bundle.get("event");
-        }
+        Bundle bundle = getArguments();
+        event = (Event) bundle.get("event");
 
         if (event == null)
         {
@@ -118,6 +116,24 @@ public class EventDetailsFragment extends Fragment
             rsvp.setText("Maybe");
         }
 
+        if (EventUtils.canInviteFriends(event))
+        {
+            invite.setEnabled(true);
+        }
+        else
+        {
+            invite.setEnabled(false);
+        }
+
+        if (EventUtils.canViewChat(event))
+        {
+            chat.setEnabled(true);
+        }
+        else
+        {
+            chat.setEnabled(false);
+        }
+
 //        invite.setOnClickListener(this);
 //        rsvp.setOnClickListener(this);
 //        chat.setOnClickListener(this);
@@ -126,13 +142,6 @@ public class EventDetailsFragment extends Fragment
         renderEventSummary();
 
         initRecyclerView();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable("event", event);
     }
 
     @Override
@@ -156,16 +165,19 @@ public class EventDetailsFragment extends Fragment
     {
         eventDetails = trigger.getEventDetails();
 
-        if (eventDetails.getDescription() == null || eventDetails.getDescription().isEmpty())
+        if (eventDetails.getId().equals(event.getId()))
         {
-            description.setText("No Description");
-        }
-        else
-        {
-            description.setText(eventDetails.getDescription());
-        }
+            if (eventDetails.getDescription() == null || eventDetails.getDescription().isEmpty())
+            {
+                description.setText("No Description");
+            }
+            else
+            {
+                description.setText(eventDetails.getDescription());
+            }
 
-        refreshRecyclerView();
+            refreshRecyclerView();
+        }
     }
 
     private void initRecyclerView()
@@ -235,5 +247,40 @@ public class EventDetailsFragment extends Fragment
 
         startDateTime.setText(start.toString(timeFormatter) + ", " + start.toString(dateFormatter));
         endDateTime.setText(end.toString(timeFormatter) + ", " + end.toString(dateFormatter));
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        menu.clear();
+        inflater.inflate(R.menu.action_button, menu);
+
+        menu.findItem(R.id.abbAccounts).setVisible(false);
+        menu.findItem(R.id.abbCreateEvent).setVisible(false);
+        menu.findItem(R.id.abbRefresh).setVisible(false);
+        menu.findItem(R.id.abbHome).setVisible(false);
+        menu.findItem(R.id.abbSearch).setVisible(false);
+        menu.findItem(R.id.abbFinaliseEvent).setVisible(false);
+        menu.findItem(R.id.abbDeleteEvent).setVisible(false);
+
+        if (EventUtils.canEdit(event, userService.getActiveUser()))
+        {
+            menu.findItem(R.id.abbEditEvent).setVisible(true);
+            menu.findItem(R.id.abbEditEvent).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+            {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem)
+                {
+                    Toast.makeText(getActivity(), "Edit Page", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
+        }
+        else
+        {
+            menu.findItem(R.id.abbEditEvent).setVisible(false);
+        }
     }
 }

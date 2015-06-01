@@ -56,7 +56,7 @@ public class EventService
         DateTime lastUpdated = (DateTime) cache.get(CacheKeys.EVENTS_TIMESTAMP);
         if (eventMap != null && lastUpdated != null)
         {
-            Log.d("reap3r", "From Cache (Last Updated : " + lastUpdated.toString() + ")");
+            //Log.d("reap3r", "Events from cache (Last Updated : " + lastUpdated.toString() + ")");
             List<Event> events = new ArrayList<>(eventMap.values());
             bus.post(new EventsFetchTrigger(events));
         }
@@ -86,8 +86,10 @@ public class EventService
         Cache cache = Cache.getInstance();
         EventDetails eventDetails = (EventDetails) cache.get(CacheKeys.eventDetails(eventId));
         List<String> updatedEvents = getUpdatedEvents();
+
         if (eventDetails != null && !updatedEvents.contains(eventId))
         {
+            //Log.d("reap3r", "EventDetails (event_id = " + eventId + ") from cache");
             bus.post(new EventDetailsFetchTrigger(eventDetails));
         }
         else
@@ -190,7 +192,13 @@ public class EventService
     public void updateCacheFor(EventDetails eventDetails)
     {
         Cache cache = Cache.getInstance();
+
         cache.put(CacheKeys.eventDetails(eventDetails.getId()), eventDetails);
+
+        List<String> updatedEvents = getUpdatedEvents();
+        updatedEvents.remove(eventDetails.getId());
+        cache.put(CacheKeys.EVENTS_UPDATES, updatedEvents);
+
         bus.post(new CacheCommitTrigger());
     }
 
