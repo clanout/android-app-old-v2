@@ -15,7 +15,6 @@ public class RsvpUpdateApiRequest extends ApiRequest
 
     public RsvpUpdateApiRequest(String eventId, Event.RSVP rsvp)
     {
-        super("event/rsvp");
         this.eventId = eventId;
         this.rsvp = rsvp;
     }

@@ -11,7 +11,6 @@ public class EventsApiRequest extends ApiRequest
 
     public EventsApiRequest(String zone)
     {
-        super("event/summary");
         this.zone = zone;
     }
 }

@@ -43,7 +43,8 @@
                     android:textSize="22sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp"
-                    android:id="@+id/tv_event_details_title"/>
+                    android:id="@+id/tv_event_details_title"
+                    />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -110,7 +111,8 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+        android:background="#FAFAFA">
 
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
@@ -123,31 +125,4 @@
             android:gravity="center_vertical|center_horizontal"
             android:id="@+id/tv_event_details_no_attendees"/>
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:id="@+id/btn_event_details_rsvp"/>
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:id="@+id/btn_event_details_invite"
-            android:text="Invite"/>
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:id="@+id/btn_event_details_chat"
-            android:text="Chat"/>
-    </LinearLayout>
-
 </LinearLayout>

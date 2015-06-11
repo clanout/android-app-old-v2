@@ -2,8 +2,10 @@ package reaper.android.app.ui.home;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,6 +25,7 @@ import com.squareup.otto.Subscribe;
 
 import org.joda.time.DateTime;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -78,12 +81,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener
 
     private EventsAdapter eventsAdapter;
 
-    private static enum Sort
+    private static enum Sort implements Serializable
     {
         RELEVANCE, DATE_TIME, DISTANCE
     }
 
-    private static enum Filter
+    private static enum Filter implements Serializable
     {
         TODAY, ALL
     }
@@ -93,6 +96,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("reap3r");
     }
 
     @Nullable
@@ -121,8 +126,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         eventService = new EventService(bus);
         locationService = new LocationService(bus);
 
-        filterButton.setText("All Events");
-        sortButton.setText("Relevance");
+        filterButton.setText(R.string.filter_all);
+        sortButton.setText(R.string.sort_relevance);
 
         sortButton.setOnClickListener(this);
         filterButton.setOnClickListener(this);
@@ -132,10 +137,26 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         chatUpdates = new ArrayList<>();
         userLocation = locationService.getUserLocation();
 
-        sort = Sort.RELEVANCE;
-        filter = Filter.ALL;
+        if (savedInstanceState != null)
+        {
+            sort = (Sort) savedInstanceState.getSerializable("sort");
+            filter = (Filter) savedInstanceState.getSerializable("filter");
+        }
+        else
+        {
+            sort = Sort.RELEVANCE;
+            filter = Filter.ALL;
+        }
 
         initRecyclerView();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("sort", sort);
+        outState.putSerializable("filter", filter);
     }
 
     @Override
@@ -185,14 +206,24 @@ public class HomeFragment extends Fragment implements View.OnClickListener
             events = eventUpdatesFetchTrigger.getEventUpdates();
             eventUpdates = eventService.getUpdatedEvents();
 
-            if (refresh != null)
+            Snackbar.make(this.getView(), "New Events", Snackbar.LENGTH_LONG).setAction("Update", new View.OnClickListener()
             {
-                refresh.setVisible(true);
-            }
-            else
-            {
-                refreshRecyclerView();
-            }
+                @Override
+                public void onClick(View view)
+                {
+                    refreshRecyclerView();
+                }
+            }).show();
+
+//
+//            if (refresh != null)
+//            {
+//                refresh.setVisible(true);
+//            }
+//            else
+//            {
+//                refreshRecyclerView();
+//            }
         }
     }
 
@@ -209,13 +240,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         eventDetailsContainerFragment.setArguments(bundle);
 
         FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment, true);
-
-//        EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
-//        Bundle bundle = new Bundle();
-//        bundle.putSerializable("event", event);
-//        eventDetailsFragment.setArguments(bundle);
-//
-//        FragmentUtils.changeFragment(fragmentManager, eventDetailsFragment, true);
     }
 
     @Subscribe
@@ -234,7 +258,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
 
         if (code == ErrorCode.RSVP_UPDATE_FAILURE)
         {
-            Toast.makeText(getActivity(), "RSVP update failed. Please try again Later", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.message_rsvp_update_failure, Toast.LENGTH_LONG).show();
             refreshRecyclerView();
         }
     }
@@ -309,7 +333,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
 
     private void setNoEventsView()
     {
-        noEventsMessage.setText("No events to show");
+        noEventsMessage.setText(R.string.home_no_events);
         noEventsMessage.setVisibility(View.VISIBLE);
         eventList.setVisibility(View.GONE);
         buttonBar.setVisibility(View.GONE);
@@ -323,16 +347,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         menu.clear();
         inflater.inflate(R.menu.action_button, menu);
 
-        menu.findItem(R.id.abbAccounts).setVisible(true);
-        menu.findItem(R.id.abbCreateEvent).setVisible(true);
-        menu.findItem(R.id.abbRefresh).setVisible(false);
-        menu.findItem(R.id.abbHome).setVisible(false);
-        menu.findItem(R.id.abbEditEvent).setVisible(false);
-        menu.findItem(R.id.abbSearch).setVisible(false);
-        menu.findItem(R.id.abbFinaliseEvent).setVisible(false);
-        menu.findItem(R.id.abbDeleteEvent).setVisible(false);
+        menu.findItem(R.id.action_account).setVisible(true);
+        menu.findItem(R.id.action_create_event).setVisible(true);
+        menu.findItem(R.id.action_refresh_events).setVisible(false);
+        menu.findItem(R.id.action_home).setVisible(false);
+        menu.findItem(R.id.action_edit_event).setVisible(false);
+        menu.findItem(R.id.action_search).setVisible(false);
+        menu.findItem(R.id.action_finalize_event).setVisible(false);
+        menu.findItem(R.id.action_delete_event).setVisible(false);
 
-        menu.findItem(R.id.abbAccounts).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        menu.findItem(R.id.action_account).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem)
@@ -342,7 +366,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
             }
         });
 
-        menu.findItem(R.id.abbCreateEvent).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        menu.findItem(R.id.action_create_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem)
@@ -352,7 +376,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
             }
         });
 
-        refresh = menu.findItem(R.id.abbRefresh);
+        refresh = menu.findItem(R.id.action_refresh_events);
         refresh.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {
             @Override
@@ -377,14 +401,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem)
                 {
-                    if (menuItem.getItemId() == R.id.itemToday)
+                    if (menuItem.getItemId() == R.id.menu_filter_today)
                     {
                         filterButton.setText(menuItem.getTitle().toString());
                         filter = Filter.TODAY;
                         refreshRecyclerView();
                     }
 
-                    if (menuItem.getItemId() == R.id.itemAllEvents)
+                    if (menuItem.getItemId() == R.id.menu_filter_all)
                     {
                         filterButton.setText(menuItem.getTitle().toString());
                         filter = Filter.ALL;
@@ -407,21 +431,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem)
                 {
-                    if (menuItem.getItemId() == R.id.itemRelevance)
+                    if (menuItem.getItemId() == R.id.menu_sort_relevance)
                     {
                         sortButton.setText(menuItem.getTitle().toString());
                         sort = Sort.RELEVANCE;
                         refreshRecyclerView();
                     }
 
-                    if (menuItem.getItemId() == R.id.itemStartTime)
+                    if (menuItem.getItemId() == R.id.menu_sort_time)
                     {
                         sortButton.setText(menuItem.getTitle().toString());
                         sort = Sort.DATE_TIME;
                         refreshRecyclerView();
                     }
 
-                    if (menuItem.getItemId() == R.id.itemDistance)
+                    if (menuItem.getItemId() == R.id.menu_sort_distance)
                     {
                         sortButton.setText(menuItem.getTitle().toString());
                         sort = Sort.DISTANCE;

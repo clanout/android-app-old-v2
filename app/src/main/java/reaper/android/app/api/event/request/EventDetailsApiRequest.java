@@ -11,7 +11,6 @@ public class EventDetailsApiRequest extends ApiRequest
 
     public EventDetailsApiRequest(String eventId)
     {
-        super("event/details");
         this.eventId = eventId;
     }
 }

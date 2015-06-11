@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -165,7 +164,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
 
             cardView = (CardView) itemView.findViewById(R.id.cv_list_item_event);
             eventIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_event_icon);
-            rsvpIcon = (ImageView) itemView.findViewById(R.id.iv_list_litem_event_rsvp);
+            rsvpIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_event_rsvp);
             chatIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_event_chat);
             updatesIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_event_updates);
             title = (TextView) itemView.findViewById(R.id.tv_list_item_event_title);

@@ -2,15 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/itemRelevance"
-        android:title="Relevance"/>
+        android:id="@+id/menu_sort_relevance"
+        android:title="@string/sort_relevance"/>
 
     <item
-        android:id="@+id/itemStartTime"
-        android:title="Start Time"/>
+        android:id="@+id/menu_sort_time"
+        android:title="@string/sort_time"/>
 
     <item
-        android:id="@+id/itemDistance"
-        android:title="Distance"/>
+        android:id="@+id/menu_sort_distance"
+        android:title="@string/sort_distance"/>
 
 </menu>

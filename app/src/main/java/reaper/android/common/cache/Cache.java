@@ -6,13 +6,12 @@ import android.util.Log;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 
-public class Cache implements Serializable
+public class Cache implements Serializable, Cloneable
 {
     private static Cache instance;
 
@@ -73,18 +72,21 @@ public class Cache implements Serializable
         }
     }
 
-    public static void commit(Context context, String cacheFile)
+    public synchronized static void commit(Context context, String cacheFile)
     {
         try
         {
             File file = context.getFileStreamPath(cacheFile);
-            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file, false));
-            outputStream.writeObject(instance);
+
+            FileOutputStream fileOutputStream = new FileOutputStream(file, false);
+
+            ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);
+            outputStream.writeObject(instance.clone());
             outputStream.close();
 
             Log.d("[reap3r] cache", "Cache committed");
         }
-        catch (IOException e)
+        catch (Exception e)
         {
             Log.d("[reap3r] cache", "Unable to commit cache [" + e.getMessage() + "]");
             e.printStackTrace();

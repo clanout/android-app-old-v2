@@ -33,11 +33,18 @@ public class EventDetailsContainerFragment extends Fragment
 
     private PagerAdapter pagerAdapter;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_event_details_container, container, false);
+
         viewPager = (ViewPager) view.findViewById(R.id.vp_event_details_container);
         return view;
     }
@@ -69,26 +76,26 @@ public class EventDetailsContainerFragment extends Fragment
 
         pagerAdapter = new EventDetailsPagerAdapter(getChildFragmentManager(), events);
         viewPager.setAdapter(pagerAdapter);
-        viewPager.setPageTransformer(true, new ViewPagerTransformer(ViewPagerTransformer.TransformType.ZOOM));
+//        viewPager.setPageTransformer(true, new ViewPagerTransformer(ViewPagerTransformer.TransformType.ZOOM));
 
         viewPager.setCurrentItem(activePosition);
 
-        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener()
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
         {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+            public void onPageScrolled(int i, float v, int i2)
             {
 
             }
 
             @Override
-            public void onPageSelected(int position)
+            public void onPageSelected(int i)
             {
-                activePosition = position;
+                activePosition = i;
             }
 
             @Override
-            public void onPageScrollStateChanged(int state)
+            public void onPageScrollStateChanged(int i)
             {
 
             }

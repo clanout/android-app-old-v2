@@ -28,19 +28,43 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="@color/primary"
         android:id="@+id/ll_home_btn_bar">
 
-        <Button
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:id="@+id/btn_home_filter"/>
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp">
 
-        <Button
+            <Button
+                android:id="@+id/btn_home_sort"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:text="All Events"
+                android:textColor="@color/primary_text_default_material_dark"
+                android:drawableLeft="@drawable/ic_sort_white_24dp"
+                android:drawablePadding="8dp"/>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:id="@+id/btn_home_sort"/>
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:gravity="right">
+
+            <Button
+                android:id="@+id/btn_home_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:text="All Events"
+                android:textColor="@color/primary_text_default_material_dark"
+                android:drawableRight="@drawable/ic_filter_list_white_24dp"
+                android:drawablePadding="8dp"/>
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

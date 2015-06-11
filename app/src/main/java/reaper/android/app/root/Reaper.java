@@ -26,11 +26,12 @@ public class Reaper extends Application
     protected void init()
     {
         Log.d("reap3r", "App init");
+
         bus = new Bus(ThreadEnforcer.ANY);
+        bus.register(this);
+
         Communicator.init(bus);
         Cache.init(this, AppConstants.CACHE_FILE);
-
-        bus.register(this);
     }
 
     @Subscribe

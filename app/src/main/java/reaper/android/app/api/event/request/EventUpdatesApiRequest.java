@@ -16,7 +16,6 @@ public class EventUpdatesApiRequest extends ApiRequest
 
     public EventUpdatesApiRequest(String zone, DateTime lastUpdated)
     {
-        super("event/updates");
         this.zone = zone;
         this.lastUpdated = lastUpdated;
     }

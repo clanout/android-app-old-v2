@@ -51,7 +51,6 @@ public class EventDetailsFragment extends Fragment
     // UI Elements
     private ImageView icon, locationIcon;
     private TextView title, description, location, startDateTime, endDateTime;
-    private Button rsvp, invite, chat;
     private RecyclerView attendeeList;
     private TextView noAttendeeMessage;
 
@@ -76,9 +75,6 @@ public class EventDetailsFragment extends Fragment
         location = (TextView) view.findViewById(R.id.tv_event_details_location);
         startDateTime = (TextView) view.findViewById(R.id.tv_event_eetails_start_date_time);
         endDateTime = (TextView) view.findViewById(R.id.tv_event_details_end_date_time);
-        rsvp = (Button) view.findViewById(R.id.btn_event_details_rsvp);
-        invite = (Button) view.findViewById(R.id.btn_event_details_invite);
-        chat = (Button) view.findViewById(R.id.btn_event_details_chat);
         attendeeList = (RecyclerView) view.findViewById(R.id.rv_event_details_attendees);
         noAttendeeMessage = (TextView) view.findViewById(R.id.tv_event_details_no_attendees);
 
@@ -103,36 +99,36 @@ public class EventDetailsFragment extends Fragment
         userService = new UserService(bus);
         eventService = new EventService(bus);
 
-        if (event.getRsvp() == Event.RSVP.YES)
-        {
-            rsvp.setText("Going");
-        }
-        else if (event.getRsvp() == Event.RSVP.NO)
-        {
-            rsvp.setText("Not Going");
-        }
-        else if (event.getRsvp() == Event.RSVP.MAYBE)
-        {
-            rsvp.setText("Maybe");
-        }
-
-        if (EventUtils.canInviteFriends(event))
-        {
-            invite.setEnabled(true);
-        }
-        else
-        {
-            invite.setEnabled(false);
-        }
-
-        if (EventUtils.canViewChat(event))
-        {
-            chat.setEnabled(true);
-        }
-        else
-        {
-            chat.setEnabled(false);
-        }
+//        if (event.getRsvp() == Event.RSVP.YES)
+//        {
+//            rsvp.setText(R.string.rsvp_yes);
+//        }
+//        else if (event.getRsvp() == Event.RSVP.NO)
+//        {
+//            rsvp.setText(R.string.rsvp_maybe);
+//        }
+//        else if (event.getRsvp() == Event.RSVP.MAYBE)
+//        {
+//            rsvp.setText(R.string.rsvp_no);
+//        }
+//
+//        if (EventUtils.canInviteFriends(event))
+//        {
+//            invite.setEnabled(true);
+//        }
+//        else
+//        {
+//            invite.setEnabled(false);
+//        }
+//
+//        if (EventUtils.canViewChat(event))
+//        {
+//            chat.setEnabled(true);
+//        }
+//        else
+//        {
+//            chat.setEnabled(false);
+//        }
 
 //        invite.setOnClickListener(this);
 //        rsvp.setOnClickListener(this);
@@ -169,7 +165,7 @@ public class EventDetailsFragment extends Fragment
         {
             if (eventDetails.getDescription() == null || eventDetails.getDescription().isEmpty())
             {
-                description.setText("No Description");
+                description.setText(R.string.event_details_no_description);
             }
             else
             {
@@ -216,7 +212,7 @@ public class EventDetailsFragment extends Fragment
 
     private void setNoAttendeeView()
     {
-        noAttendeeMessage.setText("No users to show");
+        noAttendeeMessage.setText(R.string.event_details_no_attendees);
         noAttendeeMessage.setVisibility(View.VISIBLE);
         attendeeList.setVisibility(View.GONE);
     }
@@ -224,12 +220,11 @@ public class EventDetailsFragment extends Fragment
     private void renderEventSummary()
     {
         icon.setImageResource(R.drawable.ic_local_bar_black_48dp);
-
         title.setText(event.getTitle());
 
         if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty())
         {
-            location.setText("Location Not Specified");
+            location.setText(R.string.event_details_no_location);
             locationIcon.setVisibility(View.INVISIBLE);
             location.setOnClickListener(null);
         }
@@ -257,30 +252,30 @@ public class EventDetailsFragment extends Fragment
         menu.clear();
         inflater.inflate(R.menu.action_button, menu);
 
-        menu.findItem(R.id.abbAccounts).setVisible(false);
-        menu.findItem(R.id.abbCreateEvent).setVisible(false);
-        menu.findItem(R.id.abbRefresh).setVisible(false);
-        menu.findItem(R.id.abbHome).setVisible(false);
-        menu.findItem(R.id.abbSearch).setVisible(false);
-        menu.findItem(R.id.abbFinaliseEvent).setVisible(false);
-        menu.findItem(R.id.abbDeleteEvent).setVisible(false);
+        menu.findItem(R.id.action_account).setVisible(false);
+        menu.findItem(R.id.action_create_event).setVisible(false);
+        menu.findItem(R.id.action_refresh_events).setVisible(false);
+        menu.findItem(R.id.action_home).setVisible(false);
+        menu.findItem(R.id.action_search).setVisible(false);
+        menu.findItem(R.id.action_finalize_event).setVisible(false);
+        menu.findItem(R.id.action_delete_event).setVisible(false);
 
         if (EventUtils.canEdit(event, userService.getActiveUser()))
         {
-            menu.findItem(R.id.abbEditEvent).setVisible(true);
-            menu.findItem(R.id.abbEditEvent).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+            menu.findItem(R.id.action_edit_event).setVisible(true);
+            menu.findItem(R.id.action_edit_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
             {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem)
                 {
-                    Toast.makeText(getActivity(), "Edit Page", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Edit Event (" + event.getTitle() + ")", Toast.LENGTH_SHORT).show();
                     return true;
                 }
             });
         }
         else
         {
-            menu.findItem(R.id.abbEditEvent).setVisible(false);
+            menu.findItem(R.id.action_edit_event).setVisible(false);
         }
     }
 }

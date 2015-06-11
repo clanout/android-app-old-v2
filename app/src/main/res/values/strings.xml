@@ -1,3 +1,33 @@
 <resources>
     <string name="app_name">reap3r</string>
+
+    <!-- RSVP -->
+    <string name="rsvp_yes">Going</string>
+    <string name="rsvp_maybe">Maybe</string>
+    <string name="rsvp_no">Not Going</string>
+
+    <!-- Action Bar -->
+    <string name="action_refresh_events">Refresh Events</string>
+    <string name="action_create_event">Create Event</string>
+    <string name="action_account">Account</string>
+    <string name="action_search">Search Friends</string>
+    <string name="action_home">Home</string>
+    <string name="action_edit_event">Edit Event</string>
+    <string name="action_finalize_event">Finalize Event</string>
+    <string name="action_delete_event">Delete Event</string>
+
+    <!-- Home Fragment -->
+    <string name="filter_today">Today</string>
+    <string name="filter_all">All Events</string>
+
+    <string name="sort_relevance">Relevance</string>
+    <string name="sort_time">Start Time</string>
+    <string name="sort_distance">Distance</string>
+
+    <string name="home_no_events">No events to show</string>
+
+    <!-- Event Details Fragment -->
+    <string name="event_details_no_description">No description</string>
+    <string name="event_details_no_attendees">No attendees</string>
+    <string name="event_details_no_location">Location not specified</string>
 </resources>

@@ -163,6 +163,7 @@ public class EventService
             @Override
             public void success(Response response, Response response2)
             {
+                Cache.getInstance().remove(CacheKeys.eventDetails(updatedEvent.getId()));
                 updateCacheFor(updatedEvent);
             }
 

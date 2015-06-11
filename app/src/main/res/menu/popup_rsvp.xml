@@ -2,14 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/itemGoing"
-        android:title="Going"/>
+        android:id="@+id/menu_rsvp_yes"
+        android:title="@string/rsvp_yes"/>
 
     <item
-        android:id="@+id/itemMaybe"
-        android:title="Maybe"/>
+        android:id="@+id/menu_rsvp_maybe"
+        android:title="@string/rsvp_maybe"/>
 
     <item
-        android:id="@+id/itemNotGoing"
-        android:title="Not Going"/>
+        android:id="@+id/menu_rsvp_no"
+        android:title="@string/rsvp_no"/>
 </menu>

@@ -2,6 +2,7 @@ package reaper.android.app.config;
 
 public enum ErrorCode
 {
+    INVALID_SESSION,
     EVENTS_FETCH_FAILURE,
     EVENT_UPDATES_FETCH_FAILURE,
     GOOGLE_API_CLIENT_NOT_CONNECTED,

@@ -2,8 +2,9 @@ package reaper.android.app.ui.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
 import reaper.android.R;
 import reaper.android.app.trigger.CacheCommitTrigger;
@@ -11,7 +12,7 @@ import reaper.android.app.ui.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.communicator.Communicator;
 
-public class MainActivity extends FragmentActivity
+public class MainActivity extends AppCompatActivity
 {
     private FragmentManager fragmentManager;
 
@@ -21,6 +22,9 @@ public class MainActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         fragmentManager = getSupportFragmentManager();
         FragmentUtils.changeFragment(fragmentManager, new HomeFragment(), false);
     }
@@ -29,7 +33,7 @@ public class MainActivity extends FragmentActivity
     protected void onStart()
     {
         super.onStart();
-        getActionBar().setTitle("reap3r");
+        getSupportActionBar().setTitle("reap3r");
     }
 
     @Override

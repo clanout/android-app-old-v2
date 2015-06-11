@@ -1,69 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:tools="http://schemas.android.com/tools"
-      xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/abbRefresh"
+        android:id="@+id/action_refresh_events"
         android:icon="@drawable/ic_action_refresh"
-        android:showAsAction="always"
-        android:title="Refresh Events"
+        android:title="@string/action_refresh_events"
         android:orderInCategory="0"
-        tools:ignore="AppCompatResource"/>
+        app:showAsAction="always"/>
 
     <item
-        android:id="@+id/abbCreateEvent"
+        android:id="@+id/action_create_event"
         android:icon="@drawable/ic_action_new"
-        android:showAsAction="always"
-        android:title="Create Event"
+        android:title="@string/action_create_event"
         android:orderInCategory="1"
-        tools:ignore="AppCompatResource"/>
+        app:showAsAction="always"/>
 
     <item
-        android:id="@+id/abbAccounts"
+        android:id="@+id/action_account"
         android:icon="@drawable/ic_action_accounts"
-        android:showAsAction="always"
-        tools:ignore="AppCompatResource"
+        android:title="@string/action_account"
         android:orderInCategory="2"
-        android:title="Accounts"/>
+        app:showAsAction="always"/>
 
     <item
-        android:id="@+id/abbSearch"
+        android:id="@+id/action_search"
         android:icon="@drawable/ic_action_search"
-        android:showAsAction="always"
-        android:title="Search"
+        android:title="@string/action_search"
         android:orderInCategory="3"
-        android:actionViewClass="android.widget.SearchView"
-        tools:ignore="AppCompatResource"/>
+        app:showAsAction="always"
+        android:actionViewClass="android.widget.SearchView"/>
 
     <item
-        android:id="@+id/abbHome"
+        android:id="@+id/action_home"
         android:icon="@drawable/ic_action_event"
-        android:showAsAction="ifRoom"
-        android:title="Home"
+        android:title="@string/action_home"
         android:orderInCategory="4"
-        tools:ignore="AppCompatResource"/>
+        app:showAsAction="always"/>
 
     <item
-        android:id="@+id/abbEditEvent"
+        android:id="@+id/action_edit_event"
         android:icon="@drawable/ic_action_edit"
-        android:showAsAction="always"
-        android:title="Edit Event"
+        android:title="@string/action_edit_event"
         android:orderInCategory="5"
-        tools:ignore="AppCompatResource"/>
+        app:showAsAction="always"/>
 
     <item
-        android:id="@+id/abbFinaliseEvent"
+        android:id="@+id/action_finalize_event"
         android:icon="@drawable/ic_action_secure"
-        android:showAsAction="always"
-        android:title="Finalise Event"
+        android:title="@string/action_finalize_event"
         android:orderInCategory="6"
-        tools:ignore="AppCompatResource"/>
+        app:showAsAction="always"/>
 
     <item
-        android:id="@+id/abbDeleteEvent"
+        android:id="@+id/action_delete_event"
         android:icon="@drawable/ic_action_discard"
-        android:showAsAction="always"
-        android:title="Delete Event"
+        android:title="@string/action_delete_event"
         android:orderInCategory="7"
-        tools:ignore="AppCompatResource"/>
+        app:showAsAction="always"/>
 </menu>

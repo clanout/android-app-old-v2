@@ -14,8 +14,15 @@ import com.google.gson.Gson;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.ErrorCode;
+import reaper.android.app.service.AuthService;
 import reaper.android.app.service.LocationService;
+import reaper.android.app.trigger.GenericErrorTrigger;
+import reaper.android.app.trigger.SessionValidatedTrigger;
 import reaper.android.app.trigger.UserLocationRefreshTrigger;
+import reaper.android.common.cache.AppPreferences;
+import reaper.android.common.cache.Cache;
 import reaper.android.common.communicator.Communicator;
 
 public class LauncherActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
@@ -24,6 +31,7 @@ public class LauncherActivity extends FragmentActivity implements GoogleApiClien
     private GoogleApiClient googleApiClient;
 
     // Services
+    private AuthService authService;
     private LocationService locationService;
 
     // UI Elements
@@ -37,6 +45,7 @@ public class LauncherActivity extends FragmentActivity implements GoogleApiClien
         bus = Communicator.getInstance().getBus();
         bus.register(this);
 
+        authService = new AuthService(bus);
         locationService = new LocationService(bus);
 
         googleApiClient = new GoogleApiClient.Builder(this)
@@ -45,9 +54,15 @@ public class LauncherActivity extends FragmentActivity implements GoogleApiClien
                 .addApi(LocationServices.API)
                 .build();
 
-        progressDialog = ProgressDialog.show(this, "Welcome", "Fetching your current location...");
+        // Dummy Session initialization
+        if (AppPreferences.get(this, "SESSION_COOKIE") == null)
+        {
+            AppPreferences.set(this, "SESSION_COOKIE", "dummy_session_cookie");
+        }
 
-        googleApiClient.connect();
+        String sessionCookie = AppPreferences.get(this, "SESSION_COOKIE");
+        Log.d("reap3r", "Session Cookie : " + sessionCookie);
+        authService.validateSession(sessionCookie);
     }
 
     @Override
@@ -59,6 +74,27 @@ public class LauncherActivity extends FragmentActivity implements GoogleApiClien
             googleApiClient.disconnect();
         }
         bus.unregister(this);
+    }
+
+    @Subscribe
+    public void onSessionValidatedTrigger(SessionValidatedTrigger trigger)
+    {
+        Log.d("reap3r", "Session validated");
+
+        Cache.getInstance().put(CacheKeys.SESSION_COOKIE, trigger.getValidatedSessionCookie());
+
+        progressDialog = ProgressDialog.show(this, "Welcome", "Fetching your current location...");
+
+        googleApiClient.connect();
+    }
+
+    @Subscribe
+    public void onGenericErrorTrigger(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.INVALID_SESSION)
+        {
+            Log.d("reap3r", "Session invalid. Proceed to authentication");
+        }
     }
 
     @Subscribe

@@ -1,11 +1,11 @@
-package reaper.android.app.ui.details;
+package reaper.android.app.ui.util;
 
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
 public class ViewPagerTransformer implements ViewPager.PageTransformer
 {
-    static enum TransformType
+    public static enum TransformType
     {
         FLOW,
         DEPTH,
@@ -13,11 +13,11 @@ public class ViewPagerTransformer implements ViewPager.PageTransformer
         SLIDE_OVER
     }
 
-    private final TransformType mTransformType;
+    private final TransformType transformType;
 
     public ViewPagerTransformer(TransformType transformType)
     {
-        mTransformType = transformType;
+        this.transformType = transformType;
     }
 
     private static final float MIN_SCALE_DEPTH = 0.75f;
@@ -33,7 +33,7 @@ public class ViewPagerTransformer implements ViewPager.PageTransformer
         final float scale;
         final float translationX;
 
-        switch (mTransformType)
+        switch (transformType)
         {
             case FLOW:
                 page.setRotationY(position * -30f);

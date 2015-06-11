@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/itemToday"
-        android:title="Only Today"/>
+        android:id="@+id/menu_filter_today"
+        android:title="@string/filter_today"/>
 
     <item
-        android:id="@+id/itemAllEvents"
-        android:title="All Events"/>
+        android:id="@+id/menu_filter_all"
+        android:title="@string/filter_all"/>
 
 </menu>

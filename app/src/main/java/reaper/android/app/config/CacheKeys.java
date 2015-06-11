@@ -2,6 +2,8 @@ package reaper.android.app.config;
 
 public class CacheKeys
 {
+    public static final String SESSION_COOKIE = "session_cookie";
+
     public static final String EVENTS = "events";
     public static final String EVENTS_TIMESTAMP = "events_timestamp";
     public static final String EVENTS_UPDATES = "events_updates";
