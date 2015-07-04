@@ -3,8 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/reap3r.iml" filepath="$PROJECT_DIR$/reap3r.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reaper.iml" filepath="$PROJECT_DIR$/reaper.iml" />
     </modules>
   </component>
 </project>
-

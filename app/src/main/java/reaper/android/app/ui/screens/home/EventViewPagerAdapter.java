@@ -1,4 +1,4 @@
-package reaper.android.app.ui.home;
+package reaper.android.app.ui.screens.home;
 
 import android.support.v4.view.PagerAdapter;
 import android.view.View;

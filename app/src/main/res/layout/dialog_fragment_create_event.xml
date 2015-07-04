@@ -6,6 +6,19 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/et_dialog_fragment_create_event_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:hint="Event Title"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginTop="15dp"
@@ -25,7 +38,8 @@
                 android:layout_margin="15dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:gravity="center_horizontal"
+                android:id="@+id/ll_dialog_fragment_create_event_general">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -44,7 +58,8 @@
                 android:layout_margin="15dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:gravity="center_horizontal"
+                android:id="@+id/ll_dialog_fragment_create_event_eat_out">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -63,7 +78,8 @@
                 android:layout_margin="15dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:gravity="center_horizontal"
+                android:id="@+id/ll_dialog_fragment_create_event_drinks">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -89,7 +105,8 @@
                 android:layout_margin="15dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:gravity="center_horizontal"
+                android:id="@+id/ll_dialog_fragment_create_event_cafe">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -108,7 +125,8 @@
                 android:layout_margin="15dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:gravity="center_horizontal"
+                android:id="@+id/ll_dialog_fragment_create_event_movie">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -127,7 +145,8 @@
                 android:layout_margin="15dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:gravity="center_horizontal"
+                android:id="@+id/ll_dialog_fragment_create_event_outdoors">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -153,7 +172,8 @@
                 android:layout_margin="15dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:gravity="center_horizontal"
+                android:id="@+id/ll_dialog_fragment_create_event_party">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -172,7 +192,8 @@
                 android:layout_margin="15dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:gravity="center_horizontal"
+                android:id="@+id/ll_dialog_fragment_create_event_local_events">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -191,7 +212,8 @@
                 android:layout_margin="15dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:gravity="center_horizontal"
+                android:id="@+id/ll_dialog_fragment_create_event_shopping">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -214,7 +236,7 @@
         android:gravity="center_horizontal">
 
         <CheckBox
-            android:id="@+id/checkBox"
+            android:id="@+id/cb_dialog_fragment_create_event"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Invite Only Event"/>

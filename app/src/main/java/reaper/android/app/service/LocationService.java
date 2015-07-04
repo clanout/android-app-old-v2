@@ -32,9 +32,9 @@ public class LocationService
     public Location getUserLocation()
     {
 //        Cache cache = Cache.getInstance();
-//        Double latitude = (Double) cache.get(CacheKeys.LOCATION_LATITUDE);
-//        Double longitude = (Double) cache.get(CacheKeys.LOCATION_LONGITUDE);
-//        String zone = (String) cache.get(CacheKeys.LOCATION_ZONE);
+//        Double latitude = (Double) cache.get(CacheKeys.USER_LOCATION_LATITUDE);
+//        Double longitude = (Double) cache.get(CacheKeys.USER_LOCATION_LONGITUDE);
+//        String zone = (String) cache.get(CacheKeys.USER_LOCATION_ZONE);
 //
 //        if (latitude == null || longitude == null || zone == null)
 //        {
@@ -92,7 +92,7 @@ public class LocationService
 
             Cache cache = Cache.getInstance();
 
-            String oldZone = (String) cache.get(CacheKeys.LOCATION_ZONE);
+            String oldZone = (String) cache.get(CacheKeys.USER_LOCATION_ZONE);
 
             // Invalidate Events cache if the zone changes
             if (!zone.equalsIgnoreCase(oldZone))
@@ -100,9 +100,9 @@ public class LocationService
                 cache.remove(CacheKeys.EVENTS);
             }
 
-            cache.put(CacheKeys.LOCATION_LATITUDE, location.getLatitude());
-            cache.put(CacheKeys.LOCATION_LONGITUDE, location.getLongitude());
-            cache.put(CacheKeys.LOCATION_ZONE, location.getZone());
+            cache.put(CacheKeys.USER_LOCATION_LATITUDE, location.getLatitude());
+            cache.put(CacheKeys.USER_LOCATION_LONGITUDE, location.getLongitude());
+            cache.put(CacheKeys.USER_LOCATION_ZONE, location.getZone());
 
             bus.post(new UserLocationRefreshTrigger(location));
             bus.post(new CacheCommitTrigger());
@@ -117,9 +117,9 @@ public class LocationService
 
     public boolean locationExists()
     {
-        Double latitude = (Double) Cache.getInstance().get(CacheKeys.LOCATION_LATITUDE);
-        Double longitude = (Double) Cache.getInstance().get(CacheKeys.LOCATION_LONGITUDE);
-        String zone = (String) Cache.getInstance().get(CacheKeys.LOCATION_ZONE);
+        Double latitude = (Double) Cache.getInstance().get(CacheKeys.USER_LOCATION_LATITUDE);
+        Double longitude = (Double) Cache.getInstance().get(CacheKeys.USER_LOCATION_LONGITUDE);
+        String zone = (String) Cache.getInstance().get(CacheKeys.USER_LOCATION_ZONE);
 
         Log.d("reap3r", "" + latitude + "," + longitude + "," + zone);
 

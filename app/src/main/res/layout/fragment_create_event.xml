@@ -27,7 +27,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_edit_event_title"
+                    android:id="@+id/tv_create_event_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
@@ -39,7 +39,7 @@
                     />
 
                 <TextView
-                    android:id="@+id/tv_edit_event_type"
+                    android:id="@+id/tv_create_event_type"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
@@ -56,7 +56,7 @@
                 android:layout_marginRight="16dp">
 
                 <ImageView
-                    android:id="@+id/iv_edit_event_icon"
+                    android:id="@+id/iv_create_event_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_local_attraction_black_48dp"/>
@@ -78,13 +78,13 @@
             android:layout_marginTop="8dp">
 
             <ImageView
-                android:id="@+id/iv_edit_event_location"
+                android:id="@+id/iv_create_event_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_place_black_18dp"/>
 
-            <AutoCompleteTextView
-                android:id="@+id/actv_edit_event_location"
+            <TextView
+                android:id="@+id/actv_create_event_location"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
@@ -116,7 +116,7 @@
                 android:src="@drawable/ic_access_time_black_18dp"/>
 
             <TextView
-                android:id="@+id/tv_edit_event_date_time"
+                android:id="@+id/tv_create_event_date_time"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
@@ -148,7 +148,7 @@
                 android:src="@drawable/ic_my_library_books_black_18dp"/>
 
             <EditText
-                android:id="@+id/et_edit_event_description"
+                android:id="@+id/et_create_event_description"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
@@ -168,12 +168,12 @@
         android:orientation="vertical">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_edit_event_suggestions"
+            android:id="@+id/rv_create_event_suggestions"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
         <TextView
-            android:id="@+id/tv_edit_event_no_suggestions"
+            android:id="@+id/tv_create_event_no_suggestions"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical|center_horizontal"/>
@@ -185,10 +185,10 @@
         android:gravity="center_vertical|center_horizontal">
 
         <ImageButton
-            android:id="@+id/iv_edit_event_save"
+            android:id="@+id/iv_create_event_save"
             android:layout_height="48dp"
             android:layout_width="match_parent"
-            android:src="@drawable/ic_check_white_24dp"
+            android:src="@drawable/ic_group_add_white_24dp"
             android:background="@color/primary"/>
     </LinearLayout>
 </LinearLayout>

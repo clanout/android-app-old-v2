@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import reaper.android.R;
+import reaper.android.app.ui.screens.edit.EditEventFragment;
+import reaper.android.app.ui.util.FragmentUtils;
 
 public class DummyActivity extends AppCompatActivity
 {
@@ -24,25 +26,27 @@ public class DummyActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Base_Theme_AppCompat_Light_Dialog_Alert);
-        builder.setTitle("Choose Event Category");
-        builder.setCancelable(true);
-        builder.setPositiveButton("Next", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i)
-            {
+        FragmentUtils.changeFragment(getSupportFragmentManager(), new EditEventFragment(), false);
 
-            }
-        });
-
-        LayoutInflater inflater = this.getLayoutInflater();
-        final View dialogView = inflater.inflate(R.layout.dialog_fragment_create_event, null);
-        builder.setView(dialogView);
-
-        final AlertDialog alertDialog = builder.create();
-
-        alertDialog.show();
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Base_Theme_AppCompat_Light_Dialog_Alert);
+//        builder.setTitle("Choose Event Category");
+//        builder.setCancelable(true);
+//        builder.setPositiveButton("Next", new DialogInterface.OnClickListener()
+//        {
+//            @Override
+//            public void onClick(DialogInterface dialogInterface, int i)
+//            {
+//
+//            }
+//        });
+//
+//        LayoutInflater inflater = this.getLayoutInflater();
+//        final View dialogView = inflater.inflate(R.layout.dialog_fragment_create_event, null);
+//        builder.setView(dialogView);
+//
+//        final AlertDialog alertDialog = builder.create();
+//
+//        alertDialog.show();
 
     }
 }

@@ -1,4 +1,4 @@
-package reaper.android.app.ui.details;
+package reaper.android.app.ui.screens.details;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -262,7 +262,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
                 icon.setImageResource(R.drawable.ic_event_black_48dp);
         }
 
-
         title.setText(event.getTitle());
 
         if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty())
@@ -273,7 +272,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         else
         {
             location.setText(event.getLocation().getName());
-            locationIcon.setVisibility(View.VISIBLE);
 //            location.setOnClickListener(this);
         }
 
@@ -315,6 +313,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         menu.findItem(R.id.action_search).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
+        menu.findItem(R.id.action_add_phone).setVisible(false);
 
         if (EventUtils.canEdit(event, userService.getActiveUser()))
         {

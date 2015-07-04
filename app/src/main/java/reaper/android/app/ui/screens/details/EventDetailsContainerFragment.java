@@ -1,4 +1,4 @@
-package reaper.android.app.ui.details;
+package reaper.android.app.ui.screens.details;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

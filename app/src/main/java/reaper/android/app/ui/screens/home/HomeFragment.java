@@ -1,9 +1,12 @@
-package reaper.android.app.ui.home;
+package reaper.android.app.ui.screens.home;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,7 +15,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -46,8 +52,9 @@ import reaper.android.app.trigger.event.EventClickTrigger;
 import reaper.android.app.trigger.event.EventUpdatesFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.event.RsvpChangeTrigger;
-import reaper.android.app.ui.details.EventDetailsContainerFragment;
+import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.cache.Cache;
 import reaper.android.common.communicator.Communicator;
 
@@ -329,7 +336,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater)
     {
         super.onCreateOptionsMenu(menu, inflater);
 
@@ -343,6 +350,63 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         menu.findItem(R.id.action_search).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
+
+        if (Cache.getInstance().get(CacheKeys.MY_PHONE_NUMBER) == null)
+        {
+            menu.findItem(R.id.action_add_phone).setVisible(true);
+
+            menu.findItem(R.id.action_add_phone).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+            {
+                @Override
+                public boolean onMenuItemClick(MenuItem item)
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Add Phone Number");
+                    builder.setCancelable(true);
+
+                    LayoutInflater inflater = getActivity().getLayoutInflater();
+                    final View dialogView = inflater.inflate(R.layout.alert_dialog_add_phone, null);
+                    builder.setView(dialogView);
+
+                    final EditText phoneNumber = (EditText) dialogView.findViewById(R.id.et_alert_dialog_add_phone);
+
+                    builder.setPositiveButton("Done", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
+                            if (parsedPhone == null)
+                            {
+                                Toast.makeText(getActivity(), "Please enter a valid phone number", Toast.LENGTH_LONG).show();
+                            }
+                            else
+                            {
+                                userService.updatePhoneNumber(parsedPhone);
+
+                                menu.findItem(R.id.action_add_phone).setVisible(false);
+
+                                InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                inputManager.hideSoftInputFromWindow(dialogView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
+                                dialog.dismiss();
+                            }
+
+                        }
+                    });
+
+                    final AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+
+                    return true;
+                }
+
+            });
+        }
+        else
+        {
+            menu.findItem(R.id.action_add_phone).setVisible(false);
+        }
 
         menu.findItem(R.id.action_account).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {
@@ -359,7 +423,38 @@ public class HomeFragment extends Fragment implements View.OnClickListener
             @Override
             public boolean onMenuItemClick(MenuItem menuItem)
             {
-                Toast.makeText(getActivity(), "Create Event", Toast.LENGTH_SHORT).show();
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("What are you planning?");
+                builder.setCancelable(true);
+
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+                final View createEventDialogView = inflater.inflate(R.layout.dialog_fragment_create_event, null);
+                builder.setView(createEventDialogView);
+
+                final EditText eventTitle = (EditText) createEventDialogView.findViewById(R.id.et_dialog_fragment_create_event_title);
+                LinearLayout general = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_eat_out);
+                LinearLayout eat_out = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_general);
+                LinearLayout drinks = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_drinks);
+                LinearLayout cafe = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_cafe);
+                LinearLayout movie = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_movie);
+                LinearLayout outdoors = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_outdoors);
+                LinearLayout party = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_party);
+                LinearLayout localEvents = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_local_events);
+                LinearLayout shopping = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_shopping);
+                CheckBox checkBox = (CheckBox) createEventDialogView.findViewById(R.id.cb_dialog_fragment_create_event);
+
+                builder.setPositiveButton("Next", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        String title = eventTitle.getText().toString();
+
+
+                    }
+                });
+
                 return true;
             }
         });
