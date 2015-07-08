@@ -76,4 +76,12 @@ public class ApiManager
             return DateTime.parse(jsonElement.getAsString());
         }
     }
+
+    public <T> T getExternalApi(Class<T> clazz, String baseUrl)
+    {
+        RestAdapter externalRestAdapter = new RestAdapter.Builder().setClient(new OkClient(new OkHttpClient()))
+                .setConverter(new GsonConverter(gson)).setEndpoint(baseUrl).build();
+
+        return externalRestAdapter.create(clazz);
+    }
 }

@@ -9,9 +9,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
-import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
@@ -36,19 +35,16 @@ import reaper.android.app.model.Location;
 import reaper.android.app.model.Suggestion;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
-import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventCreatedTrigger;
 import reaper.android.app.trigger.event.EventSuggestionsTrigger;
-import reaper.android.app.ui.util.EventUtils;
-import reaper.android.common.cache.Cache;
 import reaper.android.common.communicator.Communicator;
 
 
 /**
  * Created by aditya on 04/07/15.
  */
-public class CreateEventFragment extends Fragment implements View.OnClickListener, EventSuggestionsAdapter.EventSuggestionsClickListener
+public class CreateEventFragment extends Fragment implements View.OnClickListener, EventSuggestionsAdapter.EventSuggestionsClickListener, AdapterView.OnItemClickListener
 {
     private TextView eventTitle, eventType, timing, noSuggestionsMessage;
     private EditText description;
@@ -125,8 +121,15 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
 
         renderEventDetails(title, isInviteOnly, eventCategory);
 
+        initGoogleAutocompleteAdapter();
         initRecyclerView();
 
+    }
+
+    private void initGoogleAutocompleteAdapter()
+    {
+        location.setAdapter(new GooglePlacesAutocompleteAdapter(getActivity(), R.layout.list_item_autocomplete, R.id.tv_list_item_autocomplete , bus, "food"));
+        location.setOnItemClickListener(this);
     }
 
     private void initRecyclerView()
@@ -276,5 +279,11 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
         if(trigger.getErrorCode() == ErrorCode.EVENT_CREATION_FAILURE){
             Toast.makeText(getActivity(), "Looks like we messed up! Please try again", Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+    {
+
     }
 }
