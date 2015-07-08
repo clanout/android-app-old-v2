@@ -1,10 +1,14 @@
 package reaper.android.app.api.event;
 
+import reaper.android.app.api.event.request.CreateEventApiRequest;
 import reaper.android.app.api.event.request.EventDetailsApiRequest;
+import reaper.android.app.api.event.request.EventSuggestionsApiRequest;
 import reaper.android.app.api.event.request.EventUpdatesApiRequest;
 import reaper.android.app.api.event.request.EventsApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
+import reaper.android.app.api.event.response.CreateEventApiResponse;
 import reaper.android.app.api.event.response.EventDetailsApiResponse;
+import reaper.android.app.api.event.response.EventSuggestionsApiResponse;
 import reaper.android.app.api.event.response.EventUpdatesApiResponse;
 import reaper.android.app.api.event.response.EventsApiResponse;
 import retrofit.Callback;
@@ -25,4 +29,10 @@ public interface EventApi
 
     @POST("/event/rsvp")
     public void updateRsvp(@Body RsvpUpdateApiRequest request, Callback<Response> callback);
+
+    @POST("/event/create")
+    public void createEvent(@Body CreateEventApiRequest request, Callback<CreateEventApiResponse> callback);
+
+    @POST("/event/recommendations")
+    public void getEventSuggestions(@Body EventSuggestionsApiRequest request, Callback<EventSuggestionsApiResponse> callback);
 }

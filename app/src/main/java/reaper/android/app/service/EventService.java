@@ -12,21 +12,29 @@ import java.util.Map;
 
 import reaper.android.app.api.core.ApiManager;
 import reaper.android.app.api.event.EventApi;
+import reaper.android.app.api.event.request.CreateEventApiRequest;
 import reaper.android.app.api.event.request.EventDetailsApiRequest;
+import reaper.android.app.api.event.request.EventSuggestionsApiRequest;
 import reaper.android.app.api.event.request.EventUpdatesApiRequest;
 import reaper.android.app.api.event.request.EventsApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
+import reaper.android.app.api.event.response.CreateEventApiResponse;
 import reaper.android.app.api.event.response.EventDetailsApiResponse;
+import reaper.android.app.api.event.response.EventSuggestionsApiResponse;
 import reaper.android.app.api.event.response.EventUpdatesApiResponse;
 import reaper.android.app.api.event.response.EventsApiResponse;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventAttendeeComparator;
+import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
+import reaper.android.app.model.Suggestion;
 import reaper.android.app.trigger.common.CacheCommitTrigger;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
+import reaper.android.app.trigger.event.EventCreatedTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
+import reaper.android.app.trigger.event.EventSuggestionsTrigger;
 import reaper.android.app.trigger.event.EventUpdatesFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.common.cache.Cache;
@@ -258,5 +266,43 @@ public class EventService
 
             return events;
         }
+    }
+
+    public void fetchEventSuggestions(EventCategory eventCategory, String latitude, String longitude){
+
+        EventSuggestionsApiRequest request = new EventSuggestionsApiRequest(eventCategory, latitude, longitude);
+        eventApi.getEventSuggestions(request, new Callback<EventSuggestionsApiResponse>()
+        {
+            @Override
+            public void success(EventSuggestionsApiResponse eventSuggestionsApiResponse, Response response)
+            {
+                bus.post(new EventSuggestionsTrigger(eventSuggestionsApiResponse.getEventSuggestions()));
+            }
+
+            @Override
+            public void failure(RetrofitError error)
+            {
+                bus.post(new EventSuggestionsTrigger(new ArrayList<Suggestion>()));
+            }
+        });
+    }
+
+    public void createEvent(String title, Event.Type eventType, EventCategory eventCategory, String description, String locationName, String locationZone, String latitude, String longitude, DateTime startTime, DateTime endTime){
+
+        CreateEventApiRequest request = new CreateEventApiRequest(title, eventType, eventCategory, description, locationName, locationZone, latitude, longitude, startTime, endTime);
+        eventApi.createEvent(request, new Callback<CreateEventApiResponse>()
+        {
+            @Override
+            public void success(CreateEventApiResponse createEventApiResponse, Response response)
+            {
+                bus.post(new EventCreatedTrigger(createEventApiResponse.getEventId()));
+            }
+
+            @Override
+            public void failure(RetrofitError error)
+            {
+                bus.post(new GenericErrorTrigger(ErrorCode.EVENT_CREATION_FAILURE, error));
+            }
+        });
     }
 }

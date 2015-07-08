@@ -104,42 +104,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         userService = new UserService(bus);
         eventService = new EventService(bus);
 
-//        if (event.getRsvp() == Event.RSVP.YES)
-//        {
-//            rsvp.setText(R.string.rsvp_yes);
-//        }
-//        else if (event.getRsvp() == Event.RSVP.NO)
-//        {
-//            rsvp.setText(R.string.rsvp_maybe);
-//        }
-//        else if (event.getRsvp() == Event.RSVP.MAYBE)
-//        {
-//            rsvp.setText(R.string.rsvp_no);
-//        }
-//
-//        if (EventUtils.canInviteFriends(event))
-//        {
-//            invite.setEnabled(true);
-//        }
-//        else
-//        {
-//            invite.setEnabled(false);
-//        }
-//
-//        if (EventUtils.canViewChat(event))
-//        {
-//            chat.setEnabled(true);
-//        }
-//        else
-//        {
-//            chat.setEnabled(false);
-//        }
-
-//        invite.setOnClickListener(this);
-//        rsvp.setOnClickListener(this);
-//        chat.setOnClickListener(this);
-//        location.setOnClickListener(this);
-
         location.setOnClickListener(this);
         description.setOnClickListener(this);
         dateTime.setOnClickListener(this);

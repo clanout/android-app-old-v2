@@ -1,5 +1,7 @@
 package reaper.android.app.api.core;
 
+import android.util.Log;
+
 import com.fatboyindustrial.gsonjodatime.Converters;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -54,6 +56,7 @@ public class ApiManager
 
     public <T> T getApi(Class<T> clazz)
     {
+        Log.d("reap3r", clazz.getName());
         T api = (T) apiMap.get(clazz);
         if (api == null)
         {

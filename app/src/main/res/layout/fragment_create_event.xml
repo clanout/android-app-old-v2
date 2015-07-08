@@ -83,7 +83,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_place_black_18dp"/>
 
-            <TextView
+            <AutoCompleteTextView
                 android:id="@+id/actv_create_event_location"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -185,10 +185,10 @@
         android:gravity="center_vertical|center_horizontal">
 
         <ImageButton
-            android:id="@+id/iv_create_event_save"
+            android:id="@+id/ib_create_event_save"
             android:layout_height="48dp"
             android:layout_width="match_parent"
-            android:src="@drawable/ic_group_add_white_24dp"
+            android:src="@drawable/ic_check_white_24dp"
             android:background="@color/primary"/>
     </LinearLayout>
 </LinearLayout>
