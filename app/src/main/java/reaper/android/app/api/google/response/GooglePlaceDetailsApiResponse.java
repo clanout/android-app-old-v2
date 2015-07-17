@@ -13,37 +13,37 @@ public class GooglePlaceDetailsApiResponse extends ApiResponse
         return result.name;
     }
 
-//    public double getLatitude()
-//    {
-//        return result.geometry.location.latitude;
-//    }
-//
-//    public double getLongitude()
-//    {
-//        return result.geometry.location.longitude;
-//    }
+    public double getLatitude()
+    {
+        return result.geometry.location.latitude;
+    }
+
+    public double getLongitude()
+    {
+        return result.geometry.location.longitude;
+    }
 
     private static class Result
     {
         @SerializedName("name")
         private String name;
 
-//        @SerializedName("geometry")
-//        private Geometry geometry;
-//
-//        private static class Geometry
-//        {
-//            @SerializedName("location")
-//            private Location location;
-//
-//            private static class Location
-//            {
-//                @SerializedName("lat")
-//                private double latitude;
-//
-//                @SerializedName("lng")
-//                private double longitude;
-//            }
-//        }
+        @SerializedName("geometry")
+        private Geometry geometry;
+
+        private static class Geometry
+        {
+            @SerializedName("location")
+            private Location location;
+
+            private static class Location
+            {
+                @SerializedName("lat")
+                private double latitude;
+
+                @SerializedName("lng")
+                private double longitude;
+            }
+        }
     }
 }

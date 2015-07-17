@@ -10,4 +10,8 @@ public class AppConstants
     public static final int EVENTS_REFRESH_RATE_MILLISECONDS = 10000; //2 * 60 * 1000;
 
     public static final String DEFAULT_COUNTRY_CODE = "91";
+
+    // Google API
+    public static final String GOOGLE_API_KEY = "AIzaSyDBX362r-1isovteBR3tGN3QQtDcQn-jyg";
+    public static final String GOOGLE_PLACES_API_URL = "https://maps.googleapis.com/maps/api/place/";
 }
