@@ -463,9 +463,14 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     @Subscribe
     public void onEventCreated(EventCreatedTrigger trigger)
     {
-        //TODO - Cache update and slect time dialog
+        eventService.updateCacheFor(trigger.getEvent());
 
-        FragmentUtils.changeFragment(manager, new InviteUsersContainerFragment(), false);
+        InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("event_id", trigger.getEvent().getId());
+        inviteUsersContainerFragment.setArguments(bundle);
+
+        FragmentUtils.changeFragment(manager, inviteUsersContainerFragment, false);
     }
 
     @Subscribe
@@ -496,6 +501,12 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     private void sendCreateEventRequest()
     {
         String descriptionEvent = description.getText().toString();
+
+        if(startDateTime == null || endDateTime == null)
+        {
+            Toast.makeText(getActivity(), "Please choose the timings for your event", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         if (descriptionEvent == null)
         {

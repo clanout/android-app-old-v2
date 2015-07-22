@@ -3,22 +3,23 @@ package reaper.android.app.api.event.response;
 import com.google.gson.annotations.SerializedName;
 
 import reaper.android.app.api.core.ApiResponse;
+import reaper.android.app.model.Event;
 
 /**
  * Created by aditya on 04/07/15.
  */
 public class CreateEventApiResponse extends ApiResponse
 {
-    @SerializedName("event_id")
-    private String eventId;
+    @SerializedName("event")
+    private Event event;
 
-    public CreateEventApiResponse(String eventId)
+    public CreateEventApiResponse(Event event)
     {
-        this.eventId = eventId;
+        this.event = event;
     }
 
-    public String getEventId()
+    public Event getEvent()
     {
-        return eventId;
+        return event;
     }
 }

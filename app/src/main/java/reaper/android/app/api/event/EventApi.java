@@ -7,6 +7,7 @@ import reaper.android.app.api.event.request.EventDetailsApiRequest;
 import reaper.android.app.api.event.request.EventSuggestionsApiRequest;
 import reaper.android.app.api.event.request.EventUpdatesApiRequest;
 import reaper.android.app.api.event.request.EventsApiRequest;
+import reaper.android.app.api.event.request.InviteUsersApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
 import reaper.android.app.api.event.response.CreateEventApiResponse;
 import reaper.android.app.api.event.response.EditEventApiResponse;
@@ -44,4 +45,7 @@ public interface EventApi
 
     @POST("/event/delete")
     public void deleteEvent(@Body DeleteEventApiRequest request, Callback<Response> callback);
+
+    @POST("/event/invite")
+    public void inviteFriends(@Body InviteUsersApiRequest request, Callback<Response> callback);
 }

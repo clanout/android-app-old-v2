@@ -74,5 +74,8 @@ public class UserService
         });
     }
 
+    public void getPhoneContacts(String zone)
+    {
 
+    }
 }

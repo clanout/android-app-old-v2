@@ -19,6 +19,7 @@ import reaper.android.app.api.event.request.EventDetailsApiRequest;
 import reaper.android.app.api.event.request.EventSuggestionsApiRequest;
 import reaper.android.app.api.event.request.EventUpdatesApiRequest;
 import reaper.android.app.api.event.request.EventsApiRequest;
+import reaper.android.app.api.event.request.InviteUsersApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
 import reaper.android.app.api.event.response.CreateEventApiResponse;
 import reaper.android.app.api.event.response.EditEventApiResponse;
@@ -313,7 +314,7 @@ public class EventService
             @Override
             public void success(CreateEventApiResponse createEventApiResponse, Response response)
             {
-                bus.post(new EventCreatedTrigger(createEventApiResponse.getEventId()));
+                bus.post(new EventCreatedTrigger(createEventApiResponse.getEvent()));
             }
 
             @Override
@@ -326,7 +327,7 @@ public class EventService
 
     public void editEvent(String eventId, boolean isFinalised, DateTime startTime, DateTime endTime, Location placeLocation, String description)
     {
-        EditEventApiRequest request = new EditEventApiRequest(String .valueOf(placeLocation.getLongitude()), description, endTime, eventId, isFinalised, String.valueOf(placeLocation.getLatitude()), placeLocation.getName(), placeLocation.getZone(), startTime);
+        EditEventApiRequest request = new EditEventApiRequest(String.valueOf(placeLocation.getLongitude()), description, endTime, eventId, isFinalised, String.valueOf(placeLocation.getLatitude()), placeLocation.getName(), placeLocation.getZone(), startTime);
         eventApi.editEvent(request, new Callback<EditEventApiResponse>()
         {
             @Override
@@ -358,6 +359,22 @@ public class EventService
             public void failure(RetrofitError error)
             {
                 updateCacheFor(deletedEvent);
+            }
+        });
+    }
+
+    public void inviteUsers(String eventId, List<String> userIdList)
+    {
+        eventApi.inviteFriends(new InviteUsersApiRequest(eventId, userIdList), new Callback<Response>()
+        {
+            @Override
+            public void success(Response response, Response response2)
+            {
+            }
+
+            @Override
+            public void failure(RetrofitError error)
+            {
             }
         });
     }

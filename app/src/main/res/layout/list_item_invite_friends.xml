@@ -3,7 +3,7 @@
               android:orientation="horizontal"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:layout_margin="16dp">
+              android:layout_margin="12dp">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -24,7 +24,7 @@
         android:layout_weight="1"
         android:layout_height="match_parent"
         android:textStyle="normal"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:gravity="center_vertical"
         android:text="Harsh Pokharna"
         android:id="@+id/tv_list_item_invite_friends_user_name"/>
@@ -39,6 +39,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/tv_list_item_invite_friends_already_invited"
         android:text="Already Invited"
-        android:textSize="14sp"/>
+        android:textSize="12sp"/>
 
 </LinearLayout>

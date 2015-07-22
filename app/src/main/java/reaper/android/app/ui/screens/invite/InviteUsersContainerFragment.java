@@ -11,13 +11,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import com.squareup.otto.Bus;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.model.EventDetails;
+import reaper.android.app.service.EventService;
+import reaper.android.app.ui.screens.home.HomeFragment;
+import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.communicator.Communicator;
 
-public class InviteUsersContainerFragment extends Fragment implements TabLayout.OnTabSelectedListener
+public class InviteUsersContainerFragment extends Fragment implements TabLayout.OnTabSelectedListener, InviteeListCommunicator, View.OnClickListener
 {
     private ViewPager viewPager;
     private ImageButton done;
@@ -25,8 +31,15 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
 
     private InviteUsersPagerAdapter inviteUsersPagerAdapter;
     private FragmentManager fragmentManager;
+    private EventService eventService;
+    private Bus bus;
 
-    ArrayList<EventDetails.Invitee> inviteeList;
+    private ArrayList<EventDetails.Invitee> inviteeList;
+    private String eventId;
+
+    private List<String> invitedFacebookFriends;
+    private List<String> invitedPhoneContacts;
+    private List<String> invitedUsers;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -54,16 +67,28 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
         super.onActivityCreated(savedInstanceState);
 
         Bundle bundle = getArguments();
-        inviteeList = (ArrayList<EventDetails.Invitee>) bundle.get("invitee_list");
-
-        if(inviteeList == null){
+        if(bundle == null)
+        {
             inviteeList = new ArrayList<>();
+        }else
+        {
+            inviteeList = (ArrayList<EventDetails.Invitee>) bundle.get("invitee_list");
+            eventId = (String) bundle.get("event_id");
         }
 
-        inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), inviteeList);
+        invitedFacebookFriends = new ArrayList<>();
+        invitedPhoneContacts = new ArrayList<>();
+        invitedUsers = new ArrayList<>();
+
+        bus = Communicator.getInstance().getBus();
+        eventService = new EventService(bus);
+        fragmentManager = getActivity().getSupportFragmentManager();
+
+        inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), inviteeList, this);
         viewPager.setAdapter(inviteUsersPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setOnTabSelectedListener(this);
+        done.setOnClickListener(this);
     }
 
     @Override
@@ -82,5 +107,37 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     public void onTabReselected(TabLayout.Tab tab)
     {
 
+    }
+
+    @Override
+    public void manageFacebookFriends(String id)
+    {
+        if(invitedFacebookFriends.contains(id))
+        {
+            invitedFacebookFriends.remove(id);
+        }else
+        {
+            invitedFacebookFriends.add(id);
+        }
+    }
+
+    @Override
+    public void managePhoneContacts(String id)
+    {
+
+    }
+
+    @Override
+    public void onClick(View view)
+    {
+        if(view.getId() == R.id.ib_invite_friends_container_done)
+        {
+            invitedUsers.addAll(invitedFacebookFriends);
+            invitedUsers.addAll(invitedPhoneContacts);
+
+            eventService.inviteUsers(eventId, invitedUsers);
+
+            FragmentUtils.changeFragment(fragmentManager, new HomeFragment(), false);
+        }
     }
 }

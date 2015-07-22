@@ -37,6 +37,7 @@ public class InviteFacebookFriendsFragment extends Fragment
     private UserService userService;
     private LocationService locationService;
     private Bus bus;
+    private InviteeListCommunicator inviteeListCommunicator;
 
     private ArrayList<EventDetails.Invitee> inviteeList;
     private List<Friend> friendList;
@@ -66,11 +67,21 @@ public class InviteFacebookFriendsFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
 
         Bundle bundle = getArguments();
-        inviteeList = (ArrayList<EventDetails.Invitee>) bundle.get("invitee_list");
 
-        if(inviteeList == null)
+        if (bundle == null)
         {
             inviteeList = new ArrayList<>();
+        }
+        else
+        {
+            inviteeList = (ArrayList<EventDetails.Invitee>) bundle.get("invitee_list");
+
+            if (inviteeList == null)
+            {
+                inviteeList = new ArrayList<>();
+            }
+
+            inviteeListCommunicator = (InviteeListCommunicator) bundle.get("invitee_communicator");
         }
 
         friendList = new ArrayList<>();
@@ -112,7 +123,7 @@ public class InviteFacebookFriendsFragment extends Fragment
 
     private void initRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList);
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, inviteeListCommunicator, true);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -120,7 +131,7 @@ public class InviteFacebookFriendsFragment extends Fragment
 
     private void refreshRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList);
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, inviteeListCommunicator, true);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
 
@@ -149,7 +160,7 @@ public class InviteFacebookFriendsFragment extends Fragment
     @Subscribe
     public void onFacebookFriendsNotFetched(GenericErrorTrigger trigger)
     {
-        if(trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCH_FAILURE)
+        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCH_FAILURE)
         {
             noFriendsMessage.setText("Could not load your facebook friends. Please try again.");
             noFriendsMessage.setVisibility(View.VISIBLE);

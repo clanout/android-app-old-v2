@@ -1,19 +1,21 @@
 package reaper.android.app.trigger.event;
 
+import reaper.android.app.model.Event;
+
 /**
  * Created by aditya on 04/07/15.
  */
 public class EventCreatedTrigger
 {
-    private String eventId;
+    private Event event;
 
-    public EventCreatedTrigger(String eventId)
+    public EventCreatedTrigger(Event event)
     {
-        this.eventId = eventId;
+        this.event = event;
     }
 
-    public String getEventId()
+    public Event getEvent()
     {
-        return eventId;
+        return event;
     }
 }
