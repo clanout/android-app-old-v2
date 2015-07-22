@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <DatePicker
+        android:layout_width="wrap_content"
+        android:layout_height="120dp"
+        android:calendarViewShown="false"
+        android:datePickerMode="spinner"
+        android:id="@+id/dp_select_date_start"
+        ></DatePicker>
+
+    <TimePicker
+        android:layout_width="wrap_content"
+        android:layout_height="120dp"
+        android:timePickerMode="spinner"
+        android:id="@+id/tp_select_time_start"></TimePicker>
+
+    <DatePicker
+        android:layout_width="wrap_content"
+        android:layout_height="120dp"
+        android:calendarViewShown="false"
+        android:datePickerMode="spinner"
+        android:id="@+id/dp_select_date_end"></DatePicker>
+
+    <TimePicker
+        android:layout_width="wrap_content"
+        android:layout_height="120dp"
+        android:timePickerMode="spinner"
+        android:id="@+id/tp_select_time_end"></TimePicker>
+
+</LinearLayout>

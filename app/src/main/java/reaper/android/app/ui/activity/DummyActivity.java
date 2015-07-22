@@ -1,7 +1,10 @@
 package reaper.android.app.ui.activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -11,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import reaper.android.R;
 import reaper.android.app.ui.screens.edit.EditEventFragment;
@@ -18,35 +22,30 @@ import reaper.android.app.ui.util.FragmentUtils;
 
 public class DummyActivity extends AppCompatActivity
 {
-    private ImageButton edit;
+    private TextView networkState;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_dummy);
 
-        FragmentUtils.changeFragment(getSupportFragmentManager(), new EditEventFragment(), false);
+        networkState = (TextView) findViewById(R.id.activity_main_natwork_state);
 
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Base_Theme_AppCompat_Light_Dialog_Alert);
-//        builder.setTitle("Choose Event Category");
-//        builder.setCancelable(true);
-//        builder.setPositiveButton("Next", new DialogInterface.OnClickListener()
-//        {
-//            @Override
-//            public void onClick(DialogInterface dialogInterface, int i)
-//            {
-//
-//            }
-//        });
-//
-//        LayoutInflater inflater = this.getLayoutInflater();
-//        final View dialogView = inflater.inflate(R.layout.dialog_fragment_create_event, null);
-//        builder.setView(dialogView);
-//
-//        final AlertDialog alertDialog = builder.create();
-//
-//        alertDialog.show();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] networkInfos = connectivityManager.getAllNetworkInfo();
+        for(NetworkInfo networkInfo:networkInfos)
+        {
+            String type = networkInfo.getTypeName();
+            if(type.equalsIgnoreCase("WIFI") || type.equalsIgnoreCase("MOBILE"))
+            {
+                stringBuilder.append(type + " : " + networkInfo.getSubtypeName() + " ; ");
+            }
+        }
+
+        networkState.setText(stringBuilder.toString());
 
     }
 }

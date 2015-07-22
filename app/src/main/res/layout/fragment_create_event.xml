@@ -91,7 +91,7 @@
                 android:layout_marginRight="16dp"
                 android:layout_weight="1"
                 android:hint="Event location"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:textSize="14sp"/>
         </LinearLayout>
 
@@ -123,6 +123,7 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:maxLines="1"
+                android:text="Select event timings"
                 android:textSize="14sp"/>
         </LinearLayout>
 
@@ -144,7 +145,6 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="top"
                 android:src="@drawable/ic_my_library_books_black_18dp"/>
 
             <EditText

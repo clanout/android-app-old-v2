@@ -1,9 +1,13 @@
 package reaper.android.app.ui.screens.create;
 
+import android.content.DialogInterface;
+import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,31 +17,42 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.api.google.response.GooglePlaceAutocompleteApiResponse;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.Suggestion;
 import reaper.android.app.service.EventService;
+import reaper.android.app.service.GoogleService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventCreatedTrigger;
+import reaper.android.app.trigger.event.EventLocationFetchedTrigger;
 import reaper.android.app.trigger.event.EventSuggestionsTrigger;
+import reaper.android.app.ui.screens.home.HomeFragment;
+import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.communicator.Communicator;
 
 
@@ -53,16 +68,19 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     private RecyclerView recyclerView;
     private ImageButton save;
 
-    private String title, locationName, locationLatitude, locationLongitude, locationZone;
-    private Boolean isInviteOnly;
+    private String title;
+    private Boolean isInviteOnly, isPlaceDetailsRunning, isSaveButtonClicked;
     private EventCategory eventCategory;
     private Event.Type type;
+    private Location placeLocation;
+    private DateTime startDateTime, endDateTime;
 
     private FragmentManager manager;
     private Bus bus;
 
     private EventService eventService;
     private LocationService locationService;
+    private GoogleService googleService;
 
     private List<Suggestion> suggestionList;
     private EventSuggestionsAdapter eventSuggestionsAdapter;
@@ -112,12 +130,18 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
         bus = Communicator.getInstance().getBus();
         eventService = new EventService(bus);
         locationService = new LocationService(bus);
+        googleService = new GoogleService(bus);
+        placeLocation = new Location();
 
-        locationZone = locationService.getUserLocation().getZone();
+        placeLocation.setZone(locationService.getUserLocation().getZone());
 
         suggestionList = new ArrayList<>();
 
+        isPlaceDetailsRunning = false;
+        isSaveButtonClicked = false;
+
         save.setOnClickListener(this);
+        timing.setOnClickListener(this);
 
         renderEventDetails(title, isInviteOnly, eventCategory);
 
@@ -128,7 +152,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
 
     private void initGoogleAutocompleteAdapter()
     {
-        location.setAdapter(new GooglePlacesAutocompleteAdapter(getActivity(), R.layout.list_item_autocomplete, R.id.tv_list_item_autocomplete , bus, "food"));
+        location.setAdapter(new GooglePlacesAutocompleteAdapter(getActivity(), R.layout.list_item_autocomplete, R.id.tv_list_item_autocomplete, bus));
         location.setOnItemClickListener(this);
     }
 
@@ -141,18 +165,22 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    private void refreshRecyclerView() {
+    private void refreshRecyclerView()
+    {
         eventSuggestionsAdapter = new EventSuggestionsAdapter(getActivity(), suggestionList);
         eventSuggestionsAdapter.setEventSuggestionsClickListener(this);
 
         recyclerView.setAdapter(eventSuggestionsAdapter);
 
-        if (suggestionList.size() == 0) {
+        if (suggestionList.size() == 0)
+        {
             noSuggestionsMessage.setText("No suggestions to show");
             noSuggestionsMessage.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
 
-        } else {
+        }
+        else
+        {
             recyclerView.setVisibility(View.VISIBLE);
             noSuggestionsMessage.setVisibility(View.GONE);
         }
@@ -181,10 +209,13 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     {
         eventTitle.setText(title);
 
-        if(isInviteOnly){
+        if (isInviteOnly)
+        {
             eventType.setText("Invite Only");
             type = Event.Type.INVITE_ONLY;
-        }else{
+        }
+        else
+        {
             eventType.setText("Public");
             type = Event.Type.PUBLIC;
         }
@@ -224,7 +255,8 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     }
 
     @Subscribe
-    public void onEventSuggestionsFetched(EventSuggestionsTrigger trigger){
+    public void onEventSuggestionsFetched(EventSuggestionsTrigger trigger)
+    {
         suggestionList = trigger.getRecommendations();
 
         refreshRecyclerView();
@@ -251,10 +283,169 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View v)
     {
-        if(v.getId() == R.id.ib_create_event_save){
+        if (v.getId() == R.id.ib_create_event_save)
+        {
 
-            String descriptionEvent = description.getText().toString();
-            eventService.createEvent(title, type, eventCategory, descriptionEvent, locationName, locationZone, locationLatitude, locationLongitude, DateTime.now(), DateTime.now());
+            if (isPlaceDetailsRunning)
+            {
+                isSaveButtonClicked = true;
+            }
+            else
+            {
+                isSaveButtonClicked = false;
+                sendCreateEventRequest();
+            }
+        }
+
+        if (v.getId() == R.id.tv_create_event_date_time)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setCancelable(true);
+
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            final View selectTimingsDialogView = inflater.inflate(R.layout.dialog_fragment_select_date_time, null);
+            builder.setView(selectTimingsDialogView);
+
+            final TimePicker startTimePicker = (TimePicker) selectTimingsDialogView.findViewById(R.id.tp_select_time_start);
+            final TimePicker endTimePicker = (TimePicker) selectTimingsDialogView.findViewById(R.id.tp_select_time_end);
+            final DatePicker startDatePicker = (DatePicker) selectTimingsDialogView.findViewById(R.id.dp_select_date_start);
+            final DatePicker endDatePicker = (DatePicker) selectTimingsDialogView.findViewById(R.id.dp_select_date_end);
+
+            renderDateAndTimePickers(startDatePicker, endDatePicker, startTimePicker, endTimePicker);
+
+            builder.setPositiveButton("Done", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    startDateTime = getTime(startDatePicker, startTimePicker);
+                    endDateTime = getTime(endDatePicker, endTimePicker);
+
+                    renderEventTimings(startDateTime, endDateTime);
+                }
+            });
+
+            final AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+    }
+
+    private void renderEventTimings(DateTime _startDateTime, DateTime _endDateTime)
+    {
+        DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("dd MMM");
+        DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("HH:mm");
+
+        if (_startDateTime.isAfter(_endDateTime))
+        {
+            timing.setText("Select event timings");
+            startDateTime = null;
+            endDateTime = null;
+            Toast.makeText(getActivity(), "An event can't end before it has even started", Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            startDateTime = _startDateTime;
+            endDateTime = _endDateTime;
+
+            if (_startDateTime.toString(dateFormatter).equals(_endDateTime.toString(dateFormatter)))
+            {
+                timing.setText(_startDateTime.toString(timeFormatter) + " - " + _endDateTime.toString(timeFormatter) + " (" + _startDateTime.toString(dateFormatter) + ")");
+            }
+            else
+            {
+                timing.setText(_startDateTime.toString(timeFormatter) + " (" + _startDateTime.toString(dateFormatter) + ") - " + _endDateTime.toString(timeFormatter) + " (" + _endDateTime.toString(dateFormatter) + ")");
+            }
+        }
+    }
+
+    private DateTime getTime(DatePicker datePicker, TimePicker timePicker)
+    {
+        int year = datePicker.getYear();
+        int month = datePicker.getMonth() + 1;
+        int date = datePicker.getDayOfMonth();
+        int hour = timePicker.getCurrentHour();
+        int minute = timePicker.getCurrentMinute();
+        String timeZone = DateTime.now().toString(DateTimeFormat.forPattern("Z"));
+
+        StringBuilder formattedDate = new StringBuilder();
+        formattedDate.append(year);
+        formattedDate.append("-");
+        formattedDate.append(String.format("%02d", month));
+        formattedDate.append("-");
+        formattedDate.append(String.format("%02d", date));
+        formattedDate.append("T");
+        formattedDate.append(String.format("%02d", hour));
+        formattedDate.append(":");
+        formattedDate.append(String.format("%02d", minute));
+        formattedDate.append(":00.000");
+        formattedDate.append(timeZone);
+        DateTime dateTime = DateTime.parse(formattedDate.toString());
+
+        return dateTime;
+    }
+
+    private void renderDateAndTimePickers(DatePicker startDatePicker, DatePicker endDatePicker, TimePicker startTimePicker, TimePicker endTimePicker)
+    {
+        startTimePicker.setIs24HourView(true);
+        endTimePicker.setIs24HourView(true);
+
+        hideYearinDatePicker(startDatePicker);
+        hideYearinDatePicker(endDatePicker);
+        startDatePicker.setMinDate(System.currentTimeMillis() - 1000);
+        endDatePicker.setMinDate(System.currentTimeMillis() - 1000);
+
+        if (startDateTime == null || endDateTime == null)
+        {
+            startTimePicker.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+            endTimePicker.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+        }
+        else
+        {
+            startTimePicker.setCurrentHour(startDateTime.getHourOfDay());
+            startTimePicker.setCurrentMinute(startDateTime.getMinuteOfHour());
+
+            endTimePicker.setCurrentHour(endDateTime.getHourOfDay());
+            endTimePicker.setCurrentMinute(endDateTime.getMinuteOfHour());
+
+            startDatePicker.updateDate(startDateTime.getYear(), startDateTime.getMonthOfYear() - 1, startDateTime.getDayOfMonth());
+            endDatePicker.updateDate(endDateTime.getYear(), endDateTime.getMonthOfYear() - 1, endDateTime.getDayOfMonth());
+        }
+    }
+
+    private void hideYearinDatePicker(DatePicker datePicker)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            int yearSpinnerId = Resources.getSystem().getIdentifier("year", "id", "android");
+            if (yearSpinnerId != 0)
+            {
+                View yearSpinner = datePicker.findViewById(yearSpinnerId);
+                if (yearSpinner != null)
+                {
+                    yearSpinner.setVisibility(View.GONE);
+                }
+            }
+        }
+        else
+        {
+            try
+            {
+                Field f[] = datePicker.getClass().getDeclaredFields();
+                for (Field field : f)
+                {
+                    if (field.getName().equals("mYearPicker"))
+                    {
+                        field.setAccessible(true);
+                        Object yearPicker = new Object();
+                        yearPicker = field.get(datePicker);
+                        ((View) yearPicker).setVisibility(View.GONE);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -263,27 +454,83 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     {
         location.setText(suggestionList.get(position).getName());
 
-        locationName = suggestionList.get(position).getName();
-        locationLatitude = suggestionList.get(position).getLatitude();
-        locationLongitude = suggestionList.get(position).getLongitude();
+        placeLocation.setName(suggestionList.get(position).getName());
+        placeLocation.setLatitude(suggestionList.get(position).getLatitude());
+        placeLocation.setLongitude(suggestionList.get(position).getLongitude());
     }
 
     @Subscribe
-    public void onEventCreated(EventCreatedTrigger trigger){
-        Toast.makeText(getActivity(), "Event: " + trigger.getEventId(), Toast.LENGTH_LONG).show();
+    public void onEventCreated(EventCreatedTrigger trigger)
+    {
+        //TODO - Cache update and slect time dialog
+
+        FragmentUtils.changeFragment(manager, new HomeFragment(), false);
     }
 
     @Subscribe
-    public void onEventCreationFailed(GenericErrorTrigger trigger){
+    public void onEventCreationFailed(GenericErrorTrigger trigger)
+    {
 
-        if(trigger.getErrorCode() == ErrorCode.EVENT_CREATION_FAILURE){
+        if (trigger.getErrorCode() == ErrorCode.EVENT_CREATION_FAILURE)
+        {
             Toast.makeText(getActivity(), "Looks like we messed up! Please try again", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Subscribe
+    public void onEventLocationFetched(EventLocationFetchedTrigger trigger)
+    {
+        placeLocation.setName(trigger.getLocation().getName());
+        placeLocation.setLatitude(trigger.getLocation().getLatitude());
+        placeLocation.setLongitude(trigger.getLocation().getLongitude());
+
+        isPlaceDetailsRunning = false;
+
+        if (isSaveButtonClicked)
+        {
+            sendCreateEventRequest();
+        }
+    }
+
+    private void sendCreateEventRequest()
+    {
+        String descriptionEvent = description.getText().toString();
+
+        if (descriptionEvent == null)
+        {
+            descriptionEvent = "";
+        }
+
+        eventService.createEvent(title, type, eventCategory, descriptionEvent, placeLocation, DateTime.now(), DateTime.now());
+
+    }
+
+    @Subscribe
+    public void onEventLocationNotFetched(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.EVENT_LOCATION_FETCH_FAILURE)
+        {
+            Toast.makeText(getActivity(), "Could not find the location. Please try again.", Toast.LENGTH_LONG).show();
+            location.setText("");
+            placeLocation.setName(null);
+            placeLocation.setLatitude(null);
+            placeLocation.setLongitude(null);
+
+            isPlaceDetailsRunning = false;
+
+            if (isSaveButtonClicked)
+            {
+                sendCreateEventRequest();
+            }
         }
     }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
     {
+        GooglePlacesAutocompleteAdapter adapter = (GooglePlacesAutocompleteAdapter) adapterView.getAdapter();
+        GooglePlaceAutocompleteApiResponse.Prediction prediction = adapter.getItem(i);
 
+        googleService.getPlaceDetails(prediction.getPlaceId());
     }
 }

@@ -1,9 +1,10 @@
 package reaper.android.app.api.google.response;
 
 import com.google.gson.annotations.SerializedName;
-import reaper.android.app.api.core.ApiResponse;
 
 import java.util.List;
+
+import reaper.android.app.api.core.ApiResponse;
 
 public class GooglePlaceAutocompleteApiResponse extends ApiResponse
 {
@@ -49,6 +50,12 @@ public class GooglePlaceAutocompleteApiResponse extends ApiResponse
         public void setDescription(String description)
         {
             this.description = description;
+        }
+
+        @Override
+        public String toString()
+        {
+            return description;
         }
     }
 }

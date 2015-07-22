@@ -1,12 +1,15 @@
 package reaper.android.app.api.event;
 
 import reaper.android.app.api.event.request.CreateEventApiRequest;
+import reaper.android.app.api.event.request.DeleteEventApiRequest;
+import reaper.android.app.api.event.request.EditEventApiRequest;
 import reaper.android.app.api.event.request.EventDetailsApiRequest;
 import reaper.android.app.api.event.request.EventSuggestionsApiRequest;
 import reaper.android.app.api.event.request.EventUpdatesApiRequest;
 import reaper.android.app.api.event.request.EventsApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
 import reaper.android.app.api.event.response.CreateEventApiResponse;
+import reaper.android.app.api.event.response.EditEventApiResponse;
 import reaper.android.app.api.event.response.EventDetailsApiResponse;
 import reaper.android.app.api.event.response.EventSuggestionsApiResponse;
 import reaper.android.app.api.event.response.EventUpdatesApiResponse;
@@ -35,4 +38,10 @@ public interface EventApi
 
     @POST("/event/recommendations")
     public void getEventSuggestions(@Body EventSuggestionsApiRequest request, Callback<EventSuggestionsApiResponse> callback);
+
+    @POST("/event/edit")
+    public void editEvent(@Body EditEventApiRequest request, Callback<EditEventApiResponse> callback);
+
+    @POST("/event/delete")
+    public void deleteEvent(@Body DeleteEventApiRequest request, Callback<Response> callback);
 }

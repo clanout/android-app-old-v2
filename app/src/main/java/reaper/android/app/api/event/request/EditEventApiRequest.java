@@ -2,6 +2,8 @@ package reaper.android.app.api.event.request;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.joda.time.DateTime;
+
 import reaper.android.app.api.core.ApiRequest;
 
 public class EditEventApiRequest extends ApiRequest
@@ -10,13 +12,13 @@ public class EditEventApiRequest extends ApiRequest
     private String eventId;
 
     @SerializedName("is_finalized")
-    private String isFinalized;
+    private boolean isFinalized;
 
     @SerializedName("start_time")
-    private String startTime;
+    private DateTime startTime;
 
     @SerializedName("end_time")
-    private String endTime;
+    private DateTime endTime;
 
     @SerializedName("location_latitude")
     private String locationLatitude;
@@ -33,7 +35,7 @@ public class EditEventApiRequest extends ApiRequest
     @SerializedName("description")
     private String description;
 
-    public EditEventApiRequest(String locationLongitude, String description, String endTime, String eventId, String isFinalized, String locationLatitude, String locationName, String locationZone, String startTime)
+    public EditEventApiRequest(String locationLongitude, String description, DateTime endTime, String eventId, boolean isFinalized, String locationLatitude, String locationName, String locationZone, DateTime startTime)
     {
         this.locationLongitude = locationLongitude;
         this.description = description;

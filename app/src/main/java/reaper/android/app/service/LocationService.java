@@ -31,29 +31,23 @@ public class LocationService
 
     public Location getUserLocation()
     {
-//        Cache cache = Cache.getInstance();
-//        Double latitude = (Double) cache.get(CacheKeys.USER_LOCATION_LATITUDE);
-//        Double longitude = (Double) cache.get(CacheKeys.USER_LOCATION_LONGITUDE);
-//        String zone = (String) cache.get(CacheKeys.USER_LOCATION_ZONE);
-//
-//        if (latitude == null || longitude == null || zone == null)
-//        {
-//            throw new IllegalStateException();
-//        }
-//        else
-//        {
-//            Location location = new Location();
-//            location.setLatitude(latitude);
-//            location.setLongitude(longitude);
-//            location.setZone(zone);
-//            return location;
-//        }
+        Cache cache = Cache.getInstance();
+        Double latitude = (Double) cache.get(CacheKeys.USER_LOCATION_LATITUDE);
+        Double longitude = (Double) cache.get(CacheKeys.USER_LOCATION_LONGITUDE);
+        String zone = (String) cache.get(CacheKeys.USER_LOCATION_ZONE);
 
-        Location location = new Location();
-        location.setLatitude(12.9259);
-        location.setLongitude(77.6229);
-        location.setZone("Bengaluru");
-        return location;
+        if (latitude == null || longitude == null || zone == null)
+        {
+            throw new IllegalStateException();
+        }
+        else
+        {
+            Location location = new Location();
+            location.setLatitude(latitude);
+            location.setLongitude(longitude);
+            location.setZone(zone);
+            return location;
+        }
     }
 
     public void refreshUserLocation(Context context, GoogleApiClient apiClient)

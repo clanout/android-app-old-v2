@@ -13,12 +13,15 @@ import java.util.Map;
 import reaper.android.app.api.core.ApiManager;
 import reaper.android.app.api.event.EventApi;
 import reaper.android.app.api.event.request.CreateEventApiRequest;
+import reaper.android.app.api.event.request.DeleteEventApiRequest;
+import reaper.android.app.api.event.request.EditEventApiRequest;
 import reaper.android.app.api.event.request.EventDetailsApiRequest;
 import reaper.android.app.api.event.request.EventSuggestionsApiRequest;
 import reaper.android.app.api.event.request.EventUpdatesApiRequest;
 import reaper.android.app.api.event.request.EventsApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
 import reaper.android.app.api.event.response.CreateEventApiResponse;
+import reaper.android.app.api.event.response.EditEventApiResponse;
 import reaper.android.app.api.event.response.EventDetailsApiResponse;
 import reaper.android.app.api.event.response.EventSuggestionsApiResponse;
 import reaper.android.app.api.event.response.EventUpdatesApiResponse;
@@ -29,11 +32,13 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventAttendeeComparator;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
+import reaper.android.app.model.Location;
 import reaper.android.app.model.Suggestion;
 import reaper.android.app.trigger.common.CacheCommitTrigger;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventCreatedTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
+import reaper.android.app.trigger.event.EventEditedTrigger;
 import reaper.android.app.trigger.event.EventSuggestionsTrigger;
 import reaper.android.app.trigger.event.EventUpdatesFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
@@ -193,7 +198,6 @@ public class EventService
             cache.put(CacheKeys.EVENTS, eventMap);
             bus.post(new CacheCommitTrigger());
         }
-
     }
 
     public void updateCacheFor(EventDetails eventDetails)
@@ -207,6 +211,18 @@ public class EventService
         cache.put(CacheKeys.EVENTS_UPDATES, updatedEvents);
 
         bus.post(new CacheCommitTrigger());
+    }
+
+    public void deleteCacheFor(Event event)
+    {
+        Cache cache = Cache.getInstance();
+        Map<String, Event> eventMap = (Map<String, Event>) cache.get(CacheKeys.EVENTS);
+        if (eventMap != null)
+        {
+            eventMap.remove(event.getId());
+            cache.put(CacheKeys.EVENTS, eventMap);
+            bus.post(new CacheCommitTrigger());
+        }
     }
 
     private List<Event> updateEventsCache(List<Event> events, boolean append)
@@ -268,7 +284,8 @@ public class EventService
         }
     }
 
-    public void fetchEventSuggestions(EventCategory eventCategory, String latitude, String longitude){
+    public void fetchEventSuggestions(EventCategory eventCategory, String latitude, String longitude)
+    {
 
         EventSuggestionsApiRequest request = new EventSuggestionsApiRequest(eventCategory, latitude, longitude);
         eventApi.getEventSuggestions(request, new Callback<EventSuggestionsApiResponse>()
@@ -287,9 +304,10 @@ public class EventService
         });
     }
 
-    public void createEvent(String title, Event.Type eventType, EventCategory eventCategory, String description, String locationName, String locationZone, String latitude, String longitude, DateTime startTime, DateTime endTime){
+    public void createEvent(String title, Event.Type eventType, EventCategory eventCategory, String description, Location placeLocation, DateTime startTime, DateTime endTime)
+    {
 
-        CreateEventApiRequest request = new CreateEventApiRequest(title, eventType, eventCategory, description, locationName, locationZone, latitude, longitude, startTime, endTime);
+        CreateEventApiRequest request = new CreateEventApiRequest(title, eventType, eventCategory, description, placeLocation.getName(), placeLocation.getZone(), String.valueOf(placeLocation.getLatitude()), String.valueOf(placeLocation.getLongitude()), startTime, endTime);
         eventApi.createEvent(request, new Callback<CreateEventApiResponse>()
         {
             @Override
@@ -302,6 +320,44 @@ public class EventService
             public void failure(RetrofitError error)
             {
                 bus.post(new GenericErrorTrigger(ErrorCode.EVENT_CREATION_FAILURE, error));
+            }
+        });
+    }
+
+    public void editEvent(String eventId, boolean isFinalised, DateTime startTime, DateTime endTime, Location placeLocation, String description)
+    {
+        EditEventApiRequest request = new EditEventApiRequest(String .valueOf(placeLocation.getLongitude()), description, endTime, eventId, isFinalised, String.valueOf(placeLocation.getLatitude()), placeLocation.getName(), placeLocation.getZone(), startTime);
+        eventApi.editEvent(request, new Callback<EditEventApiResponse>()
+        {
+            @Override
+            public void success(EditEventApiResponse editEventApiResponse, Response response)
+            {
+                bus.post(new EventEditedTrigger(editEventApiResponse.getEvent()));
+            }
+
+            @Override
+            public void failure(RetrofitError error)
+            {
+                bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE, error));
+            }
+        });
+    }
+
+    public void deleteEvent(final Event deletedEvent)
+    {
+        DeleteEventApiRequest request = new DeleteEventApiRequest(deletedEvent.getId());
+        eventApi.deleteEvent(request, new Callback<Response>()
+        {
+            @Override
+            public void success(Response response, Response response2)
+            {
+
+            }
+
+            @Override
+            public void failure(RetrofitError error)
+            {
+                updateCacheFor(deletedEvent);
             }
         });
     }

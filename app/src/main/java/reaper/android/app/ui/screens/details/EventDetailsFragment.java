@@ -37,7 +37,9 @@ import reaper.android.app.model.EventDetails;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
+import reaper.android.app.ui.screens.edit.EditEventFragment;
 import reaper.android.app.ui.util.EventUtils;
+import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.communicator.Communicator;
 
 public class EventDetailsFragment extends Fragment implements View.OnClickListener
@@ -287,7 +289,12 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem)
                 {
-                    Toast.makeText(getActivity(), "Edit Event (" + event.getTitle() + ")", Toast.LENGTH_SHORT).show();
+                    EditEventFragment editEventFragment = new EditEventFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("event", event);
+                    bundle.putSerializable("event_details", eventDetails);
+                    editEventFragment.setArguments(bundle);
+                    FragmentUtils.changeFragment(fragmentManager, editEventFragment, true);
                     return true;
                 }
             });
