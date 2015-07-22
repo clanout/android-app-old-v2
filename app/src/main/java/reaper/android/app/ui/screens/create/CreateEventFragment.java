@@ -501,7 +501,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
             descriptionEvent = "";
         }
 
-        eventService.createEvent(title, type, eventCategory, descriptionEvent, placeLocation, DateTime.now(), DateTime.now());
+        eventService.createEvent(title, type, eventCategory, descriptionEvent, placeLocation, startDateTime, endDateTime);
 
     }
 
