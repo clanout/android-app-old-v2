@@ -1,27 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
-    <LinearLayout
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_invite_facebook_friends"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:id="@+id/ll_invite_facebook_friends">
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:id="@+id/rv_invite_facebook_friends" />
-
-    </LinearLayout>
 
     <TextView
+        android:id="@+id/tv_invite_facebook_friends_no_users"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical|center_horizontal"
-        android:id="@+id/tv_invite_facebook_friends_no_users" />
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical|center_horizontal"/>
 
 </LinearLayout>

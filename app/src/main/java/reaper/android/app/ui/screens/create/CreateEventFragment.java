@@ -52,6 +52,7 @@ import reaper.android.app.trigger.event.EventCreatedTrigger;
 import reaper.android.app.trigger.event.EventLocationFetchedTrigger;
 import reaper.android.app.trigger.event.EventSuggestionsTrigger;
 import reaper.android.app.ui.screens.home.HomeFragment;
+import reaper.android.app.ui.screens.invite.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.communicator.Communicator;
 
@@ -464,7 +465,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     {
         //TODO - Cache update and slect time dialog
 
-        FragmentUtils.changeFragment(manager, new HomeFragment(), false);
+        FragmentUtils.changeFragment(manager, new InviteUsersContainerFragment(), false);
     }
 
     @Subscribe

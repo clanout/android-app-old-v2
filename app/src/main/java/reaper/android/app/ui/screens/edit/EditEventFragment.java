@@ -1,6 +1,8 @@
 package reaper.android.app.ui.screens.edit;
 
 import android.content.DialogInterface;
+import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,10 +18,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.squareup.otto.Bus;
@@ -29,7 +33,9 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import reaper.android.R;
@@ -71,6 +77,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     private Event event;
     private EventDetails eventDetails;
     private Location placeLocation;
+    private DateTime startDateTime, endDateTime;
 
     // UI Elements
     private TextView title;
@@ -464,7 +471,158 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             }
         }
 
+        if(v.getId() == R.id.tv_edit_event_date_time)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setCancelable(true);
 
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            final View selectTimingsDialogView = inflater.inflate(R.layout.dialog_fragment_select_date_time, null);
+            builder.setView(selectTimingsDialogView);
+
+            final TimePicker startTimePicker = (TimePicker) selectTimingsDialogView.findViewById(R.id.tp_select_time_start);
+            final TimePicker endTimePicker = (TimePicker) selectTimingsDialogView.findViewById(R.id.tp_select_time_end);
+            final DatePicker startDatePicker = (DatePicker) selectTimingsDialogView.findViewById(R.id.dp_select_date_start);
+            final DatePicker endDatePicker = (DatePicker) selectTimingsDialogView.findViewById(R.id.dp_select_date_end);
+
+            renderDateAndTimePickers(startDatePicker, endDatePicker, startTimePicker, endTimePicker);
+
+            builder.setPositiveButton("Done", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    startDateTime = getTime(startDatePicker, startTimePicker);
+                    endDateTime = getTime(endDatePicker, endTimePicker);
+
+                    renderEventTimings(startDateTime, endDateTime);
+                }
+            });
+
+            final AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+
+
+    }
+
+    private void renderEventTimings(DateTime _startDateTime, DateTime _endDateTime)
+    {
+        DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("dd MMM");
+        DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("HH:mm");
+
+        if (_startDateTime.isAfter(_endDateTime))
+        {
+            schedule.setText("Select event timings");
+            startDateTime = null;
+            endDateTime = null;
+            Toast.makeText(getActivity(), "An event can't end before it has even started", Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            startDateTime = _startDateTime;
+            endDateTime = _endDateTime;
+
+            if (_startDateTime.toString(dateFormatter).equals(_endDateTime.toString(dateFormatter)))
+            {
+                schedule.setText(_startDateTime.toString(timeFormatter) + " - " + _endDateTime.toString(timeFormatter) + " (" + _startDateTime.toString(dateFormatter) + ")");
+            }
+            else
+            {
+                schedule.setText(_startDateTime.toString(timeFormatter) + " (" + _startDateTime.toString(dateFormatter) + ") - " + _endDateTime.toString(timeFormatter) + " (" + _endDateTime.toString(dateFormatter) + ")");
+            }
+        }
+    }
+
+    private DateTime getTime(DatePicker datePicker, TimePicker timePicker)
+    {
+        int year = datePicker.getYear();
+        int month = datePicker.getMonth() + 1;
+        int date = datePicker.getDayOfMonth();
+        int hour = timePicker.getCurrentHour();
+        int minute = timePicker.getCurrentMinute();
+        String timeZone = DateTime.now().toString(DateTimeFormat.forPattern("Z"));
+
+        StringBuilder formattedDate = new StringBuilder();
+        formattedDate.append(year);
+        formattedDate.append("-");
+        formattedDate.append(String.format("%02d", month));
+        formattedDate.append("-");
+        formattedDate.append(String.format("%02d", date));
+        formattedDate.append("T");
+        formattedDate.append(String.format("%02d", hour));
+        formattedDate.append(":");
+        formattedDate.append(String.format("%02d", minute));
+        formattedDate.append(":00.000");
+        formattedDate.append(timeZone);
+        DateTime dateTime = DateTime.parse(formattedDate.toString());
+
+        return dateTime;
+    }
+
+    private void renderDateAndTimePickers(DatePicker startDatePicker, DatePicker endDatePicker, TimePicker startTimePicker, TimePicker endTimePicker)
+    {
+        startTimePicker.setIs24HourView(true);
+        endTimePicker.setIs24HourView(true);
+
+        hideYearinDatePicker(startDatePicker);
+        hideYearinDatePicker(endDatePicker);
+        startDatePicker.setMinDate(System.currentTimeMillis() - 1000);
+        endDatePicker.setMinDate(System.currentTimeMillis() - 1000);
+
+        if (startDateTime == null || endDateTime == null)
+        {
+            startTimePicker.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+            endTimePicker.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+        }
+        else
+        {
+            startTimePicker.setCurrentHour(startDateTime.getHourOfDay());
+            startTimePicker.setCurrentMinute(startDateTime.getMinuteOfHour());
+
+            endTimePicker.setCurrentHour(endDateTime.getHourOfDay());
+            endTimePicker.setCurrentMinute(endDateTime.getMinuteOfHour());
+
+            startDatePicker.updateDate(startDateTime.getYear(), startDateTime.getMonthOfYear() - 1, startDateTime.getDayOfMonth());
+            endDatePicker.updateDate(endDateTime.getYear(), endDateTime.getMonthOfYear() - 1, endDateTime.getDayOfMonth());
+        }
+    }
+
+    private void hideYearinDatePicker(DatePicker datePicker)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            int yearSpinnerId = Resources.getSystem().getIdentifier("year", "id", "android");
+            if (yearSpinnerId != 0)
+            {
+                View yearSpinner = datePicker.findViewById(yearSpinnerId);
+                if (yearSpinner != null)
+                {
+                    yearSpinner.setVisibility(View.GONE);
+                }
+            }
+        }
+        else
+        {
+            try
+            {
+                Field f[] = datePicker.getClass().getDeclaredFields();
+                for (Field field : f)
+                {
+                    if (field.getName().equals("mYearPicker"))
+                    {
+                        field.setAccessible(true);
+                        Object yearPicker = new Object();
+                        yearPicker = field.get(datePicker);
+                        ((View) yearPicker).setVisibility(View.GONE);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void sendEditEventRequest()
@@ -476,7 +634,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             descriptionEvent = "";
         }
 
-        eventService.editEvent(event.getId(), isFinalised, DateTime.now(), DateTime.now(), placeLocation, descriptionEvent);
+        eventService.editEvent(event.getId(), isFinalised, startDateTime, endDateTime, placeLocation, descriptionEvent);
     }
 
     @Subscribe
