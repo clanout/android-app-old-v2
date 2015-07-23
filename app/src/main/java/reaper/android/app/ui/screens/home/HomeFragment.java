@@ -53,6 +53,7 @@ import reaper.android.app.trigger.event.EventClickTrigger;
 import reaper.android.app.trigger.event.EventUpdatesFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.event.RsvpChangeTrigger;
+import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.create.CreateEventFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
@@ -432,7 +433,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
             @Override
             public boolean onMenuItemClick(MenuItem menuItem)
             {
-                Toast.makeText(getActivity(), "Accounts Page", Toast.LENGTH_SHORT).show();
+                FragmentUtils.changeFragment(fragmentManager, new AccountsFragment(), true);
                 return true;
             }
         });
