@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +26,7 @@ import reaper.android.app.model.Friend;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
+import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsFetchedTrigger;
 import reaper.android.common.communicator.Communicator;
 
@@ -166,5 +168,4 @@ public class InviteFacebookFriendsFragment extends Fragment
             noFriendsMessage.setVisibility(View.VISIBLE);
         }
     }
-
 }

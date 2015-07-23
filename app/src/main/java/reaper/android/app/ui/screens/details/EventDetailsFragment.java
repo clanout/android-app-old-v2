@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -36,6 +35,7 @@ import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.trigger.event.ChangeAttendeeListTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.ui.screens.edit.EditEventFragment;
 import reaper.android.app.ui.util.EventUtils;
@@ -332,6 +332,59 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         else if (view.getId() == R.id.tv_event_details_date_time)
         {
             Snackbar.make(this.getView(), "Set Reminder", Snackbar.LENGTH_LONG).setAction("OK", null).show();
+        }
+    }
+
+    @Subscribe
+    public void onRsvpChanged(ChangeAttendeeListTrigger trigger)
+    {
+        if (event.getId().equals(trigger.getEventId()))
+        {
+            EventDetails.Attendee attendee = new EventDetails.Attendee();
+            attendee.setId(userService.getActiveUser());
+
+            if (trigger.getRsvp() == Event.RSVP.YES)
+            {
+                if (eventDetails != null)
+                {
+                    attendee.setRsvp(Event.RSVP.YES);
+                    attendee.setName("Lucas Johnson");
+
+                    if(eventDetails.getAttendees().contains(attendee)){
+                        eventDetails.getAttendees().remove(attendee);
+                    }
+
+                    eventDetails.getAttendees().add(attendee);
+                    refreshRecyclerView();
+                }
+            }
+            else if (trigger.getRsvp() == Event.RSVP.MAYBE)
+            {
+                if(eventDetails != null)
+                {
+                    attendee.setRsvp(Event.RSVP.MAYBE);
+                    attendee.setName("Lucas Johnson");
+
+                    if(eventDetails.getAttendees().contains(attendee)){
+                        eventDetails.getAttendees().remove(attendee);
+                    }
+                    eventDetails.getAttendees().add(attendee);
+                    refreshRecyclerView();
+                }
+
+            }
+            else if (trigger.getRsvp() == Event.RSVP.NO)
+            {
+                if(eventDetails != null)
+                {
+                    attendee.setRsvp(Event.RSVP.NO);
+                    if(eventDetails.getAttendees().contains(attendee))
+                    {
+                        eventDetails.getAttendees().remove(attendee);
+                        refreshRecyclerView();
+                    }
+                }
+            }
         }
     }
 }

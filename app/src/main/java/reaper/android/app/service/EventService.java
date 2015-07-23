@@ -226,6 +226,12 @@ public class EventService
         }
     }
 
+    public void deleteEventDetailsCacheFor(String eventId)
+    {
+        Cache cache = Cache.getInstance();
+        cache.remove(CacheKeys.eventDetails(eventId));
+    }
+
     private List<Event> updateEventsCache(List<Event> events, boolean append)
     {
         Cache cache = Cache.getInstance();

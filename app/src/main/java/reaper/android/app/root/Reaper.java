@@ -16,6 +16,7 @@ import com.squareup.otto.ThreadEnforcer;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.trigger.common.CacheCommitTrigger;
+import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshRequestTrigger;
 import reaper.android.common.cache.Cache;
 import reaper.android.common.communicator.Communicator;
@@ -97,4 +98,5 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     {
         Log.d("reap3r", "Unable to connect to Google API client");
     }
+    
 }

@@ -31,14 +31,16 @@
 
     <CheckBox
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/cb_list_item_invite_friends"/>
+        android:layout_height="match_parent"
+        android:id="@+id/cb_list_item_invite_friends"
+        android:gravity="center_vertical|center_horizontal"/>
 
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/tv_list_item_invite_friends_already_invited"
         android:text="Already Invited"
-        android:textSize="12sp"/>
+        android:textSize="12sp"
+        android:gravity="center_vertical|center_horizontal"/>
 
 </LinearLayout>

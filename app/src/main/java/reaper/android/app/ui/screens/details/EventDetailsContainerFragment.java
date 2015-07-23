@@ -25,6 +25,9 @@ import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
+import reaper.android.app.trigger.event.ChangeAttendeeListTrigger;
+import reaper.android.app.ui.screens.invite.InviteUsersContainerFragment;
+import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.communicator.Communicator;
 
 public class EventDetailsContainerFragment extends Fragment implements View.OnClickListener
@@ -41,7 +44,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
 
     // UI Elements
     private ViewPager viewPager;
-    private ImageButton rsvp;
+    private ImageButton rsvp, invite;
 
     private PagerAdapter pagerAdapter;
 
@@ -59,6 +62,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
 
         viewPager = (ViewPager) view.findViewById(R.id.vp_event_details_container);
         rsvp = (ImageButton) view.findViewById(R.id.ibtn_event_details_rsvp);
+        invite = (ImageButton) view.findViewById(R.id.ibtn_event_details_invite);
 
         return view;
     }
@@ -119,6 +123,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         });
 
         rsvp.setOnClickListener(this);
+        invite.setOnClickListener(this);
         renderRsvpButton(events.get(activePosition).getRsvp());
     }
 
@@ -147,12 +152,15 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
                     switch (menuItemId)
                     {
                         case R.id.menu_rsvp_yes:
+                            bus.post(new ChangeAttendeeListTrigger(Event.RSVP.YES, events.get(activePosition).getId()));
                             updateRsvp(Event.RSVP.YES);
                             break;
                         case R.id.menu_rsvp_maybe:
+                            bus.post(new ChangeAttendeeListTrigger(Event.RSVP.MAYBE, events.get(activePosition).getId()));
                             updateRsvp(Event.RSVP.MAYBE);
                             break;
                         case R.id.menu_rsvp_no:
+                            bus.post(new ChangeAttendeeListTrigger(Event.RSVP.NO, events.get(activePosition).getId()));
                             updateRsvp(Event.RSVP.NO);
                             break;
                         default:
@@ -163,6 +171,15 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
             });
 
             rsvpMenu.show();
+        }
+        else if(view.getId() == R.id.ibtn_event_details_invite)
+        {
+            InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("event_id", events.get(activePosition).getId());
+            bundle.putBoolean("from_create_fragment", false);
+            inviteUsersContainerFragment.setArguments(bundle);
+            FragmentUtils.changeFragment(fragmentManager, inviteUsersContainerFragment, true);
         }
     }
 

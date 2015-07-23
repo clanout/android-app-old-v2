@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,15 +14,20 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.trigger.common.GenericErrorTrigger;
+import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
+import reaper.android.app.trigger.user.PhoneContactsFetchedTrigger;
 import reaper.android.common.communicator.Communicator;
 
 public class InvitePhoneContactsFragment extends Fragment
@@ -88,7 +94,7 @@ public class InvitePhoneContactsFragment extends Fragment
         locationService = new LocationService(bus);
 
         initRecyclerView();
-        userService.getPhoneContacts(locationService.getUserLocation().getZone());
+        userService.getPhoneContacts(getActivity().getContentResolver());
     }
 
     @Override
@@ -135,7 +141,7 @@ public class InvitePhoneContactsFragment extends Fragment
 
         if (friendList.size() == 0)
         {
-            noContactsMessage.setText("None of your facebook friends are on the app. Invite people by going to the accounts page.");
+            noContactsMessage.setText("None of your phone contacts are on the app. Invite people by going to the accounts page.");
             noContactsMessage.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
 
@@ -147,4 +153,20 @@ public class InvitePhoneContactsFragment extends Fragment
         }
     }
 
+    @Subscribe
+    public void onPhoneContactsFetched(PhoneContactsFetchedTrigger trigger)
+    {
+        friendList = trigger.getPhoneContacts();
+        refreshRecyclerView();
+    }
+
+    @Subscribe
+    public void onPhoneContactsNotFetched(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.PHONE_CONTACTS_FETCH_FAILURE)
+        {
+            noContactsMessage.setText("Could not load your phone contacts. Please try again.");
+            noContactsMessage.setVisibility(View.VISIBLE);
+        }
+    }
 }

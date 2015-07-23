@@ -52,7 +52,16 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
     {
         Friend current = friends.get(position);
 
-        holder.userPic.setImageResource(R.drawable.ic_local_bar_black_36dp);
+        if (isFacebookAdapter)
+        {
+            holder.userPic.setVisibility(View.VISIBLE);
+            holder.userPic.setImageResource(R.drawable.ic_local_bar_black_36dp);
+        }
+        else
+        {
+            holder.userPic.setVisibility(View.GONE);
+        }
+
         holder.username.setText(current.getName());
 
         EventDetails.Invitee invitee = new EventDetails.Invitee();
@@ -99,6 +108,10 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
             if (isFacebookAdapter)
             {
                 inviteeListCommunicator.manageFacebookFriends(friends.get(getAdapterPosition()).getId());
+            }
+            else
+            {
+                inviteeListCommunicator.managePhoneContacts(friends.get(getAdapterPosition()).getId());
             }
         }
     }
