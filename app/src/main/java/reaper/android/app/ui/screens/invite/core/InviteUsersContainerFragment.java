@@ -1,4 +1,4 @@
-package reaper.android.app.ui.screens.invite;
+package reaper.android.app.ui.screens.invite.core;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,7 +25,6 @@ import reaper.android.app.service.LocationService;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
-import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.communicator.Communicator;
 
@@ -110,8 +109,12 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
 
         done.setOnClickListener(this);
 
-        eventService.fetchEventDetails(eventId);
+        if (!fromCreateFragment)
+        {
+            eventService.fetchEventDetails(eventId);
+        }
     }
+
 
     @Override
     public void onTabSelected(TabLayout.Tab tab)
@@ -129,6 +132,13 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     public void onTabReselected(TabLayout.Tab tab)
     {
 
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        bus.unregister(this);
     }
 
     @Override
@@ -162,20 +172,14 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     {
         if (view.getId() == R.id.ib_invite_friends_container_done)
         {
+            invitedUsers = new ArrayList<>();
             invitedUsers.addAll(invitedFacebookFriends);
             invitedUsers.addAll(invitedPhoneContacts);
 
             eventService.inviteUsers(eventId, invitedUsers);
             eventService.deleteEventDetailsCacheFor(eventId);
 
-            if (fromCreateFragment)
-            {
-                FragmentUtils.changeFragment(fragmentManager, new HomeFragment(), false);
-            }
-            else
-            {
-                eventService.fetchEvents(locationService.getUserLocation().getZone());
-            }
+            eventService.fetchEvents(locationService.getUserLocation().getZone());
 
         }
     }
@@ -183,10 +187,13 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     @Subscribe
     public void onEventDetailsFetched(EventDetailsFetchTrigger trigger)
     {
-        inviteeList = (ArrayList<EventDetails.Invitee>) trigger.getEventDetails().getInvitee();
+        if (!fromCreateFragment)
+        {
+            inviteeList = (ArrayList<EventDetails.Invitee>) trigger.getEventDetails().getInvitee();
 
-        inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), inviteeList, this);
-        viewPager.setAdapter(inviteUsersPagerAdapter);
+            inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), inviteeList, this);
+            viewPager.setAdapter(inviteUsersPagerAdapter);
+        }
     }
 
     @Subscribe
@@ -207,4 +214,5 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
         FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment, false);
 
     }
+
 }

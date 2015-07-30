@@ -21,6 +21,10 @@ public class FragmentUtils
 
     public static void clearBackStack(FragmentManager manager)
     {
-        manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//        manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        for (int i = 0; i < manager.getBackStackEntryCount(); ++i)
+        {
+            manager.popBackStack();
+        }
     }
 }

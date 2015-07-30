@@ -1,11 +1,13 @@
 package reaper.android.app.ui.screens.accounts;
 
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,12 +15,20 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.otto.Bus;
+
 import reaper.android.R;
 import reaper.android.app.service.AccountsService;
+import reaper.android.app.service.UserService;
+import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
+import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.communicator.Communicator;
 
 public class AccountsFragment extends Fragment implements AccountsAdapter.AccountsItemClickListener
 {
@@ -27,6 +37,8 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
     private ImageView userPic;
 
     private FragmentManager fragmentManager;
+    private UserService userService;
+    private Bus bus;
 
     private AccountsAdapter accountsAdapter;
 
@@ -54,6 +66,8 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
         super.onActivityCreated(savedInstanceState);
 
         fragmentManager = getActivity().getSupportFragmentManager();
+        bus = Communicator.getInstance().getBus();
+        userService = new UserService(bus);
 
         accountsAdapter = new AccountsAdapter(getActivity(), AccountsService.getmenuList());
         accountsAdapter.setAccountItemClickListener(this);
@@ -84,23 +98,78 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
     {
         if (position == 0)
         {
-
+            FragmentUtils.changeFragment(fragmentManager, new ManageFriendsFragment(), true);
         }
         else if (position == 1)
         {
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
-            if (isWhatsappInstalled) {
+            if (isWhatsappInstalled)
+            {
                 ComponentName componentName = new ComponentName("com.whatsapp", "com.whatsapp.ContactPicker");
                 Intent intent = new Intent();
                 intent.setComponent(componentName);
                 intent.setType("text/plain");
                 intent.putExtra(Intent.EXTRA_TEXT, "This is a test message.");
                 startActivity(intent);
-            } else {
+            }
+            else
+            {
                 Toast.makeText(getActivity(), "Whatsapp is not installed on this device.", Toast.LENGTH_LONG).show();
             }
         }
         else if (position == 2)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setCancelable(true);
+
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.alert_dialog_share_feedback, null);
+            builder.setView(dialogView);
+
+            final EditText commentMessage = (EditText) dialogView.findViewById(R.id.et_alert_dialog_share_feedback_comment);
+            final RatingBar ratingBar = (RatingBar) dialogView.findViewById(R.id.rb_alert_dialog_share_feedback_rating);
+
+            builder.setPositiveButton("Submit", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i)
+                {
+
+                }
+            });
+
+            final AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    String rating = String.valueOf(ratingBar.getRating());
+                    String comment = commentMessage.getText().toString();
+                    Boolean wantToCloseDialog = false;
+
+                    if (rating == null || rating.isEmpty() || rating.equals("0.0"))
+                    {
+                        Toast.makeText(getActivity(), "Please rate us by selecting a star.", Toast.LENGTH_LONG).show();
+                        wantToCloseDialog = false;
+                    }
+                    else
+                    {
+                        userService.shareFeedback(rating, comment);
+                        Toast.makeText(getActivity(), "Thank you for your feedback.", Toast.LENGTH_LONG).show();
+                        wantToCloseDialog = true;
+                    }
+
+                    if(wantToCloseDialog)
+                    {
+                        alertDialog.dismiss();
+                    }
+                }
+            });
+        }
+        else if (position == 3)
         {
 
         }

@@ -40,6 +40,8 @@ public class LauncherActivity extends AppCompatActivity
     // UI Elements
     private ProgressDialog progressDialog;
 
+    private boolean isBlocking;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
@@ -57,6 +59,7 @@ public class LauncherActivity extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
+
         bus.register(this);
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
         {
@@ -99,7 +102,6 @@ public class LauncherActivity extends AppCompatActivity
             }
 
             String sessionCookie = AppPreferences.get(this, "SESSION_COOKIE");
-            Log.d("reap3r", "Session Cookie : " + sessionCookie);
             authService.validateSession(sessionCookie);
         }
     }
@@ -119,13 +121,13 @@ public class LauncherActivity extends AppCompatActivity
         if (!locationService.locationExists())
         {
             // TODO: Prompt to turn location on
-            Log.d("reap3r", "Location does not exist in cache");
             progressDialog = ProgressDialog.show(this, "Welcome", "Fetching your current location...");
+            isBlocking = true;
             bus.post(new UserLocationRefreshRequestTrigger());
         }
         else
         {
-            Log.d("reap3r", "Location exists in cache");
+            isBlocking = false;
             bus.post(new UserLocationRefreshRequestTrigger());
             gotoMainActivity();
         }
@@ -143,12 +145,15 @@ public class LauncherActivity extends AppCompatActivity
     @Subscribe
     public void onUserLocationRefreshTrigger(UserLocationRefreshTrigger trigger)
     {
-        Log.d("reap3r", "onUserLocationRefreshTrigger called");
         if (progressDialog != null)
         {
             progressDialog.dismiss();
         }
-        gotoMainActivity();
+
+        if (isBlocking)
+        {
+            gotoMainActivity();
+        }
     }
 
     public void gotoMainActivity()

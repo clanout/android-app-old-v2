@@ -51,8 +51,7 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventCreatedTrigger;
 import reaper.android.app.trigger.event.EventLocationFetchedTrigger;
 import reaper.android.app.trigger.event.EventSuggestionsTrigger;
-import reaper.android.app.ui.screens.home.HomeFragment;
-import reaper.android.app.ui.screens.invite.InviteUsersContainerFragment;
+import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.communicator.Communicator;
 
@@ -304,7 +303,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
             builder.setCancelable(true);
 
             LayoutInflater inflater = getActivity().getLayoutInflater();
-            final View selectTimingsDialogView = inflater.inflate(R.layout.dialog_fragment_select_date_time, null);
+            final View selectTimingsDialogView = inflater.inflate(R.layout.alert_dialog_select_date_time, null);
             builder.setView(selectTimingsDialogView);
 
             final TimePicker startTimePicker = (TimePicker) selectTimingsDialogView.findViewById(R.id.tp_select_time_start);

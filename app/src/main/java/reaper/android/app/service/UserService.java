@@ -18,14 +18,19 @@ import reaper.android.app.api.core.ApiManager;
 import reaper.android.app.api.core.GsonProvider;
 import reaper.android.app.api.me.MeApi;
 import reaper.android.app.api.me.request.AddPhoneApiRequest;
+import reaper.android.app.api.me.request.BlockFriendsApiRequest;
+import reaper.android.app.api.me.request.GetAllFacebookFriendsApiRequest;
 import reaper.android.app.api.me.request.GetFacebookFriendsApiRequest;
 import reaper.android.app.api.me.request.GetPhoneContactsApiRequest;
+import reaper.android.app.api.me.request.ShareFeedbackApiRequest;
+import reaper.android.app.api.me.response.GetAllFacebookFriendsApiResponse;
 import reaper.android.app.api.me.response.GetFacebookFriendsApiResponse;
 import reaper.android.app.api.me.response.GetPhoneContactsApiResponse;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
+import reaper.android.app.trigger.user.AllFacebookFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.PhoneContactsFetchedTrigger;
 import reaper.android.app.ui.util.PhoneUtils;
@@ -84,8 +89,26 @@ public class UserService
             @Override
             public void failure(RetrofitError error)
             {
-                Log.d("reap3r", "error : " + error.getMessage());
                 bus.post(new GenericErrorTrigger(ErrorCode.FACEBOOK_FRIENDS_FETCH_FAILURE, error));
+            }
+        });
+    }
+
+    public void getAllFacebookFriends()
+    {
+        meApi = ApiManager.getInstance().getApi(MeApi.class);
+        meApi.getAllFacebookFriends(new GetAllFacebookFriendsApiRequest(), new Callback<GetAllFacebookFriendsApiResponse>()
+        {
+            @Override
+            public void success(GetAllFacebookFriendsApiResponse getAllFacebookFriendsApiResponse, Response response)
+            {
+                bus.post(new AllFacebookFriendsFetchedTrigger(getAllFacebookFriendsApiResponse.getFriends()));
+            }
+
+            @Override
+            public void failure(RetrofitError error)
+            {
+                bus.post(new GenericErrorTrigger(ErrorCode.ALL_FACEBOOK_FRIENDS_FETCH_FAILURE, error));
             }
         });
     }
@@ -140,5 +163,43 @@ public class UserService
 
         cur.close();
         return allContacts;
+    }
+
+    public void sendBlockRequests(List<String> blockList, List<String> unblockList)
+    {
+        meApi = ApiManager.getInstance().getApi(MeApi.class);
+        meApi.blockFriends(new BlockFriendsApiRequest(blockList, unblockList), new Callback<Response>()
+        {
+            @Override
+            public void success(Response response, Response response2)
+            {
+
+            }
+
+            @Override
+            public void failure(RetrofitError error)
+            {
+
+            }
+        });
+    }
+
+    public void shareFeedback(String rating, String comment)
+    {
+        meApi = ApiManager.getInstance().getApi(MeApi.class);
+        meApi.shareFeedback(new ShareFeedbackApiRequest(comment, rating), new Callback<Response>()
+        {
+            @Override
+            public void success(Response response, Response response2)
+            {
+
+            }
+
+            @Override
+            public void failure(RetrofitError error)
+            {
+
+            }
+        });
     }
 }

@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,12 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.api.core.GsonProvider;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.ChangeAttendeeListTrigger;
-import reaper.android.app.ui.screens.invite.InviteUsersContainerFragment;
+import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.communicator.Communicator;
 
@@ -124,6 +126,9 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
 
         rsvp.setOnClickListener(this);
         invite.setOnClickListener(this);
+
+        Log.d("APP", GsonProvider.getGson().toJson(events.get(activePosition)));
+
         renderRsvpButton(events.get(activePosition).getRsvp());
     }
 

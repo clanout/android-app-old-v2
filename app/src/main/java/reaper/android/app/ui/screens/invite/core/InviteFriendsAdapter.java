@@ -1,4 +1,4 @@
-package reaper.android.app.ui.screens.invite;
+package reaper.android.app.ui.screens.invite.core;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -67,13 +67,25 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
         EventDetails.Invitee invitee = new EventDetails.Invitee();
         invitee.setId(current.getId());
 
-        if (invitees.contains(invitee))
+        if (current.isBlocked())
         {
             holder.checkBox.setVisibility(View.GONE);
+            holder.alreadyInvited.setText("Blocked");
+            holder.alreadyInvited.setVisibility(View.VISIBLE);
         }
         else
         {
-            holder.alreadyInvited.setVisibility(View.GONE);
+            if (invitees.contains(invitee))
+            {
+                holder.checkBox.setVisibility(View.GONE);
+                holder.alreadyInvited.setText("Already Invited");
+                holder.alreadyInvited.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                holder.alreadyInvited.setVisibility(View.GONE);
+                holder.checkBox.setVisibility(View.VISIBLE);
+            }
         }
     }
 

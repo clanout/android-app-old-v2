@@ -1,52 +1,53 @@
-package reaper.android.app.ui.screens.invite;
+package reaper.android.app.ui.screens.accounts.friends;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.config.ErrorCode;
-import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
-import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
-import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
-import reaper.android.app.trigger.user.FacebookFriendsFetchedTrigger;
+import reaper.android.app.trigger.user.AllFacebookFriendsFetchedTrigger;
+import reaper.android.app.ui.screens.accounts.AccountsFragment;
+import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.communicator.Communicator;
 
-public class InviteFacebookFriendsFragment extends Fragment
+public class ManageFriendsFragment extends Fragment implements BlockListCommunicator, View.OnClickListener
 {
     private RecyclerView recyclerView;
     private TextView noFriendsMessage;
+    private ImageButton done;
 
-    private InviteFriendsAdapter inviteFriendsAdapter;
+    private ManageFriendsAdapter manageFriendsAdapter;
     private UserService userService;
-    private LocationService locationService;
     private Bus bus;
-    private InviteeListCommunicator inviteeListCommunicator;
+    private FragmentManager fragmentManager;
 
-    private ArrayList<EventDetails.Invitee> inviteeList;
-    private List<Friend> friendList;
+    private ArrayList<String> blockList;
+    private ArrayList<String> unblockList;
+    private ArrayList<Friend> friendList;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
@@ -55,10 +56,11 @@ public class InviteFacebookFriendsFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.fragment_invite_facebook_friends, container, false);
+        View view = inflater.inflate(R.layout.fragment_manage_friends, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.rv_invite_facebook_friends);
-        noFriendsMessage = (TextView) view.findViewById(R.id.tv_invite_facebook_friends_no_users);
+        recyclerView = (RecyclerView) view.findViewById(R.id.rv_manage_friends);
+        noFriendsMessage = (TextView) view.findViewById(R.id.tv_manage_friends_no_users);
+        done = (ImageButton) view.findViewById(R.id.ib_manage_friends_done);
 
         return view;
     }
@@ -68,34 +70,20 @@ public class InviteFacebookFriendsFragment extends Fragment
     {
         super.onActivityCreated(savedInstanceState);
 
-        Bundle bundle = getArguments();
-
-        if (bundle == null)
-        {
-            inviteeList = new ArrayList<>();
-        }
-        else
-        {
-            inviteeList = (ArrayList<EventDetails.Invitee>) bundle.get("invitee_list");
-
-            if (inviteeList == null)
-            {
-                inviteeList = new ArrayList<>();
-            }
-
-            inviteeListCommunicator = (InviteeListCommunicator) bundle.get("invitee_communicator");
-        }
-
+        blockList = new ArrayList<>();
+        unblockList = new ArrayList<>();
         friendList = new ArrayList<>();
 
         bus = Communicator.getInstance().getBus();
         bus.register(this);
         userService = new UserService(bus);
-        locationService = new LocationService(bus);
+        fragmentManager = getActivity().getSupportFragmentManager();
+
+        done.setOnClickListener(this);
 
         initRecyclerView();
 
-        userService.getFacebookFriends(locationService.getUserLocation().getZone());
+        userService.getAllFacebookFriends();
     }
 
     @Override
@@ -125,17 +113,17 @@ public class InviteFacebookFriendsFragment extends Fragment
 
     private void initRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, inviteeListCommunicator, true);
+        manageFriendsAdapter = new ManageFriendsAdapter(getActivity(), friendList, this);
 
-        recyclerView.setAdapter(inviteFriendsAdapter);
+        recyclerView.setAdapter(manageFriendsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     private void refreshRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, inviteeListCommunicator, true);
+        manageFriendsAdapter = new ManageFriendsAdapter(getActivity(), friendList, this);
 
-        recyclerView.setAdapter(inviteFriendsAdapter);
+        recyclerView.setAdapter(manageFriendsAdapter);
 
         if (friendList.size() == 0)
         {
@@ -152,9 +140,9 @@ public class InviteFacebookFriendsFragment extends Fragment
     }
 
     @Subscribe
-    public void onFacebookFriendsFetched(FacebookFriendsFetchedTrigger trigger)
+    public void onAllFacebookFriendsFetched(AllFacebookFriendsFetchedTrigger trigger)
     {
-        friendList = trigger.getFriends();
+        friendList = (ArrayList<Friend>) trigger.getFriends();
 
         refreshRecyclerView();
     }
@@ -162,10 +150,61 @@ public class InviteFacebookFriendsFragment extends Fragment
     @Subscribe
     public void onFacebookFriendsNotFetched(GenericErrorTrigger trigger)
     {
-        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCH_FAILURE)
+        if (trigger.getErrorCode() == ErrorCode.ALL_FACEBOOK_FRIENDS_FETCH_FAILURE)
         {
             noFriendsMessage.setText("Could not load your facebook friends. Please try again.");
             noFriendsMessage.setVisibility(View.VISIBLE);
+        }
+    }
+
+
+    @Override
+    public void onClick(View view)
+    {
+        if (view.getId() == R.id.ib_manage_friends_done)
+        {
+            userService.sendBlockRequests(blockList, unblockList);
+            FragmentUtils.changeFragment(fragmentManager, new AccountsFragment(), false);
+        }
+    }
+
+    @Override
+    public void toggleBlock(String id)
+    {
+        Friend friend = new Friend();
+        friend.setId(id);
+
+        int position = friendList.indexOf(friend);
+
+        if (friendList.get(position).isBlocked())
+        {
+            if (unblockList.contains(id))
+            {
+                unblockList.remove(id);
+                blockList.add(id);
+            }
+            else
+            {
+                unblockList.add(id);
+
+                if (blockList.contains(id))
+                {
+                    blockList.remove(id);
+                }
+            }
+        }
+        else
+        {
+            if (blockList.contains(id))
+            {
+                blockList.remove(id);
+                unblockList.add(id);
+            }
+            else
+            {
+                unblockList.remove(id);
+                blockList.add(id);
+            }
         }
     }
 }

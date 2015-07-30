@@ -6,24 +6,26 @@
     <item
         android:id="@+id/action_add_phone"
         android:icon="@drawable/ic_action_error"
-        android:showAsAction="always"
+        app:showAsAction ="always"
         android:title= "Add Phone Number"
         android:orderInCategory="1"
-        tools:ignore="AppCompatResource" />
+        />
 
     <item
         android:id="@+id/action_create_event"
         android:icon="@drawable/ic_action_new"
         android:title="@string/action_create_event"
         android:orderInCategory="2"
-        app:showAsAction="always"/>
+        app:showAsAction="always"
+        />
 
     <item
         android:id="@+id/action_account"
         android:icon="@drawable/ic_action_accounts"
         android:title="@string/action_account"
         android:orderInCategory="3"
-        app:showAsAction="always"/>
+        app:showAsAction="always"
+        />
 
     <item
         android:id="@+id/action_search"
@@ -31,34 +33,39 @@
         android:title="@string/action_search"
         android:orderInCategory="4"
         app:showAsAction="always"
-        android:actionViewClass="android.widget.SearchView"/>
+        app:actionViewClass="android.widget.SearchView"
+        />
 
     <item
         android:id="@+id/action_home"
         android:icon="@drawable/ic_action_event"
         android:title="@string/action_home"
         android:orderInCategory="5"
-        app:showAsAction="always"/>
+        app:showAsAction="always"
+        />
 
     <item
         android:id="@+id/action_edit_event"
         android:icon="@drawable/ic_action_edit"
         android:title="@string/action_edit_event"
         android:orderInCategory="6"
-        app:showAsAction="always"/>
+        app:showAsAction="always"
+        />
 
     <item
         android:id="@+id/action_finalize_event"
         android:icon="@drawable/ic_action_secure"
         android:title="@string/action_finalize_event"
         android:orderInCategory="7"
-        app:showAsAction="always"/>
+        app:showAsAction="always"
+        />
 
     <item
         android:id="@+id/action_delete_event"
         android:icon="@drawable/ic_action_discard"
         android:title="@string/action_delete_event"
         android:orderInCategory="8"
-        app:showAsAction="always"/>
+        app:showAsAction="always"
+        />
 
 </menu>

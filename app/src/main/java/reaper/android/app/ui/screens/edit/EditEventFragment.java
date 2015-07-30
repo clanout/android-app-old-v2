@@ -477,7 +477,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             builder.setCancelable(true);
 
             LayoutInflater inflater = getActivity().getLayoutInflater();
-            final View selectTimingsDialogView = inflater.inflate(R.layout.dialog_fragment_select_date_time, null);
+            final View selectTimingsDialogView = inflater.inflate(R.layout.alert_dialog_select_date_time, null);
             builder.setView(selectTimingsDialogView);
 
             final TimePicker startTimePicker = (TimePicker) selectTimingsDialogView.findViewById(R.id.tp_select_time_start);

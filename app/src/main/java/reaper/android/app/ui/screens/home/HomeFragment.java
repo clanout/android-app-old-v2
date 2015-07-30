@@ -448,7 +448,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
                 builder.setCancelable(true);
 
                 LayoutInflater inflater = getActivity().getLayoutInflater();
-                final View createEventDialogView = inflater.inflate(R.layout.dialog_fragment_create_event, null);
+                final View createEventDialogView = inflater.inflate(R.layout.alert_dialog_create_event, null);
                 builder.setView(createEventDialogView);
 
                 final EditText eventTitle = (EditText) createEventDialogView.findViewById(R.id.et_dialog_fragment_create_event_title);

@@ -3,7 +3,7 @@
               android:orientation="horizontal"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:layout_margin="16dp">
+              android:layout_margin="12dp">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -14,7 +14,8 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/iv_list_item_friends_user_pic"/>
+            android:src="@drawable/ic_local_bar_black_36dp"
+            android:id="@+id/iv_list_item_manage_friends_user_pic"/>
 
     </LinearLayout>
 
@@ -25,21 +26,15 @@
         android:textStyle="normal"
         android:textSize="16sp"
         android:gravity="center_vertical"
-        android:id="@+id/tv_list_item_friends_user_name"/>
+        android:text="Harsh Pokharna"
+        android:id="@+id/tv_list_item_manage_friends_user_name"/>
 
-    <LinearLayout
+    <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginRight="4dp"
-        android:gravity="center_vertical|center_horizontal">
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_not_important"
-            android:id="@+id/ib_list_item_friends_block_status"/>
-
-    </LinearLayout>
+        android:id="@+id/ib_list_item_manage_friends_block"
+        android:src="@drawable/ic_action_important"
+        android:gravity="center_vertical|center_horizontal"/>
 
 
 </LinearLayout>

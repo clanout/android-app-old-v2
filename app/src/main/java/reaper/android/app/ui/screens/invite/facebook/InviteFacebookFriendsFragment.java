@@ -1,16 +1,17 @@
-package reaper.android.app.ui.screens.invite;
+package reaper.android.app.ui.screens.invite.facebook;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
@@ -26,27 +27,31 @@ import reaper.android.app.model.Friend;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
-import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
-import reaper.android.app.trigger.user.PhoneContactsFetchedTrigger;
+import reaper.android.app.trigger.user.FacebookFriendsFetchedTrigger;
+import reaper.android.app.ui.screens.invite.core.InviteFriendsAdapter;
+import reaper.android.app.ui.screens.invite.core.InviteeListCommunicator;
 import reaper.android.common.communicator.Communicator;
 
-public class InvitePhoneContactsFragment extends Fragment
+public class InviteFacebookFriendsFragment extends Fragment
 {
     private RecyclerView recyclerView;
-    private TextView noContactsMessage;
+    private TextView noFriendsMessage;
+    private SearchView searchView;
+    private MenuItem searchItem;
+
+    private InviteFriendsAdapter inviteFriendsAdapter;
+    private UserService userService;
+    private LocationService locationService;
+    private Bus bus;
+    private InviteeListCommunicator inviteeListCommunicator;
 
     private ArrayList<EventDetails.Invitee> inviteeList;
     private List<Friend> friendList;
-    private InviteFriendsAdapter inviteFriendsAdapter;
-
-    private InviteeListCommunicator inviteeListCommunicator;
-    private Bus bus;
-    private UserService userService;
-    private LocationService locationService;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
@@ -55,10 +60,10 @@ public class InvitePhoneContactsFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.fragment_invite_phone_contacts, container, false);
+        View view = inflater.inflate(R.layout.fragment_invite_facebook_friends, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.rv_invite_phone_contacts);
-        noContactsMessage = (TextView) view.findViewById(R.id.tv_invite_phone_contacts_no_users);
+        recyclerView = (RecyclerView) view.findViewById(R.id.rv_invite_facebook_friends);
+        noFriendsMessage = (TextView) view.findViewById(R.id.tv_invite_facebook_friends_no_users);
 
         return view;
     }
@@ -94,7 +99,8 @@ public class InvitePhoneContactsFragment extends Fragment
         locationService = new LocationService(bus);
 
         initRecyclerView();
-        userService.getPhoneContacts(getActivity().getContentResolver());
+
+        userService.getFacebookFriends(locationService.getUserLocation().getZone());
     }
 
     @Override
@@ -120,14 +126,11 @@ public class InvitePhoneContactsFragment extends Fragment
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
-
-        // TODO - Add 'refresh' menu item
     }
-
 
     private void initRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, inviteeListCommunicator, false);
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, inviteeListCommunicator, true);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -135,38 +138,40 @@ public class InvitePhoneContactsFragment extends Fragment
 
     private void refreshRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, inviteeListCommunicator, false);
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, inviteeListCommunicator, true);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
 
         if (friendList.size() == 0)
         {
-            noContactsMessage.setText("None of your phone contacts are on the app. Invite people by going to the accounts page.");
-            noContactsMessage.setVisibility(View.VISIBLE);
+            noFriendsMessage.setText("None of your facebook friends are on the app. Invite people by going to the accounts page.");
+            noFriendsMessage.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
 
         }
         else
         {
             recyclerView.setVisibility(View.VISIBLE);
-            noContactsMessage.setVisibility(View.GONE);
+            noFriendsMessage.setVisibility(View.GONE);
         }
     }
 
     @Subscribe
-    public void onPhoneContactsFetched(PhoneContactsFetchedTrigger trigger)
+    public void onFacebookFriendsFetched(FacebookFriendsFetchedTrigger trigger)
     {
-        friendList = trigger.getPhoneContacts();
+        friendList = trigger.getFriends();
+
         refreshRecyclerView();
     }
 
     @Subscribe
-    public void onPhoneContactsNotFetched(GenericErrorTrigger trigger)
+    public void onFacebookFriendsNotFetched(GenericErrorTrigger trigger)
     {
-        if (trigger.getErrorCode() == ErrorCode.PHONE_CONTACTS_FETCH_FAILURE)
+        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCH_FAILURE)
         {
-            noContactsMessage.setText("Could not load your phone contacts. Please try again.");
-            noContactsMessage.setVisibility(View.VISIBLE);
+            noFriendsMessage.setText("Could not load your facebook friends. Please try again.");
+            noFriendsMessage.setVisibility(View.VISIBLE);
         }
     }
+
 }

@@ -5,8 +5,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+
+import com.squareup.otto.Bus;
 
 import reaper.android.R;
+import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.common.CacheCommitTrigger;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
@@ -15,6 +20,7 @@ import reaper.android.common.communicator.Communicator;
 public class MainActivity extends AppCompatActivity
 {
     private FragmentManager fragmentManager;
+    private Bus bus;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -26,6 +32,8 @@ public class MainActivity extends AppCompatActivity
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        bus = Communicator.getInstance().getBus();
+
         fragmentManager = getSupportFragmentManager();
         FragmentUtils.changeFragment(fragmentManager, new HomeFragment(), false);
     }
@@ -35,6 +43,7 @@ public class MainActivity extends AppCompatActivity
     {
         super.onStart();
         getSupportActionBar().setTitle("reap3r");
+        bus.register(this);
     }
 
     @Override
@@ -42,5 +51,6 @@ public class MainActivity extends AppCompatActivity
     {
         super.onStop();
         Communicator.getInstance().getBus().post(new CacheCommitTrigger());
+        bus.unregister(this);
     }
 }
