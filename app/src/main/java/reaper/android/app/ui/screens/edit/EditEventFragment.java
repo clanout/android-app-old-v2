@@ -54,8 +54,10 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventEditedTrigger;
 import reaper.android.app.trigger.event.EventLocationFetchedTrigger;
 import reaper.android.app.trigger.event.EventSuggestionsTrigger;
+import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.ui.screens.create.EventSuggestionsAdapter;
 import reaper.android.app.ui.screens.create.GooglePlacesAutocompleteAdapter;
+import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.EventUtils;
 import reaper.android.app.ui.util.FragmentUtils;
@@ -75,6 +77,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
 
     // Data
     private Event event;
+    private String eventId;
     private EventDetails eventDetails;
     private Location placeLocation;
     private DateTime startDateTime, endDateTime;
@@ -641,7 +644,28 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     public void onEventEdited(EventEditedTrigger trigger)
     {
         eventService.updateCacheFor(trigger.getEvent());
-        FragmentUtils.changeFragment(fragmentManager, new HomeFragment(), false);
+        eventId = trigger.getEvent().getId();
+
+        eventService.fetchEvents(locationService.getUserLocation().getZone());
+    }
+
+    @Subscribe
+    public void onEventsFetchedEdit(EventsFetchTrigger trigger)
+    {
+        List<Event> events = trigger.getEvents();
+
+        Event activeEvent = new Event();
+        activeEvent.setId(eventId);
+
+        int activePosition = events.indexOf(activeEvent);
+
+        EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("events", (ArrayList<Event>) events);
+        bundle.putInt("active_event", activePosition);
+        eventDetailsContainerFragment.setArguments(bundle);
+        FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment, false);
+
     }
 
     @Subscribe
