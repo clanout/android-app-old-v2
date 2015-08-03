@@ -113,7 +113,7 @@ public class EventService
                 public void success(EventDetailsApiResponse eventDetailsApiResponse, Response response)
                 {
                     EventDetails eventDetails = eventDetailsApiResponse.getEventDetails();
-                    Collections.sort(eventDetails.getAttendees(), new EventAttendeeComparator(userService.getActiveUser()));
+                    Collections.sort(eventDetails.getAttendees(), new EventAttendeeComparator(userService.getActiveUserId()));
                     updateCacheFor(eventDetails);
                     bus.post(new EventDetailsFetchTrigger(eventDetails));
                 }

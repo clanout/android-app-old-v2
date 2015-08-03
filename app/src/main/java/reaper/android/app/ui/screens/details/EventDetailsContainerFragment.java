@@ -28,6 +28,7 @@ import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.ChangeAttendeeListTrigger;
+import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.communicator.Communicator;
@@ -46,7 +47,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
 
     // UI Elements
     private ViewPager viewPager;
-    private ImageButton rsvp, invite;
+    private ImageButton rsvp, invite, chat;
 
     private PagerAdapter pagerAdapter;
 
@@ -65,6 +66,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         viewPager = (ViewPager) view.findViewById(R.id.vp_event_details_container);
         rsvp = (ImageButton) view.findViewById(R.id.ibtn_event_details_rsvp);
         invite = (ImageButton) view.findViewById(R.id.ibtn_event_details_invite);
+        chat = (ImageButton) view.findViewById(R.id.ibtn_event_details_chat);
 
         return view;
     }
@@ -126,8 +128,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
 
         rsvp.setOnClickListener(this);
         invite.setOnClickListener(this);
-
-        Log.d("APP", GsonProvider.getGson().toJson(events.get(activePosition)));
+        chat.setOnClickListener(this);
 
         renderRsvpButton(events.get(activePosition).getRsvp());
     }
@@ -177,7 +178,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
 
             rsvpMenu.show();
         }
-        else if(view.getId() == R.id.ibtn_event_details_invite)
+        else if (view.getId() == R.id.ibtn_event_details_invite)
         {
             InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
             Bundle bundle = new Bundle();
@@ -185,6 +186,14 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
             bundle.putBoolean("from_create_fragment", false);
             inviteUsersContainerFragment.setArguments(bundle);
             FragmentUtils.changeFragment(fragmentManager, inviteUsersContainerFragment, true);
+        }
+        else if (view.getId() == R.id.ibtn_event_details_chat)
+        {
+            ChatFragment chatFragment = new ChatFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("event_id", events.get(activePosition).getId());
+            chatFragment.setArguments(bundle);
+            FragmentUtils.changeFragment(fragmentManager, chatFragment, true);
         }
     }
 

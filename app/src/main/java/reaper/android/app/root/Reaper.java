@@ -8,7 +8,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.ThreadEnforcer;
@@ -16,7 +15,6 @@ import com.squareup.otto.ThreadEnforcer;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.trigger.common.CacheCommitTrigger;
-import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshRequestTrigger;
 import reaper.android.common.cache.Cache;
 import reaper.android.common.communicator.Communicator;
@@ -38,8 +36,6 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
 
     protected void init()
     {
-        Log.d("reap3r", "App init");
-
         bus = new Bus(ThreadEnforcer.ANY);
         bus.register(this);
 
@@ -54,7 +50,6 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
                 .build();
 
         String cache = new Gson().toJson(Cache.getInstance());
-        Log.d("reap3r", cache);
     }
 
     @Subscribe
@@ -98,5 +93,5 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     {
         Log.d("reap3r", "Unable to connect to Google API client");
     }
-    
+
 }

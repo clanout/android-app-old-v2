@@ -290,7 +290,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         switch (sort)
         {
             case RELEVANCE:
-                Collections.sort(events, new EventComparator.Relevance(userService.getActiveUser()));
+                Collections.sort(events, new EventComparator.Relevance(userService.getActiveUserId()));
                 break;
             case DATE_TIME:
                 Collections.sort(events, new EventComparator.DateTime());

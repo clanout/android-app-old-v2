@@ -24,6 +24,7 @@ android {
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -53,4 +54,8 @@ dependencies {
     compile 'com.google.android.gms:play-services:7.5.0'
     compile 'com.googlecode.libphonenumber:libphonenumber:7.0.2'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile "org.igniterealtime.smack:smack-android:4.1.0-rc1"
+    compile "org.igniterealtime.smack:smack-tcp:4.1.0-rc1"
+    compile "org.igniterealtime.smack:smack-android-extensions:4.1.0"
+    compile 'io.reactivex:rxandroid:0.25.0'
 }

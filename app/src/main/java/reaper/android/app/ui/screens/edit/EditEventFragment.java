@@ -306,7 +306,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
 
-        if (EventUtils.canDeleteEvent(event, userService.getActiveUser()))
+        if (EventUtils.canDeleteEvent(event, userService.getActiveUserId()))
         {
             menu.findItem(R.id.action_delete_event).setVisible(true);
             menu.findItem(R.id.action_delete_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
@@ -352,7 +352,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             menu.findItem(R.id.action_delete_event).setVisible(false);
         }
 
-        if (EventUtils.canFinaliseEvent(event, userService.getActiveUser()))
+        if (EventUtils.canFinaliseEvent(event, userService.getActiveUserId()))
         {
             if (isFinalised)
             {

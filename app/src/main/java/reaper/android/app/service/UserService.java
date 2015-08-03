@@ -7,15 +7,11 @@ import android.util.Log;
 
 import com.squareup.otto.Bus;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import reaper.android.app.api.core.ApiManager;
-import reaper.android.app.api.core.GsonProvider;
 import reaper.android.app.api.me.MeApi;
 import reaper.android.app.api.me.request.AddPhoneApiRequest;
 import reaper.android.app.api.me.request.BlockFriendsApiRequest;
@@ -49,9 +45,14 @@ public class UserService
         this.bus = bus;
     }
 
-    public String getActiveUser()
+    public String getActiveUserId()
     {
         return "9320369679";
+    }
+
+    public String getActiveUserName()
+    {
+        return "Lucas Johnson";
     }
 
     public void updatePhoneNumber(final String phoneNumber)

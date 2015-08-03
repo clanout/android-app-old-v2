@@ -281,7 +281,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
 
-        if (EventUtils.canEdit(event, userService.getActiveUser()))
+        if (EventUtils.canEdit(event, userService.getActiveUserId()))
         {
             menu.findItem(R.id.action_edit_event).setVisible(true);
             menu.findItem(R.id.action_edit_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
@@ -341,7 +341,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         if (event.getId().equals(trigger.getEventId()))
         {
             EventDetails.Attendee attendee = new EventDetails.Attendee();
-            attendee.setId(userService.getActiveUser());
+            attendee.setId(userService.getActiveUserId());
 
             if (trigger.getRsvp() == Event.RSVP.YES)
             {

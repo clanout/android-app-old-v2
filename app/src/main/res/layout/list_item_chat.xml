@@ -1,0 +1,47 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/llListItemChat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:id="@+id/llChatContentWithBackground"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:background="@drawable/out_message_bg"
+            android:paddingLeft="10dp"
+            android:paddingBottom="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvTextContentName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_marginLeft="5dp"
+                android:textStyle="bold"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvTextMessageInBubble"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginBottom="5dp"
+                android:maxWidth="240dp"
+                android:minWidth="100dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>
