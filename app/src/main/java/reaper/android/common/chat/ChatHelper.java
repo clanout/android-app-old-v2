@@ -6,18 +6,15 @@ import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
-import org.jivesoftware.smackx.muc.DiscussionHistory;
-import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.smackx.muc.MultiUserChatManager;
 
 import java.io.IOException;
-import java.util.List;
 
-import reaper.android.app.model.ChatMessage;
 import rx.Observable;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
@@ -92,6 +89,14 @@ public class ChatHelper
                                 }
                             });
 
+                            connection.addAsyncStanzaListener(new StanzaListener()
+                            {
+                                @Override
+                                public void processPacket(Stanza packet) throws SmackException.NotConnectedException
+                                {
+                                }
+                            }, null);
+
                             if (connection != null)
                             {
                                 try
@@ -147,7 +152,7 @@ public class ChatHelper
 
     public static void disconnectConnection()
     {
-        if(connection != null)
+        if (connection != null)
         {
             connection.disconnect();
         }

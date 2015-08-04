@@ -2,12 +2,14 @@ package reaper.android.app.api.me.request;
 
 import com.google.gson.annotations.SerializedName;
 
+import reaper.android.app.api.core.ApiRequest;
+
 /**
  * Created by aditya on 02/07/15.
  */
-public class AddPhoneApiRequest
+public class AddPhoneApiRequest extends ApiRequest
 {
-    @SerializedName("phone_number")
+    @SerializedName("phone")
     private String phoneNumber;
 
     public AddPhoneApiRequest(String phoneNumber){

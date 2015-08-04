@@ -355,6 +355,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         menu.findItem(R.id.action_search).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
+        menu.findItem(R.id.action_refresh).setVisible(false);
 
         if (Cache.getInstance().get(CacheKeys.MY_PHONE_NUMBER) == null)
         {

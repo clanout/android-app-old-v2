@@ -12,8 +12,12 @@ public class GetPhoneContactsApiRequest extends ApiRequest
     @SerializedName("contacts")
     private String phoneNumberList;
 
-    public GetPhoneContactsApiRequest(Set<String> phoneNumberList)
+    @SerializedName("zone")
+    private String zone;
+
+    public GetPhoneContactsApiRequest(Set<String> phoneNumberList, String zone)
     {
         this.phoneNumberList = GsonProvider.getGson().toJson(phoneNumberList);
+        this.zone = zone;
     }
 }

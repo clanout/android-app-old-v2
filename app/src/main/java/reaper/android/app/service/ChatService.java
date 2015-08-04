@@ -1,8 +1,11 @@
 package reaper.android.app.service;
 
+import android.util.Log;
+
 import com.squareup.otto.Bus;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
+import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
@@ -27,31 +30,51 @@ public class ChatService
         this.bus = bus;
     }
 
-    public static List<ChatMessage> fetchHistory(String eventId, AbstractXMPPConnection connection, String nickName) throws SmackException.NotConnectedException, XMPPException.XMPPErrorException, SmackException.NoResponseException, MUCNotJoinedException
+    public List<ChatMessage> fetchHistory(MultiUserChat chat, String nickName, String userId, long timeout) throws SmackException.NotConnectedException, XMPPException.XMPPErrorException, SmackException.NoResponseException, MUCNotJoinedException
     {
         List<ChatMessage> chatMessageList = new ArrayList<>();
 
-        MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
-        MultiUserChat chat = manager.getMultiUserChat(eventId + XMPP_CHATROOM_PREFIX);
-
         DiscussionHistory history = new DiscussionHistory();
-        history.setMaxStanzas(50);
+        history.setMaxStanzas(10);
 
-        chat.join(nickName, null, history, connection.getPacketReplyTimeout());
+        chat.join(nickName, null, history, timeout);
 
         Message message = null;
-        while ((message = chat.nextMessage()) != null){
+        while ((message = chat.nextMessage()) != null)
+        {
+            String[] fromUser = message.getFrom().split("/");
+            String[] userDetails = fromUser[1].split("_");
 
             ChatMessage chatMessage = new ChatMessage();
             chatMessage.setMessage(message.getBody());
-            chatMessage.setSenderName(message.getFrom());
-            chatMessage.setSenderId(message.getFrom());
+            chatMessage.setSenderName(userDetails[0]);
+            chatMessage.setSenderId(userDetails[1]);
+
+            if (userId.equals(userDetails[1]))
+            {
+                chatMessage.setMe(true);
+            }
+            else
+            {
+                chatMessage.setMe(false);
+            }
 
             chatMessageList.add(chatMessage);
         }
-
         return chatMessageList;
     }
 
+    public void postMessage(MultiUserChat chat, String chatMessage, String nickName) throws SmackException.NotConnectedException, XMPPException.XMPPErrorException, SmackException.NoResponseException
+    {
+        chat.join(nickName);
+        chat.sendMessage(chatMessage);
+    }
+
+    public MultiUserChat getMultiUserChat(AbstractXMPPConnection connection, String eventId)
+    {
+        MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
+        MultiUserChat chat = manager.getMultiUserChat(eventId + XMPP_CHATROOM_PREFIX);
+        return chat;
+    }
 
 }

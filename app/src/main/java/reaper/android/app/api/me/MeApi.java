@@ -19,7 +19,7 @@ import retrofit.Callback;
  */
 public interface MeApi
 {
-    @POST("/me/add-phone")
+    @POST("/me/phone")
     public void updatePhoneNumber(@Body AddPhoneApiRequest request, Callback<Response> callback);
 
     @POST("/me/friends")

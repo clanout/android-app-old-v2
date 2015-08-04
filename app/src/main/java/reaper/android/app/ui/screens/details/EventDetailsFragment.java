@@ -280,6 +280,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
+        menu.findItem(R.id.action_refresh).setVisible(false);
 
         if (EventUtils.canEdit(event, userService.getActiveUserId()))
         {

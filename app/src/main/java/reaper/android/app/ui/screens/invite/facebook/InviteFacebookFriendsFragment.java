@@ -11,7 +11,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
@@ -36,8 +35,7 @@ public class InviteFacebookFriendsFragment extends Fragment
 {
     private RecyclerView recyclerView;
     private TextView noFriendsMessage;
-    private SearchView searchView;
-    private MenuItem searchItem;
+    private Menu menu;
 
     private InviteFriendsAdapter inviteFriendsAdapter;
     private UserService userService;
@@ -118,6 +116,8 @@ public class InviteFacebookFriendsFragment extends Fragment
         menu.clear();
         inflater.inflate(R.menu.action_button, menu);
 
+        this.menu = menu;
+
         menu.findItem(R.id.action_account).setVisible(false);
         menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
@@ -126,6 +126,18 @@ public class InviteFacebookFriendsFragment extends Fragment
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
+        menu.findItem(R.id.action_refresh).setVisible(true);
+
+        menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem)
+            {
+                menuItem.setActionView(R.layout.action_button_refreshing);
+                userService.getFacebookFriends(locationService.getUserLocation().getZone());
+                return true;
+            }
+        });
     }
 
     private void initRecyclerView()
@@ -160,8 +172,12 @@ public class InviteFacebookFriendsFragment extends Fragment
     public void onFacebookFriendsFetched(FacebookFriendsFetchedTrigger trigger)
     {
         friendList = trigger.getFriends();
-
         refreshRecyclerView();
+
+        if (menu != null)
+        {
+            menu.findItem(R.id.action_refresh).setActionView(null);
+        }
     }
 
     @Subscribe
@@ -171,6 +187,11 @@ public class InviteFacebookFriendsFragment extends Fragment
         {
             noFriendsMessage.setText("Could not load your facebook friends. Please try again.");
             noFriendsMessage.setVisibility(View.VISIBLE);
+
+            if (menu != null)
+            {
+                menu.findItem(R.id.action_refresh).setActionView(null);
+            }
         }
     }
 

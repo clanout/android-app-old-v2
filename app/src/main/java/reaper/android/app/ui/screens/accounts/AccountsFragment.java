@@ -91,6 +91,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
+        menu.findItem(R.id.action_refresh).setVisible(false);
     }
 
     @Override
@@ -162,7 +163,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
                         wantToCloseDialog = true;
                     }
 
-                    if(wantToCloseDialog)
+                    if (wantToCloseDialog)
                     {
                         alertDialog.dismiss();
                     }

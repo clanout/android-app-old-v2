@@ -114,13 +114,13 @@ public class UserService
         });
     }
 
-    public void getPhoneContacts(ContentResolver contentResolver)
+    public void getPhoneContacts(ContentResolver contentResolver, String zone)
     {
         Set<String> contacts = fetchAllContacts(contentResolver);
 
         meApi = ApiManager.getInstance().getApi(MeApi.class);
 
-        GetPhoneContactsApiRequest request = new GetPhoneContactsApiRequest(contacts);
+        GetPhoneContactsApiRequest request = new GetPhoneContactsApiRequest(contacts, zone);
         meApi.getPhoneContacts(request, new Callback<GetPhoneContactsApiResponse>()
         {
             @Override
