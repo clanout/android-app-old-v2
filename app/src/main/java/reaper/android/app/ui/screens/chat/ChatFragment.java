@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.config.BundleKeys;
 import reaper.android.app.model.ChatMessage;
 import reaper.android.app.service.ChatService;
 import reaper.android.app.service.UserService;
@@ -93,7 +94,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener
             renderNoSessionView();
         }
 
-        eventId = (String) bundle.get("event_id");
+        eventId = (String) bundle.get(BundleKeys.CHAT_FRAGMENT_EVENT_ID);
         if (eventId == null || eventId.isEmpty())
         {
             Log.d("APP", "2");
@@ -196,7 +197,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     {
         mainContent.setVisibility(View.GONE);
         noSessionMessage.setVisibility(View.VISIBLE);
-        noSessionMessage.setText("Cannot fetch the messages at the moment. Please try again.");
+        noSessionMessage.setText(R.string.chat_messages_not_fetched);
         return;
     }
 
@@ -308,7 +309,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener
             catch (Exception e)
             {
                 typeMessage.setText(message);
-                Toast.makeText(getActivity(), "Could not send your message. Please try again.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), R.string.chat_message_not_sent, Toast.LENGTH_LONG).show();
                 return;
             }
 

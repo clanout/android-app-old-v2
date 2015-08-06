@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
@@ -39,6 +40,7 @@ import java.util.TimerTask;
 
 import reaper.android.R;
 import reaper.android.app.config.AppConstants;
+import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
@@ -88,6 +90,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     private LinearLayout buttonBar;
     private Button filterButton, sortButton;
     private ImageButton refresh;
+    private FloatingActionButton createEvent;
 
     private EventsAdapter eventsAdapter;
 
@@ -120,6 +123,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         filterButton = (Button) view.findViewById(R.id.btn_home_filter);
         sortButton = (Button) view.findViewById(R.id.btn_home_sort);
         refresh = (ImageButton) view.findViewById(R.id.ibtn_home_refresh);
+        createEvent = (FloatingActionButton) view.findViewById(R.id.fib_home_create);
 
         return view;
     }
@@ -128,6 +132,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+
+        dispayBasicView();
 
         bus = Communicator.getInstance().getBus();
         fragmentManager = getActivity().getSupportFragmentManager();
@@ -141,6 +147,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         sortButton.setOnClickListener(this);
         filterButton.setOnClickListener(this);
         refresh.setOnClickListener(this);
+        createEvent.setOnClickListener(this);
 
         events = new ArrayList<>();
         eventUpdates = new ArrayList<>();
@@ -210,6 +217,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     }
 
     @Subscribe
+    public void onEventsNotFetchedTrigger(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.EVENTS_FETCH_FAILURE)
+        {
+            displayErrorView();
+        }
+    }
+
+    @Subscribe
     public void onEventUpdatesFetchTrigger(EventUpdatesFetchTrigger eventUpdatesFetchTrigger)
     {
         if (eventUpdatesFetchTrigger.getEventUpdates() != null)
@@ -236,8 +252,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener
 
         EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
         Bundle bundle = new Bundle();
-        bundle.putSerializable("events", (ArrayList<Event>) events);
-        bundle.putInt("active_event", activePosition);
+        bundle.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, (ArrayList<Event>) events);
+        bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
         eventDetailsContainerFragment.setArguments(bundle);
 
         FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment, true);
@@ -280,11 +296,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener
 
         if (events.size() == 0)
         {
-            setNoEventsView();
+            displayNoEventsView();
         }
         else
         {
-            setNormalView();
+            dispayBasicView();
         }
 
         switch (sort)
@@ -320,22 +336,40 @@ public class HomeFragment extends Fragment implements View.OnClickListener
                 }
             }
 
-            eventsAdapter = new EventsAdapter(bus, visibleEvents, eventUpdates, chatUpdates);
-            eventList.setAdapter(eventsAdapter);
+            if (visibleEvents.size() == 0)
+            {
+                displayNoEventsView();
+            }
+            else
+            {
+                eventsAdapter = new EventsAdapter(bus, visibleEvents, eventUpdates, chatUpdates);
+                eventList.setAdapter(eventsAdapter);
+            }
         }
     }
 
-    private void setNormalView()
+    private void dispayBasicView()
     {
         noEventsMessage.setVisibility(View.GONE);
+        createEvent.setVisibility(View.GONE);
         eventList.setVisibility(View.VISIBLE);
         buttonBar.setVisibility(View.VISIBLE);
     }
 
-    private void setNoEventsView()
+    private void displayNoEventsView()
     {
         noEventsMessage.setText(R.string.home_no_events);
         noEventsMessage.setVisibility(View.VISIBLE);
+        createEvent.setVisibility(View.VISIBLE);
+        eventList.setVisibility(View.GONE);
+        buttonBar.setVisibility(View.VISIBLE);
+    }
+
+    private void displayErrorView()
+    {
+        noEventsMessage.setVisibility(View.VISIBLE);
+        noEventsMessage.setText(R.string.home_events_fetch_error);
+        createEvent.setVisibility(View.GONE);
         eventList.setVisibility(View.GONE);
         buttonBar.setVisibility(View.GONE);
     }
@@ -396,7 +430,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
                             String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
                             if (parsedPhone == null)
                             {
-                                Toast.makeText(getActivity(), "Please enter a valid phone number", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity(), R.string.phone_invalid, Toast.LENGTH_LONG).show();
                                 wantToCloseDialog = false;
                             }
                             else
@@ -444,161 +478,164 @@ public class HomeFragment extends Fragment implements View.OnClickListener
             @Override
             public boolean onMenuItemClick(MenuItem menuItem)
             {
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setCancelable(true);
-
-                LayoutInflater inflater = getActivity().getLayoutInflater();
-                final View createEventDialogView = inflater.inflate(R.layout.alert_dialog_create_event, null);
-                builder.setView(createEventDialogView);
-
-                final EditText eventTitle = (EditText) createEventDialogView.findViewById(R.id.et_dialog_fragment_create_event_title);
-                LinearLayout general = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_general);
-                LinearLayout eat_out = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_eat_out);
-                LinearLayout drinks = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_drinks);
-                LinearLayout cafe = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_cafe);
-                LinearLayout movie = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_movie);
-                LinearLayout outdoors = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_outdoors);
-                LinearLayout party = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_party);
-                LinearLayout localEvents = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_local_events);
-                LinearLayout shopping = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_shopping);
-                final CheckBox checkBox = (CheckBox) createEventDialogView.findViewById(R.id.cb_dialog_fragment_create_event);
-
-                general.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        eventCategory = EventCategory.GENERAL;
-                    }
-                });
-
-                eat_out.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        eventCategory = EventCategory.EAT_OUT;
-                    }
-                });
-
-                drinks.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        eventCategory = EventCategory.DRINKS;
-                    }
-                });
-
-                cafe.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        eventCategory = EventCategory.CAFE;
-                    }
-                });
-
-                movie.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        eventCategory = EventCategory.MOVIES;
-                    }
-                });
-
-                outdoors.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        eventCategory = EventCategory.OUTDOORS;
-                    }
-                });
-
-                party.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        eventCategory = EventCategory.PARTY;
-                    }
-                });
-
-                localEvents.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        eventCategory = EventCategory.LOCAL_EVENTS;
-                    }
-                });
-
-                shopping.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        eventCategory = EventCategory.SHOPPING;
-                    }
-                });
-
-                builder.setPositiveButton("Next", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-
-                    }
-                });
-
-                final AlertDialog dialog = builder.create();
-                dialog.show();
-
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        Boolean wantToCloseDialog = false;
-
-                        String title = eventTitle.getText().toString();
-                        boolean isInviteOnly = checkBox.isChecked();
-
-                        if (title == null || title.isEmpty())
-                        {
-                            Toast.makeText(getActivity(), "Please enter a title", Toast.LENGTH_LONG).show();
-                            wantToCloseDialog = false;
-                        }
-                        else if (eventCategory == null)
-                        {
-                            Toast.makeText(getActivity(), "Please choose a category", Toast.LENGTH_LONG).show();
-                            wantToCloseDialog = false;
-                        }
-                        else
-                        {
-                            wantToCloseDialog = true;
-                            CreateEventFragment createEventFragment = new CreateEventFragment();
-                            Bundle bundle = new Bundle();
-                            bundle.putString("title", title);
-                            bundle.putBoolean("is_invite_only", isInviteOnly);
-                            bundle.putSerializable("category", eventCategory);
-                            createEventFragment.setArguments(bundle);
-                            FragmentUtils.changeFragment(fragmentManager, createEventFragment, true);
-                        }
-
-
-                        if (wantToCloseDialog)
-                        {
-                            dialog.dismiss();
-                        }
-
-                    }
-                });
-
+                displayCreateEventDialog();
                 return true;
+            }
+        });
+    }
+
+    public void displayCreateEventDialog()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(true);
+
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        final View createEventDialogView = inflater.inflate(R.layout.alert_dialog_create_event, null);
+        builder.setView(createEventDialogView);
+
+        final EditText eventTitle = (EditText) createEventDialogView.findViewById(R.id.et_dialog_fragment_create_event_title);
+        LinearLayout general = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_general);
+        LinearLayout eat_out = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_eat_out);
+        LinearLayout drinks = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_drinks);
+        LinearLayout cafe = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_cafe);
+        LinearLayout movie = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_movie);
+        LinearLayout outdoors = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_outdoors);
+        LinearLayout party = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_party);
+        LinearLayout localEvents = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_local_events);
+        LinearLayout shopping = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_shopping);
+        final CheckBox checkBox = (CheckBox) createEventDialogView.findViewById(R.id.cb_dialog_fragment_create_event);
+
+        general.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                eventCategory = EventCategory.GENERAL;
+            }
+        });
+
+        eat_out.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                eventCategory = EventCategory.EAT_OUT;
+            }
+        });
+
+        drinks.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                eventCategory = EventCategory.DRINKS;
+            }
+        });
+
+        cafe.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                eventCategory = EventCategory.CAFE;
+            }
+        });
+
+        movie.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                eventCategory = EventCategory.MOVIES;
+            }
+        });
+
+        outdoors.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                eventCategory = EventCategory.OUTDOORS;
+            }
+        });
+
+        party.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                eventCategory = EventCategory.PARTY;
+            }
+        });
+
+        localEvents.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                eventCategory = EventCategory.LOCAL_EVENTS;
+            }
+        });
+
+        shopping.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                eventCategory = EventCategory.SHOPPING;
+            }
+        });
+
+        builder.setPositiveButton("Next", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+
+            }
+        });
+
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Boolean wantToCloseDialog = false;
+
+                String title = eventTitle.getText().toString();
+                boolean isInviteOnly = checkBox.isChecked();
+
+                if (title == null || title.isEmpty())
+                {
+                    Toast.makeText(getActivity(), "Please enter a title", Toast.LENGTH_LONG).show();
+                    wantToCloseDialog = false;
+                }
+                else if (eventCategory == null)
+                {
+                    Toast.makeText(getActivity(), "Please choose a category", Toast.LENGTH_LONG).show();
+                    wantToCloseDialog = false;
+                }
+                else
+                {
+                    wantToCloseDialog = true;
+                    CreateEventFragment createEventFragment = new CreateEventFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putString(BundleKeys.CREATE_EVENT_FRAGMENT_TITLE, title);
+                    bundle.putBoolean(BundleKeys.CREATE_EVENT_FRAGMENT_IS_INVITE_ONLY, isInviteOnly);
+                    bundle.putSerializable(BundleKeys.CREATE_EVENT_CATEGORY, eventCategory);
+                    createEventFragment.setArguments(bundle);
+                    FragmentUtils.changeFragment(fragmentManager, createEventFragment, true);
+                }
+
+
+                if (wantToCloseDialog)
+                {
+                    dialog.dismiss();
+                }
+
             }
         });
     }
@@ -671,6 +708,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         else if (view.getId() == R.id.ibtn_home_refresh)
         {
             refreshRecyclerView();
+        }
+        else if (view.getId() == R.id.fib_home_create)
+        {
+            displayCreateEventDialog();
         }
     }
 }

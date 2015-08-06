@@ -110,12 +110,12 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
                 Intent intent = new Intent();
                 intent.setComponent(componentName);
                 intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, "This is a test message.");
+                intent.putExtra(Intent.EXTRA_TEXT, R.string.whatsapp_message);
                 startActivity(intent);
             }
             else
             {
-                Toast.makeText(getActivity(), "Whatsapp is not installed on this device.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), R.string.whatsapp_not_installed, Toast.LENGTH_LONG).show();
             }
         }
         else if (position == 2)
@@ -153,13 +153,13 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
 
                     if (rating == null || rating.isEmpty() || rating.equals("0.0"))
                     {
-                        Toast.makeText(getActivity(), "Please rate us by selecting a star.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), R.string.empty_rating, Toast.LENGTH_LONG).show();
                         wantToCloseDialog = false;
                     }
                     else
                     {
                         userService.shareFeedback(rating, comment);
-                        Toast.makeText(getActivity(), "Thank you for your feedback.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), R.string.feedback_submitted, Toast.LENGTH_LONG).show();
                         wantToCloseDialog = true;
                     }
 

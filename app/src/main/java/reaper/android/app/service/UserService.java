@@ -28,6 +28,7 @@ import reaper.android.app.config.ErrorCode;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.AllFacebookFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsFetchedTrigger;
+import reaper.android.app.trigger.user.PhoneAddedTrigger;
 import reaper.android.app.trigger.user.PhoneContactsFetchedTrigger;
 import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.cache.Cache;
@@ -64,12 +65,13 @@ public class UserService
             public void success(Response response, Response response2)
             {
                 Cache.getInstance().put(CacheKeys.MY_PHONE_NUMBER, phoneNumber);
+                bus.post(new PhoneAddedTrigger());
             }
 
             @Override
             public void failure(RetrofitError error)
             {
-
+                bus.post(new GenericErrorTrigger(ErrorCode.PHONE_ADD_FAILURE, error));
             }
         });
 

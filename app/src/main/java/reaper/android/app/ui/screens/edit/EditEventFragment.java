@@ -40,6 +40,7 @@ import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.api.google.response.GooglePlaceAutocompleteApiResponse;
+import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
@@ -130,8 +131,8 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         super.onActivityCreated(savedInstanceState);
 
         Bundle bundle = getArguments();
-        event = (Event) bundle.get("event");
-        eventDetails = (EventDetails) bundle.get("event_details");
+        event = (Event) bundle.get(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT);
+        eventDetails = (EventDetails) bundle.get(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT_DETAILS);
 
         if (event == null || eventDetails == null)
         {
@@ -278,7 +279,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
 
         if (suggestionList.size() == 0)
         {
-            noSuggestions.setText("No suggestions to show");
+            noSuggestions.setText(R.string.no_suggestions);
             noSuggestions.setVisibility(View.VISIBLE);
             recommendationList.setVisibility(View.GONE);
 
@@ -318,7 +319,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setCancelable(true);
-                    builder.setMessage("Are you sure you want to delete this event?");
+                    builder.setMessage(R.string.event_delete_confirmation);
 
                     builder.setPositiveButton("Yes", new DialogInterface.OnClickListener()
                     {
@@ -376,13 +377,13 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                     {
                         isFinalised = false;
                         menu.findItem(R.id.action_finalize_event).setIcon(R.drawable.ic_action_error);
-                        Toast.makeText(getActivity(), "The event is now not finalised. People going to the event can update it.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), R.string.event_not_finalised, Toast.LENGTH_SHORT).show();
                     }
                     else
                     {
                         menu.findItem(R.id.action_finalize_event).setIcon(R.drawable.ic_action_secure);
                         isFinalised = true;
-                        Toast.makeText(getActivity(), "The event is now finalised. No one can make any changes to it.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), R.string.event_finalised, Toast.LENGTH_SHORT).show();
                     }
 
                     return true;
@@ -443,7 +444,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     {
         if (trigger.getErrorCode() == ErrorCode.EVENT_LOCATION_FETCH_FAILURE)
         {
-            Toast.makeText(getActivity(), "Could not find the location. Please try again.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.location_not_found, Toast.LENGTH_LONG).show();
             eventLocation.setText("");
             placeLocation.setName(null);
             placeLocation.setLatitude(null);
@@ -520,7 +521,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             schedule.setText("Select event timings");
             startDateTime = null;
             endDateTime = null;
-            Toast.makeText(getActivity(), "An event can't end before it has even started", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.event_end_before_start, Toast.LENGTH_LONG).show();
         }
         else
         {
@@ -662,8 +663,8 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
 
         EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
         Bundle bundle = new Bundle();
-        bundle.putSerializable("events", (ArrayList<Event>) events);
-        bundle.putInt("active_event", activePosition);
+        bundle.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, (ArrayList<Event>) events);
+        bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
         eventDetailsContainerFragment.setArguments(bundle);
         FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment, false);
 
@@ -674,7 +675,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     {
         if (trigger.getErrorCode() == ErrorCode.EVENT_EDIT_FAILURE)
         {
-            Toast.makeText(getActivity(), "Looks like we messed up! Please try again", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.messed_up, Toast.LENGTH_LONG).show();
         }
     }
 }

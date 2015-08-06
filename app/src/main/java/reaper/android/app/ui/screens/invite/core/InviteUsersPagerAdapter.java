@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
 
+import reaper.android.app.config.BundleKeys;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.ui.screens.invite.facebook.InviteFacebookFriendsFragment;
 import reaper.android.app.ui.screens.invite.phone.InvitePhoneContactsFragment;
@@ -16,17 +17,13 @@ public class InviteUsersPagerAdapter extends FragmentPagerAdapter
     private InviteFacebookFriendsFragment inviteFacebookFriendsFragment;
     private InvitePhoneContactsFragment invitePhoneContactsFragment;
     private ArrayList<EventDetails.Invitee> inviteeList;
-    private InviteeListCommunicator inviteeListCommunicator;
 
-    public InviteUsersPagerAdapter(FragmentManager fm, ArrayList<EventDetails.Invitee> inviteeList, InviteeListCommunicator inviteeListCommunicator)
+    public InviteUsersPagerAdapter(FragmentManager fm, ArrayList<EventDetails.Invitee> inviteeList)
     {
         super(fm);
 
-        this.inviteeListCommunicator = inviteeListCommunicator;
-
         Bundle bundle = new Bundle();
-        bundle.putSerializable("invitee_list", inviteeList);
-        bundle.putSerializable("invitee_communicator", inviteeListCommunicator);
+        bundle.putSerializable(BundleKeys.INVITEE_LIST, inviteeList);
 
         this.inviteeList = inviteeList;
     }
@@ -35,8 +32,7 @@ public class InviteUsersPagerAdapter extends FragmentPagerAdapter
     public Fragment getItem(int position)
     {
         Bundle bundle = new Bundle();
-        bundle.putSerializable("invitee_list", inviteeList);
-        bundle.putSerializable("invitee_communicator", inviteeListCommunicator);
+        bundle.putSerializable(BundleKeys.INVITEE_LIST, inviteeList);
 
         switch (position)
         {

@@ -30,6 +30,7 @@ import org.joda.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import reaper.android.R;
+import reaper.android.app.config.BundleKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
@@ -94,7 +95,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         super.onActivityCreated(savedInstanceState);
 
         Bundle bundle = getArguments();
-        event = (Event) bundle.get("event");
+        event = (Event) bundle.get(BundleKeys.EVENT_DETAILS_FRAGMENT_EVENT);
 
         if (event == null)
         {
@@ -292,8 +293,8 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
                 {
                     EditEventFragment editEventFragment = new EditEventFragment();
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable("event", event);
-                    bundle.putSerializable("event_details", eventDetails);
+                    bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT, event);
+                    bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT_DETAILS, eventDetails);
                     editEventFragment.setArguments(bundle);
                     FragmentUtils.changeFragment(fragmentManager, editEventFragment, true);
                     return true;
@@ -318,7 +319,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         else if (view.getId() == R.id.tv_event_details_description)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.Base_Theme_AppCompat_Light_Dialog_Alert)
-                    .setTitle("Description")
                     .setMessage(eventDetails.getDescription())
                     .setPositiveButton("OK", new DialogInterface.OnClickListener()
                     {
@@ -332,7 +332,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         }
         else if (view.getId() == R.id.tv_event_details_date_time)
         {
-            Snackbar.make(this.getView(), "Set Reminder", Snackbar.LENGTH_LONG).setAction("OK", null).show();
         }
     }
 
@@ -349,7 +348,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
                 if (eventDetails != null)
                 {
                     attendee.setRsvp(Event.RSVP.YES);
-                    attendee.setName("Lucas Johnson");
+                    attendee.setName(userService.getActiveUserName());
 
                     if(eventDetails.getAttendees().contains(attendee)){
                         eventDetails.getAttendees().remove(attendee);
@@ -364,7 +363,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
                 if(eventDetails != null)
                 {
                     attendee.setRsvp(Event.RSVP.MAYBE);
-                    attendee.setName("Lucas Johnson");
+                    attendee.setName(userService.getActiveUserName());
 
                     if(eventDetails.getAttendees().contains(attendee)){
                         eventDetails.getAttendees().remove(attendee);

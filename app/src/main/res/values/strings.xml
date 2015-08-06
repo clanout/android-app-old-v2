@@ -24,7 +24,8 @@
     <string name="sort_time">Start Time</string>
     <string name="sort_distance">Distance</string>
 
-    <string name="home_no_events">No events to show</string>
+    <string name="home_no_events">Currently you do not have any events to view. Start by creating an event and inviting your friends.</string>
+    <string name="home_events_fetch_error">Could not fetch your events. Please try again</string>
 
     <!-- Event Details Fragment -->
     <string name="event_details_no_description">No description</string>
@@ -33,4 +34,38 @@
 
     <string name="event_details_type_public">Public</string>
     <string name="event_details_type_invite_only">Invite Only</string>
+
+    <!-- Toast and Blank Screen Messages -->
+
+    <string name="location_denied">We don\'t like people with trust issues</string>
+    <string name="location_not_found">Could not find the location. Please try again.</string>
+
+    <string name="no_facebook_friends">None of your facebook friends are on the app. Invite people through whatsapp or share the app on facebook.</string>
+    <string name="no_local_facebook_friends">None of your zonal facebook friends are on the app. Invite people through whatsapp or share the app on facebook.</string>
+    <string name="facebook_friends_not_fetched">Could not load your facebook friends. Please try again.</string>
+
+    <string name="phone_contacts_not_fetched">Could not load your phone contacts. Please try again.</string>
+    <string name="no_local_phone_contacts">None of your zonal phone contacts are on the app. Invite people through whatsapp or share the app on facebook.</string>
+
+    <string name="whatsapp_message">Test Message</string>
+    <string name="whatsapp_not_installed">Whatsapp is not installed on this device.</string>
+
+    <string name="empty_rating">Please rate us by selecting a star.</string>
+    <string name="feedback_submitted">Thank you for the feedback.</string>
+
+    <string name="chat_messages_not_fetched">Cannot fetch your messages at the moment. Please try again.</string>
+    <string name="chat_message_not_sent">Could not send your message. Please try again.</string>
+
+    <string name="no_suggestions">There are no suggestion to show for this event category.</string>
+    <string name="event_end_before_start">An event can\'t end before it has even started.</string>
+    <string name="event_timings_null">Please choose the timings for your event.</string>
+    <string name="event_finalised">The event is now finalised. No one can make any changes to it.</string>
+    <string name="event_not_finalised">The event is now not finalised. People going to the event can update it.</string>
+    <string name="event_delete_confirmation">Are you sure you want to delete this event?</string>
+
+    <string name="messed_up">Looks like we messed up. Please try again.</string>
+
+    <string name="phone_invalid">Please enter a valid phone number.</string>
+    <string name="add_phone_number">Please add your phone number to send/receive invites from your phone contacts</string>
+
 </resources>

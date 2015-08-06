@@ -10,11 +10,15 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.otto.Bus;
+
 import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
+import reaper.android.app.trigger.user.ManageFacebookFriendsTrigger;
+import reaper.android.app.trigger.user.ManagePhoneContactsTrigger;
 
 /**
  * Created by harsh on 13-05-2015.
@@ -26,17 +30,17 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
     private Context context;
     private List<EventDetails.Invitee> invitees;
     private List<Friend> friends;
-    private InviteeListCommunicator inviteeListCommunicator;
     private boolean isFacebookAdapter;
+    private Bus bus;
 
-    public InviteFriendsAdapter(Context context, List<EventDetails.Invitee> invitees, List<Friend> friends, InviteeListCommunicator inviteeListCommunicator, boolean isFacebookAdapter)
+    public InviteFriendsAdapter(Context context, List<EventDetails.Invitee> invitees, List<Friend> friends, boolean isFacebookAdapter, Bus bus)
     {
         inflater = LayoutInflater.from(context);
         this.invitees = invitees;
         this.friends = friends;
         this.context = context;
-        this.inviteeListCommunicator = inviteeListCommunicator;
         this.isFacebookAdapter = isFacebookAdapter;
+        this.bus = bus;
     }
 
     @Override
@@ -119,11 +123,11 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
         {
             if (isFacebookAdapter)
             {
-                inviteeListCommunicator.manageFacebookFriends(friends.get(getAdapterPosition()).getId());
+               bus.post(new ManageFacebookFriendsTrigger(friends.get(getAdapterPosition()).getId()));
             }
             else
             {
-                inviteeListCommunicator.managePhoneContacts(friends.get(getAdapterPosition()).getId());
+               bus.post(new ManagePhoneContactsTrigger(friends.get(getAdapterPosition()).getId()));
             }
         }
     }

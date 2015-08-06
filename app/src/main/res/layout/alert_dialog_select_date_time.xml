@@ -1,31 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
-    <DatePicker
-        android:layout_width="wrap_content"
-        android:layout_height="120dp"
-        android:calendarViewShown="false"
-        android:id="@+id/dp_select_date_start"
-        ></DatePicker>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="STARTS"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/accent"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="10dp"/>
 
-    <TimePicker
-        android:layout_width="wrap_content"
-        android:layout_height="120dp"
-        android:id="@+id/tp_select_time_start"></TimePicker>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-    <DatePicker
-        android:layout_width="wrap_content"
-        android:layout_height="120dp"
-        android:calendarViewShown="false"
-        android:id="@+id/dp_select_date_end"></DatePicker>
+        <TimePicker
+            android:id="@+id/tp_select_time_start"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"></TimePicker>
 
-    <TimePicker
-        android:layout_width="wrap_content"
-        android:layout_height="120dp"
-        android:id="@+id/tp_select_time_end"></TimePicker>
+        <DatePicker
+            android:id="@+id/dp_select_date_start"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:calendarViewShown="false"></DatePicker>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@color/divider"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ENDS"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/accent"
+        android:gravity="center_horizontal"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TimePicker
+            android:id="@+id/tp_select_time_end"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"></TimePicker>
+
+        <DatePicker
+            android:id="@+id/dp_select_date_end"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:calendarViewShown="false"
+            ></DatePicker>
+
+    </LinearLayout>
 
 </LinearLayout>

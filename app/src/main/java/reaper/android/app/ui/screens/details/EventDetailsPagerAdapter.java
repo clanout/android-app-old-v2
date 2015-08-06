@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import java.util.List;
 
+import reaper.android.app.config.BundleKeys;
 import reaper.android.app.model.Event;
 
 public class EventDetailsPagerAdapter extends FragmentStatePagerAdapter
@@ -24,7 +25,7 @@ public class EventDetailsPagerAdapter extends FragmentStatePagerAdapter
     {
         EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
         Bundle bundle = new Bundle();
-        bundle.putSerializable("event", events.get(position));
+        bundle.putSerializable(BundleKeys.EVENT_DETAILS_FRAGMENT_EVENT, events.get(position));
         eventDetailsFragment.setArguments(bundle);
         return eventDetailsFragment;
     }

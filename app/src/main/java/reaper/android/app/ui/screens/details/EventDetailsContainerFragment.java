@@ -23,6 +23,7 @@ import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.api.core.GsonProvider;
+import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
@@ -78,14 +79,14 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
 
         if (savedInstanceState != null)
         {
-            events = (List<Event>) savedInstanceState.get("events");
-            activePosition = savedInstanceState.getInt("active_event");
+            events = (List<Event>) savedInstanceState.get(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
+            activePosition = savedInstanceState.getInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION);
         }
         else
         {
             Bundle bundle = getArguments();
-            events = (List<Event>) bundle.get("events");
-            activePosition = bundle.getInt("active_event");
+            events = (List<Event>) bundle.get(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
+            activePosition = bundle.getInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION);
         }
 
         if (events == null)
@@ -95,15 +96,11 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
 
         bus = Communicator.getInstance().getBus();
         fragmentManager = getActivity().getSupportFragmentManager();
-
         eventService = new EventService(bus);
 
         pagerAdapter = new EventDetailsPagerAdapter(getChildFragmentManager(), events);
         viewPager.setAdapter(pagerAdapter);
-//        viewPager.setPageTransformer(true, new ViewPagerTransformer(ViewPagerTransformer.TransformType.ZOOM));
-
         viewPager.setCurrentItem(activePosition);
-
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
         {
             @Override
@@ -137,8 +134,8 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
     public void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("events", (ArrayList<Event>) events);
-        outState.putInt("active_event", activePosition);
+        outState.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, (ArrayList<Event>) events);
+        outState.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
     }
 
     @Override
@@ -182,8 +179,8 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         {
             InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
             Bundle bundle = new Bundle();
-            bundle.putString("event_id", events.get(activePosition).getId());
-            bundle.putBoolean("from_create_fragment", false);
+            bundle.putString(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT_ID, events.get(activePosition).getId());
+            bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, false);
             inviteUsersContainerFragment.setArguments(bundle);
             FragmentUtils.changeFragment(fragmentManager, inviteUsersContainerFragment, true);
         }
@@ -191,7 +188,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         {
             ChatFragment chatFragment = new ChatFragment();
             Bundle bundle = new Bundle();
-            bundle.putString("event_id", events.get(activePosition).getId());
+            bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_ID, events.get(activePosition).getId());
             chatFragment.setArguments(bundle);
             FragmentUtils.changeFragment(fragmentManager, chatFragment, true);
         }

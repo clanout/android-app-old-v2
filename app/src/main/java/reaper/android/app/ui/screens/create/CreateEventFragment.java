@@ -39,6 +39,7 @@ import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.api.google.response.GooglePlaceAutocompleteApiResponse;
+import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
@@ -116,9 +117,9 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
         super.onActivityCreated(savedInstanceState);
 
         Bundle bundle = getArguments();
-        title = (String) bundle.get("title");
-        isInviteOnly = (Boolean) bundle.get("is_invite_only");
-        eventCategory = (EventCategory) bundle.get("category");
+        title = (String) bundle.get(BundleKeys.CREATE_EVENT_FRAGMENT_TITLE);
+        isInviteOnly = (Boolean) bundle.get(BundleKeys.CREATE_EVENT_FRAGMENT_IS_INVITE_ONLY);
+        eventCategory = (EventCategory) bundle.get(BundleKeys.CREATE_EVENT_CATEGORY);
 
         if (eventCategory == null || title == null || title.isEmpty() || isInviteOnly == null)
         {
@@ -174,7 +175,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
 
         if (suggestionList.size() == 0)
         {
-            noSuggestionsMessage.setText("No suggestions to show");
+            noSuggestionsMessage.setText(R.string.no_suggestions);
             noSuggestionsMessage.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
 
@@ -341,7 +342,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
             timing.setText("Select event timings");
             startDateTime = null;
             endDateTime = null;
-            Toast.makeText(getActivity(), "An event can't end before it has even started", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.event_end_before_start, Toast.LENGTH_LONG).show();
         }
         else
         {
@@ -467,8 +468,8 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
 
         InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
         Bundle bundle = new Bundle();
-        bundle.putString("event_id", trigger.getEvent().getId());
-        bundle.putBoolean("from_create_fragment", true);
+        bundle.putString(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT_ID, trigger.getEvent().getId());
+        bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, true);
         inviteUsersContainerFragment.setArguments(bundle);
 
         FragmentUtils.changeFragment(manager, inviteUsersContainerFragment, false);
@@ -480,7 +481,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
 
         if (trigger.getErrorCode() == ErrorCode.EVENT_CREATION_FAILURE)
         {
-            Toast.makeText(getActivity(), "Looks like we messed up! Please try again", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.messed_up, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -505,7 +506,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
 
         if(startDateTime == null || endDateTime == null)
         {
-            Toast.makeText(getActivity(), "Please choose the timings for your event", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.event_timings_null, Toast.LENGTH_LONG).show();
             return;
         }
 

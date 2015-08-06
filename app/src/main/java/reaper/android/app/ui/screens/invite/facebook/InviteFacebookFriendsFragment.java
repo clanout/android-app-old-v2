@@ -1,10 +1,14 @@
 package reaper.android.app.ui.screens.invite.facebook;
 
+import android.content.ComponentName;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -20,28 +25,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
+import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsFetchedTrigger;
 import reaper.android.app.ui.screens.invite.core.InviteFriendsAdapter;
-import reaper.android.app.ui.screens.invite.core.InviteeListCommunicator;
 import reaper.android.common.communicator.Communicator;
 
-public class InviteFacebookFriendsFragment extends Fragment
+public class InviteFacebookFriendsFragment extends Fragment implements View.OnClickListener
 {
     private RecyclerView recyclerView;
     private TextView noFriendsMessage;
     private Menu menu;
+    private FloatingActionButton inviteWhatsapp, shareFacebook;
 
     private InviteFriendsAdapter inviteFriendsAdapter;
     private UserService userService;
     private LocationService locationService;
     private Bus bus;
-    private InviteeListCommunicator inviteeListCommunicator;
 
     private ArrayList<EventDetails.Invitee> inviteeList;
     private List<Friend> friendList;
@@ -49,7 +55,6 @@ public class InviteFacebookFriendsFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
@@ -62,6 +67,8 @@ public class InviteFacebookFriendsFragment extends Fragment
 
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_invite_facebook_friends);
         noFriendsMessage = (TextView) view.findViewById(R.id.tv_invite_facebook_friends_no_users);
+        inviteWhatsapp = (FloatingActionButton) view.findViewById(R.id.fib_fragment_invite_facebook_friends_invite_people_whatsapp);
+        shareFacebook = (FloatingActionButton) view.findViewById(R.id.fib_fragment_invite_facebook_friends_share_facebook);
 
         return view;
     }
@@ -71,6 +78,8 @@ public class InviteFacebookFriendsFragment extends Fragment
     {
         super.onActivityCreated(savedInstanceState);
 
+        displayBasicView();
+
         Bundle bundle = getArguments();
 
         if (bundle == null)
@@ -79,33 +88,72 @@ public class InviteFacebookFriendsFragment extends Fragment
         }
         else
         {
-            inviteeList = (ArrayList<EventDetails.Invitee>) bundle.get("invitee_list");
+            inviteeList = (ArrayList<EventDetails.Invitee>) bundle.get(BundleKeys.INVITEE_LIST);
 
             if (inviteeList == null)
             {
                 inviteeList = new ArrayList<>();
             }
-
-            inviteeListCommunicator = (InviteeListCommunicator) bundle.get("invitee_communicator");
         }
 
         friendList = new ArrayList<>();
 
         bus = Communicator.getInstance().getBus();
-        bus.register(this);
         userService = new UserService(bus);
         locationService = new LocationService(bus);
+        inviteWhatsapp.setOnClickListener(this);
+        shareFacebook.setOnClickListener(this);
 
         initRecyclerView();
-
-        userService.getFacebookFriends(locationService.getUserLocation().getZone());
     }
 
     @Override
     public void onStop()
     {
         super.onStop();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        bus.register(this);
+        userService.getFacebookFriends(locationService.getUserLocation().getZone());
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
         bus.unregister(this);
+    }
+
+    private void displayBasicView()
+    {
+        recyclerView.setVisibility(View.VISIBLE);
+        noFriendsMessage.setVisibility(View.GONE);
+        shareFacebook.setVisibility(View.GONE);
+        inviteWhatsapp.setVisibility(View.GONE);
+    }
+
+    private void displayNoFriendsView()
+    {
+        recyclerView.setVisibility(View.GONE);
+        noFriendsMessage.setVisibility(View.VISIBLE);
+        shareFacebook.setVisibility(View.VISIBLE);
+        inviteWhatsapp.setVisibility(View.VISIBLE);
+
+        noFriendsMessage.setText(R.string.no_local_facebook_friends);
+    }
+
+    private void displayErrorView()
+    {
+        recyclerView.setVisibility(View.GONE);
+        noFriendsMessage.setVisibility(View.VISIBLE);
+        shareFacebook.setVisibility(View.GONE);
+        inviteWhatsapp.setVisibility(View.GONE);
+
+        noFriendsMessage.setText(R.string.facebook_friends_not_fetched);
     }
 
     @Override
@@ -142,7 +190,7 @@ public class InviteFacebookFriendsFragment extends Fragment
 
     private void initRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, inviteeListCommunicator, true);
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, true, bus);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -150,21 +198,18 @@ public class InviteFacebookFriendsFragment extends Fragment
 
     private void refreshRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, inviteeListCommunicator, true);
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, true, bus);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
 
         if (friendList.size() == 0)
         {
-            noFriendsMessage.setText("None of your facebook friends are on the app. Invite people by going to the accounts page.");
-            noFriendsMessage.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
+            displayNoFriendsView();
 
         }
         else
         {
-            recyclerView.setVisibility(View.VISIBLE);
-            noFriendsMessage.setVisibility(View.GONE);
+            displayBasicView();
         }
     }
 
@@ -185,8 +230,7 @@ public class InviteFacebookFriendsFragment extends Fragment
     {
         if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCH_FAILURE)
         {
-            noFriendsMessage.setText("Could not load your facebook friends. Please try again.");
-            noFriendsMessage.setVisibility(View.VISIBLE);
+            displayErrorView();
 
             if (menu != null)
             {
@@ -195,4 +239,29 @@ public class InviteFacebookFriendsFragment extends Fragment
         }
     }
 
+    @Override
+    public void onClick(View view)
+    {
+        if (view.getId() == R.id.fib_fragment_invite_facebook_friends_invite_people_whatsapp)
+        {
+            boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
+            if (isWhatsappInstalled)
+            {
+                ComponentName componentName = new ComponentName("com.whatsapp", "com.whatsapp.ContactPicker");
+                Intent intent = new Intent();
+                intent.setComponent(componentName);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT, R.string.whatsapp_message);
+                startActivity(intent);
+            }
+            else
+            {
+                Toast.makeText(getActivity(), R.string.whatsapp_not_installed, Toast.LENGTH_LONG).show();
+            }
+        }
+        else if (view.getId() == R.id.fib_fragment_invite_facebook_friends_share_facebook)
+        {
+            Toast.makeText(getActivity(), "Facebook", Toast.LENGTH_LONG).show();
+        }
+    }
 }
