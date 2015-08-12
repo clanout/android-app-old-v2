@@ -6,10 +6,8 @@ import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
@@ -89,13 +87,6 @@ public class ChatHelper
                                 }
                             });
 
-                            connection.addAsyncStanzaListener(new StanzaListener()
-                            {
-                                @Override
-                                public void processPacket(Stanza packet) throws SmackException.NotConnectedException
-                                {
-                                }
-                            }, null);
 
                             if (connection != null)
                             {

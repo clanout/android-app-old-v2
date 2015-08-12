@@ -19,4 +19,6 @@ public class CacheKeys
     {
         return EVENT_DETAILS_PREFIX + eventId;
     }
+
+    public static final String ACTIVE_FRAGMENT = "active_fragment";
 }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -48,6 +49,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     private UserService userService;
     private LocationService locationService;
     private Bus bus;
+    private FragmentManager fragmentManager;
 
     private ArrayList<EventDetails.Invitee> inviteeList;
     private List<Friend> friendList;
@@ -103,6 +105,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
         locationService = new LocationService(bus);
         inviteWhatsapp.setOnClickListener(this);
         shareFacebook.setOnClickListener(this);
+        fragmentManager = getActivity().getSupportFragmentManager();
 
         initRecyclerView();
     }
@@ -117,6 +120,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     public void onResume()
     {
         super.onResume();
+        Log.d("APP", "invite facebook ------ " + fragmentManager.getBackStackEntryCount());
         bus.register(this);
         userService.getFacebookFriends(locationService.getUserLocation().getZone());
     }

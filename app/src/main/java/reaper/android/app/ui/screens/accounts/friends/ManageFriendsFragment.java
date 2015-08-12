@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +25,8 @@ import com.squareup.otto.Subscribe;
 import java.util.ArrayList;
 
 import reaper.android.R;
+import reaper.android.app.config.BackstackTags;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Friend;
 import reaper.android.app.service.AccountsService;
@@ -32,6 +35,7 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.AllFacebookFriendsFetchedTrigger;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.communicator.Communicator;
 
 public class ManageFriendsFragment extends Fragment implements BlockListCommunicator, View.OnClickListener
@@ -104,8 +108,12 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     public void onResume()
     {
         super.onResume();
+
+        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.MANAGE_FRIENDS);
+
         bus.register(this);
         userService.getAllFacebookFriends();
+        Log.d("APP", "manage friends ------ " + fragmentManager.getBackStackEntryCount());
     }
 
     @Override
@@ -211,7 +219,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
         if (view.getId() == R.id.ib_manage_friends_done)
         {
             userService.sendBlockRequests(blockList, unblockList);
-            FragmentUtils.changeFragment(fragmentManager, new AccountsFragment(), false);
+            FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
         }
         else if (view.getId() == R.id.fib_fragment_manage_friends_invite_people_whatsapp)
         {

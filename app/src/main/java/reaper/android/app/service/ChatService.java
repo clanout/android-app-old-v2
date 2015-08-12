@@ -1,14 +1,10 @@
 package reaper.android.app.service;
 
-import android.util.Log;
-
 import com.squareup.otto.Bus;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
-import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MUCNotJoinedException;
 import org.jivesoftware.smackx.muc.MultiUserChat;
@@ -30,43 +26,20 @@ public class ChatService
         this.bus = bus;
     }
 
-    public List<ChatMessage> fetchHistory(MultiUserChat chat, String nickName, String userId, long timeout) throws SmackException.NotConnectedException, XMPPException.XMPPErrorException, SmackException.NoResponseException, MUCNotJoinedException
+    public void fetchHistory(MultiUserChat chat, String nickName, String userId, long timeout, int maxStanzas) throws SmackException.NotConnectedException, XMPPException.XMPPErrorException, SmackException.NoResponseException, MUCNotJoinedException
     {
-        List<ChatMessage> chatMessageList = new ArrayList<>();
-
         DiscussionHistory history = new DiscussionHistory();
-        history.setMaxStanzas(10);
+        history.setMaxStanzas(maxStanzas);
 
         chat.join(nickName, null, history, timeout);
-
-        Message message = null;
-        while ((message = chat.nextMessage()) != null)
-        {
-            String[] fromUser = message.getFrom().split("/");
-            String[] userDetails = fromUser[1].split("_");
-
-            ChatMessage chatMessage = new ChatMessage();
-            chatMessage.setMessage(message.getBody());
-            chatMessage.setSenderName(userDetails[0]);
-            chatMessage.setSenderId(userDetails[1]);
-
-            if (userId.equals(userDetails[1]))
-            {
-                chatMessage.setMe(true);
-            }
-            else
-            {
-                chatMessage.setMe(false);
-            }
-
-            chatMessageList.add(chatMessage);
-        }
-        return chatMessageList;
     }
 
-    public void postMessage(MultiUserChat chat, String chatMessage, String nickName) throws SmackException.NotConnectedException, XMPPException.XMPPErrorException, SmackException.NoResponseException
+    public void postMessage(MultiUserChat chat, String chatMessage, String nickName, long timeout) throws SmackException.NotConnectedException, XMPPException.XMPPErrorException, SmackException.NoResponseException
     {
-        chat.join(nickName);
+        DiscussionHistory history = new DiscussionHistory();
+        history.setMaxStanzas(0);
+
+        chat.join(nickName, null, history, timeout);
         chat.sendMessage(chatMessage);
     }
 

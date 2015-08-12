@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,10 +25,13 @@ import android.widget.Toast;
 import com.squareup.otto.Bus;
 
 import reaper.android.R;
+import reaper.android.app.config.BackstackTags;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.communicator.Communicator;
 
 public class AccountsFragment extends Fragment implements AccountsAdapter.AccountsItemClickListener
@@ -76,6 +80,16 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
     }
 
     @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.ACCOUNTS);
+
+        Log.d("APP", "accounts ------ " + fragmentManager.getBackStackEntryCount());
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         super.onCreateOptionsMenu(menu, inflater);
@@ -99,7 +113,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
     {
         if (position == 0)
         {
-            FragmentUtils.changeFragment(fragmentManager, new ManageFriendsFragment(), true);
+            FragmentUtils.changeFragment(fragmentManager, new ManageFriendsFragment());
         }
         else if (position == 1)
         {

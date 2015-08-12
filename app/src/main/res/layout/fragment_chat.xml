@@ -1,55 +1,63 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:id="@+id/tv_fragment_chat_no_session"
-        android:gravity="center_vertical|center_horizontal"/>
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:id="@+id/tv_fragment_chat_no_session"
+    android:gravity="center_vertical|center_horizontal"/>
 
-    <RelativeLayout
-        android:id="@+id/rl_fragment_chat_main_content"
+    <LinearLayout
+        android:id="@+id/ll_fragment_chat_main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="15dp">
 
-        <EditText
-            android:id="@+id/etTypeMessageChat"
+        <Button
+            android:id="@+id/b_chat_fragment_load_history"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_toLeftOf="@+id/ib_fragment_chat_send"
-            android:autoText="true"
-            android:hint="Type message" />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:id="@+id/ib_fragment_chat_send"
-            android:textSize="14sp"
-            android:background="@color/primary"
-            android:src="@drawable/ic_send_white_24dp" />
+            android:background="@color/accent"
+            android:text="Load Previous Messages"/>
 
         <ListView
-            android:id="@+id/lvChat"
+            android:id="@+id/lv_chat_fragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentTop="false"
+            android:layout_height="0dp"
             android:layout_marginBottom="20dp"
-            android:layout_above="@+id/etTypeMessageChat"
             android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:divider="@null"
             android:listSelector="@android:color/transparent"
-            android:transcriptMode="alwaysScroll"
-            android:divider="@null" />
+            android:transcriptMode="alwaysScroll"/>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-    </RelativeLayout>
+            <EditText
+                android:id="@+id/et_chat_fragment_type_message_chat"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:autoText="true"
+                android:hint="Your Message"
+                />
+
+            <ImageButton
+                android:id="@+id/ib_fragment_chat_send"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/primary"
+                android:src="@drawable/ic_send_white_24dp"
+                android:textSize="14sp"
+                android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+
+    </LinearLayout>
 </LinearLayout>

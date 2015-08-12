@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
@@ -174,6 +175,11 @@ public class ChatAdapter extends BaseAdapter
     public void add(List<ChatMessage> messages)
     {
         chatMessageList.addAll(messages);
+    }
+
+    public void clear()
+    {
+        chatMessageList = new ArrayList<>();
     }
 
     private ChatViewHolder createViewHolder(View v)

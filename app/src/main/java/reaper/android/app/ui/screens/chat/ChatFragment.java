@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,10 +13,11 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,7 +50,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     private ImageButton send;
     private ListView listView;
     private TextView noSessionMessage;
-    private RelativeLayout mainContent;
+    private LinearLayout mainContent;
+    private Button loadHistory;
 
     private ChatAdapter chatAdapter;
     private List<ChatMessage> chatMessageList;
@@ -57,8 +60,13 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     private AbstractXMPPConnection connection;
     private MultiUserChat multiUserChat;
     private UserService userService;
-    private Bus bus;
     private ChatService chatService;
+    private FragmentManager fragmentManager;
+    private Bus bus;
+
+    private int loadHistoryClickCount = 1;
+
+    private MessageListener messageListener;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -72,11 +80,12 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
 
-        typeMessage = (EditText) view.findViewById(R.id.etTypeMessageChat);
+        typeMessage = (EditText) view.findViewById(R.id.et_chat_fragment_type_message_chat);
         send = (ImageButton) view.findViewById(R.id.ib_fragment_chat_send);
-        listView = (ListView) view.findViewById(R.id.lvChat);
+        listView = (ListView) view.findViewById(R.id.lv_chat_fragment);
         noSessionMessage = (TextView) view.findViewById(R.id.tv_fragment_chat_no_session);
-        mainContent = (RelativeLayout) view.findViewById(R.id.rl_fragment_chat_main_content);
+        mainContent = (LinearLayout) view.findViewById(R.id.ll_fragment_chat_main_content);
+        loadHistory = (Button) view.findViewById(R.id.b_chat_fragment_load_history);
 
         return view;
     }
@@ -85,25 +94,28 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+
         send.setOnClickListener(this);
+        loadHistory.setOnClickListener(this);
 
         Bundle bundle = getArguments();
         if (bundle == null)
         {
-            Log.d("APP", "1");
             renderNoSessionView();
         }
 
         eventId = (String) bundle.get(BundleKeys.CHAT_FRAGMENT_EVENT_ID);
         if (eventId == null || eventId.isEmpty())
         {
-            Log.d("APP", "2");
             renderNoSessionView();
         }
 
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
         chatService = new ChatService(bus);
+        fragmentManager = getActivity().getSupportFragmentManager();
+
+        initXmppConnection();
     }
 
     @Override
@@ -111,86 +123,90 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     {
         super.onResume();
 
+        Log.d("APP", "chat ------ " + fragmentManager.getBackStackEntryCount());
+        if (connection == null)
+        {
+            initXmppConnection();
+        }
+
+        if (multiUserChat == null)
+        {
+            renderNoSessionView();
+            return;
+        }
+        else
+        {
+            chatMessageList = new ArrayList<>();
+            messageListener = new MessageListener()
+            {
+                @Override
+                public void processMessage(Message message)
+                {
+                    ChatMessage newMessage = new ChatMessage();
+                    newMessage.setId(message.getStanzaId());
+
+                    String[] fromUser = message.getFrom().split("/");
+
+                    if (fromUser[1].equals("reap3r"))
+                    {
+                        newMessage.setMessage(message.getBody());
+                        newMessage.setSenderName("reap3r");
+                        newMessage.setSenderId("reap3r");
+                        newMessage.setMe(false);
+
+                    }
+                    else
+                    {
+                        String[] userDetails = fromUser[1].split("_");
+                        newMessage.setMessage(message.getBody());
+                        newMessage.setSenderName(userDetails[0]);
+                        newMessage.setSenderId(userDetails[1]);
+
+                        if (userService.getActiveUserId().equals(userDetails[1]))
+                        {
+                            newMessage.setMe(true);
+                        }
+                        else
+                        {
+                            newMessage.setMe(false);
+                        }
+
+                    }
+
+                    chatMessageList.add(newMessage);
+                    displayMessage(newMessage);
+
+                }
+            };
+            multiUserChat.addMessageListener(messageListener);
+        }
+
+        initChatAdapter();
+        chatAdapter.clear();
+        renderHistory();
+    }
+
+    private void initXmppConnection()
+    {
         try
         {
             connection = ChatHelper.getXmppConnection();
         }
         catch (Exception e)
         {
-            Log.d("APP", "3 ------ " + e.getMessage());
             renderNoSessionView();
         }
 
         if (connection == null)
         {
-            Log.d("APP", "4");
             renderNoSessionView();
         }
         else
         {
             renderChatView();
-            chatMessageList = new ArrayList<>();
-
             multiUserChat = chatService.getMultiUserChat(connection, eventId);
-
-            if (multiUserChat == null)
-            {
-                Log.d("APP", "5");
-                renderNoSessionView();
-            }
-            else
-            {
-                multiUserChat.addMessageListener(new MessageListener()
-                {
-                    @Override
-                    public void processMessage(Message message_received)
-                    {
-                        Log.d("APP", message_received + "");
-
-//                        String[] fromUser = message_received.getFrom().split("/");
-//
-//                        if (fromUser[1].equals("reap3r"))
-//                        {
-//                            ChatMessage chatMessage = new ChatMessage();
-//                            chatMessage.setMe(true);
-//                            chatMessage.setSenderId("reap3r");
-//                            chatMessage.setSenderName("reap3r");
-//                            chatMessage.setMessage(message_received.getBody());
-//
-//                            displayMessage(chatMessage);
-//                        }
-//                        else
-//                        {
-//                            String[] senderDetails = fromUser[1].split("_");
-//
-//                            if (senderDetails[1].equals(userService.getActiveUserId()))
-//                            {
-//                                ChatMessage chatMessage = new ChatMessage();
-//                                chatMessage.setMe(true);
-//                                chatMessage.setSenderId(senderDetails[1]);
-//                                chatMessage.setSenderName(senderDetails[0]);
-//                                chatMessage.setMessage(message_received.getBody());
-//
-//                                displayMessage(chatMessage);
-//                            }
-//                            else
-//                            {
-//                                ChatMessage chatMessage = new ChatMessage();
-//                                chatMessage.setMe(false);
-//                                chatMessage.setSenderId(senderDetails[1]);
-//                                chatMessage.setSenderName(senderDetails[0]);
-//                                chatMessage.setMessage(message_received.getBody());
-//
-//                                displayMessage(chatMessage);
-//                            }
-//                        }
-                    }
-                });
-            }
-
-            initChatAdapter();
-            renderHistory();
         }
+
     }
 
     private void renderNoSessionView()
@@ -204,6 +220,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     private void renderChatView()
     {
         mainContent.setVisibility(View.VISIBLE);
+        loadHistory.setVisibility(View.GONE);
         noSessionMessage.setVisibility(View.GONE);
     }
 
@@ -242,14 +259,34 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     public void onPause()
     {
         super.onPause();
-        multiUserChat.addMessageListener(null);
+
+        if(messageListener != null)
+        {
+            multiUserChat.removeMessageListener(messageListener);
+            messageListener = null;
+        }
     }
 
-    public void displayMessage(ChatMessage message)
+    public void displayMessage(final ChatMessage message)
     {
-        chatAdapter.add(message);
-        chatAdapter.notifyDataSetChanged();
-        scroll();
+        getActivity().runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (chatMessageList.size() >= 20 * loadHistoryClickCount)
+                {
+                    loadHistory.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    loadHistory.setVisibility(View.GONE);
+                }
+                chatAdapter.add(message);
+                chatAdapter.notifyDataSetChanged();
+                scroll();
+            }
+        });
     }
 
     private void scroll()
@@ -261,26 +298,11 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     {
         try
         {
-            chatMessageList = chatService.fetchHistory(multiUserChat, userService.getActiveUserName() + "_" + userService.getActiveUserId(), userService.getActiveUserId(), connection.getPacketReplyTimeout());
+            chatService.fetchHistory(multiUserChat, userService.getActiveUserName() + "_" + userService.getActiveUserId(), userService.getActiveUserId(), connection.getPacketReplyTimeout(), 20);
         }
         catch (Exception e)
         {
-            Log.d("APP", "6" + e.getMessage());
             renderNoSessionView();
-        }
-
-        if (chatMessageList == null)
-        {
-            Log.d("APP", "7");
-            renderNoSessionView();
-        }
-        else
-        {
-            for (int i = 0; i < chatMessageList.size(); i++)
-            {
-                ChatMessage message = chatMessageList.get(i);
-                displayMessage(message);
-            }
         }
     }
 
@@ -296,15 +318,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener
                 return;
             }
 
-            ChatMessage chatMessage = new ChatMessage();
-            chatMessage.setMessage(message);
-            chatMessage.setSenderName(userService.getActiveUserName());
-            chatMessage.setMe(true);
-            chatMessage.setSenderId(userService.getActiveUserId());
-
             try
             {
-                chatService.postMessage(multiUserChat, message, userService.getActiveUserName() + "_" + userService.getActiveUserId());
+                chatService.postMessage(multiUserChat, message, userService.getActiveUserName() + "_" + userService.getActiveUserId(), connection.getPacketReplyTimeout());
             }
             catch (Exception e)
             {
@@ -314,11 +330,28 @@ public class ChatFragment extends Fragment implements View.OnClickListener
             }
 
             typeMessage.setText("");
-            displayMessage(chatMessage);
 
             InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             inputManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
+        }
+        else if (v.getId() == R.id.b_chat_fragment_load_history)
+        {
+            loadHistoryClickCount++;
+
+            chatMessageList = new ArrayList<>();
+            chatAdapter.clear();
+
+            int maxStanzas = 20*loadHistoryClickCount;
+
+            try
+            {
+                chatService.fetchHistory(multiUserChat, userService.getActiveUserName() + "_" + userService.getActiveUserId(), userService.getActiveUserId(), connection.getPacketReplyTimeout(), maxStanzas);
+            }
+            catch (Exception e)
+            {
+                renderNoSessionView();
+            }
         }
     }
 }

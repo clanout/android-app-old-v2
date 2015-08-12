@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,6 +41,7 @@ import java.util.TimerTask;
 
 import reaper.android.R;
 import reaper.android.app.config.AppConstants;
+import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
@@ -60,6 +62,7 @@ import reaper.android.app.ui.screens.create.CreateEventFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.cache.Cache;
 import reaper.android.common.communicator.Communicator;
 
@@ -182,6 +185,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     {
         super.onResume();
 
+        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.HOME);
+
         bus.register(this);
         eventService.fetchEvents(userLocation.getZone());
 
@@ -196,7 +201,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener
             }
         }, AppConstants.EVENTS_REFRESH_RATE_MILLISECONDS, AppConstants.EVENTS_REFRESH_RATE_MILLISECONDS);
 
+        Log.d("APP", "home before popping ------ " + fragmentManager.getBackStackEntryCount());
         FragmentUtils.clearBackStack(fragmentManager);
+        Log.d("APP", "home after popping ------ " + fragmentManager.getBackStackEntryCount());
     }
 
     @Override
@@ -256,7 +263,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
         eventDetailsContainerFragment.setArguments(bundle);
 
-        FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment, true);
+        FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment);
     }
 
     @Subscribe
@@ -468,7 +475,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
             @Override
             public boolean onMenuItemClick(MenuItem menuItem)
             {
-                FragmentUtils.changeFragment(fragmentManager, new AccountsFragment(), true);
+                FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
                 return true;
             }
         });
@@ -627,7 +634,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
                     bundle.putBoolean(BundleKeys.CREATE_EVENT_FRAGMENT_IS_INVITE_ONLY, isInviteOnly);
                     bundle.putSerializable(BundleKeys.CREATE_EVENT_CATEGORY, eventCategory);
                     createEventFragment.setArguments(bundle);
-                    FragmentUtils.changeFragment(fragmentManager, createEventFragment, true);
+                    FragmentUtils.changeFragment(fragmentManager, createEventFragment);
                 }
 
 

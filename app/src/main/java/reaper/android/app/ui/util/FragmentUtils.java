@@ -8,20 +8,16 @@ import reaper.android.R;
 
 public class FragmentUtils
 {
-    public static void changeFragment(FragmentManager manager, Fragment fragment, boolean addToBackStack)
+    public static void changeFragment(FragmentManager manager, Fragment fragment)
     {
         FragmentTransaction fragmentTransaction = manager.beginTransaction();
         fragmentTransaction.replace(R.id.fl_main, fragment, fragment.getClass().getSimpleName());
-        if (addToBackStack)
-        {
-            fragmentTransaction.addToBackStack(null);
-        }
         fragmentTransaction.commit();
+        manager.executePendingTransactions();
     }
 
     public static void clearBackStack(FragmentManager manager)
     {
-//        manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         for (int i = 0; i < manager.getBackStackEntryCount(); ++i)
         {
             manager.popBackStack();

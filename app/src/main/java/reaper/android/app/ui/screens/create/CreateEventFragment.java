@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,7 +40,9 @@ import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.api.google.response.GooglePlaceAutocompleteApiResponse;
+import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
@@ -54,6 +57,7 @@ import reaper.android.app.trigger.event.EventLocationFetchedTrigger;
 import reaper.android.app.trigger.event.EventSuggestionsTrigger;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.communicator.Communicator;
 
 
@@ -199,6 +203,10 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     public void onResume()
     {
         super.onResume();
+
+        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.CREATE);
+
+        Log.d("APP", "createEvent ------ " + manager.getBackStackEntryCount());
 
         bus.register(this);
 
@@ -472,7 +480,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
         bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, true);
         inviteUsersContainerFragment.setArguments(bundle);
 
-        FragmentUtils.changeFragment(manager, inviteUsersContainerFragment, false);
+        FragmentUtils.changeFragment(manager, inviteUsersContainerFragment);
     }
 
     @Subscribe

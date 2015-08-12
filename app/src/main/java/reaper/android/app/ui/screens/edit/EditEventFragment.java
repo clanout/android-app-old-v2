@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -249,6 +250,8 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     {
         super.onResume();
 
+        Log.d("APP", "edit ------ " + fragmentManager.getBackStackEntryCount());
+
         bus.register(this);
 
         Location userLocation = locationService.getUserLocation();
@@ -329,7 +332,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                             eventService.deleteEvent(event);
                             eventService.deleteCacheFor(event);
                             Toast.makeText(getActivity(), "The event has been deleted", Toast.LENGTH_SHORT).show();
-                            FragmentUtils.changeFragment(fragmentManager, new HomeFragment(), false);
+                            FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
                         }
                     });
 
@@ -666,7 +669,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         bundle.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, (ArrayList<Event>) events);
         bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
         eventDetailsContainerFragment.setArguments(bundle);
-        FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment, false);
+        FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment);
 
     }
 

@@ -131,6 +131,13 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
     }
 
     @Override
+    public void onResume()
+    {
+        super.onResume();
+        Log.d("APP", "event details container ------ " + fragmentManager.getBackStackEntryCount());
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
@@ -182,7 +189,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
             bundle.putString(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT_ID, events.get(activePosition).getId());
             bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, false);
             inviteUsersContainerFragment.setArguments(bundle);
-            FragmentUtils.changeFragment(fragmentManager, inviteUsersContainerFragment, true);
+            FragmentUtils.changeFragment(fragmentManager, inviteUsersContainerFragment);
         }
         else if (view.getId() == R.id.ibtn_event_details_chat)
         {
@@ -190,7 +197,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
             Bundle bundle = new Bundle();
             bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_ID, events.get(activePosition).getId());
             chatFragment.setArguments(bundle);
-            FragmentUtils.changeFragment(fragmentManager, chatFragment, true);
+            FragmentUtils.changeFragment(fragmentManager, chatFragment);
         }
     }
 

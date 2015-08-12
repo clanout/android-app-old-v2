@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -64,6 +65,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
     private Bus bus;
     private UserService userService;
     private LocationService locationService;
+    private FragmentManager fragmentManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -102,6 +104,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         inviteWhatsapp.setOnClickListener(this);
         sharefacebook.setOnClickListener(this);
         addPhone.setOnClickListener(this);
+        fragmentManager = getActivity().getSupportFragmentManager();
 
         if (Cache.getInstance().get(CacheKeys.MY_PHONE_NUMBER) == null)
         {
@@ -153,6 +156,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
     public void onResume()
     {
         super.onResume();
+        Log.d("APP", "invite phone ------ " + fragmentManager.getBackStackEntryCount());
         bus.register(this);
 
         if (isPhoneAdded)

@@ -19,17 +19,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
+import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.user.ManageFacebookFriendsTrigger;
 import reaper.android.app.trigger.user.ManagePhoneContactsTrigger;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.communicator.Communicator;
 
 public class InviteUsersContainerFragment extends Fragment implements TabLayout.OnTabSelectedListener, View.OnClickListener
@@ -117,6 +121,8 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     public void onResume()
     {
         super.onResume();
+        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.INVITE_USERS_CONTAINER);
+        Log.d("APP", "invite container ------ " + fragmentManager.getBackStackEntryCount());
         bus.register(this);
         if (!fromCreateFragment)
         {
@@ -219,6 +225,15 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
         bundle.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, (ArrayList<Event>) events);
         bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
         eventDetailsContainerFragment.setArguments(bundle);
-        FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment, false);
+        FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment);
+    }
+
+    @Subscribe
+    public void backPressed(BackPressedTrigger trigger)
+    {
+        if(trigger.getActiveFragment().equals(BackstackTags.INVITE_USERS_CONTAINER))
+        {
+            eventService.fetchEvents(locationService.getUserLocation().getZone());
+        }
     }
 }

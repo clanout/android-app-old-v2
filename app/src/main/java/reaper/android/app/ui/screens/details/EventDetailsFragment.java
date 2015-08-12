@@ -5,12 +5,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -120,6 +120,8 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     public void onResume()
     {
         super.onResume();
+
+        Log.d("APP", "event details ------ " + fragmentManager.getBackStackEntryCount());
 
         bus.register(this);
         eventService.fetchEventDetails(event.getId());
@@ -296,7 +298,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
                     bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT, event);
                     bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT_DETAILS, eventDetails);
                     editEventFragment.setArguments(bundle);
-                    FragmentUtils.changeFragment(fragmentManager, editEventFragment, true);
+                    FragmentUtils.changeFragment(fragmentManager, editEventFragment);
                     return true;
                 }
             });
@@ -318,16 +320,26 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         }
         else if (view.getId() == R.id.tv_event_details_description)
         {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.Base_Theme_AppCompat_Light_Dialog_Alert)
-                    .setMessage(eventDetails.getDescription())
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i)
-                        {
-                            dialogInterface.dismiss();
-                        }
-                    });
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.Base_Theme_AppCompat_Light_Dialog_Alert);
+
+            if (description.getText().toString().isEmpty())
+            {
+                builder.setMessage(description.getText().toString());
+            }
+            else
+            {
+                builder.setMessage(description.getText().toString());
+            }
+
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i)
+                {
+                    dialogInterface.dismiss();
+                }
+            });
+
             builder.create().show();
         }
         else if (view.getId() == R.id.tv_event_details_date_time)
@@ -350,7 +362,8 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
                     attendee.setRsvp(Event.RSVP.YES);
                     attendee.setName(userService.getActiveUserName());
 
-                    if(eventDetails.getAttendees().contains(attendee)){
+                    if (eventDetails.getAttendees().contains(attendee))
+                    {
                         eventDetails.getAttendees().remove(attendee);
                     }
 
@@ -360,12 +373,13 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
             }
             else if (trigger.getRsvp() == Event.RSVP.MAYBE)
             {
-                if(eventDetails != null)
+                if (eventDetails != null)
                 {
                     attendee.setRsvp(Event.RSVP.MAYBE);
                     attendee.setName(userService.getActiveUserName());
 
-                    if(eventDetails.getAttendees().contains(attendee)){
+                    if (eventDetails.getAttendees().contains(attendee))
+                    {
                         eventDetails.getAttendees().remove(attendee);
                     }
                     eventDetails.getAttendees().add(attendee);
@@ -375,10 +389,10 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
             }
             else if (trigger.getRsvp() == Event.RSVP.NO)
             {
-                if(eventDetails != null)
+                if (eventDetails != null)
                 {
                     attendee.setRsvp(Event.RSVP.NO);
-                    if(eventDetails.getAttendees().contains(attendee))
+                    if (eventDetails.getAttendees().contains(attendee))
                     {
                         eventDetails.getAttendees().remove(attendee);
                         refreshRecyclerView();
