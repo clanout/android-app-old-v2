@@ -41,7 +41,9 @@ import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.api.google.response.GooglePlaceAutocompleteApiResponse;
+import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
@@ -52,6 +54,7 @@ import reaper.android.app.service.EventService;
 import reaper.android.app.service.GoogleService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventEditedTrigger;
 import reaper.android.app.trigger.event.EventLocationFetchedTrigger;
@@ -63,6 +66,7 @@ import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.EventUtils;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.communicator.Communicator;
 
 
@@ -250,7 +254,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     {
         super.onResume();
 
-        Log.d("APP", "edit ------ " + fragmentManager.getBackStackEntryCount());
+        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EDIT);
 
         bus.register(this);
 
@@ -479,7 +483,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             }
         }
 
-        if(v.getId() == R.id.tv_edit_event_date_time)
+        if (v.getId() == R.id.tv_edit_event_date_time)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setCancelable(true);
@@ -660,7 +664,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         List<Event> events = trigger.getEvents();
 
         Event activeEvent = new Event();
-        activeEvent.setId(eventId);
+        activeEvent.setId(event.getId());
 
         int activePosition = events.indexOf(activeEvent);
 
@@ -679,6 +683,15 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         if (trigger.getErrorCode() == ErrorCode.EVENT_EDIT_FAILURE)
         {
             Toast.makeText(getActivity(), R.string.messed_up, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Subscribe
+    public void backPressed(BackPressedTrigger trigger)
+    {
+        if(trigger.getActiveFragment().equals(BackstackTags.EDIT))
+        {
+            eventService.fetchEvents(locationService.getUserLocation().getZone());
         }
     }
 }

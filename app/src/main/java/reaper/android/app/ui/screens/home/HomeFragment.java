@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -200,10 +199,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener
                 eventService.fetchEventUpdates(userLocation.getZone(), lastUpdated);
             }
         }, AppConstants.EVENTS_REFRESH_RATE_MILLISECONDS, AppConstants.EVENTS_REFRESH_RATE_MILLISECONDS);
-
-        Log.d("APP", "home before popping ------ " + fragmentManager.getBackStackEntryCount());
-        FragmentUtils.clearBackStack(fragmentManager);
-        Log.d("APP", "home after popping ------ " + fragmentManager.getBackStackEntryCount());
     }
 
     @Override

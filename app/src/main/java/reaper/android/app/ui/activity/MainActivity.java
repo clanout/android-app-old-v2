@@ -73,34 +73,48 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
-        if (AppPreferences.get(this, CacheKeys.ACTIVE_FRAGMENT) == null)
+        String activeFragment = AppPreferences.get(this, CacheKeys.ACTIVE_FRAGMENT);
+
+        if (activeFragment == null)
         {
             super.onBackPressed();
         }
 
-        if (AppPreferences.get(this, CacheKeys.ACTIVE_FRAGMENT).equals(BackstackTags.HOME))
+        if (activeFragment.equals(BackstackTags.HOME))
         {
             finish();
         }
-        else if (AppPreferences.get(this, CacheKeys.ACTIVE_FRAGMENT).equals(BackstackTags.ACCOUNTS))
+        else if (activeFragment.equals(BackstackTags.ACCOUNTS))
         {
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
         }
-        else if (AppPreferences.get(this, CacheKeys.ACTIVE_FRAGMENT).equals(BackstackTags.MANAGE_FRIENDS))
+        else if (activeFragment.equals(BackstackTags.MANAGE_FRIENDS))
         {
             FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
         }
-        else if (AppPreferences.get(this, CacheKeys.ACTIVE_FRAGMENT).equals(BackstackTags.FAQ))
+        else if (activeFragment.equals(BackstackTags.FAQ))
         {
             FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
         }
-        else if (AppPreferences.get(this, CacheKeys.ACTIVE_FRAGMENT).equals(BackstackTags.CREATE))
+        else if (activeFragment.equals(BackstackTags.CREATE))
         {
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
         }
-        else if (AppPreferences.get(this, CacheKeys.ACTIVE_FRAGMENT).equals(BackstackTags.INVITE_USERS_CONTAINER))
+        else if (activeFragment.equals(BackstackTags.INVITE_USERS_CONTAINER))
         {
             bus.post(new BackPressedTrigger(BackstackTags.INVITE_USERS_CONTAINER));
+        }
+        else if (activeFragment.equals(BackstackTags.EVENT_DETAILS_CONTAINER))
+        {
+            FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
+        }
+        else if (activeFragment.equals(BackstackTags.EDIT))
+        {
+            bus.post(new BackPressedTrigger(BackstackTags.EDIT));
+        }
+        else if (activeFragment.equals(BackstackTags.CHAT))
+        {
+            bus.post(new BackPressedTrigger(BackstackTags.CHAT));
         }
     }
 }

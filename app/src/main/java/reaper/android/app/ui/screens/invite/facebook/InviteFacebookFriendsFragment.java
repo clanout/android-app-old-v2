@@ -120,7 +120,6 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     public void onResume()
     {
         super.onResume();
-        Log.d("APP", "invite facebook ------ " + fragmentManager.getBackStackEntryCount());
         bus.register(this);
         userService.getFacebookFriends(locationService.getUserLocation().getZone());
     }

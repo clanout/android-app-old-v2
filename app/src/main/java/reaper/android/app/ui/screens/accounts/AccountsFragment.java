@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -30,6 +31,7 @@ import reaper.android.app.config.CacheKeys;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
+import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.communicator.Communicator;
@@ -85,8 +87,6 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
         super.onResume();
 
         AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.ACCOUNTS);
-
-        Log.d("APP", "accounts ------ " + fragmentManager.getBackStackEntryCount());
     }
 
     @Override
@@ -99,13 +99,23 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
 
         menu.findItem(R.id.action_account).setVisible(false);
         menu.findItem(R.id.action_create_event).setVisible(false);
-        menu.findItem(R.id.action_home).setVisible(false);
+        menu.findItem(R.id.action_home).setVisible(true);
         menu.findItem(R.id.action_search).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
+
+        menu.findItem(R.id.action_home).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem)
+            {
+                FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
+                return true;
+            }
+        });
     }
 
     @Override

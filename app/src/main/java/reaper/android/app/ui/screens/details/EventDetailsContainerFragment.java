@@ -23,7 +23,9 @@ import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.api.core.GsonProvider;
+import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
@@ -32,6 +34,7 @@ import reaper.android.app.trigger.event.ChangeAttendeeListTrigger;
 import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.communicator.Communicator;
 
 public class EventDetailsContainerFragment extends Fragment implements View.OnClickListener
@@ -134,7 +137,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
     public void onResume()
     {
         super.onResume();
-        Log.d("APP", "event details container ------ " + fragmentManager.getBackStackEntryCount());
+        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EVENT_DETAILS_CONTAINER);
     }
 
     @Override

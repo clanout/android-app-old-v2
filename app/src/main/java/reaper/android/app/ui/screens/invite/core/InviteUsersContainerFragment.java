@@ -122,7 +122,6 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     {
         super.onResume();
         AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.INVITE_USERS_CONTAINER);
-        Log.d("APP", "invite container ------ " + fragmentManager.getBackStackEntryCount());
         bus.register(this);
         if (!fromCreateFragment)
         {

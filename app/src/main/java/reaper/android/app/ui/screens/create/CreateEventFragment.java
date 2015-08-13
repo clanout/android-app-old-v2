@@ -206,8 +206,6 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
 
         AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.CREATE);
 
-        Log.d("APP", "createEvent ------ " + manager.getBackStackEntryCount());
-
         bus.register(this);
 
         Location userLocation = locationService.getUserLocation();

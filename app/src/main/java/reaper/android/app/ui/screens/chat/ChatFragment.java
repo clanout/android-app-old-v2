@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.MessageListener;
@@ -32,10 +33,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.model.ChatMessage;
+import reaper.android.app.model.Event;
 import reaper.android.app.service.ChatService;
+import reaper.android.app.service.EventService;
+import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.trigger.common.BackPressedTrigger;
+import reaper.android.app.trigger.event.EventsFetchTrigger;
+import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
+import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.chat.ChatHelper;
 import reaper.android.common.communicator.Communicator;
 
@@ -61,6 +72,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     private MultiUserChat multiUserChat;
     private UserService userService;
     private ChatService chatService;
+    private EventService eventService;
+    private LocationService locationService;
     private FragmentManager fragmentManager;
     private Bus bus;
 
@@ -113,6 +126,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
         chatService = new ChatService(bus);
+        eventService = new EventService(bus);
+        locationService = new LocationService(bus);
         fragmentManager = getActivity().getSupportFragmentManager();
 
         initXmppConnection();
@@ -123,7 +138,10 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     {
         super.onResume();
 
-        Log.d("APP", "chat ------ " + fragmentManager.getBackStackEntryCount());
+        bus.register(this);
+
+        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.CHAT);
+
         if (connection == null)
         {
             initXmppConnection();
@@ -260,6 +278,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     {
         super.onPause();
 
+        bus.unregister(this);
+
         if(messageListener != null)
         {
             multiUserChat.removeMessageListener(messageListener);
@@ -353,5 +373,32 @@ public class ChatFragment extends Fragment implements View.OnClickListener
                 renderNoSessionView();
             }
         }
+    }
+
+    @Subscribe
+    public void backPressed(BackPressedTrigger trigger)
+    {
+        if(trigger.getActiveFragment().equals(BackstackTags.CHAT))
+        {
+            eventService.fetchEvents(locationService.getUserLocation().getZone());
+        }
+    }
+
+    @Subscribe
+    public void onEventsFetched(EventsFetchTrigger trigger)
+    {
+        List<Event> events = trigger.getEvents();
+
+        Event activeEvent = new Event();
+        activeEvent.setId(eventId);
+
+        int activePosition = events.indexOf(activeEvent);
+
+        EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, (ArrayList<Event>) events);
+        bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
+        eventDetailsContainerFragment.setArguments(bundle);
+        FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment);
     }
 }

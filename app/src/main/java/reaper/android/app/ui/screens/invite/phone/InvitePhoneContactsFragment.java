@@ -156,7 +156,6 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
     public void onResume()
     {
         super.onResume();
-        Log.d("APP", "invite phone ------ " + fragmentManager.getBackStackEntryCount());
         bus.register(this);
 
         if (isPhoneAdded)

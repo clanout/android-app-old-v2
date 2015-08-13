@@ -113,7 +113,6 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
 
         bus.register(this);
         userService.getAllFacebookFriends();
-        Log.d("APP", "manage friends ------ " + fragmentManager.getBackStackEntryCount());
     }
 
     @Override

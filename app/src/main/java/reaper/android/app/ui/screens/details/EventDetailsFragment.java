@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -63,6 +62,8 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     private TextView noAttendeeMessage;
 
     private EventAttendeesAdapter eventAttendeesAdapter;
+
+    private boolean areEventDetailsFetched;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -121,8 +122,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     {
         super.onResume();
 
-        Log.d("APP", "event details ------ " + fragmentManager.getBackStackEntryCount());
-
+        areEventDetailsFetched = false;
         bus.register(this);
         eventService.fetchEventDetails(event.getId());
     }
@@ -151,6 +151,8 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
             }
 
             refreshRecyclerView();
+
+            areEventDetailsFetched = true;
         }
     }
 
@@ -293,12 +295,15 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem)
                 {
-                    EditEventFragment editEventFragment = new EditEventFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT, event);
-                    bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT_DETAILS, eventDetails);
-                    editEventFragment.setArguments(bundle);
-                    FragmentUtils.changeFragment(fragmentManager, editEventFragment);
+                    if (areEventDetailsFetched)
+                    {
+                        EditEventFragment editEventFragment = new EditEventFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT, event);
+                        bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT_DETAILS, eventDetails);
+                        editEventFragment.setArguments(bundle);
+                        FragmentUtils.changeFragment(fragmentManager, editEventFragment);
+                    }
                     return true;
                 }
             });
