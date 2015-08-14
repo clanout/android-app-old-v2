@@ -6,9 +6,9 @@ import retrofit.RetrofitError;
 public class GenericErrorTrigger
 {
     private ErrorCode errorCode;
-    private RetrofitError error;
+    private Exception error;
 
-    public GenericErrorTrigger(ErrorCode errorCode, RetrofitError error)
+    public GenericErrorTrigger(ErrorCode errorCode, Exception error)
     {
         this.errorCode = errorCode;
         this.error = error;
@@ -19,7 +19,7 @@ public class GenericErrorTrigger
         return errorCode;
     }
 
-    public RetrofitError getError()
+    public Exception getError()
     {
         return error;
     }

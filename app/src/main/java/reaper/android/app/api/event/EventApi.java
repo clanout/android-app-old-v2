@@ -15,18 +15,20 @@ import reaper.android.app.api.event.response.EventDetailsApiResponse;
 import reaper.android.app.api.event.response.EventSuggestionsApiResponse;
 import reaper.android.app.api.event.response.EventUpdatesApiResponse;
 import reaper.android.app.api.event.response.EventsApiResponse;
+import reaper.android.app.model.EventDetails;
 import retrofit.Callback;
 import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.POST;
+import rx.Observable;
 
 public interface EventApi
 {
     @POST("/event/summary")
-    public void getEvents(@Body EventsApiRequest request, Callback<EventsApiResponse> callback);
+    Observable<EventsApiResponse> getEvents(@Body EventsApiRequest request);
 
     @POST("/event/details")
-    public void getEventDetails(@Body EventDetailsApiRequest request, Callback<EventDetailsApiResponse> callback);
+    Observable<EventDetailsApiResponse> getEventDetails(@Body EventDetailsApiRequest request);
 
     @POST("/event/updates")
     public void getEventUpdates(@Body EventUpdatesApiRequest request, Callback<EventUpdatesApiResponse> callback);

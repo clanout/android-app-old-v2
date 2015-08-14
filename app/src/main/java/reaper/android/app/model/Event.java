@@ -38,6 +38,9 @@ public class Event implements Model
     private int friendCount;
     private int inviterCount;
 
+    private boolean isUpdated;
+    private boolean isChatUpdated;
+
     public String getId()
     {
         return id;
@@ -186,6 +189,31 @@ public class Event implements Model
     public void setInviterCount(int inviterCount)
     {
         this.inviterCount = inviterCount;
+    }
+
+    public void setIsFinalized(boolean isFinalized)
+    {
+        this.isFinalized = isFinalized;
+    }
+
+    public boolean isUpdated()
+    {
+        return isUpdated;
+    }
+
+    public void setIsUpdated(boolean isUpdated)
+    {
+        this.isUpdated = isUpdated;
+    }
+
+    public boolean isChatUpdated()
+    {
+        return isChatUpdated;
+    }
+
+    public void setIsChatUpdated(boolean isChatUpdated)
+    {
+        this.isChatUpdated = isChatUpdated;
     }
 
     @Override

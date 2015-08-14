@@ -13,7 +13,13 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.ThreadEnforcer;
 
+import java.util.List;
+
+import reaper.android.app.cache.core.SQLiteCacheHelper;
+import reaper.android.app.cache.event.EventCache;
+import reaper.android.app.cache.event.sqlite.SQLiteEventCacheDataSource;
 import reaper.android.app.config.AppConstants;
+import reaper.android.app.model.Event;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.trigger.common.CacheCommitTrigger;
 import reaper.android.app.trigger.gcm.GcmregistrationIntentTrigger;
@@ -45,14 +51,14 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         Communicator.init(bus);
         Cache.init(this, AppConstants.CACHE_FILE);
 
+        SQLiteCacheHelper.init(this);
+
         locationService = new LocationService(bus);
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-
-        String cache = new Gson().toJson(Cache.getInstance());
     }
 
     @Subscribe
