@@ -33,6 +33,8 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     private Bus bus;
     private GoogleApiClient googleApiClient;
 
+    private static Reaper instance;
+
     // Services
     private LocationService locationService;
 
@@ -45,6 +47,8 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
 
     protected void init()
     {
+        instance = this;
+
         bus = new Bus(ThreadEnforcer.ANY);
         bus.register(this);
 
@@ -108,6 +112,11 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     public void onConnectionFailed(ConnectionResult connectionResult)
     {
         Log.d("reap3r", "Unable to connect to Google API client");
+    }
+
+    public static Reaper getReaperContext()
+    {
+        return instance;
     }
 
 }

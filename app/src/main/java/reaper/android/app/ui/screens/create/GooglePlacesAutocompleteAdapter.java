@@ -12,21 +12,22 @@ import java.util.ArrayList;
 import reaper.android.app.api.google.response.GooglePlaceAutocompleteApiResponse;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.service.GoogleService;
+import reaper.android.app.service.LocationService;
 import reaper.android.common.cache.Cache;
 
 public class GooglePlacesAutocompleteAdapter extends ArrayAdapter<GooglePlaceAutocompleteApiResponse.Prediction> implements Filterable
 {
     private ArrayList<GooglePlaceAutocompleteApiResponse.Prediction> resultList;
     private GoogleService googleService;
-    private Double userLatitude, userLongitude;
+    private double userLatitude, userLongitude;
 
-    public GooglePlacesAutocompleteAdapter(Context context, int resource, int textViewResourceId, Bus bus)
+    public GooglePlacesAutocompleteAdapter(Context context, int resource, int textViewResourceId, Bus bus, LocationService locationService)
     {
         super(context, resource, textViewResourceId);
 
         googleService = new GoogleService(bus);
-        userLatitude = (Double) Cache.getInstance().get(CacheKeys.USER_LOCATION_LATITUDE);
-        userLongitude = (Double) Cache.getInstance().get(CacheKeys.USER_LOCATION_LONGITUDE);
+        userLatitude = locationService.getUserLocation().getLatitude();
+        userLongitude = locationService.getUserLocation().getLongitude();
     }
 
 

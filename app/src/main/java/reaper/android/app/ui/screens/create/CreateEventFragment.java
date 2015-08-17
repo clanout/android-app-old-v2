@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -157,7 +156,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
 
     private void initGoogleAutocompleteAdapter()
     {
-        location.setAdapter(new GooglePlacesAutocompleteAdapter(getActivity(), R.layout.list_item_autocomplete, R.id.tv_list_item_autocomplete, bus));
+        location.setAdapter(new GooglePlacesAutocompleteAdapter(getActivity(), R.layout.list_item_autocomplete, R.id.tv_list_item_autocomplete, bus, locationService));
         location.setOnItemClickListener(this);
     }
 
@@ -470,8 +469,6 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     @Subscribe
     public void onEventCreated(EventCreatedTrigger trigger)
     {
-        eventService.updateCacheFor(trigger.getEvent());
-
         InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
         Bundle bundle = new Bundle();
         bundle.putString(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT_ID, trigger.getEvent().getId());
@@ -510,7 +507,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     {
         String descriptionEvent = description.getText().toString();
 
-        if(startDateTime == null || endDateTime == null)
+        if (startDateTime == null || endDateTime == null)
         {
             Toast.makeText(getActivity(), R.string.event_timings_null, Toast.LENGTH_LONG).show();
             return;

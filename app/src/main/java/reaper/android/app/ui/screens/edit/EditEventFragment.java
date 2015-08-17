@@ -264,7 +264,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
 
     private void initGoogleAutocompleteAdapter()
     {
-        eventLocation.setAdapter(new GooglePlacesAutocompleteAdapter(getActivity(), R.layout.list_item_autocomplete, R.id.tv_list_item_autocomplete, bus));
+        eventLocation.setAdapter(new GooglePlacesAutocompleteAdapter(getActivity(), R.layout.list_item_autocomplete, R.id.tv_list_item_autocomplete, bus, locationService));
         eventLocation.setOnItemClickListener(this);
     }
 
@@ -334,7 +334,6 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                         public void onClick(DialogInterface dialog, int which)
                         {
                             eventService.deleteEvent(event);
-                            eventService.deleteCacheFor(event);
                             Toast.makeText(getActivity(), "The event has been deleted", Toast.LENGTH_SHORT).show();
                             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
                         }
@@ -652,9 +651,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     @Subscribe
     public void onEventEdited(EventEditedTrigger trigger)
     {
-        eventService.updateCacheFor(trigger.getEvent());
         eventId = trigger.getEvent().getId();
-
         eventService.fetchEvents(locationService.getUserLocation().getZone());
     }
 

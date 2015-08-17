@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -81,8 +82,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener
 
     // Data
     private List<Event> events;
-    private List<String> eventUpdates;
-    private List<String> chatUpdates;
     private Location userLocation;
     EventCategory eventCategory;
 
@@ -152,8 +151,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         createEvent.setOnClickListener(this);
 
         events = new ArrayList<>();
-        eventUpdates = new ArrayList<>();
-        chatUpdates = new ArrayList<>();
         userLocation = locationService.getUserLocation();
         eventCategory = EventCategory.GENERAL;
 
@@ -184,6 +181,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     {
         super.onResume();
 
+        Log.d("APP", "HomeFragment onResume");
+
         AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.HOME);
 
         bus.register(this);
@@ -213,7 +212,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     public void onEventsFetchTrigger(EventsFetchTrigger eventsFetchTrigger)
     {
         events = eventsFetchTrigger.getEvents();
-        eventUpdates = eventService.getUpdatedEvents();
+
+        Log.d("APP", "HomeFragment events fetched ------ " + events);
 
         refreshRecyclerView();
     }
@@ -285,7 +285,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     private void initRecyclerView()
     {
         eventList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        eventsAdapter = new EventsAdapter(bus, new ArrayList<Event>(), new ArrayList<String>(), new ArrayList<String>());
+        eventsAdapter = new EventsAdapter(bus, new ArrayList<Event>());
         eventList.setAdapter(eventsAdapter);
     }
 
@@ -322,7 +322,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
 
         if (filter == Filter.ALL)
         {
-            eventsAdapter = new EventsAdapter(bus, events, eventUpdates, chatUpdates);
+            eventsAdapter = new EventsAdapter(bus, events);
             eventList.setAdapter(eventsAdapter);
         }
         else
@@ -344,7 +344,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener
             }
             else
             {
-                eventsAdapter = new EventsAdapter(bus, visibleEvents, eventUpdates, chatUpdates);
+                eventsAdapter = new EventsAdapter(bus, visibleEvents);
                 eventList.setAdapter(eventsAdapter);
             }
         }

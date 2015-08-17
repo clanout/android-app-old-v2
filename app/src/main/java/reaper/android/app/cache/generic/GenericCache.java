@@ -1,5 +1,7 @@
 package reaper.android.app.cache.generic;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 
 import java.util.HashMap;
@@ -39,9 +41,29 @@ public class GenericCache
                 dataSource.write(key, value);
                 subscriber.onCompleted();
             }
-        }).observeOn(Schedulers.io())
-                  .subscribeOn(Schedulers.io())
-                  .subscribe();
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.newThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.d(TAG, e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
     }
 
     public String get(String key)
@@ -53,6 +75,11 @@ public class GenericCache
             memoryCache.put(key, value);
         }
         return value;
+    }
+
+    public void delete(String key)
+    {
+        // TODO
     }
 
     public void put(final String key, final Object value)

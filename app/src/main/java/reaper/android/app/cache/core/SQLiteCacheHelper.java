@@ -42,6 +42,8 @@ public class SQLiteCacheHelper extends SQLiteOpenHelper
         db.execSQL(SQLiteCacheContract.Event.SQL_CREATE_TABLE);
         db.execSQL(SQLiteCacheContract.EventDetails.SQL_CREATE_TABLE);
         db.execSQL(SQLiteCacheContract.Generic.SQL_CREATE_TABLE);
+        db.execSQL(SQLiteCacheContract.FacebookFriends.SQL_CREATE_TABLE);
+        db.execSQL(SQLiteCacheContract.PhoneContacts.SQL_CREATE_TABLE);
         Log.d(TAG, "Cache database created");
     }
 
@@ -51,6 +53,8 @@ public class SQLiteCacheHelper extends SQLiteOpenHelper
         db.execSQL(SQLiteCacheContract.Event.SQL_DELETE_TABLE);
         db.execSQL(SQLiteCacheContract.EventDetails.SQL_DELETE_TABLE);
         db.execSQL(SQLiteCacheContract.Generic.SQL_DELETE_TABLE);
+        db.execSQL(SQLiteCacheContract.FacebookFriends.SQL_DELETE_TABLE);
+        db.execSQL(SQLiteCacheContract.PhoneContacts.SQL_DELETE_TABLE);
         onCreate(db);
         Log.d(TAG, "Cache database upgraded");
     }

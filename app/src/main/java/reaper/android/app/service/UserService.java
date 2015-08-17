@@ -3,6 +3,7 @@ package reaper.android.app.service;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import com.squareup.otto.Bus;
 
@@ -43,6 +44,8 @@ import rx.schedulers.Schedulers;
 
 public class UserService
 {
+    private static final String TAG = "UserService";
+
     private Bus bus;
     private MeApi meApi;
     private UserCache userCache;
@@ -292,7 +295,26 @@ public class UserService
         meApi.blockFriends(request)
              .subscribeOn(Schedulers.newThread())
              .observeOn(Schedulers.newThread())
-             .subscribe();
+             .subscribe(new Subscriber<Response>()
+             {
+                 @Override
+                 public void onCompleted()
+                 {
+
+                 }
+
+                 @Override
+                 public void onError(Throwable e)
+                 {
+                     Log.d(TAG, e.getMessage());
+                 }
+
+                 @Override
+                 public void onNext(Response response)
+                 {
+
+                 }
+             });
     }
 
     public void shareFeedback(String rating, String comment)
@@ -302,7 +324,26 @@ public class UserService
         meApi.shareFeedback(request)
              .subscribeOn(Schedulers.newThread())
              .observeOn(Schedulers.newThread())
-             .subscribe();
+             .subscribe(new Subscriber<Response>()
+             {
+                 @Override
+                 public void onCompleted()
+                 {
+
+                 }
+
+                 @Override
+                 public void onError(Throwable e)
+                 {
+                     Log.d(TAG, e.getMessage());
+                 }
+
+                 @Override
+                 public void onNext(Response response)
+                 {
+
+                 }
+             });
     }
 
     private Set<String> fetchAllContacts(ContentResolver contentResolver)

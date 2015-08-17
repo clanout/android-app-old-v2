@@ -2,7 +2,7 @@ package reaper.android.app.api.gcm.request;
 
 import com.google.gson.annotations.SerializedName;
 
-public class RegisterRequest
+public class GCmRegisterUserApiRequest
 {
     @SerializedName("token")
     private String token;
@@ -10,7 +10,7 @@ public class RegisterRequest
     @SerializedName("user_id")
     private String userId;
 
-    public RegisterRequest(String token, String userId)
+    public GCmRegisterUserApiRequest(String token, String userId)
     {
         this.token = token;
         this.userId = userId;

@@ -6,10 +6,10 @@ import reaper.android.app.api.me.request.GetAllFacebookFriendsApiRequest;
 import reaper.android.app.api.me.request.GetFacebookFriendsApiRequest;
 import reaper.android.app.api.me.request.GetPhoneContactsApiRequest;
 import reaper.android.app.api.me.request.ShareFeedbackApiRequest;
+import reaper.android.app.api.me.request.UserZoneUpdatedApiRequest;
 import reaper.android.app.api.me.response.GetAllFacebookFriendsApiResponse;
 import reaper.android.app.api.me.response.GetFacebookFriendsApiResponse;
 import reaper.android.app.api.me.response.GetPhoneContactsApiResponse;
-import retrofit.Callback;
 import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.POST;
@@ -37,4 +37,7 @@ public interface MeApi
 
     @POST("/me/feedback")
     Observable<Response> shareFeedback(@Body ShareFeedbackApiRequest request);
+
+    @POST("/me/location")
+    Observable<Response> updateUserZone(@Body UserZoneUpdatedApiRequest request);
 }

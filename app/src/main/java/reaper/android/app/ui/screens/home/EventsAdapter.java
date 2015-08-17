@@ -31,33 +31,18 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
 
     // Data
     private List<Event> events;
-    private List<String> updates;
-    private List<String> chatUpdates;
-
     private List<SwipedState> state;
 
-    public EventsAdapter(Bus bus, List<Event> events, List<String> updates, List<String> chatUpdates)
+    public EventsAdapter(Bus bus, List<Event> events)
     {
         this.bus = bus;
         this.events = events;
-        this.updates = updates;
-        this.chatUpdates = chatUpdates;
 
         state = new ArrayList<>();
         for (int i = 0; i < events.size(); i++)
         {
             state.add(SwipedState.SHOWING_PRIMARY_CONTENT);
         }
-    }
-
-    public void setUpdates(List<String> updates)
-    {
-        this.chatUpdates = updates;
-    }
-
-    public void setChatUpdates(List<String> chatUpdates)
-    {
-        this.chatUpdates = chatUpdates;
     }
 
     @Override
@@ -239,16 +224,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
 
         public void render(Event event)
         {
-            boolean isUpdated = false;
             boolean isChatUpdated = false;
-            if (updates.contains(event.getId()))
-            {
-                isUpdated = true;
-            }
-            if (chatUpdates.contains(event.getId()))
-            {
-                isChatUpdated = true;
-            }
 
             // Title
             if (event.getTitle().length() <= 20)
@@ -361,7 +337,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 }
 
                 // Event Updates
-                if (isUpdated)
+                if (event.isUpdated())
                 {
                     updatesIcon.setVisibility(View.VISIBLE);
                     updatesIcon.setImageResource(R.drawable.ic_info_black_18dp);

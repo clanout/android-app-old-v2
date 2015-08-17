@@ -12,6 +12,9 @@ import com.squareup.otto.Bus;
 import java.util.List;
 import java.util.Locale;
 
+import reaper.android.app.api.core.ApiManager;
+import reaper.android.app.api.me.MeApi;
+import reaper.android.app.api.me.request.UserZoneUpdatedApiRequest;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
@@ -22,6 +25,9 @@ import reaper.android.app.trigger.common.CacheCommitTrigger;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshTrigger;
 import reaper.android.common.cache.Cache;
+import retrofit.client.Response;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
 public class LocationService
 {
@@ -29,11 +35,13 @@ public class LocationService
 
     private Bus bus;
     private GenericCache cache;
+    private MeApi meApi;
 
     public LocationService(Bus bus)
     {
         this.bus = bus;
         cache = new GenericCache();
+        meApi = ApiManager.getInstance().getApi(MeApi.class);
     }
 
     public Location getUserLocation()
@@ -97,6 +105,8 @@ public class LocationService
                 }
             }
 
+            updateZone(location.getZone());
+
             cache.put(CacheKeys.USER_LOCATION, location);
             bus.post(new UserLocationRefreshTrigger(location));
         }
@@ -112,5 +122,33 @@ public class LocationService
     {
         Location location = cache.get(CacheKeys.USER_LOCATION, Location.class);
         return (location != null);
+    }
+
+    private void updateZone(String zone)
+    {
+        UserZoneUpdatedApiRequest request = new UserZoneUpdatedApiRequest(zone);
+        meApi.updateUserZone(request)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(Schedulers.newThread())
+                .subscribe(new Subscriber<Response>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.d(TAG, e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(Response response)
+                    {
+
+                    }
+                });
     }
 }

@@ -12,18 +12,8 @@ public class CacheKeys
 
     // User Cache
     public static final String MY_PHONE_NUMBER = "my_phone_number";
-
-    // Event Cache
-    public static final String EVENTS = "events";
-    public static final String EVENTS_TIMESTAMP = "events_timestamp";
-    public static final String EVENTS_UPDATES = "events_updates";
-    public static final String EVENT_DETAILS_PREFIX = "event_details_";
-    public static String eventDetails(String eventId)
-    {
-        return EVENT_DETAILS_PREFIX + eventId;
-    }
-
     public static final String ACTIVE_FRAGMENT = "active_fragment";
 
     public static final String GCM_TOKEN = "gcm_token";
+    public static final String GCM_TOKEN_SENT_TO_SERVER = "gcm_token_sent_to_server";
 }

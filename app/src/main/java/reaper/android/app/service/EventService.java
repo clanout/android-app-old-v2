@@ -206,35 +206,35 @@ public class EventService
                 });
     }
 
-    public List<String> getUpdatedEvents()
-    {
-        return eventCache.getEvents()
-                         .flatMap(new Func1<List<Event>, Observable<String>>()
-                         {
-                             @Override
-                             public Observable<String> call(final List<Event> events)
-                             {
-                                 return Observable.create(new Observable.OnSubscribe<String>()
-                                 {
-                                     @Override
-                                     public void call(Subscriber<? super String> subscriber)
-                                     {
-                                         for (Event event : events)
-                                         {
-                                             if (event.isUpdated())
-                                             {
-                                                 subscriber.onNext(event.getId());
-                                             }
-                                         }
-                                         subscriber.onCompleted();
-                                     }
-                                 });
-                             }
-                         })
-                         .toList()
-                         .toBlocking()
-                         .first();
-    }
+//    public List<String> getUpdatedEvents()
+//    {
+//        return eventCache.getEvents()
+//                         .flatMap(new Func1<List<Event>, Observable<String>>()
+//                         {
+//                             @Override
+//                             public Observable<String> call(final List<Event> events)
+//                             {
+//                                 return Observable.create(new Observable.OnSubscribe<String>()
+//                                 {
+//                                     @Override
+//                                     public void call(Subscriber<? super String> subscriber)
+//                                     {
+//                                         for (Event event : events)
+//                                         {
+//                                             if (event.isUpdated())
+//                                             {
+//                                                 subscriber.onNext(event.getId());
+//                                             }
+//                                         }
+//                                         subscriber.onCompleted();
+//                                     }
+//                                 });
+//                             }
+//                         })
+//                         .toList()
+//                         .toBlocking()
+//                         .first();
+//    }
 
     public void updateRsvp(final Event updatedEvent, final Event.RSVP oldRsvp)
     {
@@ -431,123 +431,145 @@ public class EventService
 
         eventApi.inviteFriends(request)
                 .subscribeOn(Schedulers.newThread())
-                .subscribe();
-    }
-
-    public void fetchEventUpdates(String zone, DateTime lastUpdated)
-    {
-        EventUpdatesApiRequest request = new EventUpdatesApiRequest(zone, lastUpdated);
-        eventApi.getEventUpdates(request, new Callback<EventUpdatesApiResponse>()
-        {
-            @Override
-            public void success(EventUpdatesApiResponse eventUpdatesApiResponse, Response response)
-            {
-                List<Event> updates = eventUpdatesApiResponse.getUpdates();
-                if (updates.size() > 0)
+                .subscribe(new Subscriber<Response>()
                 {
-                    List<Event> events = updateEventsCache(updates, true);
-                    bus.post(new EventUpdatesFetchTrigger(events));
-                }
-                else
-                {
-                    bus.post(new EventUpdatesFetchTrigger(null));
-                }
-            }
+                    @Override
+                    public void onCompleted()
+                    {
 
-            @Override
-            public void failure(RetrofitError error)
-            {
-                bus.post(new GenericErrorTrigger(ErrorCode.EVENT_UPDATES_FETCH_FAILURE, error));
-            }
-        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+
+                    }
+
+                    @Override
+                    public void onNext(Response response)
+                    {
+                        if(response.getStatus() == 200)
+                        {
+                            // TODO: Delete event details or add a new invitee
+                        }
+                    }
+                });
     }
 
-    public void updateCacheFor(Event event)
-    {
-        Cache cache = Cache.getInstance();
-        Map<String, Event> eventMap = (Map<String, Event>) cache.get(CacheKeys.EVENTS);
-        if (eventMap != null)
-        {
-            eventMap.put(event.getId(), event);
-            cache.put(CacheKeys.EVENTS, eventMap);
-            bus.post(new CacheCommitTrigger());
-        }
-    }
-
-    public void deleteCacheFor(Event event)
-    {
-        Cache cache = Cache.getInstance();
-        Map<String, Event> eventMap = (Map<String, Event>) cache.get(CacheKeys.EVENTS);
-        if (eventMap != null)
-        {
-            eventMap.remove(event.getId());
-            cache.put(CacheKeys.EVENTS, eventMap);
-            bus.post(new CacheCommitTrigger());
-        }
-    }
-
-    public void deleteEventDetailsCacheFor(String eventId)
-    {
-        Cache cache = Cache.getInstance();
-        cache.remove(CacheKeys.eventDetails(eventId));
-    }
-
-    private List<Event> updateEventsCache(List<Event> events, boolean append)
-    {
-        Cache cache = Cache.getInstance();
-
-        if (append)
-        {
-            Map<String, Event> eventMap = (Map<String, Event>) cache.get(CacheKeys.EVENTS);
-            List<String> eventUpdates = (List<String>) cache.get(CacheKeys.EVENTS_UPDATES);
-
-            if (eventMap == null)
-            {
-                eventMap = new HashMap<>();
-            }
-            if (eventUpdates == null)
-            {
-                eventUpdates = new ArrayList<>();
-            }
-
-            for (Event event : events)
-            {
-                String eventId = event.getId();
-                if (eventMap.containsKey(eventId))
-                {
-                    eventUpdates.add(eventId);
-                }
-
-                eventMap.put(eventId, event);
-            }
-
-            DateTime time = DateTime.now();
-
-            cache.put(CacheKeys.EVENTS, eventMap);
-            cache.put(CacheKeys.EVENTS_UPDATES, eventUpdates);
-            cache.put(CacheKeys.EVENTS_TIMESTAMP, time);
-
-            bus.post(new CacheCommitTrigger());
-
-            return new ArrayList<>(eventMap.values());
-        }
-        else
-        {
-            Map<String, Event> eventMap = new HashMap<>();
-            for (Event event : events)
-            {
-                eventMap.put(event.getId(), event);
-            }
-
-            DateTime time = DateTime.now();
-
-            cache.put(CacheKeys.EVENTS, eventMap);
-            cache.put(CacheKeys.EVENTS_UPDATES, new ArrayList<String>());
-            cache.put(CacheKeys.EVENTS_TIMESTAMP, time);
-
-            bus.post(new CacheCommitTrigger());
-
-            return events;
-        }
-    }
+//    public void fetchEventUpdates(String zone, DateTime lastUpdated)
+//    {
+//        EventUpdatesApiRequest request = new EventUpdatesApiRequest(zone, lastUpdated);
+//        eventApi.getEventUpdates(request, new Callback<EventUpdatesApiResponse>()
+//        {
+//            @Override
+//            public void success(EventUpdatesApiResponse eventUpdatesApiResponse, Response response)
+//            {
+//                List<Event> updates = eventUpdatesApiResponse.getUpdates();
+//                if (updates.size() > 0)
+//                {
+//                    List<Event> events = updateEventsCache(updates, true);
+//                    bus.post(new EventUpdatesFetchTrigger(events));
+//                }
+//                else
+//                {
+//                    bus.post(new EventUpdatesFetchTrigger(null));
+//                }
+//            }
+//
+//            @Override
+//            public void failure(RetrofitError error)
+//            {
+//                bus.post(new GenericErrorTrigger(ErrorCode.EVENT_UPDATES_FETCH_FAILURE, error));
+//            }
+//        });
+//    }
+//
+//    public void updateCacheFor(Event event)
+//    {
+//        Cache cache = Cache.getInstance();
+//        Map<String, Event> eventMap = (Map<String, Event>) cache.get(CacheKeys.EVENTS);
+//        if (eventMap != null)
+//        {
+//            eventMap.put(event.getId(), event);
+//            cache.put(CacheKeys.EVENTS, eventMap);
+//            bus.post(new CacheCommitTrigger());
+//        }
+//    }
+//
+//    public void deleteCacheFor(Event event)
+//    {
+//        Cache cache = Cache.getInstance();
+//        Map<String, Event> eventMap = (Map<String, Event>) cache.get(CacheKeys.EVENTS);
+//        if (eventMap != null)
+//        {
+//            eventMap.remove(event.getId());
+//            cache.put(CacheKeys.EVENTS, eventMap);
+//            bus.post(new CacheCommitTrigger());
+//        }
+//    }
+//
+//    public void deleteEventDetailsCacheFor(String eventId)
+//    {
+//        Cache cache = Cache.getInstance();
+//        cache.remove(CacheKeys.eventDetails(eventId));
+//    }
+//
+//    private List<Event> updateEventsCache(List<Event> events, boolean append)
+//    {
+//        Cache cache = Cache.getInstance();
+//
+//        if (append)
+//        {
+//            Map<String, Event> eventMap = (Map<String, Event>) cache.get(CacheKeys.EVENTS);
+//            List<String> eventUpdates = (List<String>) cache.get(CacheKeys.EVENTS_UPDATES);
+//
+//            if (eventMap == null)
+//            {
+//                eventMap = new HashMap<>();
+//            }
+//            if (eventUpdates == null)
+//            {
+//                eventUpdates = new ArrayList<>();
+//            }
+//
+//            for (Event event : events)
+//            {
+//                String eventId = event.getId();
+//                if (eventMap.containsKey(eventId))
+//                {
+//                    eventUpdates.add(eventId);
+//                }
+//
+//                eventMap.put(eventId, event);
+//            }
+//
+//            DateTime time = DateTime.now();
+//
+//            cache.put(CacheKeys.EVENTS, eventMap);
+//            cache.put(CacheKeys.EVENTS_UPDATES, eventUpdates);
+//            cache.put(CacheKeys.EVENTS_TIMESTAMP, time);
+//
+//            bus.post(new CacheCommitTrigger());
+//
+//            return new ArrayList<>(eventMap.values());
+//        }
+//        else
+//        {
+//            Map<String, Event> eventMap = new HashMap<>();
+//            for (Event event : events)
+//            {
+//                eventMap.put(event.getId(), event);
+//            }
+//
+//            DateTime time = DateTime.now();
+//
+//            cache.put(CacheKeys.EVENTS, eventMap);
+//            cache.put(CacheKeys.EVENTS_UPDATES, new ArrayList<String>());
+//            cache.put(CacheKeys.EVENTS_TIMESTAMP, time);
+//
+//            bus.post(new CacheCommitTrigger());
+//
+//            return events;
+//        }
+//    }
 }

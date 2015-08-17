@@ -190,10 +190,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
             invitedUsers.addAll(invitedPhoneContacts);
 
             eventService.inviteUsers(eventId, invitedUsers);
-            eventService.deleteEventDetailsCacheFor(eventId);
-
             eventService.fetchEvents(locationService.getUserLocation().getZone());
-
         }
     }
 
