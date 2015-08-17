@@ -26,13 +26,11 @@ public class RegistrationIntentService extends IntentService
 {
     private static final String TAG = "RegIntentService";
     private Bus bus;
-    private GenericCache genericCache;
 
     public RegistrationIntentService()
     {
         super(TAG);
         this.bus = Communicator.getInstance().getBus();
-        genericCache = new GenericCache();
     }
 
     @Override
@@ -51,14 +49,12 @@ public class RegistrationIntentService extends IntentService
         catch (Exception e)
         {
             Log.d(TAG, "Error = " + e.getMessage());
-            genericCache.delete(CacheKeys.GCM_TOKEN);
-            genericCache.put(CacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
+            AppPreferences.set(this, CacheKeys.GCM_TOKEN, null);
+            AppPreferences.set(this, CacheKeys.GCM_TOKEN_SENT_TO_SERVER, String.valueOf(false));
         }
 
 
-        Log.d(TAG, "here1");
         bus.post(new GcmRegistrationCompleteTrigger());
-        Log.d(TAG, "here2");
     }
 
     private void sendTokenToServer(final String token)
@@ -77,14 +73,13 @@ public class RegistrationIntentService extends IntentService
                     @Override
                     public void onCompleted()
                     {
-                        Log.d(TAG, "saved in cache");
                     }
 
                     @Override
                     public void onError(Throwable e)
                     {
-                        genericCache.delete(CacheKeys.GCM_TOKEN);
-                        genericCache.put(CacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
+                        AppPreferences.set(RegistrationIntentService.this, CacheKeys.GCM_TOKEN, null);
+                        AppPreferences.set(RegistrationIntentService.this, CacheKeys.GCM_TOKEN_SENT_TO_SERVER, String.valueOf(false));
                     }
 
                     @Override
@@ -92,13 +87,13 @@ public class RegistrationIntentService extends IntentService
                     {
                         if (response.getStatus() == 200)
                         {
-                            genericCache.put(CacheKeys.GCM_TOKEN, token);
-                            genericCache.put(CacheKeys.GCM_TOKEN_SENT_TO_SERVER, true);
+                            AppPreferences.set(RegistrationIntentService.this, CacheKeys.GCM_TOKEN, token);
+                            AppPreferences.set(RegistrationIntentService.this, CacheKeys.GCM_TOKEN_SENT_TO_SERVER, String.valueOf(true));
                         }
                         else
                         {
-                            genericCache.delete(CacheKeys.GCM_TOKEN);
-                            genericCache.put(CacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
+                            AppPreferences.set(RegistrationIntentService.this, CacheKeys.GCM_TOKEN, null);
+                            AppPreferences.set(RegistrationIntentService.this, CacheKeys.GCM_TOKEN_SENT_TO_SERVER, String.valueOf(false));
                         }
                     }
                 });

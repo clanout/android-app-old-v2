@@ -57,9 +57,8 @@ public class MainActivity extends AppCompatActivity
 
         genericCache = new GenericCache();
 
-        if (genericCache.get(CacheKeys.GCM_TOKEN) == null)
+        if (AppPreferences.get(this, CacheKeys.GCM_TOKEN) == null)
         {
-            Log.d("APP", "token null");
             if (checkPlayServices())
             {
                 gcmService.register();
@@ -67,17 +66,26 @@ public class MainActivity extends AppCompatActivity
         }
         else
         {
-            Log.d("APP", "token not null");
             ChatHelper.init(userService.getActiveUserId());
 
-            try
+            Log.d("APP", "token main thread====== " + AppPreferences.get(this, CacheKeys.GCM_TOKEN));
+
+            new Thread(new Runnable()
             {
-                gcmService.subscribeTopic(genericCache.get(CacheKeys.GCM_TOKEN), "abc");
-            }
-            catch (IOException e)
-            {
-                Log.d("APP", e.getMessage());
-            }
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        Log.d("APP", "token ====== " + AppPreferences.get(MainActivity.this, CacheKeys.GCM_TOKEN));
+                        gcmService.subscribeTopic(AppPreferences.get(MainActivity.this, CacheKeys.GCM_TOKEN), "abc");
+                    }
+                    catch (IOException e)
+                    {
+                        Log.d("APP", "exception while subscribing topic" + e.getMessage());
+                    }
+                }
+            }).start();
 
             fragmentManager = getSupportFragmentManager();
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
@@ -178,7 +186,7 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onGcmRegistrationComplete(GcmRegistrationCompleteTrigger trigger)
     {
-        Log.d("APP", "registration complete");
+        Log.d("APP", "registration complete token ----- " + genericCache.get(CacheKeys.GCM_TOKEN));
         ChatHelper.init(userService.getActiveUserId());
 
         runOnUiThread(new Runnable()
