@@ -34,7 +34,7 @@ public class UserCache
                 subscriber.onNext(dataSource.readFriends());
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.io());
+        }).subscribeOn(Schedulers.newThread());
     }
 
     public void evictFriendsCache()
@@ -58,7 +58,7 @@ public class UserCache
                 subscriber.onNext(dataSource.readContacts());
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.io());
+        }).subscribeOn(Schedulers.newThread());
     }
 
     public void evictContactsCache()

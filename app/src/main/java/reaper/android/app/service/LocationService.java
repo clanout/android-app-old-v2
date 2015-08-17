@@ -27,6 +27,7 @@ import reaper.android.app.trigger.user.UserLocationRefreshTrigger;
 import reaper.android.common.cache.Cache;
 import retrofit.client.Response;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class LocationService
@@ -129,7 +130,7 @@ public class LocationService
         UserZoneUpdatedApiRequest request = new UserZoneUpdatedApiRequest(zone);
         meApi.updateUserZone(request)
                 .subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Response>()
                 {
                     @Override
