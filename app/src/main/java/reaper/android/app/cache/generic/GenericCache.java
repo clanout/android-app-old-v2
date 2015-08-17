@@ -10,6 +10,7 @@ import java.util.Map;
 import reaper.android.app.api.core.GsonProvider;
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class GenericCache
@@ -38,32 +39,31 @@ public class GenericCache
             @Override
             public void call(Subscriber<? super Object> subscriber)
             {
-                dataSource.write(key, value);
                 subscriber.onCompleted();
             }
         })
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.newThread())
-                .subscribe(new Subscriber<Object>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
+                  .subscribeOn(Schedulers.computation())
+                  .observeOn(AndroidSchedulers.mainThread())
+                  .subscribe(new Subscriber<Object>()
+                  {
+                      @Override
+                      public void onCompleted()
+                      {
 
-                    }
+                      }
 
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                        Log.d(TAG, e.getMessage());
-                    }
+                      @Override
+                      public void onError(Throwable e)
+                      {
+                          Log.d(TAG, e.getMessage());
+                      }
 
-                    @Override
-                    public void onNext(Object o)
-                    {
+                      @Override
+                      public void onNext(Object o)
+                      {
 
-                    }
-                });
+                      }
+                  });
     }
 
     public String get(String key)

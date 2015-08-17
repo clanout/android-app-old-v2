@@ -193,7 +193,7 @@ public class UserService
                  }
              })
              .subscribeOn(Schedulers.newThread())
-             .observeOn(Schedulers.io())
+             .observeOn(AndroidSchedulers.mainThread())
              .subscribe(new Subscriber<List<Friend>>()
              {
                  @Override
@@ -294,7 +294,7 @@ public class UserService
 
         meApi.blockFriends(request)
              .subscribeOn(Schedulers.newThread())
-             .observeOn(Schedulers.newThread())
+             .observeOn(AndroidSchedulers.mainThread())
              .subscribe(new Subscriber<Response>()
              {
                  @Override
@@ -323,7 +323,7 @@ public class UserService
 
         meApi.shareFeedback(request)
              .subscribeOn(Schedulers.newThread())
-             .observeOn(Schedulers.newThread())
+             .observeOn(AndroidSchedulers.mainThread())
              .subscribe(new Subscriber<Response>()
              {
                  @Override

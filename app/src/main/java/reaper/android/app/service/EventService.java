@@ -243,7 +243,7 @@ public class EventService
 
         eventApi.updateRsvp(request)
                 .subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Response>()
                 {
                     @Override

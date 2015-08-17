@@ -29,7 +29,7 @@ public class EventCache
                 subscriber.onNext(dataSource.read());
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.io());
+        }).subscribeOn(Schedulers.newThread());
     }
 
     public void save(final List<Event> events)
@@ -48,7 +48,7 @@ public class EventCache
                 subscriber.onNext(dataSource.read(eventId));
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.io());
+        }).subscribeOn(Schedulers.newThread());
     }
 
     public void save(Event event)
@@ -66,7 +66,7 @@ public class EventCache
                 subscriber.onNext(dataSource.readDetails(eventId));
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.io());
+        }).subscribeOn(Schedulers.newThread());
     }
 
     public void save(final EventDetails eventDetails)
