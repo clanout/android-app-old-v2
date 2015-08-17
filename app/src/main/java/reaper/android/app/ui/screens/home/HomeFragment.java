@@ -181,8 +181,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     {
         super.onResume();
 
-        Log.d("APP", "HomeFragment onResume");
-
         AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.HOME);
 
         bus.register(this);
@@ -212,9 +210,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener
     public void onEventsFetchTrigger(EventsFetchTrigger eventsFetchTrigger)
     {
         events = eventsFetchTrigger.getEvents();
-
-        Log.d("APP", "HomeFragment events fetched ------ " + events);
-
         refreshRecyclerView();
     }
 

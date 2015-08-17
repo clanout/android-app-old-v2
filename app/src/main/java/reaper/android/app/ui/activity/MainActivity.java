@@ -67,26 +67,6 @@ public class MainActivity extends AppCompatActivity
         else
         {
             ChatHelper.init(userService.getActiveUserId());
-
-            Log.d("APP", "token main thread====== " + AppPreferences.get(this, CacheKeys.GCM_TOKEN));
-
-            new Thread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        Log.d("APP", "token ====== " + AppPreferences.get(MainActivity.this, CacheKeys.GCM_TOKEN));
-                        gcmService.subscribeTopic(AppPreferences.get(MainActivity.this, CacheKeys.GCM_TOKEN), "abc");
-                    }
-                    catch (IOException e)
-                    {
-                        Log.d("APP", "exception while subscribing topic" + e.getMessage());
-                    }
-                }
-            }).start();
-
             fragmentManager = getSupportFragmentManager();
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
         }
@@ -186,7 +166,6 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onGcmRegistrationComplete(GcmRegistrationCompleteTrigger trigger)
     {
-        Log.d("APP", "registration complete token ----- " + genericCache.get(CacheKeys.GCM_TOKEN));
         ChatHelper.init(userService.getActiveUserId());
 
         runOnUiThread(new Runnable()
