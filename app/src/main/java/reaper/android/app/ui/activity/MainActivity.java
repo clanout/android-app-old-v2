@@ -1,12 +1,10 @@
 package reaper.android.app.ui.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -28,7 +26,6 @@ import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.chat.ChatHelper;
 import reaper.android.common.communicator.Communicator;
-import reaper.android.common.gcm.RegistrationIntentService;
 
 public class MainActivity extends AppCompatActivity
 {

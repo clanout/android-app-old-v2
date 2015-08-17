@@ -96,12 +96,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener
 
     private EventsAdapter eventsAdapter;
 
-    private static enum Sort implements Serializable
+    private enum Sort implements Serializable
     {
         RELEVANCE, DATE_TIME, DISTANCE
     }
 
-    private static enum Filter implements Serializable
+    private enum Filter implements Serializable
     {
         TODAY, ALL
     }
@@ -189,23 +189,23 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         bus.register(this);
         eventService.fetchEvents(userLocation.getZone());
 
-        timer = new Timer();
-        timer.schedule(new TimerTask()
-        {
-            @Override
-            public void run()
-            {
-                DateTime lastUpdated = (DateTime) Cache.getInstance().get(CacheKeys.EVENTS_TIMESTAMP);
-                eventService.fetchEventUpdates(userLocation.getZone(), lastUpdated);
-            }
-        }, AppConstants.EVENTS_REFRESH_RATE_MILLISECONDS, AppConstants.EVENTS_REFRESH_RATE_MILLISECONDS);
+//        timer = new Timer();
+//        timer.schedule(new TimerTask()
+//        {
+//            @Override
+//            public void run()
+//            {
+//                DateTime lastUpdated = (DateTime) Cache.getInstance().get(CacheKeys.EVENTS_TIMESTAMP);
+//                eventService.fetchEventUpdates(userLocation.getZone(), lastUpdated);
+//            }
+//        }, AppConstants.EVENTS_REFRESH_RATE_MILLISECONDS, AppConstants.EVENTS_REFRESH_RATE_MILLISECONDS);
     }
 
     @Override
     public void onPause()
     {
         super.onPause();
-        timer.cancel();
+//        timer.cancel();
         bus.unregister(this);
     }
 
@@ -227,24 +227,24 @@ public class HomeFragment extends Fragment implements View.OnClickListener
         }
     }
 
-    @Subscribe
-    public void onEventUpdatesFetchTrigger(EventUpdatesFetchTrigger eventUpdatesFetchTrigger)
-    {
-        if (eventUpdatesFetchTrigger.getEventUpdates() != null)
-        {
-            events = eventUpdatesFetchTrigger.getEventUpdates();
-            eventUpdates = eventService.getUpdatedEvents();
-
-            if (refresh != null)
-            {
-                refresh.setVisibility(View.VISIBLE);
-            }
-            else
-            {
-                refreshRecyclerView();
-            }
-        }
-    }
+//    @Subscribe
+//    public void onEventUpdatesFetchTrigger(EventUpdatesFetchTrigger eventUpdatesFetchTrigger)
+//    {
+//        if (eventUpdatesFetchTrigger.getEventUpdates() != null)
+//        {
+//            events = eventUpdatesFetchTrigger.getEventUpdates();
+//            eventUpdates = eventService.getUpdatedEvents();
+//
+//            if (refresh != null)
+//            {
+//                refresh.setVisibility(View.VISIBLE);
+//            }
+//            else
+//            {
+//                refreshRecyclerView();
+//            }
+//        }
+//    }
 
     @Subscribe
     public void onEventClickTrigger(EventClickTrigger eventClickTrigger)

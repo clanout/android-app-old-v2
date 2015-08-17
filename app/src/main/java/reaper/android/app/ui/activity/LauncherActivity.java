@@ -15,6 +15,7 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import reaper.android.R;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.service.AuthService;
@@ -30,8 +31,9 @@ import reaper.android.common.communicator.Communicator;
 public class LauncherActivity extends AppCompatActivity
 {
     private Bus bus;
-
     private LocationManager locationManager;
+
+    private GenericCache cache;
 
     // Services
     private AuthService authService;
@@ -51,6 +53,8 @@ public class LauncherActivity extends AppCompatActivity
 
         authService = new AuthService(bus);
         locationService = new LocationService(bus);
+
+        cache = new GenericCache();
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
     }
@@ -96,12 +100,12 @@ public class LauncherActivity extends AppCompatActivity
         else
         {
             // Dummy Session initialization
-            if (AppPreferences.get(this, "SESSION_COOKIE") == null)
+            if(cache.get(CacheKeys.SESSION_ID) == null)
             {
-                AppPreferences.set(this, "SESSION_COOKIE", "dummy_session_cookie");
+                cache.put(CacheKeys.SESSION_ID, "dummy_session_cookie");
             }
 
-            String sessionCookie = AppPreferences.get(this, "SESSION_COOKIE");
+            String sessionCookie = cache.get(CacheKeys.SESSION_ID);
             authService.validateSession(sessionCookie);
         }
     }
@@ -116,11 +120,10 @@ public class LauncherActivity extends AppCompatActivity
     @Subscribe
     public void onSessionValidatedTrigger(SessionValidatedTrigger trigger)
     {
-        Cache.getInstance().put(CacheKeys.SESSION_COOKIE, trigger.getValidatedSessionCookie());
+        cache.put(CacheKeys.SESSION_ID, trigger.getValidatedSessionCookie());
 
         if (!locationService.locationExists())
         {
-            // TODO: Prompt to turn location on
             progressDialog = ProgressDialog.show(this, "Welcome", "Fetching your current location...");
             isBlocking = true;
             bus.post(new UserLocationRefreshRequestTrigger());

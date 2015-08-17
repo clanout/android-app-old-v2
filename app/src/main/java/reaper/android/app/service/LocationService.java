@@ -12,6 +12,9 @@ import com.squareup.otto.Bus;
 import java.util.List;
 import java.util.Locale;
 
+import reaper.android.app.cache.event.EventCache;
+import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Location;
@@ -22,32 +25,26 @@ import reaper.android.common.cache.Cache;
 
 public class LocationService
 {
+    private static final String TAG = "LocationService";
+
     private Bus bus;
+    private GenericCache cache;
 
     public LocationService(Bus bus)
     {
         this.bus = bus;
+        cache = new GenericCache();
     }
 
     public Location getUserLocation()
     {
-        Cache cache = Cache.getInstance();
-        Double latitude = (Double) cache.get(CacheKeys.USER_LOCATION_LATITUDE);
-        Double longitude = (Double) cache.get(CacheKeys.USER_LOCATION_LONGITUDE);
-        String zone = (String) cache.get(CacheKeys.USER_LOCATION_ZONE);
-
-        if (latitude == null || longitude == null || zone == null)
+        Location location = cache.get(CacheKeys.USER_LOCATION, Location.class);
+        if (location == null)
         {
-            throw new IllegalStateException();
+            Log.e(TAG, "User location is null");
+            throw new IllegalStateException("User location cannot be null");
         }
-        else
-        {
-            Location location = new Location();
-            location.setLatitude(latitude);
-            location.setLongitude(longitude);
-            location.setZone(zone);
-            return location;
-        }
+        return location;
     }
 
     public void refreshUserLocation(Context context, GoogleApiClient apiClient)
@@ -62,7 +59,8 @@ public class LocationService
 
                 Geocoder gcd = new Geocoder(context, Locale.getDefault());
                 List<Address> addresses = null;
-                addresses = gcd.getFromLocation(googleApiLocation.getLatitude(), googleApiLocation.getLongitude(), 1);
+                addresses = gcd.getFromLocation(googleApiLocation.getLatitude(), googleApiLocation
+                        .getLongitude(), 1);
                 if (addresses == null || addresses.size() == 0)
                 {
                     throw new IllegalStateException();
@@ -72,7 +70,7 @@ public class LocationService
             }
             catch (Exception e)
             {
-                Log.d("reap3r", "Error... " + e.getMessage());
+                Log.d(TAG, "Unable to refresh user location (" + e.getMessage() + ")");
                 bus.post(new GenericErrorTrigger(ErrorCode.GOOGLE_API_LOCATION_FETCH_FAILURE, null));
                 return;
             }
@@ -82,24 +80,25 @@ public class LocationService
             location.setLatitude(googleApiLocation.getLatitude());
             location.setZone(zone);
 
-            Log.d("reap3r", "Location updated (Zone = " + zone + "; Co-ordinates = " + location.getLongitude() + "," + location.getLatitude() + ")");
+            Log.d(TAG, "Location updated (Zone = " + zone + "; Co-ordinates = " + location
+                    .getLongitude() + "," + location.getLatitude() + ")");
 
-            Cache cache = Cache.getInstance();
-
-            String oldZone = (String) cache.get(CacheKeys.USER_LOCATION_ZONE);
-
-            // Invalidate Events cache if the zone changes
-            if (!zone.equalsIgnoreCase(oldZone))
+            if(locationExists())
             {
-                cache.remove(CacheKeys.EVENTS);
+                Location oldLocation = getUserLocation();
+                if(!oldLocation.getZone().equalsIgnoreCase(location.getZone()))
+                {
+                    EventCache eventCache = new EventCache();
+                    eventCache.evict();
+
+                    UserCache userCache = new UserCache();
+                    userCache.evictFriendsCache();
+                    userCache.evictContactsCache();
+                }
             }
 
-            cache.put(CacheKeys.USER_LOCATION_LATITUDE, location.getLatitude());
-            cache.put(CacheKeys.USER_LOCATION_LONGITUDE, location.getLongitude());
-            cache.put(CacheKeys.USER_LOCATION_ZONE, location.getZone());
-
+            cache.put(CacheKeys.USER_LOCATION, location);
             bus.post(new UserLocationRefreshTrigger(location));
-            bus.post(new CacheCommitTrigger());
         }
         else
         {
@@ -111,19 +110,7 @@ public class LocationService
 
     public boolean locationExists()
     {
-        Double latitude = (Double) Cache.getInstance().get(CacheKeys.USER_LOCATION_LATITUDE);
-        Double longitude = (Double) Cache.getInstance().get(CacheKeys.USER_LOCATION_LONGITUDE);
-        String zone = (String) Cache.getInstance().get(CacheKeys.USER_LOCATION_ZONE);
-
-        Log.d("reap3r", "" + latitude + "," + longitude + "," + zone);
-
-        if (latitude == null || longitude == null || zone == null)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        Location location = cache.get(CacheKeys.USER_LOCATION, Location.class);
+        return (location != null);
     }
 }

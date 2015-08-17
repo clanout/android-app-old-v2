@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -160,7 +159,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
 
         if (isPhoneAdded)
         {
-            userService.getPhoneContacts(getActivity().getContentResolver(), locationService.getUserLocation().getZone());
+            userService.getPhoneContacts();
         }
     }
 
@@ -239,7 +238,8 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
                 {
 
                     menuItem.setActionView(R.layout.action_button_refreshing);
-                    userService.getPhoneContacts(getActivity().getContentResolver(), locationService.getUserLocation().getZone());
+                    userService.refreshPhoneContacts(getActivity()
+                            .getContentResolver(), locationService.getUserLocation().getZone());
                     return true;
                 }
             }
@@ -301,7 +301,8 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
     {
         isPhoneAdded = true;
         displayBasicView();
-        userService.getPhoneContacts(getActivity().getContentResolver(), locationService.getUserLocation().getZone());
+        userService.refreshPhoneContacts(getActivity().getContentResolver(), locationService
+                .getUserLocation().getZone());
     }
 
     @Subscribe

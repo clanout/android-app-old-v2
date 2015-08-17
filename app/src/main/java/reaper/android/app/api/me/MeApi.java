@@ -9,10 +9,11 @@ import reaper.android.app.api.me.request.ShareFeedbackApiRequest;
 import reaper.android.app.api.me.response.GetAllFacebookFriendsApiResponse;
 import reaper.android.app.api.me.response.GetFacebookFriendsApiResponse;
 import reaper.android.app.api.me.response.GetPhoneContactsApiResponse;
+import retrofit.Callback;
 import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.POST;
-import retrofit.Callback;
+import rx.Observable;
 
 /**
  * Created by aditya on 02/07/15.
@@ -20,20 +21,20 @@ import retrofit.Callback;
 public interface MeApi
 {
     @POST("/me/phone")
-    public void updatePhoneNumber(@Body AddPhoneApiRequest request, Callback<Response> callback);
+    Observable<Response> updatePhoneNumber(@Body AddPhoneApiRequest request);
 
     @POST("/me/friends")
-    public void getFacebookFriends(@Body GetFacebookFriendsApiRequest request, Callback<GetFacebookFriendsApiResponse> callback);
+    Observable<GetFacebookFriendsApiResponse> getFacebookFriends(@Body GetFacebookFriendsApiRequest request);
 
     @POST("/me/friends")
-    public void getAllFacebookFriends(@Body GetAllFacebookFriendsApiRequest request, Callback<GetAllFacebookFriendsApiResponse> callback);
+    Observable<GetAllFacebookFriendsApiResponse> getAllFacebookFriends(@Body GetAllFacebookFriendsApiRequest request);
 
     @POST("/me/contacts")
-    public void getPhoneContacts(@Body GetPhoneContactsApiRequest request, Callback<GetPhoneContactsApiResponse> callback);
+    Observable<GetPhoneContactsApiResponse> getPhoneContacts(@Body GetPhoneContactsApiRequest request);
 
     @POST("/me/block")
-    public void blockFriends(@Body BlockFriendsApiRequest request, Callback<Response> callback);
+    Observable<Response> blockFriends(@Body BlockFriendsApiRequest request);
 
     @POST("/me/feedback")
-    public void shareFeedback(@Body ShareFeedbackApiRequest request, Callback<Response> callback);
+    Observable<Response> shareFeedback(@Body ShareFeedbackApiRequest request);
 }

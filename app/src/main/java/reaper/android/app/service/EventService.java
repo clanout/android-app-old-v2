@@ -204,39 +204,234 @@ public class EventService
                         bus.post(new EventDetailsFetchTrigger(eventDetails));
                     }
                 });
-//
-//        Cache cache = Cache.getInstance();
-//        EventDetails eventDetails = (EventDetails) cache.get(CacheKeys.eventDetails(eventId));
-//        List<String> updatedEvents = getUpdatedEvents();
-//
-//        if (eventDetails != null && !updatedEvents.contains(eventId))
-//        {
-//            //Log.d("reap3r", "EventDetails (event_id = " + eventId + ") from cache");
-//            bus.post(new EventDetailsFetchTrigger(eventDetails));
-//        }
-//        else
-//        {
-//            EventDetailsApiRequest request = new EventDetailsApiRequest(eventId);
-//            eventApi.getEventDetails(request, new Callback<EventDetailsApiResponse>()
-//            {
-//                @Override
-//                public void success(EventDetailsApiResponse eventDetailsApiResponse, Response response)
-//                {
-//                    EventDetails eventDetails = eventDetailsApiResponse.getEventDetails();
-//                    Collections.sort(eventDetails
-//                            .getAttendees(), new EventAttendeeComparator(userService
-//                            .getActiveUserId()));
-//                    updateCacheFor(eventDetails);
-//                    bus.post(new EventDetailsFetchTrigger(eventDetails));
-//                }
-//
-//                @Override
-//                public void failure(RetrofitError error)
-//                {
-//                    bus.post(new GenericErrorTrigger(ErrorCode.EVENT_DETAILS_FETCH_FAILURE, error));
-//                }
-//            });
-//        }
+    }
+
+    public List<String> getUpdatedEvents()
+    {
+        return eventCache.getEvents()
+                         .flatMap(new Func1<List<Event>, Observable<String>>()
+                         {
+                             @Override
+                             public Observable<String> call(final List<Event> events)
+                             {
+                                 return Observable.create(new Observable.OnSubscribe<String>()
+                                 {
+                                     @Override
+                                     public void call(Subscriber<? super String> subscriber)
+                                     {
+                                         for (Event event : events)
+                                         {
+                                             if (event.isUpdated())
+                                             {
+                                                 subscriber.onNext(event.getId());
+                                             }
+                                         }
+                                         subscriber.onCompleted();
+                                     }
+                                 });
+                             }
+                         })
+                         .toList()
+                         .toBlocking()
+                         .first();
+    }
+
+    public void updateRsvp(final Event updatedEvent, final Event.RSVP oldRsvp)
+    {
+        RsvpUpdateApiRequest request = new RsvpUpdateApiRequest(updatedEvent.getId(), updatedEvent
+                .getRsvp());
+
+        eventApi.updateRsvp(request)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(Schedulers.io())
+                .subscribe(new Subscriber<Response>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        updatedEvent.setRsvp(oldRsvp);
+                        bus.post(new GenericErrorTrigger(ErrorCode.RSVP_UPDATE_FAILURE, (Exception) e));
+                    }
+
+                    @Override
+                    public void onNext(Response response)
+                    {
+                        if (response.getStatus() == 200)
+                        {
+                            eventCache.save(updatedEvent);
+                        }
+                        else
+                        {
+                            updatedEvent.setRsvp(oldRsvp);
+                            bus.post(new GenericErrorTrigger(ErrorCode.RSVP_UPDATE_FAILURE, null));
+                        }
+                    }
+                });
+    }
+
+    public void fetchEventSuggestions(EventCategory eventCategory, String latitude, String longitude)
+    {
+        EventSuggestionsApiRequest request = new EventSuggestionsApiRequest(eventCategory, latitude, longitude);
+        eventApi.getEventSuggestions(request)
+                .map(new Func1<EventSuggestionsApiResponse, List<Suggestion>>()
+                {
+                    @Override
+                    public List<Suggestion> call(EventSuggestionsApiResponse eventSuggestionsApiResponse)
+                    {
+                        return eventSuggestionsApiResponse.getEventSuggestions();
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Suggestion>>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        bus.post(new EventSuggestionsTrigger(new ArrayList<Suggestion>()));
+                    }
+
+                    @Override
+                    public void onNext(List<Suggestion> suggestions)
+                    {
+                        bus.post(new EventSuggestionsTrigger(suggestions));
+                    }
+                });
+    }
+
+    public void createEvent(String title, Event.Type eventType, EventCategory eventCategory, String description, Location placeLocation, DateTime startTime, DateTime endTime)
+    {
+        CreateEventApiRequest request = new CreateEventApiRequest(title, eventType, eventCategory, description, placeLocation
+                .getName(), placeLocation.getZone(), String
+                .valueOf(placeLocation.getLatitude()), String
+                .valueOf(placeLocation.getLongitude()), startTime, endTime);
+
+        eventApi.createEvent(request)
+                .map(new Func1<CreateEventApiResponse, Event>()
+                {
+                    @Override
+                    public Event call(CreateEventApiResponse createEventApiResponse)
+                    {
+                        return createEventApiResponse.getEvent();
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Event>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        bus.post(new GenericErrorTrigger(ErrorCode.EVENT_CREATION_FAILURE, (Exception) e));
+                    }
+
+                    @Override
+                    public void onNext(Event event)
+                    {
+                        eventCache.save(event);
+                        bus.post(new EventCreatedTrigger(event));
+                    }
+                });
+    }
+
+    public void editEvent(String eventId, boolean isFinalised, DateTime startTime, DateTime endTime, Location placeLocation, String description)
+    {
+        EditEventApiRequest request = new EditEventApiRequest(String.valueOf(placeLocation
+                .getLongitude()), description, endTime, eventId, isFinalised, String
+                .valueOf(placeLocation.getLatitude()), placeLocation.getName(), placeLocation
+                .getZone(), startTime);
+
+        eventApi.editEvent(request)
+                .map(new Func1<EditEventApiResponse, Event>()
+                {
+                    @Override
+                    public Event call(EditEventApiResponse editEventApiResponse)
+                    {
+                        return editEventApiResponse.getEvent();
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Event>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE, (Exception) e));
+                    }
+
+                    @Override
+                    public void onNext(Event event)
+                    {
+                        eventCache.save(event);
+                        bus.post(new EventEditedTrigger(event));
+                    }
+                });
+    }
+
+    public void deleteEvent(final Event deletedEvent)
+    {
+        DeleteEventApiRequest request = new DeleteEventApiRequest(deletedEvent.getId());
+
+        eventApi.deleteEvent(request)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Response>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+
+                    }
+
+                    @Override
+                    public void onNext(Response response)
+                    {
+                        if (response.getStatus() == 200)
+                        {
+                            eventCache.invalidate(deletedEvent.getId());
+                        }
+                    }
+                });
+    }
+
+    public void inviteUsers(String eventId, List<String> userIdList)
+    {
+        InviteUsersApiRequest request = new InviteUsersApiRequest(eventId, userIdList);
+
+        eventApi.inviteFriends(request)
+                .subscribeOn(Schedulers.newThread())
+                .subscribe();
     }
 
     public void fetchEventUpdates(String zone, DateTime lastUpdated)
@@ -267,41 +462,6 @@ public class EventService
         });
     }
 
-    public List<String> getUpdatedEvents()
-    {
-        Cache cache = Cache.getInstance();
-        List<String> updatedEvents = (List<String>) cache.get(CacheKeys.EVENTS_UPDATES);
-        if (updatedEvents == null)
-        {
-            updatedEvents = new ArrayList<>();
-        }
-
-        return updatedEvents;
-    }
-
-    public void updateRsvp(final Event updatedEvent, final Event.RSVP oldRsvp)
-    {
-        RsvpUpdateApiRequest request = new RsvpUpdateApiRequest(updatedEvent.getId(), updatedEvent
-                .getRsvp());
-        eventApi.updateRsvp(request, new Callback<Response>()
-        {
-            @Override
-            public void success(Response response, Response response2)
-            {
-                Cache.getInstance().remove(CacheKeys.eventDetails(updatedEvent.getId()));
-                updateCacheFor(updatedEvent);
-            }
-
-            @Override
-            public void failure(RetrofitError error)
-            {
-                updatedEvent.setRsvp(oldRsvp);
-                updateCacheFor(updatedEvent);
-                bus.post(new GenericErrorTrigger(ErrorCode.RSVP_UPDATE_FAILURE, error));
-            }
-        });
-    }
-
     public void updateCacheFor(Event event)
     {
         Cache cache = Cache.getInstance();
@@ -312,19 +472,6 @@ public class EventService
             cache.put(CacheKeys.EVENTS, eventMap);
             bus.post(new CacheCommitTrigger());
         }
-    }
-
-    public void updateCacheFor(EventDetails eventDetails)
-    {
-        Cache cache = Cache.getInstance();
-
-        cache.put(CacheKeys.eventDetails(eventDetails.getId()), eventDetails);
-
-        List<String> updatedEvents = getUpdatedEvents();
-        updatedEvents.remove(eventDetails.getId());
-        cache.put(CacheKeys.EVENTS_UPDATES, updatedEvents);
-
-        bus.post(new CacheCommitTrigger());
     }
 
     public void deleteCacheFor(Event event)
@@ -402,106 +549,5 @@ public class EventService
 
             return events;
         }
-    }
-
-    public void fetchEventSuggestions(EventCategory eventCategory, String latitude, String longitude)
-    {
-
-        EventSuggestionsApiRequest request = new EventSuggestionsApiRequest(eventCategory, latitude, longitude);
-        eventApi.getEventSuggestions(request, new Callback<EventSuggestionsApiResponse>()
-        {
-            @Override
-            public void success(EventSuggestionsApiResponse eventSuggestionsApiResponse, Response response)
-            {
-                bus.post(new EventSuggestionsTrigger(eventSuggestionsApiResponse
-                        .getEventSuggestions()));
-            }
-
-            @Override
-            public void failure(RetrofitError error)
-            {
-                bus.post(new EventSuggestionsTrigger(new ArrayList<Suggestion>()));
-            }
-        });
-    }
-
-    public void createEvent(String title, Event.Type eventType, EventCategory eventCategory, String description, Location placeLocation, DateTime startTime, DateTime endTime)
-    {
-
-        CreateEventApiRequest request = new CreateEventApiRequest(title, eventType, eventCategory, description, placeLocation
-                .getName(), placeLocation.getZone(), String
-                .valueOf(placeLocation.getLatitude()), String
-                .valueOf(placeLocation.getLongitude()), startTime, endTime);
-        eventApi.createEvent(request, new Callback<CreateEventApiResponse>()
-        {
-            @Override
-            public void success(CreateEventApiResponse createEventApiResponse, Response response)
-            {
-                bus.post(new EventCreatedTrigger(createEventApiResponse.getEvent()));
-            }
-
-            @Override
-            public void failure(RetrofitError error)
-            {
-                bus.post(new GenericErrorTrigger(ErrorCode.EVENT_CREATION_FAILURE, error));
-            }
-        });
-    }
-
-    public void editEvent(String eventId, boolean isFinalised, DateTime startTime, DateTime endTime, Location placeLocation, String description)
-    {
-        EditEventApiRequest request = new EditEventApiRequest(String.valueOf(placeLocation
-                .getLongitude()), description, endTime, eventId, isFinalised, String
-                .valueOf(placeLocation.getLatitude()), placeLocation.getName(), placeLocation
-                .getZone(), startTime);
-        eventApi.editEvent(request, new Callback<EditEventApiResponse>()
-        {
-            @Override
-            public void success(EditEventApiResponse editEventApiResponse, Response response)
-            {
-                bus.post(new EventEditedTrigger(editEventApiResponse.getEvent()));
-            }
-
-            @Override
-            public void failure(RetrofitError error)
-            {
-                bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE, error));
-            }
-        });
-    }
-
-    public void deleteEvent(final Event deletedEvent)
-    {
-        DeleteEventApiRequest request = new DeleteEventApiRequest(deletedEvent.getId());
-        eventApi.deleteEvent(request, new Callback<Response>()
-        {
-            @Override
-            public void success(Response response, Response response2)
-            {
-
-            }
-
-            @Override
-            public void failure(RetrofitError error)
-            {
-                updateCacheFor(deletedEvent);
-            }
-        });
-    }
-
-    public void inviteUsers(String eventId, List<String> userIdList)
-    {
-        eventApi.inviteFriends(new InviteUsersApiRequest(eventId, userIdList), new Callback<Response>()
-        {
-            @Override
-            public void success(Response response, Response response2)
-            {
-            }
-
-            @Override
-            public void failure(RetrofitError error)
-            {
-            }
-        });
     }
 }

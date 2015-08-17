@@ -2,12 +2,15 @@ package reaper.android.app.config;
 
 public class CacheKeys
 {
+    // Session User
+    public static final String SESSION_ID = "session_id";
+    public static final String USER_ID = "user_id";
+    public static final String USER_NAME = "user_name";
+    public static final String USER_PHONE = "user_phone";
+    public static final String USER_LOCATION = "user_location";
+
+
     // User Cache
-    public static final String SESSION_COOKIE = "session_cookie";
-    public static final String ACTIVE_USER = "active_user";
-    public static final String USER_LOCATION_LONGITUDE = "user_location_longitude";
-    public static final String USER_LOCATION_LATITUDE = "user_location_latitude";
-    public static final String USER_LOCATION_ZONE = "user_location_zone";
     public static final String MY_PHONE_NUMBER = "my_phone_number";
 
     // Event Cache

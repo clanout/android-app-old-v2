@@ -31,23 +31,23 @@ public interface EventApi
     Observable<EventDetailsApiResponse> getEventDetails(@Body EventDetailsApiRequest request);
 
     @POST("/event/updates")
-    public void getEventUpdates(@Body EventUpdatesApiRequest request, Callback<EventUpdatesApiResponse> callback);
+    void getEventUpdates(@Body EventUpdatesApiRequest request, Callback<EventUpdatesApiResponse> callback);
 
     @POST("/event/rsvp")
-    public void updateRsvp(@Body RsvpUpdateApiRequest request, Callback<Response> callback);
+    Observable<Response> updateRsvp(@Body RsvpUpdateApiRequest request);
 
     @POST("/event/create")
-    public void createEvent(@Body CreateEventApiRequest request, Callback<CreateEventApiResponse> callback);
+    Observable<CreateEventApiResponse> createEvent(@Body CreateEventApiRequest request);
 
     @POST("/event/recommendations")
-    public void getEventSuggestions(@Body EventSuggestionsApiRequest request, Callback<EventSuggestionsApiResponse> callback);
+    Observable<EventSuggestionsApiResponse> getEventSuggestions(@Body EventSuggestionsApiRequest request);
 
     @POST("/event/edit")
-    public void editEvent(@Body EditEventApiRequest request, Callback<EditEventApiResponse> callback);
+    Observable<EditEventApiResponse> editEvent(@Body EditEventApiRequest request);
 
     @POST("/event/delete")
-    public void deleteEvent(@Body DeleteEventApiRequest request, Callback<Response> callback);
+    Observable<Response> deleteEvent(@Body DeleteEventApiRequest request);
 
     @POST("/event/invite")
-    public void inviteFriends(@Body InviteUsersApiRequest request, Callback<Response> callback);
+    Observable<Response> inviteFriends(@Body InviteUsersApiRequest request);
 }

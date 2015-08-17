@@ -21,7 +21,7 @@ public interface EventCacheDataSource
 
     void delete();
 
-    void delete(final String eventId);
+    void delete(final String eventId, final boolean deleteDetails);
 
     void markUpdated(List<Event> events);
 

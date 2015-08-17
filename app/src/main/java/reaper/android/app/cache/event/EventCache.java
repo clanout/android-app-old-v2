@@ -1,7 +1,5 @@
 package reaper.android.app.cache.event;
 
-import android.util.Log;
-
 import java.util.List;
 
 import reaper.android.app.model.Event;
@@ -36,40 +34,26 @@ public class EventCache
 
     public void save(final List<Event> events)
     {
-        dataSource.delete();
+        evict();
         dataSource.write(events);
-//        Observable.create(new Observable.OnSubscribe<Object>()
-//        {
-//            @Override
-//            public void call(Subscriber<? super Object> subscriber)
-//            {
-//                dataSource.delete();
-//                dataSource.write(events);
-//                subscriber.onCompleted();
-//            }
-//        })
-//                  .subscribeOn(Schedulers.io())
-//                  .observeOn(Schedulers.io())
-//                  .subscribe(new Subscriber<Object>()
-//                  {
-//                      @Override
-//                      public void onCompleted()
-//                      {
-//                          Log.d(TAG, "Cache save successful");
-//                      }
-//
-//                      @Override
-//                      public void onError(Throwable e)
-//                      {
-//                          Log.d(TAG, "Cache save failed [" + e.getMessage() + "]");
-//                      }
-//
-//                      @Override
-//                      public void onNext(Object o)
-//                      {
-//
-//                      }
-//                  });
+    }
+
+    public Observable<Event> getEvent(final String eventId)
+    {
+        return Observable.create(new Observable.OnSubscribe<Event>()
+        {
+            @Override
+            public void call(Subscriber<? super Event> subscriber)
+            {
+                subscriber.onNext(dataSource.read(eventId));
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.io());
+    }
+
+    public void save(Event event)
+    {
+        dataSource.write(event);
     }
 
     public Observable<EventDetails> getEventDetails(final String eventId)
@@ -88,108 +72,21 @@ public class EventCache
     public void save(final EventDetails eventDetails)
     {
         dataSource.writeDetails(eventDetails);
-//        Observable.create(new Observable.OnSubscribe<Object>()
-//        {
-//            @Override
-//            public void call(Subscriber<? super Object> subscriber)
-//            {
-//                dataSource.writeDetails(eventDetails);
-//                subscriber.onCompleted();
-//            }
-//        })
-//                  .subscribeOn(Schedulers.io())
-//                  .observeOn(Schedulers.io())
-//                  .subscribe(new Subscriber<Object>()
-//                  {
-//                      @Override
-//                      public void onCompleted()
-//                      {
-//                          Log.d(TAG, "Cache save successful");
-//                      }
-//
-//                      @Override
-//                      public void onError(Throwable e)
-//                      {
-//                          Log.d(TAG, "Cache save failed [" + e.getMessage() + "]");
-//                      }
-//
-//                      @Override
-//                      public void onNext(Object o)
-//                      {
-//
-//                      }
-//                  });
     }
 
-    public void invalidate()
+    public void evict()
     {
-        Observable.create(new Observable.OnSubscribe<Object>()
-        {
-            @Override
-            public void call(Subscriber<? super Object> subscriber)
-            {
-                dataSource.delete();
-                subscriber.onCompleted();
-            }
-        })
-                  .subscribeOn(Schedulers.io())
-                  .observeOn(Schedulers.io())
-                  .subscribe(new Subscriber<Object>()
-                  {
-                      @Override
-                      public void onCompleted()
-                      {
-                          Log.d(TAG, "Cache invalidation successful");
-                      }
-
-                      @Override
-                      public void onError(Throwable e)
-                      {
-                          Log.d(TAG, "Cache invalidation failed [" + e.getMessage() + "]");
-                      }
-
-                      @Override
-                      public void onNext(Object o)
-                      {
-
-                      }
-                  });
+        dataSource.delete();
     }
 
-    public void invalidate(final Event event)
+    public void invalidate(final String eventId)
     {
-        Observable.create(new Observable.OnSubscribe<Object>()
-        {
-            @Override
-            public void call(Subscriber<? super Object> subscriber)
-            {
-                dataSource.delete(event.getId());
-                subscriber.onCompleted();
-            }
-        })
-                  .subscribeOn(Schedulers.io())
-                  .observeOn(Schedulers.io())
-                  .subscribe(new Subscriber<Object>()
-                  {
-                      @Override
-                      public void onCompleted()
-                      {
-                          Log.d(TAG, "Cache invalidation successful for event = " + event.getId());
-                      }
+        dataSource.delete(eventId, false);
+    }
 
-                      @Override
-                      public void onError(Throwable e)
-                      {
-                          Log.d(TAG, "Cache invalidation failed for event = " + event
-                                  .getId() + "[" + e.getMessage() + "]");
-                      }
-
-                      @Override
-                      public void onNext(Object o)
-                      {
-
-                      }
-                  });
+    public void invalidateCompletely(final String eventId)
+    {
+        dataSource.delete(eventId, true);
     }
 
 }

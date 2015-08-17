@@ -60,12 +60,24 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     public void write(Event event)
     {
         SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
-        SQLiteStatement statement = db.compileStatement(SQLiteCacheContract.Event.SQL_INSERT);
+        db.beginTransactionNonExclusive();
+
+        SQLiteStatement statement = db.compileStatement(SQLiteCacheContract.Event.SQL_DELETE_ONE);
+        statement.bindString(1, event.getId());
+        statement.execute();
+        statement.clearBindings();
+
+        statement = db.compileStatement(SQLiteCacheContract.Event.SQL_INSERT);
         statement.bindString(1, event.getId());
         statement.bindString(2, gson.toJson(event));
         statement.bindString(3, String.valueOf(false));
         statement.bindString(4, String.valueOf(false));
         statement.execute();
+        statement.clearBindings();
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+
         statement.close();
         db.close();
 
@@ -241,7 +253,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     }
 
     @Override
-    public void delete(final String eventId)
+    public void delete(final String eventId, final boolean deleteDetails)
     {
         SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
         db.beginTransactionNonExclusive();
@@ -251,10 +263,13 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
         statement.execute();
         statement.clearBindings();
 
-        statement = db.compileStatement(SQLiteCacheContract.EventDetails.SQL_DELETE_ONE);
-        statement.bindString(1, eventId);
-        statement.execute();
-        statement.clearBindings();
+        if(deleteDetails)
+        {
+            statement = db.compileStatement(SQLiteCacheContract.EventDetails.SQL_DELETE_ONE);
+            statement.bindString(1, eventId);
+            statement.execute();
+            statement.clearBindings();
+        }
 
         db.setTransactionSuccessful();
         db.endTransaction();

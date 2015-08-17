@@ -17,7 +17,7 @@ public class SQLiteCacheHelper extends SQLiteOpenHelper
 
     public static SQLiteCacheHelper getInstance()
     {
-        if(instance == null)
+        if (instance == null)
         {
             Log.e(TAG, "SQLiteCacheHelper not initialized");
             throw new IllegalStateException();
@@ -41,6 +41,7 @@ public class SQLiteCacheHelper extends SQLiteOpenHelper
     {
         db.execSQL(SQLiteCacheContract.Event.SQL_CREATE_TABLE);
         db.execSQL(SQLiteCacheContract.EventDetails.SQL_CREATE_TABLE);
+        db.execSQL(SQLiteCacheContract.Generic.SQL_CREATE_TABLE);
         Log.d(TAG, "Cache database created");
     }
 
@@ -49,6 +50,7 @@ public class SQLiteCacheHelper extends SQLiteOpenHelper
     {
         db.execSQL(SQLiteCacheContract.Event.SQL_DELETE_TABLE);
         db.execSQL(SQLiteCacheContract.EventDetails.SQL_DELETE_TABLE);
+        db.execSQL(SQLiteCacheContract.Generic.SQL_DELETE_TABLE);
         onCreate(db);
         Log.d(TAG, "Cache database upgraded");
     }

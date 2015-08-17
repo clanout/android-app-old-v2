@@ -43,4 +43,57 @@ public abstract class SQLiteCacheContract
         public static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME;
         public static final String SQL_DELETE_ONE = "DELETE FROM " + TABLE_NAME +" WHERE " + COLUMN_ID + " = ?";
     }
+
+    public static abstract class FacebookFriends
+    {
+        public static final String TABLE_NAME = "facebook_friends_cache";
+
+        public static final String COLUMN_ID = "user_id";
+        public static final String COLUMN_CONTENT = "json";
+
+        public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_ID + " TEXT PRIMARY KEY, " +
+                COLUMN_CONTENT + " TEXT)";
+
+        public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+
+        public static final String SQL_INSERT = "INSERT INTO " + TABLE_NAME + " VALUES (?,?)";
+        public static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME;
+        public static final String SQL_DELETE_ONE = "DELETE FROM " + TABLE_NAME + " WHERE user_id = ?";
+    }
+
+    public static abstract class PhoneContacts
+    {
+        public static final String TABLE_NAME = "phone_contacts_cache";
+
+        public static final String COLUMN_ID = "user_id";
+        public static final String COLUMN_CONTENT = "json";
+
+        public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_ID + " TEXT PRIMARY KEY, " +
+                COLUMN_CONTENT + " TEXT)";
+
+        public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+
+        public static final String SQL_INSERT = "INSERT INTO " + TABLE_NAME + " VALUES (?,?)";
+        public static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME;
+        public static final String SQL_DELETE_ONE = "DELETE FROM " + TABLE_NAME + " WHERE user_id = ?";
+    }
+
+    public static final class Generic
+    {
+        public static final String TABLE_NAME = "generic_cache";
+
+        public static final String COLUMN_KEY = "key";
+        public static final String COLUMN_VALUE = "value";
+
+        public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_KEY + " TEXT PRIMARY KEY, " +
+                COLUMN_VALUE + " TEXT)";
+
+        public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+
+        public static final String SQL_INSERT = "INSERT INTO " + TABLE_NAME + " VALUES (?,?)";
+        public static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME + " where key = ?";
+    }
 }
