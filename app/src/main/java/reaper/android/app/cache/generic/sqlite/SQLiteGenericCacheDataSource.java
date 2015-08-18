@@ -78,4 +78,18 @@ public class SQLiteGenericCacheDataSource implements GenericCacheDataSource
             return null;
         }
     }
+
+    @Override
+    public void delete(String key)
+    {
+        SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
+
+        SQLiteStatement statement = db.compileStatement(SQLiteCacheContract.Generic.SQL_DELETE);
+        statement.bindString(1, key);
+        statement.execute();
+        statement.close();
+        db.close();
+
+        Log.d(TAG, "Cache (Delete) : " + key);
+    }
 }

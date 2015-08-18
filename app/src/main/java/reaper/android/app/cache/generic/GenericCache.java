@@ -77,9 +77,18 @@ public class GenericCache
         return value;
     }
 
-    public void delete(String key)
+    public void delete(final String key)
     {
-        // TODO
+        Observable.create(new Observable.OnSubscribe<Object>()
+        {
+            @Override
+            public void call(Subscriber<? super Object> subscriber)
+            {
+                memoryCache.remove(key);
+                dataSource.delete(key);
+                subscriber.onCompleted();
+            }
+        });
     }
 
     public void put(final String key, final Object value)
