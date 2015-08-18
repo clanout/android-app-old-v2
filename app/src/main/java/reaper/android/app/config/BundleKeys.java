@@ -20,5 +20,4 @@ public class BundleKeys
     public static final String EDIT_EVENT_FRAGMENT_EVENT_DETAILS = "event_details";
 
     public static final String INVITEE_LIST = "invitee_list";
-    public static final String INVITEE_COMMUNICATOR = "invitee_communicator";
 }

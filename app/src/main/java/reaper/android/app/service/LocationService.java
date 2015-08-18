@@ -50,7 +50,6 @@ public class LocationService
         Location location = cache.get(CacheKeys.USER_LOCATION, Location.class);
         if (location == null)
         {
-            Log.e(TAG, "User location is null");
             throw new IllegalStateException("User location cannot be null");
         }
         return location;
@@ -79,7 +78,7 @@ public class LocationService
             }
             catch (Exception e)
             {
-                Log.d(TAG, "Unable to refresh user location (" + e.getMessage() + ")");
+                Log.d("APP", "Unable to refresh user location (" + e.getMessage() + ")");
                 bus.post(new GenericErrorTrigger(ErrorCode.GOOGLE_API_LOCATION_FETCH_FAILURE, null));
                 return;
             }
@@ -88,9 +87,6 @@ public class LocationService
             location.setLongitude(googleApiLocation.getLongitude());
             location.setLatitude(googleApiLocation.getLatitude());
             location.setZone(zone);
-
-            Log.d(TAG, "Location updated (Zone = " + zone + "; Co-ordinates = " + location
-                    .getLongitude() + "," + location.getLatitude() + ")");
 
             if(locationExists())
             {
@@ -142,7 +138,7 @@ public class LocationService
                     @Override
                     public void onError(Throwable e)
                     {
-                        Log.d(TAG, e.getMessage());
+                        Log.d("APP", e.getMessage());
                     }
 
                     @Override

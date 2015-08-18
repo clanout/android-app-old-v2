@@ -26,8 +26,41 @@ public class GCMService
         bus.post(new GcmregistrationIntentTrigger());
     }
 
-    public void subscribeTopic(String token, String topic) throws IOException
+    public void subscribeTopic(final String token, final String topic)
     {
-        gcmPubSub.subscribe(token, "/topics/" + topic, null);
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    gcmPubSub.subscribe(token, "/topics/" + topic, null);
+                }
+                catch (IOException e)
+                {
+                    Log.d("APP", "exception subscribing topic ----- " + e.getMessage());
+                }
+            }
+        }).start();
+    }
+
+    public void unsubscribeTopic(final String token, final String topic)
+    {
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    gcmPubSub.unsubscribe(token, "/topics/" + topic);
+                }
+                catch (IOException e)
+                {
+                    Log.d("APP", "exception unsubscribing topic ----- " + e.getMessage());
+                }
+            }
+        }).start();
     }
 }

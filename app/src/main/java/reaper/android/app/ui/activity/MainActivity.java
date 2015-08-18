@@ -5,15 +5,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
-
-import java.io.IOException;
 
 import reaper.android.R;
 import reaper.android.app.cache.generic.GenericCache;

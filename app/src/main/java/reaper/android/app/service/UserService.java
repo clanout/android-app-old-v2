@@ -306,7 +306,7 @@ public class UserService
                  @Override
                  public void onError(Throwable e)
                  {
-                     Log.d(TAG, e.getMessage());
+                     Log.d("APP", e.getMessage());
                  }
 
                  @Override
@@ -335,7 +335,7 @@ public class UserService
                  @Override
                  public void onError(Throwable e)
                  {
-                     Log.d(TAG, e.getMessage());
+                     Log.d("APP", e.getMessage());
                  }
 
                  @Override

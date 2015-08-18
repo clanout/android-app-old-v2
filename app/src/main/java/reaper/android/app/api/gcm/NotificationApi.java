@@ -8,6 +8,6 @@ import rx.Observable;
 
 public interface NotificationApi
 {
-    @POST("/register")
+    @POST("/notification/register")
     Observable<Response> registerUser(@Body GCmRegisterUserApiRequest request);
 }

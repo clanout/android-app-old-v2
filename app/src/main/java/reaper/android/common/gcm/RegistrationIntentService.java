@@ -8,10 +8,9 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.squareup.otto.Bus;
 
-import reaper.android.app.api.core.NotificationApiManager;
+import reaper.android.app.api.core.ApiManager;
 import reaper.android.app.api.gcm.NotificationApi;
 import reaper.android.app.api.gcm.request.GCmRegisterUserApiRequest;
-import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.service.UserService;
@@ -48,7 +47,7 @@ public class RegistrationIntentService extends IntentService
         }
         catch (Exception e)
         {
-            Log.d(TAG, "Error = " + e.getMessage());
+            Log.d("APP", "Error = " + e.getMessage());
             AppPreferences.set(this, CacheKeys.GCM_TOKEN, null);
             AppPreferences.set(this, CacheKeys.GCM_TOKEN_SENT_TO_SERVER, String.valueOf(false));
         }
@@ -62,9 +61,9 @@ public class RegistrationIntentService extends IntentService
         Bus bus = Communicator.getInstance().getBus();
         UserService userService = new UserService(bus);
 
-        NotificationApi notificationApi = NotificationApiManager.getInstance().getApi(NotificationApi.class);
+        NotificationApi notificationApi = ApiManager.getInstance().getApi(NotificationApi.class);
 
-        GCmRegisterUserApiRequest request = new GCmRegisterUserApiRequest(token, userService.getActiveUserId());
+        GCmRegisterUserApiRequest request = new GCmRegisterUserApiRequest(token);
         notificationApi.registerUser(request)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.newThread())

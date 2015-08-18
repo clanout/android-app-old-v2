@@ -333,7 +333,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                         @Override
                         public void onClick(DialogInterface dialog, int which)
                         {
-                            eventService.deleteEvent(event);
+                            eventService.deleteEvent(event.getId());
                             Toast.makeText(getActivity(), "The event has been deleted", Toast.LENGTH_SHORT).show();
                             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
                         }
