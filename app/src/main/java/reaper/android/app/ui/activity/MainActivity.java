@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity
 
         if (AppPreferences.get(this, CacheKeys.GCM_TOKEN) == null)
         {
+            Log.d("APP", "token null");
             if (checkPlayServices())
             {
                 gcmService.register();
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity
         }
         else
         {
+            Log.d("APP", "token not null");
             ChatHelper.init(userService.getActiveUserId());
             fragmentManager = getSupportFragmentManager();
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());

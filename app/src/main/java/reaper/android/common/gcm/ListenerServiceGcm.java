@@ -1,7 +1,9 @@
 package reaper.android.common.gcm;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,8 +22,9 @@ import reaper.android.app.api.core.GsonProvider;
 import reaper.android.app.cache.core.SQLiteCacheHelper;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.user.UserCache;
-import reaper.android.app.config.NotificationTypes;
+import reaper.android.app.config.NotificationConstants;
 import reaper.android.app.service.EventService;
+import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.common.communicator.Communicator;
 
 public class ListenerServiceGcm extends GcmListenerService
@@ -59,44 +62,55 @@ public class ListenerServiceGcm extends GcmListenerService
         Map<String, String> notificationAttributes = GsonProvider.getGson().fromJson(data.getString("parameters"), type);
         String message = data.getString("message");
 
-        if (notificationType.equals(NotificationTypes.EVENT_ADDED))
+        if (notificationType.equals(NotificationConstants.EVENT_ADDED))
         {
             eventService.fetchEvent(notificationAttributes.get("event_id"));
-            buildNotification(message);
+            buildNotification(message, NotificationConstants.EVENT_ADDED_TITLE);
         }
-        else if (notificationType.equals(NotificationTypes.EVENT_REMOVED))
+        else if (notificationType.equals(NotificationConstants.EVENT_REMOVED))
         {
             eventService.deleteEvent(notificationAttributes.get("event_id"));
         }
-        else if (notificationType.equals(NotificationTypes.EVENT_UPDATED))
-        {
-            eventService.fetchEvent(notificationAttributes.get("event_id"));
-            buildNotification(message);
-        }
-        else if (notificationType.equals(NotificationTypes.FRIEND_ADDED))
-        {
-            userCache.evictFriendsCache();
-            buildNotification(message);
-        }
-        else if (notificationType.equals(NotificationTypes.FRIEND_REMOVED))
-        {
-            userCache.evictFriendsCache();
-        }
-        else if (notificationType.equals(NotificationTypes.INVITED_TO_EVENT))
+        else if (notificationType.equals(NotificationConstants.EVENT_UPDATED))
         {
             eventCache.invalidateCompletely(notificationAttributes.get("event_id"));
             eventService.fetchEvent(notificationAttributes.get("event_id"));
+            buildNotification(message, NotificationConstants.EVENT_UPDATED_TITLE);
+        }
+        else if (notificationType.equals(NotificationConstants.FRIEND_ADDED))
+        {
+            userCache.evictFriendsCache();
+            buildNotification(message, NotificationConstants.FRIEND_ADDED_TITLE);
+        }
+        else if (notificationType.equals(NotificationConstants.FRIEND_REMOVED))
+        {
+            userCache.evictFriendsCache();
+        }
+        else if (notificationType.equals(NotificationConstants.INVITED_TO_EVENT))
+        {
+            eventCache.invalidateCompletely(notificationAttributes.get("event_id"));
+            eventService.fetchEvent(notificationAttributes.get("event_id"));
+            buildNotification(message, NotificationConstants.INVITE_RECEIVED_TITLE);
         }
     }
 
-    private void buildNotification(String message)
+    private void buildNotification(String message, String title)
     {
+        // TODO - pending intent and notification id
+
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_action_important)
+                .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true)
-                .setSound(defaultSoundUri);
+                .setSound(defaultSoundUri)
+                .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

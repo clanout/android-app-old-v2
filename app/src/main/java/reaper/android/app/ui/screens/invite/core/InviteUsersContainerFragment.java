@@ -111,7 +111,14 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
         inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), new ArrayList<EventDetails.Invitee>());
         viewPager.setAdapter(inviteUsersPagerAdapter);
 
-        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                tabLayout.setupWithViewPager(viewPager);
+            }
+        });
         tabLayout.setOnTabSelectedListener(this);
 
         done.setOnClickListener(this);
