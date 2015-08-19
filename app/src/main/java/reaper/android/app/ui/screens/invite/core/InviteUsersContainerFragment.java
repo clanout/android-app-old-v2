@@ -196,7 +196,10 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
             invitedUsers.addAll(invitedFacebookFriends);
             invitedUsers.addAll(invitedPhoneContacts);
 
-            eventService.inviteUsers(eventId, invitedUsers);
+            if (invitedUsers.size() != 0)
+            {
+                eventService.inviteUsers(eventId, invitedUsers);
+            }
             eventService.fetchEvents(locationService.getUserLocation().getZone());
         }
     }
@@ -234,7 +237,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     @Subscribe
     public void backPressed(BackPressedTrigger trigger)
     {
-        if(trigger.getActiveFragment().equals(BackstackTags.INVITE_USERS_CONTAINER))
+        if (trigger.getActiveFragment().equals(BackstackTags.INVITE_USERS_CONTAINER))
         {
             eventService.fetchEvents(locationService.getUserLocation().getZone());
         }

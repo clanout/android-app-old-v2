@@ -177,18 +177,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
-        menu.findItem(R.id.action_refresh).setVisible(true);
-
-        menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem)
-            {
-                menuItem.setActionView(R.layout.action_button_refreshing);
-                userService.getFacebookFriends(locationService.getUserLocation().getZone());
-                return true;
-            }
-        });
+        menu.findItem(R.id.action_refresh).setVisible(false);
     }
 
     private void initRecyclerView()
@@ -221,11 +210,6 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     {
         friendList = trigger.getFriends();
         refreshRecyclerView();
-
-        if (menu != null)
-        {
-            menu.findItem(R.id.action_refresh).setActionView(null);
-        }
     }
 
     @Subscribe
@@ -234,11 +218,6 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
         if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCH_FAILURE)
         {
             displayErrorView();
-
-            if (menu != null)
-            {
-                menu.findItem(R.id.action_refresh).setActionView(null);
-            }
         }
     }
 
