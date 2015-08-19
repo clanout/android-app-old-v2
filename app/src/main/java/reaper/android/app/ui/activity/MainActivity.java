@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -14,7 +13,6 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import reaper.android.R;
-import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.service.GCMService;
@@ -35,7 +33,6 @@ public class MainActivity extends AppCompatActivity
     private Bus bus;
     private UserService userService;
     private GCMService gcmService;
-    private GenericCache genericCache;
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
@@ -53,11 +50,8 @@ public class MainActivity extends AppCompatActivity
         userService = new UserService(bus);
         gcmService = new GCMService(bus);
 
-        genericCache = new GenericCache();
-
         if (AppPreferences.get(this, CacheKeys.GCM_TOKEN) == null)
         {
-            Log.d("APP", "token null");
             if (checkPlayServices())
             {
                 gcmService.register();
@@ -65,7 +59,6 @@ public class MainActivity extends AppCompatActivity
         }
         else
         {
-            Log.d("APP", "token not null ------ " + AppPreferences.get(this, CacheKeys.GCM_TOKEN));
             ChatHelper.init(userService.getActiveUserId());
             fragmentManager = getSupportFragmentManager();
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());

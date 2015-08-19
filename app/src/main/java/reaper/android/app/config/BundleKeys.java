@@ -13,6 +13,7 @@ public class BundleKeys
 
     public static final String EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS = "events";
     public static final String EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION = "active_position";
+    public static final String EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_EVENT_ID = "active_event_id";
 
     public static final String EVENT_DETAILS_FRAGMENT_EVENT = "event";
 
@@ -20,4 +21,6 @@ public class BundleKeys
     public static final String EDIT_EVENT_FRAGMENT_EVENT_DETAILS = "event_details";
 
     public static final String INVITEE_LIST = "invitee_list";
+
+    public static final String SHOULD_GO_TO_DETAILS_FRAGMENT = "should_go_to_details_fragment";
 }
