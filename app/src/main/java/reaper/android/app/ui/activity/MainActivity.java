@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -14,6 +15,7 @@ import com.squareup.otto.Subscribe;
 
 import reaper.android.R;
 import reaper.android.app.config.BackstackTags;
+import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.service.GCMService;
 import reaper.android.app.service.UserService;
@@ -21,6 +23,7 @@ import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.common.CacheCommitTrigger;
 import reaper.android.app.trigger.gcm.GcmRegistrationCompleteTrigger;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
+import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.cache.AppPreferences;
@@ -50,18 +53,28 @@ public class MainActivity extends AppCompatActivity
         userService = new UserService(bus);
         gcmService = new GCMService(bus);
 
-        if (AppPreferences.get(this, CacheKeys.GCM_TOKEN) == null)
+        String shouldGoToDetailsFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);
+        String eventId = getIntent().getStringExtra("event_id");
+
+        if (shouldGoToDetailsFragment.equals("yes") && eventId != null)
         {
-            if (checkPlayServices())
-            {
-                gcmService.register();
-            }
-        }
-        else
-        {
-            ChatHelper.init(userService.getActiveUserId());
             fragmentManager = getSupportFragmentManager();
-            FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
+            FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
+
+        } else
+        {
+            if (AppPreferences.get(this, CacheKeys.GCM_TOKEN) == null)
+            {
+                if (checkPlayServices())
+                {
+                    gcmService.register();
+                }
+            } else
+            {
+                ChatHelper.init(userService.getActiveUserId());
+                fragmentManager = getSupportFragmentManager();
+                FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
+            }
         }
     }
 
@@ -101,36 +114,28 @@ public class MainActivity extends AppCompatActivity
         if (activeFragment.equals(BackstackTags.HOME))
         {
             finish();
-        }
-        else if (activeFragment.equals(BackstackTags.ACCOUNTS))
+        } else if (activeFragment.equals(BackstackTags.ACCOUNTS))
         {
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
-        }
-        else if (activeFragment.equals(BackstackTags.MANAGE_FRIENDS))
+        } else if (activeFragment.equals(BackstackTags.MANAGE_FRIENDS))
         {
             FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
-        }
-        else if (activeFragment.equals(BackstackTags.FAQ))
+        } else if (activeFragment.equals(BackstackTags.FAQ))
         {
             FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
-        }
-        else if (activeFragment.equals(BackstackTags.CREATE))
+        } else if (activeFragment.equals(BackstackTags.CREATE))
         {
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
-        }
-        else if (activeFragment.equals(BackstackTags.INVITE_USERS_CONTAINER))
+        } else if (activeFragment.equals(BackstackTags.INVITE_USERS_CONTAINER))
         {
             bus.post(new BackPressedTrigger(BackstackTags.INVITE_USERS_CONTAINER));
-        }
-        else if (activeFragment.equals(BackstackTags.EVENT_DETAILS_CONTAINER))
+        } else if (activeFragment.equals(BackstackTags.EVENT_DETAILS_CONTAINER))
         {
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
-        }
-        else if (activeFragment.equals(BackstackTags.EDIT))
+        } else if (activeFragment.equals(BackstackTags.EDIT))
         {
             bus.post(new BackPressedTrigger(BackstackTags.EDIT));
-        }
-        else if (activeFragment.equals(BackstackTags.CHAT))
+        } else if (activeFragment.equals(BackstackTags.CHAT))
         {
             bus.post(new BackPressedTrigger(BackstackTags.CHAT));
         }
@@ -145,8 +150,7 @@ public class MainActivity extends AppCompatActivity
             {
                 GooglePlayServicesUtil.getErrorDialog(resultCode, this,
                         PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            }
-            else
+            } else
             {
                 Toast.makeText(this, "This device does not support Google Play Services.", Toast.LENGTH_LONG).show();
                 finish();

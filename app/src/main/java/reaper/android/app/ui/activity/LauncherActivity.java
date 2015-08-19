@@ -17,6 +17,7 @@ import com.squareup.otto.Subscribe;
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.service.AuthService;
@@ -95,8 +96,7 @@ public class LauncherActivity extends AppCompatActivity
                         }
                     });
             builder.create().show();
-        }
-        else
+        } else
         {
             // Dummy Session initialization
             if (cache.get(CacheKeys.SESSION_ID) == null)
@@ -126,8 +126,7 @@ public class LauncherActivity extends AppCompatActivity
             progressDialog = ProgressDialog.show(this, "Welcome", "Fetching your current location...");
             isBlocking = true;
             bus.post(new UserLocationRefreshRequestTrigger());
-        }
-        else
+        } else
         {
             isBlocking = false;
             bus.post(new UserLocationRefreshRequestTrigger());
@@ -161,6 +160,30 @@ public class LauncherActivity extends AppCompatActivity
     public void gotoMainActivity()
     {
         Intent intent = new Intent(this, MainActivity.class);
+
+        String shouldGoToDetailsFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);
+        if (shouldGoToDetailsFragment == null)
+        {
+            Log.d("APP", "shouldGoToDetailsFragment is null");
+            shouldGoToDetailsFragment = "no";
+            intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
+
+        } else
+        {
+            if (shouldGoToDetailsFragment.equals("yes"))
+            {
+                Log.d("APP", "shouldGoToDetailsFragment is yes");
+                String eventId = getIntent().getStringExtra("event_id");
+                Log.d("APP","eventId ------ " + eventId);
+                intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
+                intent.putExtra("event_id", eventId);
+
+            } else
+            {
+                Log.d("APP", "shouldGoToDetailsFragment is no");
+                intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
+            }
+        }
         startActivity(intent);
         finish();
     }
