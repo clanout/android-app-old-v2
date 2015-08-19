@@ -22,6 +22,7 @@ import java.util.Map;
 
 import reaper.android.R;
 import reaper.android.app.api.core.GsonProvider;
+import reaper.android.app.cache.core.DatabaseManager;
 import reaper.android.app.cache.core.SQLiteCacheHelper;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.user.UserCache;
@@ -53,7 +54,7 @@ public class ListenerServiceGcm extends GcmListenerService
         {
         }.getType();
 
-        SQLiteCacheHelper.init(this);
+        DatabaseManager.init(this);
     }
 
     @Override

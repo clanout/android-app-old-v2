@@ -5,25 +5,25 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
+import reaper.android.app.cache.core.DatabaseManager;
 import reaper.android.app.cache.core.SQLiteCacheContract;
-import reaper.android.app.cache.core.SQLiteCacheHelper;
 import reaper.android.app.cache.generic.GenericCacheDataSource;
 
 public class SQLiteGenericCacheDataSource implements GenericCacheDataSource
 {
     private static final String TAG = "GenericCacheDataSource";
 
-    private SQLiteCacheHelper sqliteCacheHelper;
+    private DatabaseManager databaseManager;
 
     public SQLiteGenericCacheDataSource()
     {
-        sqliteCacheHelper = SQLiteCacheHelper.getInstance();
+        databaseManager = DatabaseManager.getInstance();
     }
 
     @Override
     public void write(String key, String value)
     {
-        SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.openConnection();
         db.beginTransactionNonExclusive();
 
         SQLiteStatement statement = db.compileStatement(SQLiteCacheContract.Generic.SQL_DELETE);
@@ -41,7 +41,7 @@ public class SQLiteGenericCacheDataSource implements GenericCacheDataSource
         db.endTransaction();
 
         statement.close();
-        db.close();
+        databaseManager.closeConnection();
 
         Log.d(TAG, "Cache (Insert) : " + key + " = " + value);
     }
@@ -51,7 +51,7 @@ public class SQLiteGenericCacheDataSource implements GenericCacheDataSource
     {
         try
         {
-            SQLiteDatabase db = sqliteCacheHelper.getReadableDatabase();
+            SQLiteDatabase db = databaseManager.openConnection();
             String[] projection = {
                     SQLiteCacheContract.Generic.COLUMN_KEY
             };
@@ -69,7 +69,7 @@ public class SQLiteGenericCacheDataSource implements GenericCacheDataSource
             String value = cursor.getString(0);
 
             cursor.close();
-            db.close();
+            databaseManager.closeConnection();
 
             return value;
         }
@@ -82,13 +82,13 @@ public class SQLiteGenericCacheDataSource implements GenericCacheDataSource
     @Override
     public void delete(String key)
     {
-        SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.openConnection();
 
         SQLiteStatement statement = db.compileStatement(SQLiteCacheContract.Generic.SQL_DELETE);
         statement.bindString(1, key);
         statement.execute();
         statement.close();
-        db.close();
+        databaseManager.closeConnection();
 
         Log.d(TAG, "Cache (Delete) : " + key);
     }

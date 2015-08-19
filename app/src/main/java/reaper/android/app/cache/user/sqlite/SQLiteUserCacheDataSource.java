@@ -10,22 +10,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.app.api.core.GsonProvider;
+import reaper.android.app.cache.core.DatabaseManager;
 import reaper.android.app.cache.core.SQLiteCacheContract;
-import reaper.android.app.cache.core.SQLiteCacheHelper;
 import reaper.android.app.cache.user.UserCacheDataSource;
-import reaper.android.app.model.Event;
 import reaper.android.app.model.Friend;
 
 public class SQLiteUserCacheDataSource implements UserCacheDataSource
 {
     private static final String TAG = "UserCacheDatSource";
 
-    private SQLiteCacheHelper sqliteCacheHelper;
+    private DatabaseManager databaseManager;
     private Gson gson;
 
     public SQLiteUserCacheDataSource()
     {
-        sqliteCacheHelper = SQLiteCacheHelper.getInstance();
+        databaseManager = DatabaseManager.getInstance();
         gson = GsonProvider.getGson();
     }
 
@@ -34,8 +33,9 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
     {
         if (!friends.isEmpty())
         {
-            SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
-            SQLiteStatement statement = db.compileStatement(SQLiteCacheContract.FacebookFriends.SQL_INSERT);
+            SQLiteDatabase db = databaseManager.openConnection();
+            SQLiteStatement statement = db
+                    .compileStatement(SQLiteCacheContract.FacebookFriends.SQL_INSERT);
             db.beginTransactionNonExclusive();
             for (Friend friend : friends)
             {
@@ -47,7 +47,7 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
             db.setTransactionSuccessful();
             db.endTransaction();
             statement.close();
-            db.close();
+            databaseManager.closeConnection();
         }
     }
 
@@ -58,7 +58,7 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
         {
             List<Friend> friends = new ArrayList<Friend>();
 
-            SQLiteDatabase db = sqliteCacheHelper.getReadableDatabase();
+            SQLiteDatabase db = databaseManager.openConnection();
             String[] projection = {
                     SQLiteCacheContract.FacebookFriends.COLUMN_CONTENT
             };
@@ -76,7 +76,7 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
                 cursor.moveToNext();
             }
             cursor.close();
-            db.close();
+            databaseManager.closeConnection();
 
             return friends;
         }
@@ -89,12 +89,12 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
     @Override
     public void deleteFriends()
     {
-        SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.openConnection();
         SQLiteStatement statement = db
                 .compileStatement(SQLiteCacheContract.FacebookFriends.SQL_DELETE);
         statement.execute();
         statement.close();
-        db.close();
+        databaseManager.closeConnection();
     }
 
     @Override
@@ -102,8 +102,9 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
     {
         if (!contacts.isEmpty())
         {
-            SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
-            SQLiteStatement statement = db.compileStatement(SQLiteCacheContract.PhoneContacts.SQL_INSERT);
+            SQLiteDatabase db = databaseManager.openConnection();
+            SQLiteStatement statement = db
+                    .compileStatement(SQLiteCacheContract.PhoneContacts.SQL_INSERT);
             db.beginTransactionNonExclusive();
             for (Friend contact : contacts)
             {
@@ -115,7 +116,7 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
             db.setTransactionSuccessful();
             db.endTransaction();
             statement.close();
-            db.close();
+            databaseManager.closeConnection();
         }
 
     }
@@ -127,7 +128,7 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
         {
             List<Friend> contacts = new ArrayList<Friend>();
 
-            SQLiteDatabase db = sqliteCacheHelper.getReadableDatabase();
+            SQLiteDatabase db = databaseManager.openConnection();
             String[] projection = {
                     SQLiteCacheContract.PhoneContacts.COLUMN_CONTENT
             };
@@ -145,7 +146,7 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
                 cursor.moveToNext();
             }
             cursor.close();
-            db.close();
+            databaseManager.closeConnection();
 
             return contacts;
         }
@@ -158,11 +159,11 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
     @Override
     public void deleteContacts()
     {
-        SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.openConnection();
         SQLiteStatement statement = db
                 .compileStatement(SQLiteCacheContract.PhoneContacts.SQL_DELETE);
         statement.execute();
         statement.close();
-        db.close();
+        databaseManager.closeConnection();
     }
 }

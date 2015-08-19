@@ -13,25 +13,7 @@ public class SQLiteCacheHelper extends SQLiteOpenHelper
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "reaper.db";
 
-    private static SQLiteCacheHelper instance;
-
-    public static SQLiteCacheHelper getInstance()
-    {
-        if (instance == null)
-        {
-            Log.e(TAG, "SQLiteCacheHelper not initialized");
-            throw new IllegalStateException();
-        }
-
-        return instance;
-    }
-
-    public static void init(Context context)
-    {
-        instance = new SQLiteCacheHelper(context);
-    }
-
-    private SQLiteCacheHelper(Context context)
+    public SQLiteCacheHelper(Context context)
     {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
