@@ -5,8 +5,10 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -54,9 +56,11 @@ import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
+import reaper.android.app.trigger.common.ViewPagerStateChangedTrigger;
 import reaper.android.app.trigger.event.EventClickTrigger;
 import reaper.android.app.trigger.event.EventUpdatesFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
+import reaper.android.app.trigger.event.NewEventAddedTrigger;
 import reaper.android.app.trigger.event.RsvpChangeTrigger;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.create.CreateEventFragment;
@@ -67,10 +71,10 @@ import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.cache.Cache;
 import reaper.android.common.communicator.Communicator;
 
-public class HomeFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class HomeFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener
+{
     private FragmentManager fragmentManager;
     private Bus bus;
-    private Timer timer;
 
     private Sort sort;
     private Filter filter;
@@ -90,36 +94,40 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     private RecyclerView eventList;
     private LinearLayout buttonBar;
     private Button filterButton, sortButton;
-    private ImageButton refresh;
     private FloatingActionButton createEvent;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private Snackbar snackbar;
 
     private EventsAdapter eventsAdapter;
 
     @Override
-    public void onRefresh() {
-
+    public void onRefresh()
+    {
         Toast.makeText(getActivity(), "Swiped", Toast.LENGTH_LONG).show();
         swipeRefreshLayout.setRefreshing(false);
     }
 
-    private enum Sort implements Serializable {
+    private enum Sort implements Serializable
+    {
         RELEVANCE, DATE_TIME, DISTANCE
     }
 
-    private enum Filter implements Serializable {
+    private enum Filter implements Serializable
+    {
         TODAY, ALL
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
+    {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         eventList = (RecyclerView) view.findViewById(R.id.rv_home_events);
@@ -127,7 +135,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         buttonBar = (LinearLayout) view.findViewById(R.id.ll_home_btn_bar);
         filterButton = (Button) view.findViewById(R.id.btn_home_filter);
         sortButton = (Button) view.findViewById(R.id.btn_home_sort);
-        refresh = (ImageButton) view.findViewById(R.id.ibtn_home_refresh);
         createEvent = (FloatingActionButton) view.findViewById(R.id.fib_home_create);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.srl_home);
 
@@ -135,7 +142,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    {
         super.onActivityCreated(savedInstanceState);
 
         dispayBasicView();
@@ -151,20 +159,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
 
         sortButton.setOnClickListener(this);
         filterButton.setOnClickListener(this);
-        refresh.setOnClickListener(this);
         createEvent.setOnClickListener(this);
 
         swipeRefreshLayout.setOnRefreshListener(this);
-        swipeRefreshLayout.setDistanceToTriggerSync(100);
 
         events = new ArrayList<>();
         userLocation = locationService.getUserLocation();
         eventCategory = EventCategory.GENERAL;
 
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null)
+        {
             sort = (Sort) savedInstanceState.getSerializable("sort");
             filter = (Filter) savedInstanceState.getSerializable("filter");
-        } else {
+        } else
+        {
             sort = Sort.RELEVANCE;
             filter = Filter.ALL;
         }
@@ -173,74 +181,55 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState)
+    {
         super.onSaveInstanceState(outState);
         outState.putSerializable("sort", sort);
         outState.putSerializable("filter", filter);
     }
 
     @Override
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
 
         AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.HOME);
 
         bus.register(this);
         eventService.fetchEvents(userLocation.getZone());
-
-//        timer = new Timer();
-//        timer.schedule(new TimerTask()
-//        {
-//            @Override
-//            public void run()
-//            {
-//                DateTime lastUpdated = (DateTime) Cache.getInstance().get(CacheKeys.EVENTS_TIMESTAMP);
-//                eventService.fetchEventUpdates(userLocation.getZone(), lastUpdated);
-//            }
-//        }, AppConstants.EVENTS_REFRESH_RATE_MILLISECONDS, AppConstants.EVENTS_REFRESH_RATE_MILLISECONDS);
     }
 
     @Override
-    public void onPause() {
+    public void onPause()
+    {
         super.onPause();
-//        timer.cancel();
         bus.unregister(this);
+
+        if (snackbar != null)
+        {
+            snackbar.dismiss();
+        }
     }
 
     @Subscribe
-    public void onEventsFetchTrigger(EventsFetchTrigger eventsFetchTrigger) {
+    public void onEventsFetchTrigger(EventsFetchTrigger eventsFetchTrigger)
+    {
         events = eventsFetchTrigger.getEvents();
         refreshRecyclerView();
     }
 
     @Subscribe
-    public void onEventsNotFetchedTrigger(GenericErrorTrigger trigger) {
-        if (trigger.getErrorCode() == ErrorCode.EVENTS_FETCH_FAILURE) {
+    public void onEventsNotFetchedTrigger(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.EVENTS_FETCH_FAILURE)
+        {
             displayErrorView();
         }
     }
 
-//    @Subscribe
-//    public void onEventUpdatesFetchTrigger(EventUpdatesFetchTrigger eventUpdatesFetchTrigger)
-//    {
-//        if (eventUpdatesFetchTrigger.getEventUpdates() != null)
-//        {
-//            events = eventUpdatesFetchTrigger.getEventUpdates();
-//            eventUpdates = eventService.getUpdatedEvents();
-//
-//            if (refresh != null)
-//            {
-//                refresh.setVisibility(View.VISIBLE);
-//            }
-//            else
-//            {
-//                refreshRecyclerView();
-//            }
-//        }
-//    }
-
     @Subscribe
-    public void onEventClickTrigger(EventClickTrigger eventClickTrigger) {
+    public void onEventClickTrigger(EventClickTrigger eventClickTrigger)
+    {
         Event event = eventClickTrigger.getEvent();
         int activePosition = events.indexOf(event);
 
@@ -254,7 +243,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     }
 
     @Subscribe
-    public void onRsvpChangeTrigger(RsvpChangeTrigger rsvpChangeTrigger) {
+    public void onRsvpChangeTrigger(RsvpChangeTrigger rsvpChangeTrigger)
+    {
         Event updatedEvent = rsvpChangeTrigger.getUpdatedEvent();
         Event.RSVP oldRsvp = rsvpChangeTrigger.getOldRsvp();
 
@@ -262,30 +252,70 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     }
 
     @Subscribe
-    public void onGenericErrorTrigger(GenericErrorTrigger trigger) {
+    public void onGenericErrorTrigger(GenericErrorTrigger trigger)
+    {
         ErrorCode code = trigger.getErrorCode();
 
-        if (code == ErrorCode.RSVP_UPDATE_FAILURE) {
+        if (code == ErrorCode.RSVP_UPDATE_FAILURE)
+        {
             Toast.makeText(getActivity(), R.string.message_rsvp_update_failure, Toast.LENGTH_LONG).show();
             refreshRecyclerView();
         }
     }
 
-    private void initRecyclerView() {
+    @Subscribe
+    public void onViewPagerStateChanged(ViewPagerStateChangedTrigger trigger)
+    {
+        if (trigger.getState() == ViewPager.SCROLL_STATE_DRAGGING)
+        {
+            swipeRefreshLayout.setEnabled(false);
+        } else
+        {
+            swipeRefreshLayout.setEnabled(true);
+        }
+    }
+
+    @Subscribe
+    public void onNewEventAdded(NewEventAddedTrigger trigger)
+    {
+        snackbar = Snackbar.make(getView(), "New Event Added", Snackbar.LENGTH_INDEFINITE);
+
+        snackbar.setAction("Update Feed", new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                eventService.fetchEvents(locationService.getUserLocation().getZone());
+                sort = Sort.RELEVANCE;
+                filter = Filter.ALL;
+                filterButton.setText("ALL EVENTS");
+                sortButton.setText("RELEVANCE");
+                snackbar.dismiss();
+            }
+        });
+        snackbar.show();
+    }
+
+    private void initRecyclerView()
+    {
         eventList.setLayoutManager(new LinearLayoutManager(getActivity()));
         eventsAdapter = new EventsAdapter(bus, new ArrayList<Event>());
         eventList.setAdapter(eventsAdapter);
 
-        eventList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        eventList.addOnScrollListener(new RecyclerView.OnScrollListener()
+        {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
+            {
             }
 
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
+            {
 
                 boolean enabled = false;
-                if (eventList != null && eventList.getChildCount() > 0) {
+                if (eventList != null && eventList.getChildCount() > 0)
+                {
                     LinearLayoutManager linearLayoutManager = (LinearLayoutManager) eventList.getLayoutManager();
                     boolean isFirstItemVisible = linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0;
 
@@ -297,18 +327,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         });
     }
 
-    private void refreshRecyclerView() {
-        if (refresh != null) {
-            refresh.setVisibility(View.INVISIBLE);
-        }
-
-        if (events.size() == 0) {
+    private void refreshRecyclerView()
+    {
+        if (events.size() == 0)
+        {
             displayNoEventsView();
-        } else {
+        } else
+        {
             dispayBasicView();
         }
 
-        switch (sort) {
+        switch (sort)
+        {
             case RELEVANCE:
                 Collections.sort(events, new EventComparator.Relevance(userService.getActiveUserId()));
                 break;
@@ -322,36 +352,44 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
                 break;
         }
 
-        if (filter == Filter.ALL) {
+        if (filter == Filter.ALL)
+        {
             eventsAdapter = new EventsAdapter(bus, events);
             eventList.setAdapter(eventsAdapter);
-        } else {
+        } else
+        {
             DateTime now = DateTime.now();
             DateTime todayEnd = DateTime.now().withHourOfDay(23).withMinuteOfHour(59);
             List<Event> visibleEvents = new ArrayList<>();
-            for (Event event : events) {
-                if (event.getStartTime().isBefore(todayEnd) && event.getEndTime().isAfter(now)) {
+            for (Event event : events)
+            {
+                if (event.getStartTime().isBefore(todayEnd) && event.getEndTime().isAfter(now))
+                {
                     visibleEvents.add(event);
                 }
             }
 
-            if (visibleEvents.size() == 0) {
+            if (visibleEvents.size() == 0)
+            {
                 displayNoEventsView();
-            } else {
+            } else
+            {
                 eventsAdapter = new EventsAdapter(bus, visibleEvents);
                 eventList.setAdapter(eventsAdapter);
             }
         }
     }
 
-    private void dispayBasicView() {
+    private void dispayBasicView()
+    {
         noEventsMessage.setVisibility(View.GONE);
         createEvent.setVisibility(View.GONE);
         eventList.setVisibility(View.VISIBLE);
         buttonBar.setVisibility(View.VISIBLE);
     }
 
-    private void displayNoEventsView() {
+    private void displayNoEventsView()
+    {
         noEventsMessage.setText(R.string.home_no_events);
         noEventsMessage.setVisibility(View.VISIBLE);
         createEvent.setVisibility(View.VISIBLE);
@@ -359,7 +397,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         buttonBar.setVisibility(View.VISIBLE);
     }
 
-    private void displayErrorView() {
+    private void displayErrorView()
+    {
         noEventsMessage.setVisibility(View.VISIBLE);
         noEventsMessage.setText(R.string.home_events_fetch_error);
         createEvent.setVisibility(View.GONE);
@@ -368,7 +407,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     }
 
     @Override
-    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater)
+    {
         super.onCreateOptionsMenu(menu, inflater);
 
         menu.clear();
@@ -383,12 +423,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
 
-        if (Cache.getInstance().get(CacheKeys.MY_PHONE_NUMBER) == null) {
+        if (Cache.getInstance().get(CacheKeys.MY_PHONE_NUMBER) == null)
+        {
             menu.findItem(R.id.action_add_phone).setVisible(true);
 
-            menu.findItem(R.id.action_add_phone).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            menu.findItem(R.id.action_add_phone).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+            {
                 @Override
-                public boolean onMenuItemClick(MenuItem item) {
+                public boolean onMenuItemClick(MenuItem item)
+                {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setCancelable(true);
 
@@ -398,9 +441,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
 
                     final EditText phoneNumber = (EditText) dialogView.findViewById(R.id.et_alert_dialog_add_phone);
 
-                    builder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton("Done", new DialogInterface.OnClickListener()
+                    {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(DialogInterface dialog, int which)
+                        {
 
                         }
                     });
@@ -408,15 +453,19 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
                     final AlertDialog alertDialog = builder.create();
                     alertDialog.show();
 
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+                    {
                         @Override
-                        public void onClick(View v) {
+                        public void onClick(View v)
+                        {
                             Boolean wantToCloseDialog = false;
                             String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
-                            if (parsedPhone == null) {
+                            if (parsedPhone == null)
+                            {
                                 Toast.makeText(getActivity(), R.string.phone_invalid, Toast.LENGTH_LONG).show();
                                 wantToCloseDialog = false;
-                            } else {
+                            } else
+                            {
                                 userService.updatePhoneNumber(parsedPhone);
 
                                 menu.findItem(R.id.action_add_phone).setVisible(false);
@@ -428,7 +477,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
 
                             }
 
-                            if (wantToCloseDialog) {
+                            if (wantToCloseDialog)
+                            {
                                 alertDialog.dismiss();
                             }
                         }
@@ -438,28 +488,34 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
                 }
 
             });
-        } else {
+        } else
+        {
             menu.findItem(R.id.action_add_phone).setVisible(false);
         }
 
-        menu.findItem(R.id.action_account).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        menu.findItem(R.id.action_account).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
             @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
+            public boolean onMenuItemClick(MenuItem menuItem)
+            {
                 FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
                 return true;
             }
         });
 
-        menu.findItem(R.id.action_create_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        menu.findItem(R.id.action_create_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
             @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
+            public boolean onMenuItemClick(MenuItem menuItem)
+            {
                 displayCreateEventDialog();
                 return true;
             }
         });
     }
 
-    public void displayCreateEventDialog() {
+    public void displayCreateEventDialog()
+    {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
 
@@ -479,72 +535,92 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         LinearLayout shopping = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_shopping);
         final CheckBox checkBox = (CheckBox) createEventDialogView.findViewById(R.id.cb_dialog_fragment_create_event);
 
-        general.setOnClickListener(new View.OnClickListener() {
+        general.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 eventCategory = EventCategory.GENERAL;
             }
         });
 
-        eat_out.setOnClickListener(new View.OnClickListener() {
+        eat_out.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 eventCategory = EventCategory.EAT_OUT;
             }
         });
 
-        drinks.setOnClickListener(new View.OnClickListener() {
+        drinks.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 eventCategory = EventCategory.DRINKS;
             }
         });
 
-        cafe.setOnClickListener(new View.OnClickListener() {
+        cafe.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 eventCategory = EventCategory.CAFE;
             }
         });
 
-        movie.setOnClickListener(new View.OnClickListener() {
+        movie.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 eventCategory = EventCategory.MOVIES;
             }
         });
 
-        outdoors.setOnClickListener(new View.OnClickListener() {
+        outdoors.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 eventCategory = EventCategory.OUTDOORS;
             }
         });
 
-        party.setOnClickListener(new View.OnClickListener() {
+        party.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 eventCategory = EventCategory.PARTY;
             }
         });
 
-        localEvents.setOnClickListener(new View.OnClickListener() {
+        localEvents.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 eventCategory = EventCategory.LOCAL_EVENTS;
             }
         });
 
-        shopping.setOnClickListener(new View.OnClickListener() {
+        shopping.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 eventCategory = EventCategory.SHOPPING;
             }
         });
 
-        builder.setPositiveButton("Next", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Next", new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
 
             }
         });
@@ -552,21 +628,26 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         final AlertDialog dialog = builder.create();
         dialog.show();
 
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 Boolean wantToCloseDialog = false;
 
                 String title = eventTitle.getText().toString();
                 boolean isInviteOnly = checkBox.isChecked();
 
-                if (title == null || title.isEmpty()) {
+                if (title == null || title.isEmpty())
+                {
                     Toast.makeText(getActivity(), "Please enter a title", Toast.LENGTH_LONG).show();
                     wantToCloseDialog = false;
-                } else if (eventCategory == null) {
+                } else if (eventCategory == null)
+                {
                     Toast.makeText(getActivity(), "Please choose a category", Toast.LENGTH_LONG).show();
                     wantToCloseDialog = false;
-                } else {
+                } else
+                {
                     wantToCloseDialog = true;
                     CreateEventFragment createEventFragment = new CreateEventFragment();
                     Bundle bundle = new Bundle();
@@ -578,7 +659,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
                 }
 
 
-                if (wantToCloseDialog) {
+                if (wantToCloseDialog)
+                {
                     dialog.dismiss();
                 }
 
@@ -587,19 +669,25 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     }
 
     @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.btn_home_filter) {
+    public void onClick(View view)
+    {
+        if (view.getId() == R.id.btn_home_filter)
+        {
             PopupMenu filterMenu = new PopupMenu(getActivity(), filterButton);
             filterMenu.getMenuInflater().inflate(R.menu.popup_filter, filterMenu.getMenu());
 
-            filterMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            filterMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+            {
                 @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
-                    if (menuItem.getItemId() == R.id.menu_filter_today) {
+                public boolean onMenuItemClick(MenuItem menuItem)
+                {
+                    if (menuItem.getItemId() == R.id.menu_filter_today)
+                    {
                         filterButton.setText(menuItem.getTitle().toString());
                         filter = Filter.TODAY;
                         refreshRecyclerView();
-                    } else if (menuItem.getItemId() == R.id.menu_filter_all) {
+                    } else if (menuItem.getItemId() == R.id.menu_filter_all)
+                    {
                         filterButton.setText(menuItem.getTitle().toString());
                         filter = Filter.ALL;
                         refreshRecyclerView();
@@ -609,22 +697,28 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
             });
 
             filterMenu.show();
-        } else if (view.getId() == R.id.btn_home_sort) {
+        } else if (view.getId() == R.id.btn_home_sort)
+        {
             PopupMenu sortMenu = new PopupMenu(getActivity(), sortButton);
             sortMenu.getMenuInflater().inflate(R.menu.popup_sort, sortMenu.getMenu());
 
-            sortMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            sortMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+            {
                 @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
-                    if (menuItem.getItemId() == R.id.menu_sort_relevance) {
+                public boolean onMenuItemClick(MenuItem menuItem)
+                {
+                    if (menuItem.getItemId() == R.id.menu_sort_relevance)
+                    {
                         sortButton.setText(menuItem.getTitle().toString());
                         sort = Sort.RELEVANCE;
                         refreshRecyclerView();
-                    } else if (menuItem.getItemId() == R.id.menu_sort_time) {
+                    } else if (menuItem.getItemId() == R.id.menu_sort_time)
+                    {
                         sortButton.setText(menuItem.getTitle().toString());
                         sort = Sort.DATE_TIME;
                         refreshRecyclerView();
-                    } else if (menuItem.getItemId() == R.id.menu_sort_distance) {
+                    } else if (menuItem.getItemId() == R.id.menu_sort_distance)
+                    {
                         sortButton.setText(menuItem.getTitle().toString());
                         sort = Sort.DISTANCE;
                         refreshRecyclerView();
@@ -634,9 +728,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
             });
 
             sortMenu.show();
-        } else if (view.getId() == R.id.ibtn_home_refresh) {
-            refreshRecyclerView();
-        } else if (view.getId() == R.id.fib_home_create) {
+        } else if (view.getId() == R.id.fib_home_create)
+        {
             displayCreateEventDialog();
         }
     }

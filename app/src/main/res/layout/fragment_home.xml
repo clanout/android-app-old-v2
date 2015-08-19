@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/srl_home"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,13 +26,13 @@
             <TextView
                 android:id="@+id/tv_home_no_events"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fib_home_create"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_action_new" />
+                android:src="@drawable/ic_action_new"/>
 
         </LinearLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
@@ -57,22 +58,7 @@
                 android:drawableLeft="@drawable/ic_sort_white_24dp"
                 android:drawablePadding="8dp"
                 android:text="Relevance"
-                android:textColor="@color/primary_text_default_material_dark" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp">
-
-            <ImageButton
-                android:id="@+id/ibtn_home_refresh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:background="@null"
-                android:src="@drawable/ic_action_refresh" />
+                android:textColor="@color/primary_text_default_material_dark"/>
         </LinearLayout>
 
         <LinearLayout
@@ -90,7 +76,7 @@
                 android:drawablePadding="8dp"
                 android:drawableRight="@drawable/ic_filter_list_white_24dp"
                 android:text="All Events"
-                android:textColor="@color/primary_text_default_material_dark" />
+                android:textColor="@color/primary_text_default_material_dark"/>
         </LinearLayout>
     </LinearLayout>
 

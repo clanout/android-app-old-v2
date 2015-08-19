@@ -30,6 +30,7 @@ import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.NotificationConstants;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
+import reaper.android.app.trigger.event.NewEventAddedTrigger;
 import reaper.android.app.ui.activity.LauncherActivity;
 import reaper.android.common.communicator.Communicator;
 
@@ -60,7 +61,7 @@ public class ListenerServiceGcm extends GcmListenerService
     @Override
     public void onMessageReceived(String from, Bundle data)
     {
-        Log.d("APP", "notification received ----- " + data.getString("message"));
+        Log.d("APP", "notification received ----- " + data);
         doProcessing(data);
     }
 
@@ -77,13 +78,14 @@ public class ListenerServiceGcm extends GcmListenerService
             if (!checkIfAppRunningInForeground())
             {
                 buildNotification(message, NotificationConstants.EVENT_ADDED_TITLE, true, notificationAttributes.get("event_id"));
+            } else
+            {
+                bus.post(new NewEventAddedTrigger());
             }
-        }
-        else if (notificationType.equals(NotificationConstants.EVENT_REMOVED))
+        } else if (notificationType.equals(NotificationConstants.EVENT_REMOVED))
         {
             eventService.deleteEvent(notificationAttributes.get("event_id"));
-        }
-        else if (notificationType.equals(NotificationConstants.EVENT_UPDATED))
+        } else if (notificationType.equals(NotificationConstants.EVENT_UPDATED))
         {
             eventCache.deleteCompletely(notificationAttributes.get("event_id"));
             eventService.fetchEvent(notificationAttributes.get("event_id"), true);
@@ -92,19 +94,18 @@ public class ListenerServiceGcm extends GcmListenerService
             {
                 buildNotification(message, NotificationConstants.EVENT_UPDATED_TITLE, true, notificationAttributes.get("event_id"));
             }
-        }
-        else if (notificationType.equals(NotificationConstants.FRIEND_RELOCATED))
+        } else if (notificationType.equals(NotificationConstants.FRIEND_RELOCATED))
         {
             userCache.deleteFriends();
 
             String zone = notificationAttributes.get("zone");
+
             if (zone.equals(locationService.getUserLocation().getZone()))
             {
                 String friendName = notificationAttributes.get("name");
                 buildNotification(friendName + " is in " + zone + ". You can invite " + friendName + " to local events.", NotificationConstants.FRIEND_RELOCATED_TITLE, false, "");
             }
-        }
-        else if (notificationType.equals(NotificationConstants.EVENT_INVITATION))
+        } else if (notificationType.equals(NotificationConstants.EVENT_INVITATION))
         {
             eventCache.deleteCompletely(notificationAttributes.get("event_id"));
             eventService.fetchEvent(notificationAttributes.get("event_id"), true);
@@ -121,8 +122,7 @@ public class ListenerServiceGcm extends GcmListenerService
         {
             intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "yes");
             intent.putExtra("event_id", eventId);
-        }
-        else
+        } else
         {
             intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "no");
         }
@@ -141,7 +141,7 @@ public class ListenerServiceGcm extends GcmListenerService
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0, notificationBuilder.build());
+        notificationManager.notify((int) (Math.random() * 1000), notificationBuilder.build());
     }
 
     private boolean checkIfAppRunningInForeground()
@@ -155,13 +155,11 @@ public class ListenerServiceGcm extends GcmListenerService
             if (componentName.getPackageName().equalsIgnoreCase("reaper.android"))
             {
                 return true;
-            }
-            else
+            } else
             {
                 return false;
             }
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             return false;
         }

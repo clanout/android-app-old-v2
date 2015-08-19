@@ -3,6 +3,7 @@ package reaper.android.app.ui.screens.home;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import java.util.List;
 import reaper.android.R;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
+import reaper.android.app.trigger.common.ViewPagerStateChangedTrigger;
 import reaper.android.app.trigger.event.EventClickTrigger;
 import reaper.android.app.trigger.event.RsvpChangeTrigger;
 
@@ -102,6 +104,9 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             @Override
             public void onPageScrollStateChanged(int state)
             {
+                Log.d("APP", "state changed ------ " + state);
+
+                bus.post(new ViewPagerStateChangedTrigger(state));
             }
         });
 
