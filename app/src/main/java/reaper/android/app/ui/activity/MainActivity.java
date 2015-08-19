@@ -57,9 +57,8 @@ public class MainActivity extends AppCompatActivity
 
         genericCache = new GenericCache();
 
-        if (genericCache.get(CacheKeys.GCM_TOKEN) == null)
+        if (AppPreferences.get(this, CacheKeys.GCM_TOKEN) == null)
         {
-            Log.d("APP", "token null");
             if (checkPlayServices())
             {
                 gcmService.register();
@@ -67,18 +66,7 @@ public class MainActivity extends AppCompatActivity
         }
         else
         {
-            Log.d("APP", "token not null");
             ChatHelper.init(userService.getActiveUserId());
-
-            try
-            {
-                gcmService.subscribeTopic(genericCache.get(CacheKeys.GCM_TOKEN), "abc");
-            }
-            catch (IOException e)
-            {
-                Log.d("APP", e.getMessage());
-            }
-
             fragmentManager = getSupportFragmentManager();
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
         }
@@ -178,7 +166,6 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onGcmRegistrationComplete(GcmRegistrationCompleteTrigger trigger)
     {
-        Log.d("APP", "registration complete");
         ChatHelper.init(userService.getActiveUserId());
 
         runOnUiThread(new Runnable()
