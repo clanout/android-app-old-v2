@@ -44,6 +44,7 @@ import reaper.android.app.trigger.event.EventCreatedTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventEditedTrigger;
 import reaper.android.app.trigger.event.EventSuggestionsTrigger;
+import reaper.android.app.trigger.event.EventsFetchForActivityTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.common.cache.AppPreferences;
 import retrofit.client.Response;
@@ -136,6 +137,76 @@ public class EventService
                     }
                 });
     }
+
+    public void fetchEventsForActivity(final String zone)
+    {
+        final long startTime = System.currentTimeMillis();
+        Observable<List<Event>> eventObservable =
+                eventCache.getEvents()
+                        .flatMap(new Func1<List<Event>, Observable<List<Event>>>()
+                        {
+                            @Override
+                            public Observable<List<Event>> call(List<Event> events)
+                            {
+                                if (events.isEmpty())
+                                {
+                                    Log.d("APP", "events in cache are empty");
+                                    EventsApiRequest request = new EventsApiRequest(zone);
+                                    return eventApi.getEvents(request)
+                                            .map(new Func1<EventsApiResponse, List<Event>>()
+                                            {
+                                                @Override
+                                                public List<Event> call(EventsApiResponse eventsApiResponse)
+                                                {
+                                                    Log.d("APP", "events from api call ---- " + eventsApiResponse.getEvents());
+                                                    return eventsApiResponse.getEvents();
+                                                }
+
+                                            })
+                                            .doOnNext(new Action1<List<Event>>()
+                                            {
+                                                @Override
+                                                public void call(List<Event> events)
+                                                {
+                                                    eventCache.reset(events);
+                                                }
+                                            })
+                                            .subscribeOn(Schedulers.newThread());
+                                }
+                                else
+                                {
+                                    Log.d("APP", "event from cache ----- " + events);
+                                    return Observable.just(events);
+                                }
+                            }
+                        });
+
+        eventObservable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Event>>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+                        long endTime = System.currentTimeMillis();
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.d("APP", "EVentsFetchForActivityError---- " + e.getMessage());
+                        bus.post(new GenericErrorTrigger(ErrorCode.EVENTS_FETCH_FOR_ACTIVITY_FAILURE, (Exception) e));
+                    }
+
+                    @Override
+                    public void onNext(List<Event> events)
+                    {
+                        Log.d("APP", "EVentsFetchForActivityonNext");
+                        bus.post(new EventsFetchForActivityTrigger(events));
+                    }
+                });
+    }
+
 
     public void fetchEvent(String eventId, final boolean shouldMarkUpdated)
     {

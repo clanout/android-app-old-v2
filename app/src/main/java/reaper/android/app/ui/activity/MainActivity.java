@@ -13,14 +13,21 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import reaper.android.R;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
+import reaper.android.app.model.Event;
+import reaper.android.app.service.EventService;
 import reaper.android.app.service.GCMService;
+import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.common.CacheCommitTrigger;
+import reaper.android.app.trigger.event.EventsFetchForActivityTrigger;
 import reaper.android.app.trigger.gcm.GcmRegistrationCompleteTrigger;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
@@ -36,6 +43,10 @@ public class MainActivity extends AppCompatActivity
     private Bus bus;
     private UserService userService;
     private GCMService gcmService;
+    private EventService eventService;
+    private LocationService locationService;
+
+    private String eventId;
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
@@ -50,17 +61,19 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         bus = Communicator.getInstance().getBus();
+        bus.register(this);
         userService = new UserService(bus);
         gcmService = new GCMService(bus);
+        eventService = new EventService(bus);
+        locationService = new LocationService(bus);
+        fragmentManager = getSupportFragmentManager();
 
         String shouldGoToDetailsFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);
-        String eventId = getIntent().getStringExtra("event_id");
+        eventId = getIntent().getStringExtra("event_id");
 
         if (shouldGoToDetailsFragment.equals("yes") && eventId != null)
         {
-            fragmentManager = getSupportFragmentManager();
-            FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
-
+            eventService.fetchEventsForActivity(locationService.getUserLocation().getZone());
         } else
         {
             if (AppPreferences.get(this, CacheKeys.GCM_TOKEN) == null)
@@ -72,7 +85,6 @@ public class MainActivity extends AppCompatActivity
             } else
             {
                 ChatHelper.init(userService.getActiveUserId());
-                fragmentManager = getSupportFragmentManager();
                 FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
             }
         }
@@ -83,7 +95,6 @@ public class MainActivity extends AppCompatActivity
     {
         super.onStart();
         getSupportActionBar().setTitle("reap3r");
-        bus.register(this);
     }
 
     @Override
@@ -170,10 +181,27 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                fragmentManager = getSupportFragmentManager();
                 FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
             }
         });
+    }
 
+    @Subscribe
+    public void onEventsFetched(EventsFetchForActivityTrigger trigger)
+    {
+        Log.d("APP", "onEventsFetchedTriggerForActivity");
+        List<Event> eventList = trigger.getEvents();
+
+        Event activeEvent = new Event();
+        activeEvent.setId(eventId);
+
+        int activePosition = eventList.indexOf(activeEvent);
+
+        EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, (ArrayList<Event>) eventList);
+        bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
+        eventDetailsContainerFragment.setArguments(bundle);
+        FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment);
     }
 }

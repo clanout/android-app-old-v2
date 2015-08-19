@@ -209,8 +209,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty())
         {
             eventLocation.setText(R.string.event_details_no_location);
-        }
-        else
+        } else
         {
             eventLocation.setText(event.getLocation().getName());
         }
@@ -223,8 +222,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         if (start.toString(dateFormatter).equals(end.toString(dateFormatter)))
         {
             schedule.setText(start.toString(timeFormatter) + " - " + end.toString(timeFormatter) + " (" + start.toString(dateFormatter) + ")");
-        }
-        else
+        } else
         {
             schedule.setText(start.toString(timeFormatter) + " (" + start.toString(dateFormatter) + ") - " + end.toString(timeFormatter) + " (" + end.toString(dateFormatter) + ")");
         }
@@ -232,8 +230,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         if (event.getType() == Event.Type.PUBLIC)
         {
             type.setText(R.string.event_details_type_public);
-        }
-        else
+        } else
         {
             type.setText(R.string.event_details_type_invite_only);
         }
@@ -290,8 +287,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             noSuggestions.setVisibility(View.VISIBLE);
             recommendationList.setVisibility(View.GONE);
 
-        }
-        else
+        } else
         {
             recommendationList.setVisibility(View.VISIBLE);
             noSuggestions.setVisibility(View.GONE);
@@ -354,8 +350,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                     return true;
                 }
             });
-        }
-        else
+        } else
         {
             menu.findItem(R.id.action_delete_event).setVisible(false);
         }
@@ -366,8 +361,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             {
                 menu.findItem(R.id.action_finalize_event).setIcon(R.drawable.ic_action_secure);
                 menu.findItem(R.id.action_finalize_event).setVisible(true);
-            }
-            else
+            } else
             {
                 menu.findItem(R.id.action_finalize_event).setIcon(R.drawable.ic_action_error);
                 menu.findItem(R.id.action_finalize_event).setVisible(true);
@@ -384,8 +378,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                         isFinalised = false;
                         menu.findItem(R.id.action_finalize_event).setIcon(R.drawable.ic_action_error);
                         Toast.makeText(getActivity(), R.string.event_not_finalised, Toast.LENGTH_SHORT).show();
-                    }
-                    else
+                    } else
                     {
                         menu.findItem(R.id.action_finalize_event).setIcon(R.drawable.ic_action_secure);
                         isFinalised = true;
@@ -395,8 +388,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                     return true;
                 }
             });
-        }
-        else
+        } else
         {
             menu.findItem(R.id.action_finalize_event).setVisible(false);
         }
@@ -474,8 +466,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             if (isPlaceDetailsRunning)
             {
                 isSaveButtonClicked = true;
-            }
-            else
+            } else
             {
                 isSaveButtonClicked = false;
                 sendEditEventRequest();
@@ -528,8 +519,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             startDateTime = null;
             endDateTime = null;
             Toast.makeText(getActivity(), R.string.event_end_before_start, Toast.LENGTH_LONG).show();
-        }
-        else
+        } else
         {
             startDateTime = _startDateTime;
             endDateTime = _endDateTime;
@@ -537,8 +527,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             if (_startDateTime.toString(dateFormatter).equals(_endDateTime.toString(dateFormatter)))
             {
                 schedule.setText(_startDateTime.toString(timeFormatter) + " - " + _endDateTime.toString(timeFormatter) + " (" + _startDateTime.toString(dateFormatter) + ")");
-            }
-            else
+            } else
             {
                 schedule.setText(_startDateTime.toString(timeFormatter) + " (" + _startDateTime.toString(dateFormatter) + ") - " + _endDateTime.toString(timeFormatter) + " (" + _endDateTime.toString(dateFormatter) + ")");
             }
@@ -585,8 +574,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         {
             startTimePicker.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
             endTimePicker.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-        }
-        else
+        } else
         {
             startTimePicker.setCurrentHour(startDateTime.getHourOfDay());
             startTimePicker.setCurrentMinute(startDateTime.getMinuteOfHour());
@@ -612,8 +600,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                     yearSpinner.setVisibility(View.GONE);
                 }
             }
-        }
-        else
+        } else
         {
             try
             {
@@ -628,8 +615,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                         ((View) yearPicker).setVisibility(View.GONE);
                     }
                 }
-            }
-            catch (Exception e)
+            } catch (Exception e)
             {
                 e.printStackTrace();
             }
@@ -671,7 +657,6 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
         eventDetailsContainerFragment.setArguments(bundle);
         FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment);
-
     }
 
     @Subscribe
@@ -686,7 +671,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     @Subscribe
     public void backPressed(BackPressedTrigger trigger)
     {
-        if(trigger.getActiveFragment().equals(BackstackTags.EDIT))
+        if (trigger.getActiveFragment().equals(BackstackTags.EDIT))
         {
             eventService.fetchEvents(locationService.getUserLocation().getZone());
         }
