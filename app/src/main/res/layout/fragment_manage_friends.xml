@@ -57,7 +57,7 @@
             android:id="@+id/ib_manage_friends_done"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:background="@color/primary"
+            android:background="@drawable/custom_button_background"
             android:src="@drawable/ic_check_white_24dp"/>
 
     </LinearLayout>

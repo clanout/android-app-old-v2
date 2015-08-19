@@ -53,7 +53,7 @@
                 android:id="@+id/ib_fragment_chat_send"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/primary"
+                android:background="@drawable/custom_button_background"
                 android:src="@drawable/ic_send_white_24dp"
                 android:textSize="14sp"
                 android:layout_gravity="center_vertical"/>
