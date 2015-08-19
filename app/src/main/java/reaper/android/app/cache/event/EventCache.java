@@ -89,4 +89,14 @@ public class EventCache
         dataSource.delete(eventId, true);
     }
 
+    public void markUpdated(List<String> eventIds)
+    {
+        dataSource.markUpdated(eventIds);
+    }
+
+    public void markRead(String eventId)
+    {
+        dataSource.setUpdatedFalse(eventId);
+    }
+
 }

@@ -134,7 +134,7 @@ public class EventService
                 });
     }
 
-    public void fetchEvent(String eventId)
+    public void fetchEvent(String eventId, final boolean shouldMarkUpdated)
     {
         FetchEventApiRequest request = new FetchEventApiRequest(eventId);
         eventApi.fetchEvent(request)
@@ -158,6 +158,13 @@ public class EventService
                     public void onNext(FetchEventApiResponse fetchEventApiResponse)
                     {
                         eventCache.save(fetchEventApiResponse.getEvent());
+
+                        if (shouldMarkUpdated)
+                        {
+                            List<String> updatedEvents = new ArrayList<String>();
+                            updatedEvents.add(fetchEventApiResponse.getEvent().getId());
+                            eventCache.markUpdated(updatedEvents);
+                        }
                     }
                 });
     }

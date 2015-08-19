@@ -24,6 +24,7 @@ import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.NotificationConstants;
 import reaper.android.app.service.EventService;
+import reaper.android.app.service.LocationService;
 import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.common.communicator.Communicator;
 
@@ -31,6 +32,7 @@ public class ListenerServiceGcm extends GcmListenerService
 {
     private Bus bus;
     private EventService eventService;
+    private LocationService locationService;
     private UserCache userCache;
     private EventCache eventCache;
 
@@ -40,6 +42,7 @@ public class ListenerServiceGcm extends GcmListenerService
     {
         bus = Communicator.getInstance().getBus();
         eventService = new EventService(bus);
+        locationService = new LocationService(bus);
         userCache = new UserCache();
         eventCache = new EventCache();
         type = new TypeToken<Map<String, String>>()
@@ -64,7 +67,7 @@ public class ListenerServiceGcm extends GcmListenerService
 
         if (notificationType.equals(NotificationConstants.EVENT_ADDED))
         {
-            eventService.fetchEvent(notificationAttributes.get("event_id"));
+            eventService.fetchEvent(notificationAttributes.get("event_id"), false);
             buildNotification(message, NotificationConstants.EVENT_ADDED_TITLE);
         }
         else if (notificationType.equals(NotificationConstants.EVENT_REMOVED))
@@ -74,29 +77,31 @@ public class ListenerServiceGcm extends GcmListenerService
         else if (notificationType.equals(NotificationConstants.EVENT_UPDATED))
         {
             eventCache.invalidateCompletely(notificationAttributes.get("event_id"));
-            eventService.fetchEvent(notificationAttributes.get("event_id"));
+            eventService.fetchEvent(notificationAttributes.get("event_id"), true);
             buildNotification(message, NotificationConstants.EVENT_UPDATED_TITLE);
         }
-        else if (notificationType.equals(NotificationConstants.FRIEND_ADDED))
+        else if (notificationType.equals(NotificationConstants.FRIEND_RELOCATED))
         {
             userCache.evictFriendsCache();
-            buildNotification(message, NotificationConstants.FRIEND_ADDED_TITLE);
+
+            String zone = notificationAttributes.get("zone");
+            if (zone.equals(locationService.getUserLocation().getZone()))
+            {
+                String friendName = notificationAttributes.get("name");
+                buildNotification(friendName + " is in " + zone + ". You can invite " + friendName + " to local events.", NotificationConstants.FRIEND_RELOCATED_TITLE);
+            }
         }
-        else if (notificationType.equals(NotificationConstants.FRIEND_REMOVED))
-        {
-            userCache.evictFriendsCache();
-        }
-        else if (notificationType.equals(NotificationConstants.INVITED_TO_EVENT))
+        else if (notificationType.equals(NotificationConstants.EVENT_INVITATION))
         {
             eventCache.invalidateCompletely(notificationAttributes.get("event_id"));
-            eventService.fetchEvent(notificationAttributes.get("event_id"));
+            eventService.fetchEvent(notificationAttributes.get("event_id"), true);
             buildNotification(message, NotificationConstants.INVITE_RECEIVED_TITLE);
         }
     }
 
     private void buildNotification(String message, String title)
     {
-        // TODO - pending intent and notification id
+        // TODO - pending intent
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

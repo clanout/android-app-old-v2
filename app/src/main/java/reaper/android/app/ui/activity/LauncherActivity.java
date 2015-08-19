@@ -24,8 +24,6 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.SessionValidatedTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshRequestTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshTrigger;
-import reaper.android.common.cache.AppPreferences;
-import reaper.android.common.cache.Cache;
 import reaper.android.common.communicator.Communicator;
 
 public class LauncherActivity extends AppCompatActivity
@@ -100,12 +98,14 @@ public class LauncherActivity extends AppCompatActivity
         else
         {
             // Dummy Session initialization
-            if(cache.get(CacheKeys.SESSION_ID) == null)
+            if (cache.get(CacheKeys.SESSION_ID) == null)
             {
+                Log.d("Generic", "here");
                 cache.put(CacheKeys.SESSION_ID, "dummy_session_cookie");
             }
 
             String sessionCookie = cache.get(CacheKeys.SESSION_ID);
+            Log.d("Generic", sessionCookie);
             authService.validateSession(sessionCookie);
         }
     }
@@ -120,8 +120,6 @@ public class LauncherActivity extends AppCompatActivity
     @Subscribe
     public void onSessionValidatedTrigger(SessionValidatedTrigger trigger)
     {
-        cache.put(CacheKeys.SESSION_ID, trigger.getValidatedSessionCookie());
-
         if (!locationService.locationExists())
         {
             progressDialog = ProgressDialog.show(this, "Welcome", "Fetching your current location...");

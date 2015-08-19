@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity
         }
         else
         {
-            Log.d("APP", "token not null");
+            Log.d("APP", "token not null ------ " + AppPreferences.get(this, CacheKeys.GCM_TOKEN));
             ChatHelper.init(userService.getActiveUserId());
             fragmentManager = getSupportFragmentManager();
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());

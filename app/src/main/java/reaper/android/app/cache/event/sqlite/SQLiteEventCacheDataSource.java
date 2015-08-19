@@ -263,7 +263,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
         statement.execute();
         statement.clearBindings();
 
-        if(deleteDetails)
+        if (deleteDetails)
         {
             statement = db.compileStatement(SQLiteCacheContract.EventDetails.SQL_DELETE_ONE);
             statement.bindString(1, eventId);
@@ -281,7 +281,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     }
 
     @Override
-    public void markUpdated(List<Event> events)
+    public void markUpdated(List<String> events)
     {
         if (!events.isEmpty())
         {
@@ -289,10 +289,10 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
             SQLiteStatement statement = db
                     .compileStatement(SQLiteCacheContract.Event.SQL_MARK_UPDATED);
             db.beginTransactionNonExclusive();
-            for (Event event : events)
+            for (String event : events)
             {
                 statement.bindString(1, String.valueOf(true));
-                statement.bindString(2, event.getId());
+                statement.bindString(2, event);
                 statement.execute();
                 statement.clearBindings();
             }
@@ -301,18 +301,16 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
             statement.close();
             db.close();
         }
-
-        Log.d(TAG, "Marked " + events.size() + " events as updated in cache db");
     }
 
     @Override
-    public void setUpdatedFalse(Event event)
+    public void setUpdatedFalse(String event)
     {
         SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
         SQLiteStatement statement = db
                 .compileStatement(SQLiteCacheContract.Event.SQL_MARK_UPDATED);
         statement.bindString(1, String.valueOf(false));
-        statement.bindString(2, event.getId());
+        statement.bindString(2, event);
         statement.execute();
         statement.close();
         db.close();

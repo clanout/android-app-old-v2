@@ -34,36 +34,7 @@ public class GenericCache
     public void put(final String key, final String value)
     {
         memoryCache.put(key, value);
-        Observable.create(new Observable.OnSubscribe<Object>()
-        {
-            @Override
-            public void call(Subscriber<? super Object> subscriber)
-            {
-                subscriber.onCompleted();
-            }
-        })
-                  .subscribeOn(Schedulers.computation())
-                  .observeOn(AndroidSchedulers.mainThread())
-                  .subscribe(new Subscriber<Object>()
-                  {
-                      @Override
-                      public void onCompleted()
-                      {
-
-                      }
-
-                      @Override
-                      public void onError(Throwable e)
-                      {
-                          Log.d(TAG, e.getMessage());
-                      }
-
-                      @Override
-                      public void onNext(Object o)
-                      {
-
-                      }
-                  });
+        dataSource.write(key, value);
     }
 
     public String get(String key)
@@ -79,16 +50,7 @@ public class GenericCache
 
     public void delete(final String key)
     {
-        Observable.create(new Observable.OnSubscribe<Object>()
-        {
-            @Override
-            public void call(Subscriber<? super Object> subscriber)
-            {
-                memoryCache.remove(key);
-                dataSource.delete(key);
-                subscriber.onCompleted();
-            }
-        });
+        dataSource.delete(key);
     }
 
     public void put(final String key, final Object value)

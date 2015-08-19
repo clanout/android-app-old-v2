@@ -50,9 +50,8 @@ public class RegistrationIntentService extends IntentService
             Log.d("APP", "Error = " + e.getMessage());
             AppPreferences.set(this, CacheKeys.GCM_TOKEN, null);
             AppPreferences.set(this, CacheKeys.GCM_TOKEN_SENT_TO_SERVER, String.valueOf(false));
+
         }
-
-
         bus.post(new GcmRegistrationCompleteTrigger());
     }
 

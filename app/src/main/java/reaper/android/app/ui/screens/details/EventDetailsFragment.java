@@ -29,6 +29,7 @@ import org.joda.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import reaper.android.R;
+import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
@@ -50,6 +51,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     // Services
     private UserService userService;
     private EventService eventService;
+    private EventCache eventCache;
 
     // Data
     private Event event;
@@ -112,8 +114,9 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         description.setOnClickListener(this);
         dateTime.setOnClickListener(this);
 
-        renderEventSummary();
+        eventCache = new EventCache();
 
+        renderEventSummary();
         initRecyclerView();
     }
 
@@ -124,6 +127,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 
         areEventDetailsFetched = false;
         bus.register(this);
+        eventCache.markRead(event.getId());
         eventService.fetchEventDetails(event.getId());
     }
 
