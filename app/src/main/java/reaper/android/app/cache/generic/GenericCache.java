@@ -34,7 +34,38 @@ public class GenericCache
     public void put(final String key, final String value)
     {
         memoryCache.put(key, value);
-        dataSource.write(key, value);
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        dataSource.write(key, value);
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.e(TAG, "Cache write failed", e);
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
     }
 
     public String get(String key)
@@ -50,7 +81,38 @@ public class GenericCache
 
     public void delete(final String key)
     {
-        dataSource.delete(key);
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        dataSource.delete(key);
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.e(TAG, "Cache delete failed", e);
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
     }
 
     public void put(final String key, final Object value)

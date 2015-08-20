@@ -15,6 +15,7 @@ import com.squareup.otto.ThreadEnforcer;
 
 import java.util.List;
 
+import reaper.android.app.cache.core.DatabaseManager;
 import reaper.android.app.cache.core.SQLiteCacheHelper;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.event.sqlite.SQLiteEventCacheDataSource;
@@ -55,7 +56,7 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         Communicator.init(bus);
         Cache.init(this, AppConstants.CACHE_FILE);
 
-        SQLiteCacheHelper.init(this);
+        DatabaseManager.init(this);
 
         locationService = new LocationService(bus);
         googleApiClient = new GoogleApiClient.Builder(this)

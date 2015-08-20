@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.app.api.core.GsonProvider;
+import reaper.android.app.cache.core.DatabaseManager;
 import reaper.android.app.cache.core.SQLiteCacheContract;
-import reaper.android.app.cache.core.SQLiteCacheHelper;
 import reaper.android.app.cache.event.EventCacheDataSource;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
@@ -21,12 +21,12 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
 {
     private static final String TAG = "EventCacheDatSource";
 
-    private SQLiteCacheHelper sqliteCacheHelper;
+    private DatabaseManager databaseManager;
     private Gson gson;
 
     public SQLiteEventCacheDataSource()
     {
-        sqliteCacheHelper = SQLiteCacheHelper.getInstance();
+        databaseManager = DatabaseManager.getInstance();
         gson = GsonProvider.getGson();
     }
 
@@ -35,7 +35,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     {
         if (!events.isEmpty())
         {
-            SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
+            SQLiteDatabase db = databaseManager.openConnection();
             SQLiteStatement statement = db.compileStatement(SQLiteCacheContract.Event.SQL_INSERT);
             db.beginTransactionNonExclusive();
             for (Event event : events)
@@ -50,7 +50,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
             db.setTransactionSuccessful();
             db.endTransaction();
             statement.close();
-            db.close();
+            databaseManager.closeConnection();
         }
 
         Log.d(TAG, "Inserted " + events.size() + " events into cache db");
@@ -59,7 +59,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     @Override
     public void write(Event event)
     {
-        SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.openConnection();
         db.beginTransactionNonExclusive();
 
         SQLiteStatement statement = db.compileStatement(SQLiteCacheContract.Event.SQL_DELETE_ONE);
@@ -79,7 +79,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
         db.endTransaction();
 
         statement.close();
-        db.close();
+        databaseManager.closeConnection();
 
         Log.d(TAG, "Inserted event = " + event.getId() + " into cache db");
     }
@@ -91,7 +91,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
         {
             List<Event> events = new ArrayList<Event>();
 
-            SQLiteDatabase db = sqliteCacheHelper.getReadableDatabase();
+            SQLiteDatabase db = databaseManager.openConnection();
             String[] projection = {
                     SQLiteCacheContract.Event.COLUMN_CONTENT,
                     SQLiteCacheContract.Event.COLUMN_UPDATES,
@@ -115,7 +115,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
                 cursor.moveToNext();
             }
             cursor.close();
-            db.close();
+            databaseManager.closeConnection();
 
             return events;
         }
@@ -130,7 +130,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     {
         try
         {
-            SQLiteDatabase db = sqliteCacheHelper.getReadableDatabase();
+            SQLiteDatabase db = databaseManager.openConnection();
             String[] projection = {
                     SQLiteCacheContract.Event.COLUMN_CONTENT,
                     SQLiteCacheContract.Event.COLUMN_UPDATES,
@@ -156,7 +156,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
             event.setIsChatUpdated(isChatUpdated);
 
             cursor.close();
-            db.close();
+            databaseManager.closeConnection();
 
             return event;
         }
@@ -169,7 +169,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     @Override
     public void writeDetails(EventDetails eventDetails)
     {
-        SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.openConnection();
         db.beginTransactionNonExclusive();
 
         SQLiteStatement statement = db
@@ -189,7 +189,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
 
 
         statement.close();
-        db.close();
+        databaseManager.closeConnection();
 
         Log.d(TAG, "Inserted details for event = " + eventDetails.getId() + " into cache db");
     }
@@ -199,7 +199,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     {
         try
         {
-            SQLiteDatabase db = sqliteCacheHelper.getReadableDatabase();
+            SQLiteDatabase db = databaseManager.openConnection();
             String[] projection = {
                     SQLiteCacheContract.EventDetails.COLUMN_CONTENT
             };
@@ -219,7 +219,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
             EventDetails eventDetails = gson.fromJson(eventDetailsJson, EventDetails.class);
 
             cursor.close();
-            db.close();
+            databaseManager.closeConnection();
 
             return eventDetails;
         }
@@ -232,7 +232,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     @Override
     public void delete()
     {
-        SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.openConnection();
         db.beginTransactionNonExclusive();
 
         SQLiteStatement statement = db.compileStatement(SQLiteCacheContract.Event.SQL_DELETE);
@@ -247,7 +247,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
         db.endTransaction();
 
         statement.close();
-        db.close();
+        databaseManager.closeConnection();
 
         Log.d(TAG, "Deleted all events from cache db");
     }
@@ -255,7 +255,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     @Override
     public void delete(final String eventId, final boolean deleteDetails)
     {
-        SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.openConnection();
         db.beginTransactionNonExclusive();
 
         SQLiteStatement statement = db.compileStatement(SQLiteCacheContract.Event.SQL_DELETE_ONE);
@@ -275,7 +275,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
         db.endTransaction();
 
         statement.close();
-        db.close();
+        databaseManager.closeConnection();
 
         Log.d(TAG, "Deleted event(" + eventId + " from cache db");
     }
@@ -285,7 +285,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     {
         if (!events.isEmpty())
         {
-            SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
+            SQLiteDatabase db = databaseManager.openConnection();
             SQLiteStatement statement = db
                     .compileStatement(SQLiteCacheContract.Event.SQL_MARK_UPDATED);
             db.beginTransactionNonExclusive();
@@ -299,21 +299,21 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
             db.setTransactionSuccessful();
             db.endTransaction();
             statement.close();
-            db.close();
+            databaseManager.closeConnection();
         }
     }
 
     @Override
     public void setUpdatedFalse(String event)
     {
-        SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.openConnection();
         SQLiteStatement statement = db
                 .compileStatement(SQLiteCacheContract.Event.SQL_MARK_UPDATED);
         statement.bindString(1, String.valueOf(false));
         statement.bindString(2, event);
         statement.execute();
         statement.close();
-        db.close();
+        databaseManager.closeConnection();
     }
 
     @Override
@@ -321,7 +321,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     {
         if (!eventIds.isEmpty())
         {
-            SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
+            SQLiteDatabase db = databaseManager.openConnection();
             SQLiteStatement statement = db
                     .compileStatement(SQLiteCacheContract.Event.SQL_MARK_CHAT_UPDATED);
             db.beginTransactionNonExclusive();
@@ -335,7 +335,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
             db.setTransactionSuccessful();
             db.endTransaction();
             statement.close();
-            db.close();
+            databaseManager.closeConnection();
         }
 
         Log.d(TAG, "Marked " + eventIds.size() + " events as chat updated in cache db");
@@ -344,7 +344,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     @Override
     public void setChatUpdatedFalse(final String eventId)
     {
-        SQLiteDatabase db = sqliteCacheHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.openConnection();
         SQLiteStatement statement = db
                 .compileStatement(SQLiteCacheContract.Event.SQL_MARK_CHAT_UPDATED);
         statement.bindString(1, String.valueOf(false));
@@ -352,6 +352,6 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
         statement.execute();
 
         statement.close();
-        db.close();
+        databaseManager.closeConnection();
     }
 }
