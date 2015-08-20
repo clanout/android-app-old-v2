@@ -31,7 +31,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     }
 
     @Override
-    public void write(List<Event> events)
+    public synchronized void write(List<Event> events)
     {
         if (!events.isEmpty())
         {
@@ -57,7 +57,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     }
 
     @Override
-    public void write(Event event)
+    public synchronized void write(Event event)
     {
         SQLiteDatabase db = databaseManager.openConnection();
         db.beginTransactionNonExclusive();
@@ -85,7 +85,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     }
 
     @Override
-    public List<Event> read()
+    public synchronized List<Event> read()
     {
         try
         {
@@ -126,7 +126,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     }
 
     @Override
-    public Event read(final String eventId)
+    public synchronized Event read(final String eventId)
     {
         try
         {
@@ -167,7 +167,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     }
 
     @Override
-    public void writeDetails(EventDetails eventDetails)
+    public synchronized void writeDetails(EventDetails eventDetails)
     {
         SQLiteDatabase db = databaseManager.openConnection();
         db.beginTransactionNonExclusive();
@@ -195,7 +195,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     }
 
     @Override
-    public EventDetails readDetails(final String eventId)
+    public synchronized EventDetails readDetails(final String eventId)
     {
         try
         {
@@ -230,7 +230,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     }
 
     @Override
-    public void delete()
+    public synchronized void delete()
     {
         SQLiteDatabase db = databaseManager.openConnection();
         db.beginTransactionNonExclusive();
@@ -253,7 +253,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     }
 
     @Override
-    public void delete(final String eventId, final boolean deleteDetails)
+    public synchronized void delete(final String eventId, final boolean deleteDetails)
     {
         SQLiteDatabase db = databaseManager.openConnection();
         db.beginTransactionNonExclusive();
@@ -281,7 +281,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     }
 
     @Override
-    public void markUpdated(List<String> events)
+    public synchronized void markUpdated(List<String> events)
     {
         if (!events.isEmpty())
         {
@@ -304,7 +304,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     }
 
     @Override
-    public void setUpdatedFalse(String event)
+    public synchronized void setUpdatedFalse(String event)
     {
         SQLiteDatabase db = databaseManager.openConnection();
         SQLiteStatement statement = db
@@ -317,7 +317,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     }
 
     @Override
-    public void markChatUpdated(List<String> eventIds)
+    public synchronized void markChatUpdated(List<String> eventIds)
     {
         if (!eventIds.isEmpty())
         {
@@ -342,7 +342,7 @@ public class SQLiteEventCacheDataSource implements EventCacheDataSource
     }
 
     @Override
-    public void setChatUpdatedFalse(final String eventId)
+    public synchronized void setChatUpdatedFalse(final String eventId)
     {
         SQLiteDatabase db = databaseManager.openConnection();
         SQLiteStatement statement = db

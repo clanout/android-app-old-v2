@@ -21,7 +21,7 @@ public class SQLiteGenericCacheDataSource implements GenericCacheDataSource
     }
 
     @Override
-    public void write(String key, String value)
+    public synchronized void write(String key, String value)
     {
         SQLiteDatabase db = databaseManager.openConnection();
         db.beginTransactionNonExclusive();
@@ -47,13 +47,13 @@ public class SQLiteGenericCacheDataSource implements GenericCacheDataSource
     }
 
     @Override
-    public String read(String key)
+    public synchronized String read(String key)
     {
         try
         {
             SQLiteDatabase db = databaseManager.openConnection();
             String[] projection = {
-                    SQLiteCacheContract.Generic.COLUMN_KEY
+                    SQLiteCacheContract.Generic.COLUMN_VALUE
             };
 
             String selection = SQLiteCacheContract.Generic.COLUMN_KEY + " = ?";
@@ -80,7 +80,7 @@ public class SQLiteGenericCacheDataSource implements GenericCacheDataSource
     }
 
     @Override
-    public void delete(String key)
+    public synchronized void delete(String key)
     {
         SQLiteDatabase db = databaseManager.openConnection();
 

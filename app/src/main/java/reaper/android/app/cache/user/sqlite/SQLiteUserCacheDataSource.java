@@ -3,6 +3,7 @@ package reaper.android.app.cache.user.sqlite;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -29,7 +30,7 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
     }
 
     @Override
-    public void writeFriends(List<Friend> friends)
+    public synchronized void writeFriends(List<Friend> friends)
     {
         if (!friends.isEmpty())
         {
@@ -52,7 +53,7 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
     }
 
     @Override
-    public List<Friend> readFriends()
+    public synchronized List<Friend> readFriends()
     {
         try
         {
@@ -87,7 +88,7 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
     }
 
     @Override
-    public void deleteFriends()
+    public synchronized void deleteFriends()
     {
         SQLiteDatabase db = databaseManager.openConnection();
         SQLiteStatement statement = db
@@ -98,7 +99,7 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
     }
 
     @Override
-    public void writeContacts(List<Friend> contacts)
+    public synchronized void writeContacts(List<Friend> contacts)
     {
         if (!contacts.isEmpty())
         {
@@ -122,7 +123,7 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
     }
 
     @Override
-    public List<Friend> readContacts()
+    public synchronized List<Friend> readContacts()
     {
         try
         {
@@ -157,7 +158,7 @@ public class SQLiteUserCacheDataSource implements UserCacheDataSource
     }
 
     @Override
-    public void deleteContacts()
+    public synchronized void deleteContacts()
     {
         SQLiteDatabase db = databaseManager.openConnection();
         SQLiteStatement statement = db

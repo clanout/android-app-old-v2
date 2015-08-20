@@ -143,7 +143,7 @@ public class UserService
                                                      @Override
                                                      public void call(List<Friend> friends)
                                                      {
-                                                         userCache.saveContacts(friends);
+                                                         userCache.saveFriends(friends);
                                                      }
                                                  })
                                                  .subscribeOn(Schedulers.newThread());
