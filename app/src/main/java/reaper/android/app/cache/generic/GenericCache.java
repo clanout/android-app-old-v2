@@ -57,7 +57,8 @@ public class GenericCache
                     @Override
                     public void onError(Throwable e)
                     {
-                        Log.e(TAG, "Cache write failed", e);
+                        Log.e(TAG, "Cache save failed for " + key + " =  " + value + " [" + e
+                                .getMessage() + " ]");
                     }
 
                     @Override
@@ -104,7 +105,8 @@ public class GenericCache
                     @Override
                     public void onError(Throwable e)
                     {
-                        Log.e(TAG, "Cache delete failed", e);
+                        Log.e(TAG, "Cache delete failed for key = " + key + " [" + e
+                                .getMessage() + " ]");
                     }
 
                     @Override

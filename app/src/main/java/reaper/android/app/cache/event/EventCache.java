@@ -1,11 +1,14 @@
 package reaper.android.app.cache.event;
 
+import android.util.Log;
+
 import java.util.List;
 
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class EventCache
@@ -29,13 +32,44 @@ public class EventCache
                 subscriber.onNext(dataSource.read());
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.newThread());
+        }).subscribeOn(Schedulers.io());
     }
 
     public void save(final List<Event> events)
     {
-        evict();
-        dataSource.write(events);
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        dataSource.delete();
+                        dataSource.write(events);
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.e(TAG, "Event list cache save failed [" + e.getMessage() + "]");
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
     }
 
     public Observable<Event> getEvent(final String eventId)
@@ -48,12 +82,44 @@ public class EventCache
                 subscriber.onNext(dataSource.read(eventId));
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.newThread());
+        }).subscribeOn(Schedulers.io());
     }
 
-    public void save(Event event)
+    public void save(final Event event)
     {
-        dataSource.write(event);
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        dataSource.write(event);
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.e(TAG, "Event(" + event.getId() + ") save failed [" + e
+                                .getMessage() + "]");
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
     }
 
     public Observable<EventDetails> getEventDetails(final String eventId)
@@ -66,37 +132,228 @@ public class EventCache
                 subscriber.onNext(dataSource.readDetails(eventId));
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.newThread());
+        }).subscribeOn(Schedulers.io());
     }
 
     public void save(final EventDetails eventDetails)
     {
-        dataSource.writeDetails(eventDetails);
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        dataSource.writeDetails(eventDetails);
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.e(TAG, "EventDetails(" + eventDetails.getId() + ") save failed [" + e
+                                .getMessage() + "]");
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
     }
 
     public void evict()
     {
-        dataSource.delete();
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        dataSource.delete();
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.e(TAG, "Event cache evict failed [" + e.getMessage() + "]");
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
     }
 
     public void invalidate(final String eventId)
     {
-        dataSource.delete(eventId, false);
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        dataSource.delete(eventId, false);
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.e(TAG, "Event(" + eventId + ") deletion failed [" + e
+                                .getMessage() + "]");
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
     }
 
     public void invalidateCompletely(final String eventId)
     {
-        dataSource.delete(eventId, true);
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        dataSource.delete(eventId, true);
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.e(TAG, "Event(" + eventId + ") deletion failed [" + e
+                                .getMessage() + "]");
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
     }
 
-    public void markUpdated(List<String> eventIds)
+    public void markUpdated(final List<String> eventIds)
     {
-        dataSource.markUpdated(eventIds);
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        dataSource.markUpdated(eventIds);
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.e(TAG, "Event(" + eventIds.toString() + ") mark-updated failed [" + e
+                                .getMessage() + "]");
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
     }
 
-    public void markRead(String eventId)
+    public void markRead(final String eventId)
     {
-        dataSource.setUpdatedFalse(eventId);
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        dataSource.setUpdatedFalse(eventId);
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.e(TAG, "Event(" + eventId + ") mark-read failed [" + e
+                                .getMessage() + "]");
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
     }
 
 }

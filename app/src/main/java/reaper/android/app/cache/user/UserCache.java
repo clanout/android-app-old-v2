@@ -1,10 +1,13 @@
 package reaper.android.app.cache.user;
 
+import android.util.Log;
+
 import java.util.List;
 
 import reaper.android.app.model.Friend;
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class UserCache
@@ -18,10 +21,41 @@ public class UserCache
         dataSource = UserCacheDataSourceFactory.create();
     }
 
-    public void saveFriends(List<Friend> friends)
+    public void saveFriends(final List<Friend> friends)
     {
-        evictFriendsCache();
-        dataSource.writeFriends(friends);
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        dataSource.deleteFriends();
+                        dataSource.writeFriends(friends);
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.e(TAG, "Unable to save friends cache [" + e.getMessage() + "]");
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
     }
 
     public Observable<List<Friend>> getFriends()
@@ -34,18 +68,80 @@ public class UserCache
                 subscriber.onNext(dataSource.readFriends());
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.newThread());
+        }).subscribeOn(Schedulers.io());
     }
 
     public void evictFriendsCache()
     {
-        dataSource.deleteFriends();
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        dataSource.deleteFriends();
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.e(TAG, "Unable to evict friends cache [" + e.getMessage() + "]");
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
     }
 
-    public void saveContacts(List<Friend> contacts)
+    public void saveContacts(final List<Friend> contacts)
     {
-        evictContactsCache();
-        dataSource.writeContacts(contacts);
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        dataSource.deleteContacts();
+                        dataSource.writeContacts(contacts);
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.e(TAG, "Unable to save contacts cache [" + e.getMessage() + "]");
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
     }
 
     public Observable<List<Friend>> getContacts()
@@ -58,11 +154,42 @@ public class UserCache
                 subscriber.onNext(dataSource.readContacts());
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.newThread());
+        }).subscribeOn(Schedulers.io());
     }
 
     public void evictContactsCache()
     {
-        dataSource.deleteContacts();
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        dataSource.deleteContacts();
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.e(TAG, "Unable to evict contacts cache [" + e.getMessage() + "]");
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
     }
 }
