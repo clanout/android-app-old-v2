@@ -1,6 +1,6 @@
-package reaper.android.app.cache.event;
+package reaper.android.app.cache.old.event;
 
-import reaper.android.app.cache.event.sqlite.SQLiteEventCacheDataSource;
+import reaper.android.app.cache.old.event.sqlite.SQLiteEventCacheDataSource;
 
 public class EventCacheDataSourceFactory
 {

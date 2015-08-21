@@ -15,6 +15,7 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import reaper.android.R;
+import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
@@ -52,7 +53,7 @@ public class LauncherActivity extends AppCompatActivity
         authService = new AuthService(bus);
         locationService = new LocationService(bus);
 
-        cache = new GenericCache();
+        cache = CacheManager.getGenericCache();
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
     }

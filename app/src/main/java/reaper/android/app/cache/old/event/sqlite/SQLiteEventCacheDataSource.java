@@ -1,4 +1,4 @@
-package reaper.android.app.cache.event.sqlite;
+package reaper.android.app.cache.old.event.sqlite;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,7 +13,7 @@ import java.util.List;
 import reaper.android.app.api.core.GsonProvider;
 import reaper.android.app.cache.core.DatabaseManager;
 import reaper.android.app.cache.core.SQLiteCacheContract;
-import reaper.android.app.cache.event.EventCacheDataSource;
+import reaper.android.app.cache.old.event.EventCacheDataSource;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 

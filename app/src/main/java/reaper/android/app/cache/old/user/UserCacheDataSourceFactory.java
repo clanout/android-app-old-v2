@@ -1,6 +1,6 @@
-package reaper.android.app.cache.user;
+package reaper.android.app.cache.old.user;
 
-import reaper.android.app.cache.user.sqlite.SQLiteUserCacheDataSource;
+import reaper.android.app.cache.old.user.sqlite.SQLiteUserCacheDataSource;
 
 public class UserCacheDataSourceFactory
 {

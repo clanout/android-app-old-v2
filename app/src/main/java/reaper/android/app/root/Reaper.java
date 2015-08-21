@@ -8,19 +8,15 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.gson.Gson;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.ThreadEnforcer;
 
-import java.util.List;
-
+import reaper.android.BuildConfig;
+import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.core.DatabaseManager;
-import reaper.android.app.cache.core.SQLiteCacheHelper;
-import reaper.android.app.cache.event.EventCache;
-import reaper.android.app.cache.event.sqlite.SQLiteEventCacheDataSource;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
-import reaper.android.app.model.Event;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.trigger.common.CacheCommitTrigger;
 import reaper.android.app.trigger.gcm.GcmregistrationIntentTrigger;
@@ -28,6 +24,7 @@ import reaper.android.app.trigger.user.UserLocationRefreshRequestTrigger;
 import reaper.android.common.cache.Cache;
 import reaper.android.common.communicator.Communicator;
 import reaper.android.common.gcm.RegistrationIntentService;
+import timber.log.Timber;
 
 public class Reaper extends Application implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {
@@ -50,6 +47,11 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     {
         instance = this;
 
+        if (BuildConfig.DEBUG)
+        {
+            Timber.plant(new Timber.DebugTree());
+        }
+
         bus = new Bus(ThreadEnforcer.ANY);
         bus.register(this);
 
@@ -57,6 +59,19 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         Cache.init(this, AppConstants.CACHE_FILE);
 
         DatabaseManager.init(this);
+
+        // Testing
+        GenericCache genericCache = CacheManager.getGenericCache();
+        String key = "hello_message";
+        String value = genericCache.get(key);
+        if (value == null)
+        {
+            genericCache.put(key, "Hello, World!");
+        }
+        else
+        {
+            Timber.d("[Cache Valid] " + key + " = " + value);
+        }
 
         locationService = new LocationService(bus);
         googleApiClient = new GoogleApiClient.Builder(this)

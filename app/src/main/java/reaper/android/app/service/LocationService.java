@@ -15,16 +15,15 @@ import java.util.Locale;
 import reaper.android.app.api.core.ApiManager;
 import reaper.android.app.api.me.MeApi;
 import reaper.android.app.api.me.request.UserZoneUpdatedApiRequest;
-import reaper.android.app.cache.event.EventCache;
+import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.cache.user.UserCache;
+import reaper.android.app.cache.old.event.EventCache;
+import reaper.android.app.cache.old.user.UserCache;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Location;
-import reaper.android.app.trigger.common.CacheCommitTrigger;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshTrigger;
-import reaper.android.common.cache.Cache;
 import retrofit.client.Response;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -41,7 +40,7 @@ public class LocationService
     public LocationService(Bus bus)
     {
         this.bus = bus;
-        cache = new GenericCache();
+        cache = CacheManager.getGenericCache();
         meApi = ApiManager.getInstance().getApi(MeApi.class);
     }
 

@@ -1,9 +1,8 @@
-package reaper.android.app.cache.user.sqlite;
+package reaper.android.app.cache.old.user.sqlite;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -13,7 +12,7 @@ import java.util.List;
 import reaper.android.app.api.core.GsonProvider;
 import reaper.android.app.cache.core.DatabaseManager;
 import reaper.android.app.cache.core.SQLiteCacheContract;
-import reaper.android.app.cache.user.UserCacheDataSource;
+import reaper.android.app.cache.old.user.UserCacheDataSource;
 import reaper.android.app.model.Friend;
 
 public class SQLiteUserCacheDataSource implements UserCacheDataSource

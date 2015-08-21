@@ -29,7 +29,7 @@ import org.joda.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import reaper.android.R;
-import reaper.android.app.cache.event.EventCache;
+import reaper.android.app.cache.old.event.EventCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;

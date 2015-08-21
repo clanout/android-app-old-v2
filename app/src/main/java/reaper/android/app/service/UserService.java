@@ -22,8 +22,9 @@ import reaper.android.app.api.me.request.ShareFeedbackApiRequest;
 import reaper.android.app.api.me.response.GetAllFacebookFriendsApiResponse;
 import reaper.android.app.api.me.response.GetFacebookFriendsApiResponse;
 import reaper.android.app.api.me.response.GetPhoneContactsApiResponse;
+import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.cache.user.UserCache;
+import reaper.android.app.cache.old.user.UserCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
@@ -56,7 +57,7 @@ public class UserService
         this.bus = bus;
         meApi = ApiManager.getInstance().getApi(MeApi.class);
         userCache = new UserCache();
-        cache = new GenericCache();
+        cache = CacheManager.getGenericCache();
     }
 
     public String getActiveUserId()
