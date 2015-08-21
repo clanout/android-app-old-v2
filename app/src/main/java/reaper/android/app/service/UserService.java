@@ -24,7 +24,7 @@ import reaper.android.app.api.me.response.GetFacebookFriendsApiResponse;
 import reaper.android.app.api.me.response.GetPhoneContactsApiResponse;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.cache.old.user.UserCache;
+import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
@@ -56,7 +56,7 @@ public class UserService
     {
         this.bus = bus;
         meApi = ApiManager.getInstance().getApi(MeApi.class);
-        userCache = new UserCache();
+        userCache = CacheManager.getUserCache();
         cache = CacheManager.getGenericCache();
     }
 
@@ -66,6 +66,7 @@ public class UserService
         if (userId == null)
         {
             userId = "9320369679";
+            cache.put(CacheKeys.USER_ID, userId);
         }
         return userId;
     }
@@ -76,6 +77,7 @@ public class UserService
         if (name == null)
         {
             name = "Lucas Johnson";
+            cache.put(CacheKeys.USER_NAME, name);
         }
         return name;
     }

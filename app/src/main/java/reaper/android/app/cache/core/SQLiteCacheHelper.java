@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import timber.log.Timber;
+
 
 public class SQLiteCacheHelper extends SQLiteOpenHelper
 {
@@ -26,7 +28,7 @@ public class SQLiteCacheHelper extends SQLiteOpenHelper
         db.execSQL(SQLiteCacheContract.Generic.SQL_CREATE_TABLE);
         db.execSQL(SQLiteCacheContract.FacebookFriends.SQL_CREATE_TABLE);
         db.execSQL(SQLiteCacheContract.PhoneContacts.SQL_CREATE_TABLE);
-        Log.d(TAG, "Cache database created");
+        Timber.d("Cache database created");
     }
 
     @Override
@@ -38,6 +40,6 @@ public class SQLiteCacheHelper extends SQLiteOpenHelper
         db.execSQL(SQLiteCacheContract.FacebookFriends.SQL_DELETE_TABLE);
         db.execSQL(SQLiteCacheContract.PhoneContacts.SQL_DELETE_TABLE);
         onCreate(db);
-        Log.d(TAG, "Cache database upgraded");
+        Timber.d("Cache database upgraded");
     }
 }

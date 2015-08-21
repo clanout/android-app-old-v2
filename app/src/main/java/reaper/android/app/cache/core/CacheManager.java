@@ -4,6 +4,8 @@ import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.event.SQLiteEventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.generic.SQLiteGenericCache;
+import reaper.android.app.cache.user.SQLiteUserCache;
+import reaper.android.app.cache.user.UserCache;
 
 public class CacheManager
 {
@@ -15,5 +17,10 @@ public class CacheManager
     public static EventCache getEventCache()
     {
         return SQLiteEventCache.getInstance();
+    }
+
+    public static UserCache getUserCache()
+    {
+        return SQLiteUserCache.getInstance();
     }
 }

@@ -7,6 +7,7 @@ import com.squareup.otto.Bus;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,7 +28,8 @@ import reaper.android.app.api.event.response.EventDetailsApiResponse;
 import reaper.android.app.api.event.response.EventSuggestionsApiResponse;
 import reaper.android.app.api.event.response.EventsApiResponse;
 import reaper.android.app.api.event.response.FetchEventApiResponse;
-import reaper.android.app.cache.old.event.EventCache;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
@@ -51,6 +53,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 public class EventService
 {
@@ -68,7 +71,7 @@ public class EventService
         userService = new UserService(bus);
         gcmService = new GCMService(bus);
         eventApi = ApiManager.getInstance().getApi(EventApi.class);
-        eventCache = new EventCache();
+        eventCache = CacheManager.getEventCache();
     }
 
     public void fetchEvents(final String zone)
@@ -98,7 +101,7 @@ public class EventService
                                                 @Override
                                                 public void call(List<Event> events)
                                                 {
-                                                    eventCache.save(events);
+                                                    eventCache.reset(events);
                                                 }
                                             })
                                             .subscribeOn(Schedulers.newThread());
@@ -138,9 +141,17 @@ public class EventService
     {
         FetchEventApiRequest request = new FetchEventApiRequest(eventId);
         eventApi.fetchEvent(request)
+                .map(new Func1<FetchEventApiResponse, Event>()
+                {
+                    @Override
+                    public Event call(FetchEventApiResponse fetchEventApiResponse)
+                    {
+                        return fetchEventApiResponse.getEvent();
+                    }
+                })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.newThread())
-                .subscribe(new Subscriber<FetchEventApiResponse>()
+                .subscribe(new Subscriber<Event>()
                 {
                     @Override
                     public void onCompleted()
@@ -155,14 +166,13 @@ public class EventService
                     }
 
                     @Override
-                    public void onNext(FetchEventApiResponse fetchEventApiResponse)
+                    public void onNext(Event event)
                     {
-                        eventCache.save(fetchEventApiResponse.getEvent());
+                        eventCache.save(event);
 
                         if (shouldMarkUpdated)
                         {
-                            List<String> updatedEvents = new ArrayList<String>();
-                            updatedEvents.add(fetchEventApiResponse.getEvent().getId());
+                            List<String> updatedEvents = Arrays.asList(event.getId());
                             eventCache.markUpdated(updatedEvents);
                         }
                     }
@@ -181,6 +191,7 @@ public class EventService
                             {
                                 if (eventDetails == null)
                                 {
+                                    Timber.d("EventDetails null for " + eventId);
                                     EventDetailsApiRequest request = new EventDetailsApiRequest(eventId);
                                     return eventApi.getEventDetails(request)
                                             .map(new Func1<EventDetailsApiResponse, EventDetails>()
@@ -197,13 +208,14 @@ public class EventService
                                                 @Override
                                                 public void call(EventDetails eventDetails)
                                                 {
-                                                    eventCache.save(eventDetails);
+                                                    eventCache.saveDetails(eventDetails);
                                                 }
                                             })
                                             .observeOn(Schedulers.newThread());
                                 }
                                 else
                                 {
+                                    Timber.d("EventDetails in cache for " + eventId);
                                     return Observable.just(eventDetails);
                                 }
                             }
@@ -470,7 +482,7 @@ public class EventService
                     {
                         if (response.getStatus() == 200)
                         {
-                            eventCache.invalidate(eventId);
+                            eventCache.deleteCompletely(eventId);
                         }
                     }
                 });

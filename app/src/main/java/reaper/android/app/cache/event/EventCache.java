@@ -18,13 +18,13 @@ public interface EventCache
 
     void save(Event event);
 
-    void save(EventDetails eventDetails);
+    void saveDetails(EventDetails eventDetails);
 
-    void evict();
+    void deleteAll();
 
-    void invalidate(String eventId);
+    void delete(String eventId);
 
-    void invalidateCompletely(String eventId);
+    void deleteCompletely(String eventId);
 
     void markUpdated(List<String> eventIds);
 

@@ -16,14 +16,15 @@ import reaper.android.app.api.core.ApiManager;
 import reaper.android.app.api.me.MeApi;
 import reaper.android.app.api.me.request.UserZoneUpdatedApiRequest;
 import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.cache.old.event.EventCache;
-import reaper.android.app.cache.old.user.UserCache;
+import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Location;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshTrigger;
+import reaper.android.common.cache.Cache;
 import retrofit.client.Response;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -92,12 +93,12 @@ public class LocationService
                 Location oldLocation = getUserLocation();
                 if(!oldLocation.getZone().equalsIgnoreCase(location.getZone()))
                 {
-                    EventCache eventCache = new EventCache();
-                    eventCache.evict();
+                    EventCache eventCache = CacheManager.getEventCache();
+                    eventCache.deleteAll();
 
-                    UserCache userCache = new UserCache();
-                    userCache.evictFriendsCache();
-                    userCache.evictContactsCache();
+                    UserCache userCache = CacheManager.getUserCache();
+                    userCache.deleteFriends();
+                    userCache.deleteContacts();
                 }
             }
 

@@ -6,6 +6,8 @@ import android.util.Log;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import timber.log.Timber;
+
 public class DatabaseManager
 {
     private static final String TAG = "DatabaseManager";
@@ -25,14 +27,14 @@ public class DatabaseManager
     {
         instance = new DatabaseManager();
         sqliteCacheHelper = new SQLiteCacheHelper(context);
-        Log.d(TAG, "DatabaseManager initialized");
+        Timber.d("DatabaseManager initialized");
     }
 
     public static synchronized DatabaseManager getInstance()
     {
         if(instance == null)
         {
-            Log.e(TAG, "DatabaseManager not initialized");
+            Timber.e("DatabaseManager not initialized");
             throw new IllegalStateException("DatabaseManager not initialized");
         }
         return instance;

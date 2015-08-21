@@ -22,9 +22,10 @@ import java.util.Map;
 
 import reaper.android.R;
 import reaper.android.app.api.core.GsonProvider;
+import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.core.DatabaseManager;
-import reaper.android.app.cache.old.event.EventCache;
-import reaper.android.app.cache.old.user.UserCache;
+import reaper.android.app.cache.event.EventCache;
+import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.NotificationConstants;
 import reaper.android.app.service.EventService;
@@ -47,8 +48,8 @@ public class ListenerServiceGcm extends GcmListenerService
         bus = Communicator.getInstance().getBus();
         eventService = new EventService(bus);
         locationService = new LocationService(bus);
-        userCache = new UserCache();
-        eventCache = new EventCache();
+        userCache = CacheManager.getUserCache();
+        eventCache = CacheManager.getEventCache();
         type = new TypeToken<Map<String, String>>()
         {
         }.getType();
@@ -84,7 +85,7 @@ public class ListenerServiceGcm extends GcmListenerService
         }
         else if (notificationType.equals(NotificationConstants.EVENT_UPDATED))
         {
-            eventCache.invalidateCompletely(notificationAttributes.get("event_id"));
+            eventCache.deleteCompletely(notificationAttributes.get("event_id"));
             eventService.fetchEvent(notificationAttributes.get("event_id"), true);
 
             if (!checkIfAppRunningInForeground())
@@ -94,7 +95,7 @@ public class ListenerServiceGcm extends GcmListenerService
         }
         else if (notificationType.equals(NotificationConstants.FRIEND_RELOCATED))
         {
-            userCache.evictFriendsCache();
+            userCache.deleteFriends();
 
             String zone = notificationAttributes.get("zone");
             if (zone.equals(locationService.getUserLocation().getZone()))
@@ -105,7 +106,7 @@ public class ListenerServiceGcm extends GcmListenerService
         }
         else if (notificationType.equals(NotificationConstants.EVENT_INVITATION))
         {
-            eventCache.invalidateCompletely(notificationAttributes.get("event_id"));
+            eventCache.deleteCompletely(notificationAttributes.get("event_id"));
             eventService.fetchEvent(notificationAttributes.get("event_id"), true);
             buildNotification(message, NotificationConstants.INVITE_RECEIVED_TITLE, true, notificationAttributes.get("event_id"));
         }

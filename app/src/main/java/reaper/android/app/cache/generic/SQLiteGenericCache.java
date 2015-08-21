@@ -42,6 +42,7 @@ public class SQLiteGenericCache implements GenericCache
         databaseManager = DatabaseManager.getInstance();
         gson = GsonProvider.getGson();
         memoryStore = new HashMap<>();
+        Timber.d("SQLiteGenericCache initialized");
     }
 
     @Override
@@ -126,14 +127,22 @@ public class SQLiteGenericCache implements GenericCache
                         .query(SQLiteCacheContract.Generic.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
                 cursor.moveToFirst();
 
-                value = cursor.getString(0);
+                if (!cursor.isAfterLast())
+                {
+                    value = cursor.getString(0);
+                }
+                else
+                {
+                    Timber.d("Unable to find '" + key + "' in cache");
+                }
 
                 cursor.close();
                 databaseManager.closeConnection();
             }
             catch (Exception e)
             {
-                Timber.e("Error while reading key = " + key + " from cache [" + e.getMessage() + "]");
+                Timber.e("Error while reading key = " + key + " from cache [" + e
+                        .getMessage() + "]");
             }
         }
         return value;
