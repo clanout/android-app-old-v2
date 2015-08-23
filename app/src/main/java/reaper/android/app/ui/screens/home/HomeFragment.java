@@ -362,7 +362,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState)
             {
-                
+
             }
 
             @Override

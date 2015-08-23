@@ -2,7 +2,11 @@ package reaper.android.app.root;
 
 import android.app.Application;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -11,6 +15,9 @@ import com.google.android.gms.location.LocationServices;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.ThreadEnforcer;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import reaper.android.BuildConfig;
 import reaper.android.app.cache.core.CacheManager;
@@ -67,8 +74,7 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         if (value == null)
         {
             genericCache.put(key, "Hello, World!");
-        }
-        else
+        } else
         {
             Timber.d("[Cache Valid] " + key + " = " + value);
         }

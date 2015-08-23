@@ -82,7 +82,7 @@ public class LauncherActivity extends AppCompatActivity
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i)
                         {
-                            Toast.makeText(LauncherActivity.this, R.string.location_denied, Toast.LENGTH_LONG).show();
+                            Toast.makeText(LauncherActivity.this, R.string.trust_issues, Toast.LENGTH_LONG).show();
                             finish();
                         }
                     })
@@ -91,7 +91,7 @@ public class LauncherActivity extends AppCompatActivity
                         @Override
                         public void onCancel(DialogInterface dialogInterface)
                         {
-                            Toast.makeText(LauncherActivity.this, R.string.location_denied, Toast.LENGTH_LONG).show();
+                            Toast.makeText(LauncherActivity.this, R.string.trust_issues, Toast.LENGTH_LONG).show();
                             finish();
                         }
                     });

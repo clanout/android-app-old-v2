@@ -37,7 +37,7 @@
 
     <!-- Toast and Blank Screen Messages -->
 
-    <string name="location_denied">We don\'t like people with trust issues</string>
+    <string name="trust_issues">We don\'t like people with trust issues</string>
     <string name="location_not_found">Could not find the location. Please try again.</string>
 
     <string name="no_facebook_friends">None of your facebook friends are on the app. Invite people through whatsapp or share the app on facebook.</string>
@@ -68,4 +68,7 @@
     <string name="phone_invalid">Please enter a valid phone number.</string>
     <string name="add_phone_number">Please add your phone number to send/receive invites from your phone contacts</string>
 
+
+    <!-- Facebook -->
+    <string name="facebook_app_id">711701748936592</string>
 </resources>

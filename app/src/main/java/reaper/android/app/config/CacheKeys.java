@@ -8,6 +8,7 @@ public class CacheKeys
     public static final String USER_NAME = "user_name";
     public static final String USER_PHONE = "user_phone";
     public static final String USER_LOCATION = "user_location";
+    public static final String USER_PROFILE_PIC_URI = "user_profile_pic_uri";
 
 
     // User Cache
