@@ -9,7 +9,9 @@ import org.joda.time.DateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import reaper.android.app.api.core.ApiManager;
 import reaper.android.app.api.event.EventApi;
@@ -20,6 +22,7 @@ import reaper.android.app.api.event.request.EventDetailsApiRequest;
 import reaper.android.app.api.event.request.EventSuggestionsApiRequest;
 import reaper.android.app.api.event.request.EventsApiRequest;
 import reaper.android.app.api.event.request.FetchEventApiRequest;
+import reaper.android.app.api.event.request.FetchNewEventsAndUpdatesApiRequest;
 import reaper.android.app.api.event.request.InviteUsersApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
 import reaper.android.app.api.event.response.CreateEventApiResponse;
@@ -28,8 +31,10 @@ import reaper.android.app.api.event.response.EventDetailsApiResponse;
 import reaper.android.app.api.event.response.EventSuggestionsApiResponse;
 import reaper.android.app.api.event.response.EventsApiResponse;
 import reaper.android.app.api.event.response.FetchEventApiResponse;
+import reaper.android.app.api.event.response.FetchNewEventsAndUpdatesApiResponse;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
@@ -43,16 +48,20 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventCreatedTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventEditedTrigger;
+import reaper.android.app.trigger.event.EventIdsFetchedTrigger;
 import reaper.android.app.trigger.event.EventSuggestionsTrigger;
 import reaper.android.app.trigger.event.EventsFetchForActivityTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
+import reaper.android.app.trigger.event.NewEventsAndUpdatesFetchedTrigger;
 import reaper.android.common.cache.AppPreferences;
 import retrofit.client.Response;
 import rx.Observable;
+import rx.Scheduler;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -65,6 +74,7 @@ public class EventService
     private GCMService gcmService;
     private EventApi eventApi;
     private EventCache eventCache;
+    private GenericCache genericCache;
 
     public EventService(Bus bus)
     {
@@ -73,6 +83,7 @@ public class EventService
         gcmService = new GCMService(bus);
         eventApi = ApiManager.getInstance().getApi(EventApi.class);
         eventCache = CacheManager.getEventCache();
+        genericCache = CacheManager.getGenericCache();
     }
 
     public void fetchEvents(final String zone)
@@ -102,12 +113,12 @@ public class EventService
                                                 @Override
                                                 public void call(List<Event> events)
                                                 {
+                                                    genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now().toString());
                                                     eventCache.reset(events);
                                                 }
                                             })
                                             .subscribeOn(Schedulers.newThread());
-                                }
-                                else
+                                } else
                                 {
                                     return Observable.just(events);
                                 }
@@ -150,7 +161,6 @@ public class EventService
                             {
                                 if (events.isEmpty())
                                 {
-                                    Log.d("APP", "events in cache are empty");
                                     EventsApiRequest request = new EventsApiRequest(zone);
                                     return eventApi.getEvents(request)
                                             .map(new Func1<EventsApiResponse, List<Event>>()
@@ -158,7 +168,6 @@ public class EventService
                                                 @Override
                                                 public List<Event> call(EventsApiResponse eventsApiResponse)
                                                 {
-                                                    Log.d("APP", "events from api call ---- " + eventsApiResponse.getEvents());
                                                     return eventsApiResponse.getEvents();
                                                 }
 
@@ -168,14 +177,13 @@ public class EventService
                                                 @Override
                                                 public void call(List<Event> events)
                                                 {
+                                                    genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now().toString());
                                                     eventCache.reset(events);
                                                 }
                                             })
                                             .subscribeOn(Schedulers.newThread());
-                                }
-                                else
+                                } else
                                 {
-                                    Log.d("APP", "event from cache ----- " + events);
                                     return Observable.just(events);
                                 }
                             }
@@ -194,14 +202,12 @@ public class EventService
                     @Override
                     public void onError(Throwable e)
                     {
-                        Log.d("APP", "EVentsFetchForActivityError---- " + e.getMessage());
                         bus.post(new GenericErrorTrigger(ErrorCode.EVENTS_FETCH_FOR_ACTIVITY_FAILURE, (Exception) e));
                     }
 
                     @Override
                     public void onNext(List<Event> events)
                     {
-                        Log.d("APP", "EVentsFetchForActivityonNext");
                         bus.post(new EventsFetchForActivityTrigger(events));
                     }
                 });
@@ -250,6 +256,122 @@ public class EventService
                 });
     }
 
+    public void fetchNewEventsAndUpdatesFromNetwork(String zone, final List<String> eventIdList, String lastUpdateTimestamp)
+    {
+        Observable<FetchNewEventsAndUpdatesApiResponse> updatesObservable = eventApi.fetchNewEventsAndUpdates(new FetchNewEventsAndUpdatesApiRequest(zone, eventIdList, lastUpdateTimestamp));
+        Observable<List<Event>> cachedEventsObservable = eventCache.getEvents();
+
+        Observable<List<Event>> updatedObservable =
+                Observable.zip(updatesObservable, cachedEventsObservable, new Func2<FetchNewEventsAndUpdatesApiResponse, List<Event>, List<Event>>()
+                {
+                    @Override
+                    public List<Event> call(FetchNewEventsAndUpdatesApiResponse response, List<Event> events)
+                    {
+                        List<Event> newEventList = response.getNewEventsList();
+                        List<String> deletedEventIdList = response.getDeletedEventIdList();
+                        List<Event> updatedEventList = response.getUpdatedEventList();
+
+                        for (String deletedEventId : deletedEventIdList)
+                        {
+                            Event deletedEvent = new Event();
+                            deletedEvent.setId(deletedEventId);
+
+                            if (events.contains(deletedEvent))
+                            {
+                                events.remove(deletedEvent);
+                            }
+                        }
+
+                        for (Event updatedEvent : updatedEventList)
+                        {
+                            if (events.contains(updatedEvent))
+                            {
+                                int index = events.indexOf(updatedEvent);
+                                if (index >= 0)
+                                {
+                                    if (!updatedEvent.isEqualTo(events.get(index)))
+                                    {
+                                        events.set(index, updatedEvent);
+                                    } else
+                                    {
+                                    }
+                                }
+                            }
+                        }
+
+                        events.addAll(newEventList);
+
+                        return events;
+                    }
+                });
+
+        updatedObservable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Event>>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        bus.post(new GenericErrorTrigger(ErrorCode.NEW_EVENTS_AND_UPDATES_FETCH_FAILURE, (Exception) e));
+                    }
+
+                    @Override
+                    public void onNext(List<Event> events)
+                    {
+                        genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now().toString());
+                        eventCache.reset(events);
+                        bus.post(new NewEventsAndUpdatesFetchedTrigger(events));
+                    }
+                });
+    }
+
+    public void getAllEventIds()
+    {
+        eventCache.getEvents()
+                .map(new Func1<List<Event>, List<String>>()
+                {
+                    @Override
+                    public List<String> call(List<Event> events)
+                    {
+                        List<String> eventIds = new ArrayList<String>(events.size());
+                        for (Event event : events)
+                        {
+                            Log.d("APP", "getting event ids on thread ---- " + Thread.currentThread().getName());
+                            eventIds.add(event.getId());
+                        }
+                        return eventIds;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<String>>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.d("APP", "on error while getting event ids" + e.getMessage());
+                        bus.post(new GenericErrorTrigger(ErrorCode.EVENT_IDS_FETCH_FAILURE, (Exception) e));
+                    }
+
+                    @Override
+                    public void onNext(List<String> strings)
+                    {
+                        Log.d("APP", "on Next event ids fetched ---- " + strings);
+                        bus.post(new EventIdsFetchedTrigger(strings));
+                    }
+                });
+    }
+
     public void fetchEventDetails(final String eventId)
     {
         final long startTime = System.currentTimeMillis();
@@ -283,8 +405,7 @@ public class EventService
                                                 }
                                             })
                                             .observeOn(Schedulers.newThread());
-                                }
-                                else
+                                } else
                                 {
                                     Timber.d("EventDetails in cache for " + eventId);
                                     return Observable.just(eventDetails);
@@ -319,36 +440,6 @@ public class EventService
                 });
     }
 
-//    public List<String> getUpdatedEvents()
-//    {
-//        return eventCache.getEvents()
-//                         .flatMap(new Func1<List<Event>, Observable<String>>()
-//                         {
-//                             @Override
-//                             public Observable<String> call(final List<Event> events)
-//                             {
-//                                 return Observable.create(new Observable.OnSubscribe<String>()
-//                                 {
-//                                     @Override
-//                                     public void call(Subscriber<? super String> subscriber)
-//                                     {
-//                                         for (Event event : events)
-//                                         {
-//                                             if (event.isUpdated())
-//                                             {
-//                                                 subscriber.onNext(event.getId());
-//                                             }
-//                                         }
-//                                         subscriber.onCompleted();
-//                                     }
-//                                 });
-//                             }
-//                         })
-//                         .toList()
-//                         .toBlocking()
-//                         .first();
-//    }
-
     public void updateRsvp(final Event updatedEvent, final Event.RSVP oldRsvp)
     {
         RsvpUpdateApiRequest request = new RsvpUpdateApiRequest(updatedEvent.getId(), updatedEvent
@@ -380,8 +471,7 @@ public class EventService
                         {
                             eventCache.save(updatedEvent);
                             handleTopicSubscription(updatedEvent);
-                        }
-                        else
+                        } else
                         {
                             updatedEvent.setRsvp(oldRsvp);
                             handleTopicSubscription(updatedEvent);
@@ -396,8 +486,7 @@ public class EventService
         if (updatedEvent.getRsvp() == Event.RSVP.NO)
         {
             gcmService.unsubscribeTopic(AppPreferences.get(Reaper.getReaperContext(), CacheKeys.GCM_TOKEN), updatedEvent.getId());
-        }
-        else
+        } else
         {
             gcmService.subscribeTopic(AppPreferences.get(Reaper.getReaperContext(), CacheKeys.GCM_TOKEN), updatedEvent.getId());
         }
@@ -554,6 +643,11 @@ public class EventService
                         if (response.getStatus() == 200)
                         {
                             eventCache.deleteCompletely(eventId);
+
+                            if (AppPreferences.get(Reaper.getReaperContext(), CacheKeys.GCM_TOKEN) != null)
+                            {
+                                gcmService.unsubscribeTopic(AppPreferences.get(Reaper.getReaperContext(), CacheKeys.GCM_TOKEN), eventId);
+                            }
                         }
                     }
                 });
@@ -590,120 +684,4 @@ public class EventService
                 });
     }
 
-//    public void fetchEventUpdates(String zone, DateTime lastUpdated)
-//    {
-//        EventUpdatesApiRequest request = new EventUpdatesApiRequest(zone, lastUpdated);
-//        eventApi.getEventUpdates(request, new Callback<EventUpdatesApiResponse>()
-//        {
-//            @Override
-//            public void success(EventUpdatesApiResponse eventUpdatesApiResponse, Response response)
-//            {
-//                List<Event> updates = eventUpdatesApiResponse.getUpdates();
-//                if (updates.size() > 0)
-//                {
-//                    List<Event> events = updateEventsCache(updates, true);
-//                    bus.post(new EventUpdatesFetchTrigger(events));
-//                }
-//                else
-//                {
-//                    bus.post(new EventUpdatesFetchTrigger(null));
-//                }
-//            }
-//
-//            @Override
-//            public void failure(RetrofitError error)
-//            {
-//                bus.post(new GenericErrorTrigger(ErrorCode.EVENT_UPDATES_FETCH_FAILURE, error));
-//            }
-//        });
-//    }
-//
-//    public void updateCacheFor(Event event)
-//    {
-//        Cache cache = Cache.getInstance();
-//        Map<String, Event> eventMap = (Map<String, Event>) cache.get(CacheKeys.EVENTS);
-//        if (eventMap != null)
-//        {
-//            eventMap.put(event.getId(), event);
-//            cache.put(CacheKeys.EVENTS, eventMap);
-//            bus.post(new CacheCommitTrigger());
-//        }
-//    }
-//
-//    public void deleteCacheFor(Event event)
-//    {
-//        Cache cache = Cache.getInstance();
-//        Map<String, Event> eventMap = (Map<String, Event>) cache.get(CacheKeys.EVENTS);
-//        if (eventMap != null)
-//        {
-//            eventMap.remove(event.getId());
-//            cache.put(CacheKeys.EVENTS, eventMap);
-//            bus.post(new CacheCommitTrigger());
-//        }
-//    }
-//
-//    public void deleteEventDetailsCacheFor(String eventId)
-//    {
-//        Cache cache = Cache.getInstance();
-//        cache.remove(CacheKeys.eventDetails(eventId));
-//    }
-//
-//    private List<Event> updateEventsCache(List<Event> events, boolean append)
-//    {
-//        Cache cache = Cache.getInstance();
-//
-//        if (append)
-//        {
-//            Map<String, Event> eventMap = (Map<String, Event>) cache.get(CacheKeys.EVENTS);
-//            List<String> eventUpdates = (List<String>) cache.get(CacheKeys.EVENTS_UPDATES);
-//
-//            if (eventMap == null)
-//            {
-//                eventMap = new HashMap<>();
-//            }
-//            if (eventUpdates == null)
-//            {
-//                eventUpdates = new ArrayList<>();
-//            }
-//
-//            for (Event event : events)
-//            {
-//                String eventId = event.getId();
-//                if (eventMap.containsKey(eventId))
-//                {
-//                    eventUpdates.add(eventId);
-//                }
-//
-//                eventMap.put(eventId, event);
-//            }
-//
-//            DateTime time = DateTime.now();
-//
-//            cache.put(CacheKeys.EVENTS, eventMap);
-//            cache.put(CacheKeys.EVENTS_UPDATES, eventUpdates);
-//            cache.put(CacheKeys.EVENTS_TIMESTAMP, time);
-//
-//            bus.post(new CacheCommitTrigger());
-//
-//            return new ArrayList<>(eventMap.values());
-//        }
-//        else
-//        {
-//            Map<String, Event> eventMap = new HashMap<>();
-//            for (Event event : events)
-//            {
-//                eventMap.put(event.getId(), event);
-//            }
-//
-//            DateTime time = DateTime.now();
-//
-//            cache.put(CacheKeys.EVENTS, eventMap);
-//            cache.put(CacheKeys.EVENTS_UPDATES, new ArrayList<String>());
-//            cache.put(CacheKeys.EVENTS_TIMESTAMP, time);
-//
-//            bus.post(new CacheCommitTrigger());
-//
-//            return events;
-//        }
-//    }
 }

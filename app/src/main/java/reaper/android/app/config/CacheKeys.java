@@ -16,4 +16,6 @@ public class CacheKeys
 
     public static final String GCM_TOKEN = "gcm_token";
     public static final String GCM_TOKEN_SENT_TO_SERVER = "gcm_token_sent_to_server";
+
+    public static final String LAST_UPDATE_TIMESTAMP = "last_update_timestamp";
 }

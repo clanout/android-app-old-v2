@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Theme -->
-    <color name="primary">#3F51B5</color>
-    <color name="primary_dark">#303F9F</color>
+    <color name="primary">#E53935</color>
+    <color name="primary_dark">#C62828</color>
     <color name="primary_light">#C5CAE9</color>
-    <color name="accent">#F44336</color>
+    <color name="accent">#ff4081</color>
     <color name="accent_secondary">#EF9A9A</color>
 
     <!-- Background -->

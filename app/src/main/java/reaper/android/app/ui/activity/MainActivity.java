@@ -13,13 +13,21 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.event.EventCache;
+import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.NotificationConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.GCMService;
@@ -27,6 +35,7 @@ import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.common.CacheCommitTrigger;
+import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchForActivityTrigger;
 import reaper.android.app.trigger.gcm.GcmRegistrationCompleteTrigger;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
@@ -46,7 +55,12 @@ public class MainActivity extends AppCompatActivity
     private EventService eventService;
     private LocationService locationService;
 
+    private GenericCache genericCache;
+    private EventCache eventCache;
+    private UserCache userCache;
+
     private String eventId;
+    private boolean isBusRegistered;
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
@@ -62,11 +76,17 @@ public class MainActivity extends AppCompatActivity
 
         bus = Communicator.getInstance().getBus();
         bus.register(this);
+        isBusRegistered = true;
+
         userService = new UserService(bus);
         gcmService = new GCMService(bus);
         eventService = new EventService(bus);
         locationService = new LocationService(bus);
         fragmentManager = getSupportFragmentManager();
+
+        genericCache = CacheManager.getGenericCache();
+        eventCache = CacheManager.getEventCache();
+        userCache = CacheManager.getUserCache();
 
         String shouldGoToDetailsFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);
         eventId = getIntent().getStringExtra("event_id");
@@ -76,6 +96,22 @@ public class MainActivity extends AppCompatActivity
             eventService.fetchEventsForActivity(locationService.getUserLocation().getZone());
         } else
         {
+            String lastNotificationReceived = genericCache.get(NotificationConstants.NOTIFICATION_RECEIVED_TIMESTAMP);
+            String lastFriendRelocatedNotificationReceived = genericCache.get(NotificationConstants.FRIEND_RELOCATED_NOTIFICATION_TIMESTAMP);
+
+            DateTime lastNotificationTimestamp = DateTime.parse(lastNotificationReceived);
+            DateTime lastFriendRelocatedNotificationTimestamp = DateTime.parse(lastFriendRelocatedNotificationReceived);
+
+            if (DateTime.now().getMillis() - lastNotificationTimestamp.getMillis() > NotificationConstants.NOTIFICATION_NOT_RECEIVED_LIMIT)
+            {
+                eventCache.deleteAll();
+            }
+
+            if (DateTime.now().getMillis() - lastFriendRelocatedNotificationTimestamp.getMillis() > NotificationConstants.FRIEND_RELOCATED_NOTIFICATION_NOT_RECEIVED_LIMIT)
+            {
+                userCache.deleteFriends();
+            }
+
             if (AppPreferences.get(this, CacheKeys.GCM_TOKEN) == null)
             {
                 if (checkPlayServices())
@@ -94,6 +130,11 @@ public class MainActivity extends AppCompatActivity
     protected void onStart()
     {
         super.onStart();
+
+        if (!isBusRegistered)
+        {
+            bus.register(this);
+        }
         getSupportActionBar().setTitle("reap3r");
     }
 
@@ -103,6 +144,7 @@ public class MainActivity extends AppCompatActivity
         super.onStop();
         Communicator.getInstance().getBus().post(new CacheCommitTrigger());
         bus.unregister(this);
+        isBusRegistered = false;
     }
 
     @Override
@@ -189,7 +231,8 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onEventsFetched(EventsFetchForActivityTrigger trigger)
     {
-        Log.d("APP", "onEventsFetchedTriggerForActivity");
+        ChatHelper.init(userService.getActiveUserId());
+
         List<Event> eventList = trigger.getEvents();
 
         Event activeEvent = new Event();
@@ -203,5 +246,23 @@ public class MainActivity extends AppCompatActivity
         bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
         eventDetailsContainerFragment.setArguments(bundle);
         FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment);
+    }
+
+    @Subscribe
+    public void onEventsNotFetched(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.EVENTS_FETCH_FOR_ACTIVITY_FAILURE)
+        {
+            ChatHelper.init(userService.getActiveUserId());
+
+            runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
+                }
+            });
+        }
     }
 }

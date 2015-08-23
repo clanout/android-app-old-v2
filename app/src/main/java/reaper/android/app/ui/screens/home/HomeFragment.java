@@ -43,6 +43,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import reaper.android.R;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.event.EventCache;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
@@ -58,9 +61,11 @@ import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.common.ViewPagerStateChangedTrigger;
 import reaper.android.app.trigger.event.EventClickTrigger;
+import reaper.android.app.trigger.event.EventIdsFetchedTrigger;
 import reaper.android.app.trigger.event.EventUpdatesFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.event.NewEventAddedTrigger;
+import reaper.android.app.trigger.event.NewEventsAndUpdatesFetchedTrigger;
 import reaper.android.app.trigger.event.RsvpChangeTrigger;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.create.CreateEventFragment;
@@ -84,6 +89,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     private EventService eventService;
     private LocationService locationService;
 
+    //Cache
+    private GenericCache genericCache;
+    private EventCache eventCache;
+
     // Data
     private List<Event> events;
     private Location userLocation;
@@ -103,8 +112,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     @Override
     public void onRefresh()
     {
-        Toast.makeText(getActivity(), "Swiped", Toast.LENGTH_LONG).show();
-        swipeRefreshLayout.setRefreshing(false);
+        eventService.getAllEventIds();
     }
 
     private enum Sort implements Serializable
@@ -153,6 +161,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         userService = new UserService(bus);
         eventService = new EventService(bus);
         locationService = new LocationService(bus);
+
+        genericCache = CacheManager.getGenericCache();
+        eventCache = CacheManager.getEventCache();
 
         filterButton.setText(R.string.filter_all);
         sortButton.setText(R.string.sort_relevance);
@@ -296,6 +307,50 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         snackbar.show();
     }
 
+    @Subscribe
+    public void onEventIdsFetched(EventIdsFetchedTrigger trigger)
+    {
+        if (genericCache.get(CacheKeys.LAST_UPDATE_TIMESTAMP) != null)
+        {
+            eventService.fetchNewEventsAndUpdatesFromNetwork(locationService.getUserLocation().getZone(), trigger.getEventIdList(), genericCache.get(CacheKeys.LAST_UPDATE_TIMESTAMP));
+        } else
+        {
+            genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now().toString());
+        }
+    }
+
+    @Subscribe
+    public void OnEventIdsNotFetched(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.EVENT_IDS_FETCH_FAILURE)
+        {
+            displayErrorView();
+        }
+    }
+
+    @Subscribe
+    public void onNewEventsAndUpdatesFetched(NewEventsAndUpdatesFetchedTrigger trigger)
+    {
+        events = trigger.getEventList();
+
+        sort = Sort.RELEVANCE;
+        filter = Filter.ALL;
+        filterButton.setText("ALL EVENTS");
+        sortButton.setText("RELEVANCE");
+
+        refreshRecyclerView();
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    @Subscribe
+    public void onNewEventsAndUpdatesNotFetched(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.NEW_EVENTS_AND_UPDATES_FETCH_FAILURE)
+        {
+            displayErrorView();
+        }
+    }
+
     private void initRecyclerView()
     {
         eventList.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -307,6 +362,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState)
             {
+                
             }
 
             @Override

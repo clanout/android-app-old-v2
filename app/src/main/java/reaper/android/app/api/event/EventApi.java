@@ -8,6 +8,7 @@ import reaper.android.app.api.event.request.EventSuggestionsApiRequest;
 import reaper.android.app.api.event.request.EventUpdatesApiRequest;
 import reaper.android.app.api.event.request.EventsApiRequest;
 import reaper.android.app.api.event.request.FetchEventApiRequest;
+import reaper.android.app.api.event.request.FetchNewEventsAndUpdatesApiRequest;
 import reaper.android.app.api.event.request.InviteUsersApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
 import reaper.android.app.api.event.response.CreateEventApiResponse;
@@ -17,6 +18,7 @@ import reaper.android.app.api.event.response.EventSuggestionsApiResponse;
 import reaper.android.app.api.event.response.EventUpdatesApiResponse;
 import reaper.android.app.api.event.response.EventsApiResponse;
 import reaper.android.app.api.event.response.FetchEventApiResponse;
+import reaper.android.app.api.event.response.FetchNewEventsAndUpdatesApiResponse;
 import reaper.android.app.model.EventDetails;
 import retrofit.Callback;
 import retrofit.client.Response;
@@ -55,4 +57,7 @@ public interface EventApi
 
     @POST("/event")
     Observable<FetchEventApiResponse> fetchEvent(@Body FetchEventApiRequest request);
+
+    @POST("/event/updates")
+    Observable<FetchNewEventsAndUpdatesApiResponse> fetchNewEventsAndUpdates(@Body FetchNewEventsAndUpdatesApiRequest request);
 }

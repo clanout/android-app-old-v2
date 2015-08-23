@@ -1,9 +1,12 @@
 package reaper.android.app.model;
 
+import com.google.gson.Gson;
+
 import org.joda.time.DateTime;
 
 import java.util.Comparator;
 
+import reaper.android.app.api.core.GsonProvider;
 import reaper.android.app.model.core.Model;
 
 public class Event implements Model
@@ -233,15 +236,13 @@ public class Event implements Model
         if (!(o instanceof Event))
         {
             return false;
-        }
-        else
+        } else
         {
             Event other = (Event) o;
             if (id.equals(other.id))
             {
                 return true;
-            }
-            else
+            } else
             {
                 return false;
             }
@@ -252,5 +253,17 @@ public class Event implements Model
     public String toString()
     {
         return title;
+    }
+
+    public boolean isEqualTo(Event event)
+    {
+        Gson gson = GsonProvider.getGson();
+        if (gson.toJson(event).equals(gson.toJson(this)))
+        {
+            return true;
+        } else
+        {
+            return false;
+        }
     }
 }

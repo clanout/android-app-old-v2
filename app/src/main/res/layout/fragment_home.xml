@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:orientation="vertical">
+              android:orientation="vertical"
+              >
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/srl_home"
@@ -41,7 +42,7 @@
         android:id="@+id/ll_home_btn_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/primary"
+        android:background="@color/primary_dark"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -51,6 +52,7 @@
 
             <Button
                 android:id="@+id/btn_home_sort"
+
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/custom_button_background"
