@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -22,6 +23,8 @@ import android.widget.Toast;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 
 import reaper.android.R;
@@ -30,11 +33,15 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Friend;
 import reaper.android.app.service.AccountsService;
+import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
-import reaper.android.app.trigger.user.AllFacebookFriendsFetchedTrigger;
+import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
+import reaper.android.app.trigger.user.AllAppFriendsFetchedTrigger;
+import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.communicator.Communicator;
@@ -45,9 +52,11 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     private TextView noFriendsMessage;
     private ImageButton done;
     private FloatingActionButton shareFacebook, inviteWhatsapp;
+    private Menu menu;
 
     private ManageFriendsAdapter manageFriendsAdapter;
     private UserService userService;
+    private FacebookService facebookService;
     private Bus bus;
     private FragmentManager fragmentManager;
 
@@ -92,6 +101,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
 
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
+        facebookService = new FacebookService(bus);
         genericCache = CacheManager.getGenericCache();
         fragmentManager = getActivity().getSupportFragmentManager();
 
@@ -115,7 +125,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.MANAGE_FRIENDS);
         bus.register(this);
-        userService.getAllFacebookFriends();
+        userService.getAllAppFriends();
     }
 
     @Override
@@ -161,6 +171,8 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
         menu.clear();
         inflater.inflate(R.menu.action_button, menu);
 
+        this.menu = menu;
+
         menu.findItem(R.id.action_account).setVisible(false);
         menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
@@ -169,7 +181,18 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
-        menu.findItem(R.id.action_refresh).setVisible(false);
+        menu.findItem(R.id.action_refresh).setVisible(true);
+
+        menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                item.setActionView(R.layout.action_button_refreshing);
+                facebookService.getFacebookFriends(false);
+                return true;
+            }
+        });
     }
 
     private void initRecyclerView()
@@ -190,26 +213,79 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
         {
             displayNoFriendsView();
 
-        }
-        else
+        } else
         {
             displayBasicView();
         }
     }
 
     @Subscribe
-    public void onAllFacebookFriendsFetched(AllFacebookFriendsFetchedTrigger trigger)
+    public void onFacebookFriendsUpdatedOnServer(FacebookFriendsUpdatedOnServerTrigger trigger)
     {
-        friendList = (ArrayList<Friend>) trigger.getFriends();
+        if(!trigger.isPolling())
+        {
+            userService.getAllAppFriends();
+            genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now().toString());
+        }
+    }
 
+    @Subscribe
+    public void onFacebookFriendsNotUpdatedOnServer(GenericErrorTrigger trigger)
+    {
+        if(trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE)
+        {
+            if(menu != null)
+            {
+                menu.findItem(R.id.action_refresh).setActionView(null);
+            }
+            displayErrorView();
+        }
+    }
+
+    @Subscribe
+    public void onFacebookFriendsIdFetched(FacebookFriendsIdFetchedTrigger trigger)
+    {
+        if (!trigger.isPolling())
+        {
+            userService.updateFacebookFriends(trigger.getFriendsIdList(), trigger.isPolling());
+        }
+    }
+
+    @Subscribe
+    public void onFacebookFriendsIdNotFetched(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE)
+        {
+            if(menu != null)
+            {
+                menu.findItem(R.id.action_refresh).setActionView(null);
+            }
+            displayErrorView();
+        }
+    }
+
+    @Subscribe
+    public void onAllAppFriendsFetched(AllAppFriendsFetchedTrigger trigger)
+    {
+        if(menu != null)
+        {
+            menu.findItem(R.id.action_refresh).setActionView(null);
+        }
+
+        friendList = (ArrayList<Friend>) trigger.getFriends();
         refreshRecyclerView();
     }
 
     @Subscribe
-    public void onFacebookFriendsNotFetched(GenericErrorTrigger trigger)
+    public void onAllAppFriendsNotFetched(GenericErrorTrigger trigger)
     {
-        if (trigger.getErrorCode() == ErrorCode.ALL_FACEBOOK_FRIENDS_FETCH_FAILURE)
+        if (trigger.getErrorCode() == ErrorCode.USER_ALL_APP_FRIENDS_FETCH_FAILURE)
         {
+            if(menu != null)
+            {
+                menu.findItem(R.id.action_refresh).setActionView(null);
+            }
+
             displayErrorView();
         }
     }
@@ -222,8 +298,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
         {
             userService.sendBlockRequests(blockList, unblockList);
             FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
-        }
-        else if (view.getId() == R.id.fib_fragment_manage_friends_invite_people_whatsapp)
+        } else if (view.getId() == R.id.fib_fragment_manage_friends_invite_people_whatsapp)
         {
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
             if (isWhatsappInstalled)
@@ -234,12 +309,11 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
                 intent.setType("text/plain");
                 intent.putExtra(Intent.EXTRA_TEXT, R.string.whatsapp_message);
                 startActivity(intent);
-            }
-            else
+            } else
             {
                 Toast.makeText(getActivity(), R.string.whatsapp_not_installed, Toast.LENGTH_LONG).show();
             }
-        }else if(view.getId() == R.id.fib_fragment_manage_friends_share_facebook)
+        } else if (view.getId() == R.id.fib_fragment_manage_friends_share_facebook)
         {
             Toast.makeText(getActivity(), "Facebook", Toast.LENGTH_LONG).show();
         }
@@ -259,8 +333,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
             {
                 unblockList.remove(id);
                 blockList.add(id);
-            }
-            else
+            } else
             {
                 unblockList.add(id);
 
@@ -269,15 +342,13 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
                     blockList.remove(id);
                 }
             }
-        }
-        else
+        } else
         {
             if (blockList.contains(id))
             {
                 blockList.remove(id);
                 unblockList.add(id);
-            }
-            else
+            } else
             {
                 unblockList.remove(id);
                 blockList.add(id);

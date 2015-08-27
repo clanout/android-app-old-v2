@@ -12,12 +12,18 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.ThreadEnforcer;
 
+import org.joda.time.DateTime;
+
 import reaper.android.BuildConfig;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.core.DatabaseManager;
 import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.config.Timestamps;
 import reaper.android.app.service.LocationService;
+import reaper.android.app.service.UserService;
+import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.gcm.GcmregistrationIntentTrigger;
+import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshRequestTrigger;
 import reaper.android.common.communicator.Communicator;
 import reaper.android.common.gcm.RegistrationIntentService;
@@ -32,6 +38,9 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
 
     // Services
     private LocationService locationService;
+    private UserService userService;
+
+    private GenericCache genericCache;
 
     @Override
     public void onCreate()
@@ -69,6 +78,10 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         }
 
         locationService = new LocationService(bus);
+        userService = new UserService(bus);
+
+        genericCache = CacheManager.getGenericCache();
+
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -90,6 +103,27 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     {
         Intent intent = new Intent(this, RegistrationIntentService.class);
         startService(intent);
+    }
+
+    @Subscribe
+    public void onFacebookFriendsIdFetched(FacebookFriendsIdFetchedTrigger trigger)
+    {
+        if(trigger.isPolling())
+        {
+            Log.d("APP", "updating friends in application");
+            userService.updateFacebookFriends(trigger.getFriendsIdList(), trigger.isPolling());
+        }
+    }
+
+    @Subscribe
+    public void onFacebookFriendsUpdatedOnServer(FacebookFriendsUpdatedOnServerTrigger trigger)
+    {
+        if(trigger.isPolling())
+        {
+            Log.d("APP", "friends updated on server");
+            genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now().toString());
+            Log.d("APP", "timestamp after updating ------ " + genericCache.get(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP));
+        }
     }
 
 

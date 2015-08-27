@@ -4,11 +4,11 @@ import java.util.List;
 
 import reaper.android.app.model.Friend;
 
-public class FacebookFriendsFetchedTrigger
+public class AppFriendsFetchedTrigger
 {
     private List<Friend> friends;
 
-    public FacebookFriendsFetchedTrigger(List<Friend> friends)
+    public AppFriendsFetchedTrigger(List<Friend> friends)
     {
         this.friends = friends;
     }

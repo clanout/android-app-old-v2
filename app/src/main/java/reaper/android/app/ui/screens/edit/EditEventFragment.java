@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -66,7 +65,7 @@ import reaper.android.app.ui.screens.create.EventSuggestionsAdapter;
 import reaper.android.app.ui.screens.create.GooglePlacesAutocompleteAdapter;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
-import reaper.android.app.ui.util.EventUtils;
+import reaper.android.app.ui.util.event.EventUtils;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.communicator.Communicator;
 

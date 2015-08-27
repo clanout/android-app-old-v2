@@ -252,12 +252,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     }
 
     @Subscribe
-    public void onRsvpChangeTrigger(RsvpChangeTrigger rsvpChangeTrigger)
+    public void onRsvpChanged(RsvpChangeTrigger rsvpChangeTrigger)
     {
         Event updatedEvent = rsvpChangeTrigger.getUpdatedEvent();
         Event.RSVP oldRsvp = rsvpChangeTrigger.getOldRsvp();
 
-        eventService.updateRsvp(updatedEvent, oldRsvp);
+        eventService.updateRsvp(updatedEvent, oldRsvp, true);
     }
 
     @Subscribe
@@ -268,7 +268,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         if (code == ErrorCode.RSVP_UPDATE_FAILURE)
         {
             Toast.makeText(getActivity(), R.string.message_rsvp_update_failure, Toast.LENGTH_LONG).show();
-            refreshRecyclerView();
+            eventService.fetchEvents(locationService.getUserLocation().getZone());
         }
     }
 
@@ -352,7 +352,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     private void initRecyclerView()
     {
         eventList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        eventsAdapter = new EventsAdapter(bus, new ArrayList<Event>());
+        eventsAdapter = new EventsAdapter(bus, new ArrayList<Event>(), getActivity());
         eventList.setAdapter(eventsAdapter);
 
         eventList.addOnScrollListener(new RecyclerView.OnScrollListener()
@@ -408,7 +408,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
 
         if (filter == Filter.ALL)
         {
-            eventsAdapter = new EventsAdapter(bus, events);
+            eventsAdapter = new EventsAdapter(bus, events, getActivity());
             eventList.setAdapter(eventsAdapter);
         } else
         {
@@ -428,7 +428,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
                 displayNoEventsView();
             } else
             {
-                eventsAdapter = new EventsAdapter(bus, visibleEvents);
+                eventsAdapter = new EventsAdapter(bus, visibleEvents, getActivity());
                 eventList.setAdapter(eventsAdapter);
             }
         }

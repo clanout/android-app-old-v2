@@ -17,7 +17,7 @@ import java.util.List;
 import reaper.android.R;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
-import reaper.android.app.trigger.user.ManageFacebookFriendsTrigger;
+import reaper.android.app.trigger.user.ManageAppFriendsTrigger;
 import reaper.android.app.trigger.user.ManagePhoneContactsTrigger;
 
 /**
@@ -123,7 +123,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
         {
             if (isFacebookAdapter)
             {
-               bus.post(new ManageFacebookFriendsTrigger(friends.get(getAdapterPosition()).getId()));
+               bus.post(new ManageAppFriendsTrigger(friends.get(getAdapterPosition()).getId()));
             }
             else
             {

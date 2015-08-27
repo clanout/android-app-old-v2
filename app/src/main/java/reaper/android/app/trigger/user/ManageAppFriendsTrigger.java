@@ -1,10 +1,10 @@
 package reaper.android.app.trigger.user;
 
-public class ManageFacebookFriendsTrigger
+public class ManageAppFriendsTrigger
 {
     private String id;
 
-    public ManageFacebookFriendsTrigger(String id)
+    public ManageAppFriendsTrigger(String id)
     {
         this.id = id;
     }

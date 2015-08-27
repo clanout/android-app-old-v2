@@ -4,12 +4,12 @@ import com.google.gson.annotations.SerializedName;
 
 import reaper.android.app.api.core.ApiRequest;
 
-public class GetFacebookFriendsApiRequest extends ApiRequest
+public class GetAppFriendsApiRequest extends ApiRequest
 {
     @SerializedName("zone")
     private String zone;
 
-    public GetFacebookFriendsApiRequest(String zone)
+    public GetAppFriendsApiRequest(String zone)
     {
         this.zone = zone;
     }

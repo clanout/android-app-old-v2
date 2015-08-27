@@ -6,7 +6,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +30,7 @@ import reaper.android.app.service.LocationService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
-import reaper.android.app.trigger.user.ManageFacebookFriendsTrigger;
+import reaper.android.app.trigger.user.ManageAppFriendsTrigger;
 import reaper.android.app.trigger.user.ManagePhoneContactsTrigger;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
@@ -166,7 +165,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     }
 
     @Subscribe
-    public void onManageFacebookFriendsTriggerReceived(ManageFacebookFriendsTrigger trigger)
+    public void onManageFacebookFriendsTriggerReceived(ManageAppFriendsTrigger trigger)
     {
         if (invitedFacebookFriends.contains(trigger.getId()))
         {

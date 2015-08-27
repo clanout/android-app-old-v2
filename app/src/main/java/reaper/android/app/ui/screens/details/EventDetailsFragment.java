@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -32,19 +33,23 @@ import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.config.BundleKeys;
+import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.ChangeAttendeeListTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
+import reaper.android.app.trigger.event.EventRsvpNotChangedTrigger;
 import reaper.android.app.ui.screens.edit.EditEventFragment;
-import reaper.android.app.ui.util.EventUtils;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.app.ui.util.event.EventUtils;
+import reaper.android.app.ui.util.event.EventUtilsConstants;
 import reaper.android.common.communicator.Communicator;
 
-public class EventDetailsFragment extends Fragment implements View.OnClickListener
+public class EventDetailsFragment extends Fragment implements View.OnClickListener, AttendeeClickCommunicator
 {
     private FragmentManager fragmentManager;
     private Bus bus;
@@ -149,8 +154,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
             if (eventDetails.getDescription() == null || eventDetails.getDescription().isEmpty())
             {
                 description.setText(R.string.event_details_no_description);
-            }
-            else
+            } else
             {
                 description.setText(eventDetails.getDescription());
             }
@@ -166,6 +170,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         attendeeList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         eventAttendeesAdapter = new EventAttendeesAdapter(new ArrayList<EventDetails.Attendee>());
+        eventAttendeesAdapter.setAttendeeClickCommunicator(this);
         attendeeList.setAdapter(eventAttendeesAdapter);
     }
 
@@ -179,13 +184,31 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         if (eventDetails.getAttendees().size() == 0)
         {
             setNoAttendeeView();
-        }
-        else
+        } else
         {
             setNormalView();
         }
 
+        EventDetails.Attendee attendee = new EventDetails.Attendee();
+        attendee.setId(userService.getActiveUserId());
+
+        if (eventDetails.getAttendees().contains(attendee))
+        {
+            eventDetails.getAttendees().remove(attendee);
+        }
+
+        attendee.setName(userService.getActiveUserName());
+        attendee.setFriend(false);
+        attendee.setInviter(false);
+        attendee.setRsvp(event.getRsvp());
+
+        if (!(event.getRsvp() == Event.RSVP.NO))
+        {
+            eventDetails.getAttendees().add(attendee);
+        }
+
         eventAttendeesAdapter = new EventAttendeesAdapter(eventDetails.getAttendees());
+        eventAttendeesAdapter.setAttendeeClickCommunicator(this);
         attendeeList.setAdapter(eventAttendeesAdapter);
     }
 
@@ -244,8 +267,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         {
             location.setText(R.string.event_details_no_location);
             location.setOnClickListener(null);
-        }
-        else
+        } else
         {
             location.setText(event.getLocation().getName());
 //            location.setOnClickListener(this);
@@ -259,8 +281,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         if (start.toString(dateFormatter).equals(end.toString(dateFormatter)))
         {
             dateTime.setText(start.toString(timeFormatter) + " - " + end.toString(timeFormatter) + " (" + start.toString(dateFormatter) + ")");
-        }
-        else
+        } else
         {
             dateTime.setText(start.toString(timeFormatter) + " (" + start.toString(dateFormatter) + ") - " + end.toString(timeFormatter) + " (" + end.toString(dateFormatter) + ")");
         }
@@ -268,8 +289,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         if (event.getType() == Event.Type.PUBLIC)
         {
             type.setText(R.string.event_details_type_public);
-        }
-        else
+        } else
         {
             type.setText(R.string.event_details_type_invite_only);
         }
@@ -291,14 +311,14 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
+        menu.findItem(R.id.action_edit_event).setVisible(true);
 
-        if (EventUtils.canEdit(event, userService.getActiveUserId()))
+        menu.findItem(R.id.action_edit_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {
-            menu.findItem(R.id.action_edit_event).setVisible(true);
-            menu.findItem(R.id.action_edit_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
             {
-                @Override
-                public boolean onMenuItemClick(MenuItem menuItem)
+                if (EventUtils.canEdit(event, userService.getActiveUserId()) == EventUtilsConstants.CAN_EDIT)
                 {
                     if (areEventDetailsFetched)
                     {
@@ -309,14 +329,17 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
                         editEventFragment.setArguments(bundle);
                         FragmentUtils.changeFragment(fragmentManager, editEventFragment);
                     }
-                    return true;
+                } else if (EventUtils.canEdit(event, userService.getActiveUserId()) == EventUtilsConstants.CANNOT_EDIT_LOCKED)
+                {
+                    Toast.makeText(getActivity(), R.string.cannot_edit_event_locked, Toast.LENGTH_LONG).show();
+
+                } else if (EventUtils.canEdit(event, userService.getActiveUserId()) == EventUtilsConstants.CANNOT_EDIT_NOT_GOING)
+                {
+                    Toast.makeText(getActivity(), R.string.cannot_edit_event_not_going, Toast.LENGTH_LONG).show();
                 }
-            });
-        }
-        else
-        {
-            menu.findItem(R.id.action_edit_event).setVisible(false);
-        }
+                return true;
+            }
+        });
     }
 
     @Override
@@ -327,16 +350,14 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
             Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
                     Uri.parse("http://maps.google.com/maps?daddr=" + event.getLocation().getLatitude() + "," + event.getLocation().getLongitude()));
             startActivity(intent);
-        }
-        else if (view.getId() == R.id.tv_event_details_description)
+        } else if (view.getId() == R.id.tv_event_details_description)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.Base_Theme_AppCompat_Light_Dialog_Alert);
 
             if (description.getText().toString().isEmpty())
             {
                 builder.setMessage(description.getText().toString());
-            }
-            else
+            } else
             {
                 builder.setMessage(description.getText().toString());
             }
@@ -351,8 +372,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
             });
 
             builder.create().show();
-        }
-        else if (view.getId() == R.id.tv_event_details_date_time)
+        } else if (view.getId() == R.id.tv_event_details_date_time)
         {
         }
     }
@@ -369,38 +389,47 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
             {
                 if (eventDetails != null)
                 {
+                    event.setRsvp(Event.RSVP.YES);
+
+                    if (eventDetails.getAttendees().contains(attendee))
+                    {
+                        eventDetails.getAttendees().remove(attendee);
+                    }
+
                     attendee.setRsvp(Event.RSVP.YES);
                     attendee.setName(userService.getActiveUserName());
+                    attendee.setFriend(false);
+                    attendee.setInviter(false);
+
+                    eventDetails.getAttendees().add(attendee);
+                    refreshRecyclerView();
+                }
+            } else if (trigger.getRsvp() == Event.RSVP.MAYBE)
+            {
+                if (eventDetails != null)
+                {
+                    event.setRsvp(Event.RSVP.MAYBE);
 
                     if (eventDetails.getAttendees().contains(attendee))
                     {
                         eventDetails.getAttendees().remove(attendee);
                     }
 
-                    eventDetails.getAttendees().add(attendee);
-                    refreshRecyclerView();
-                }
-            }
-            else if (trigger.getRsvp() == Event.RSVP.MAYBE)
-            {
-                if (eventDetails != null)
-                {
                     attendee.setRsvp(Event.RSVP.MAYBE);
                     attendee.setName(userService.getActiveUserName());
+                    attendee.setFriend(false);
+                    attendee.setInviter(false);
 
-                    if (eventDetails.getAttendees().contains(attendee))
-                    {
-                        eventDetails.getAttendees().remove(attendee);
-                    }
                     eventDetails.getAttendees().add(attendee);
                     refreshRecyclerView();
                 }
 
-            }
-            else if (trigger.getRsvp() == Event.RSVP.NO)
+            } else if (trigger.getRsvp() == Event.RSVP.NO)
             {
                 if (eventDetails != null)
                 {
+                    event.setRsvp(Event.RSVP.NO);
+
                     attendee.setRsvp(Event.RSVP.NO);
                     if (eventDetails.getAttendees().contains(attendee))
                     {
@@ -410,5 +439,20 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
                 }
             }
         }
+    }
+
+    @Subscribe
+    public void onRsvpNotChanged(EventRsvpNotChangedTrigger trigger)
+    {
+        if (trigger.getEventId().equals(event.getId()))
+        {
+            event.setRsvp(trigger.getOldRsvp());
+        }
+    }
+
+    @Override
+    public void onAttendeeClicked(String name)
+    {
+        Toast.makeText(getActivity(), name + " has invited you to this event", Toast.LENGTH_LONG).show();
     }
 }

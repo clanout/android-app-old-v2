@@ -38,8 +38,10 @@ public class ChatHelper
 
     public static void init(final String userId)
     {
+        Log.d("APP", "xmpp connection ----- " + connection);
         if (connection == null)
         {
+            Log.d("APP", "xmpp connection is null");
             Observable.just(createConnection(userId))
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(Schedulers.io())
@@ -48,55 +50,64 @@ public class ChatHelper
                         @Override
                         public void onCompleted()
                         {
-
+                            Log.d("APP", "xmpp connection in on completed----- " + connection);
                             connection.addConnectionListener(new ConnectionListener()
                             {
                                 @Override
                                 public void connected(XMPPConnection connection)
                                 {
+                                    Log.d("APP", "xmpp connection in on connected ----- " + connection);
                                 }
 
                                 @Override
                                 public void authenticated(XMPPConnection connection, boolean resumed)
                                 {
+                                    Log.d("APP", "xmpp connection in on authenticated----- " + connection);
                                 }
 
                                 @Override
                                 public void connectionClosed()
                                 {
+                                    Log.d("APP", "xmpp connection closed");
                                 }
 
                                 @Override
                                 public void connectionClosedOnError(Exception e)
                                 {
+                                    Log.d("APP", "xmpp connection closed on error----- " + e.getMessage());
                                 }
 
                                 @Override
                                 public void reconnectionSuccessful()
                                 {
+                                    Log.d("APP", "xmpp connection reconnectioin successful");
                                 }
 
                                 @Override
                                 public void reconnectingIn(int seconds)
                                 {
+                                    Log.d("APP", "xmpp connection reconnecting in " + seconds);
                                 }
 
                                 @Override
                                 public void reconnectionFailed(Exception e)
                                 {
+                                    Log.d("APP", "xmpp connection reconnection failed");
                                 }
                             });
 
 
                             if (connection != null)
                             {
+                                Log.d("APP", "xmpp connection is not null");
                                 try
                                 {
+                                    Log.d("APP", "trying login");
                                     connection.connect();
                                     connection.login();
-                                }
-                                catch (Exception e)
+                                } catch (Exception e)
                                 {
+                                    Log.d("APP", "xmpp connection exception ----- " + e.getMessage());
                                     e.printStackTrace();
                                 }
                             }
@@ -106,11 +117,13 @@ public class ChatHelper
                         public void onError(Throwable e)
                         {
                             e.printStackTrace();
+                            Log.d("APP", "xmpp onerror ----- " + e.getMessage());
                         }
 
                         @Override
                         public void onNext(AbstractXMPPConnection xmppConnection)
                         {
+                            Log.d("APP", "xmpp connection in on next----- " + xmppConnection);
                             connection = xmppConnection;
                             if (connection == null)
                             {
@@ -125,6 +138,7 @@ public class ChatHelper
     {
         try
         {
+            Log.d("APP", "trying to create connection");
             XMPPTCPConnectionConfiguration configuration = XMPPTCPConnectionConfiguration.builder()
                     .setUsernameAndPassword(userId, userId)
                     .setServiceName(SERVICE_NAME)
@@ -137,6 +151,7 @@ public class ChatHelper
         }
         catch (Exception e)
         {
+            Log.d("APP", "xmpp connection exception while configuration----- " + e.getMessage());
             throw null;
         }
     }

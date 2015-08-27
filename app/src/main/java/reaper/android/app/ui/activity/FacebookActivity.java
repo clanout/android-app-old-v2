@@ -29,6 +29,7 @@ import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.CacheKeys;
+import reaper.android.app.service.FacebookService;
 
 /**
  * Created by Aditya on 23-08-2015.

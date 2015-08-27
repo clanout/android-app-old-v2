@@ -2,7 +2,6 @@ package reaper.android.app.api.fb;
 
 import reaper.android.app.api.fb.response.FacebookProfileResponse;
 import retrofit.http.GET;
-import retrofit.http.Query;
 import rx.Observable;
 
 /**

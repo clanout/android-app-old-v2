@@ -15,12 +15,13 @@ import reaper.android.app.api.core.ApiManager;
 import reaper.android.app.api.me.MeApi;
 import reaper.android.app.api.me.request.AddPhoneApiRequest;
 import reaper.android.app.api.me.request.BlockFriendsApiRequest;
-import reaper.android.app.api.me.request.GetAllFacebookFriendsApiRequest;
-import reaper.android.app.api.me.request.GetFacebookFriendsApiRequest;
+import reaper.android.app.api.me.request.GetAllAppFriendsApiRequest;
+import reaper.android.app.api.me.request.GetAppFriendsApiRequest;
 import reaper.android.app.api.me.request.GetPhoneContactsApiRequest;
 import reaper.android.app.api.me.request.ShareFeedbackApiRequest;
-import reaper.android.app.api.me.response.GetAllFacebookFriendsApiResponse;
-import reaper.android.app.api.me.response.GetFacebookFriendsApiResponse;
+import reaper.android.app.api.me.request.UpdateFacebookFriendsApiRequest;
+import reaper.android.app.api.me.response.GetAllAppFriendsApiResponse;
+import reaper.android.app.api.me.response.GetAppFriendsApiResponse;
 import reaper.android.app.api.me.response.GetPhoneContactsApiResponse;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
@@ -30,8 +31,9 @@ import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Friend;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
-import reaper.android.app.trigger.user.AllFacebookFriendsFetchedTrigger;
-import reaper.android.app.trigger.user.FacebookFriendsFetchedTrigger;
+import reaper.android.app.trigger.user.AllAppFriendsFetchedTrigger;
+import reaper.android.app.trigger.user.AppFriendsFetchedTrigger;
+import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.trigger.user.PhoneAddedTrigger;
 import reaper.android.app.trigger.user.PhoneContactsFetchedTrigger;
 import reaper.android.app.ui.util.PhoneUtils;
@@ -108,7 +110,7 @@ public class UserService
                 });
     }
 
-    public void getFacebookFriends(final String zone)
+    public void getAppFriends(final String zone)
     {
         Observable<List<Friend>> friendsObservable =
                 userCache.getFriends()
@@ -119,14 +121,14 @@ public class UserService
                             {
                                 if (friends.isEmpty())
                                 {
-                                    GetFacebookFriendsApiRequest request = new GetFacebookFriendsApiRequest(zone);
-                                    return meApi.getFacebookFriends(request)
-                                            .map(new Func1<GetFacebookFriendsApiResponse, List<Friend>>()
+                                    GetAppFriendsApiRequest request = new GetAppFriendsApiRequest(zone);
+                                    return meApi.getAppFriends(request)
+                                            .map(new Func1<GetAppFriendsApiResponse, List<Friend>>()
                                             {
                                                 @Override
-                                                public List<Friend> call(GetFacebookFriendsApiResponse getFacebookFriendsApiResponse)
+                                                public List<Friend> call(GetAppFriendsApiResponse getAppFriendsApiResponse)
                                                 {
-                                                    return getFacebookFriendsApiResponse
+                                                    return getAppFriendsApiResponse
                                                             .getFriends();
                                                 }
                                             })
@@ -159,28 +161,28 @@ public class UserService
                     @Override
                     public void onError(Throwable e)
                     {
-                        bus.post(new GenericErrorTrigger(ErrorCode.FACEBOOK_FRIENDS_FETCH_FAILURE, (Exception) e));
+                        bus.post(new GenericErrorTrigger(ErrorCode.USER_APP_FRIENDS_FETCH_FAILURE, (Exception) e));
                     }
 
                     @Override
                     public void onNext(List<Friend> friends)
                     {
-                        bus.post(new FacebookFriendsFetchedTrigger(friends));
+                        bus.post(new AppFriendsFetchedTrigger(friends));
                     }
                 });
     }
 
-    public void getAllFacebookFriends()
+    public void getAllAppFriends()
     {
-        GetAllFacebookFriendsApiRequest request = new GetAllFacebookFriendsApiRequest();
+        GetAllAppFriendsApiRequest request = new GetAllAppFriendsApiRequest();
 
-        meApi.getAllFacebookFriends(request)
-                .map(new Func1<GetAllFacebookFriendsApiResponse, List<Friend>>()
+        meApi.getAllAppFriends(request)
+                .map(new Func1<GetAllAppFriendsApiResponse, List<Friend>>()
                 {
                     @Override
-                    public List<Friend> call(GetAllFacebookFriendsApiResponse getAllFacebookFriendsApiResponse)
+                    public List<Friend> call(GetAllAppFriendsApiResponse getAllAppFriendsApiResponse)
                     {
-                        return getAllFacebookFriendsApiResponse.getFriends();
+                        return getAllAppFriendsApiResponse.getFriends();
                     }
                 })
                 .subscribeOn(Schedulers.newThread())
@@ -196,13 +198,13 @@ public class UserService
                     @Override
                     public void onError(Throwable e)
                     {
-                        bus.post(new GenericErrorTrigger(ErrorCode.ALL_FACEBOOK_FRIENDS_FETCH_FAILURE, (Exception) e));
+                        bus.post(new GenericErrorTrigger(ErrorCode.USER_ALL_APP_FRIENDS_FETCH_FAILURE, (Exception) e));
                     }
 
                     @Override
                     public void onNext(List<Friend> friends)
                     {
-                        bus.post(new AllFacebookFriendsFetchedTrigger(friends));
+                        bus.post(new AllAppFriendsFetchedTrigger(friends));
                     }
                 });
     }
@@ -304,6 +306,38 @@ public class UserService
                     public void onNext(Response response)
                     {
 
+                    }
+                });
+    }
+
+    public void updateFacebookFriends(List<String> friendIdList, final boolean isPolling)
+    {
+        UpdateFacebookFriendsApiRequest request = new UpdateFacebookFriendsApiRequest(friendIdList);
+
+        meApi.updateFacebookFriends(request)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Response>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        bus.post(new GenericErrorTrigger(ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE, (Exception) e));
+                    }
+
+                    @Override
+                    public void onNext(Response response)
+                    {
+                        if(response.getStatus() == 200)
+                        {
+                            bus.post(new FacebookFriendsUpdatedOnServerTrigger(isPolling));
+                        }
                     }
                 });
     }

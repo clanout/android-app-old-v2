@@ -7,7 +7,7 @@ import java.util.List;
 import reaper.android.app.api.core.ApiResponse;
 import reaper.android.app.model.Friend;
 
-public class GetFacebookFriendsApiResponse extends ApiResponse
+public class GetAppFriendsApiResponse extends ApiResponse
 {
     @SerializedName("friends")
     private List<Friend> friends;

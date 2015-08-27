@@ -49,6 +49,7 @@ import reaper.android.app.trigger.event.EventCreatedTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventEditedTrigger;
 import reaper.android.app.trigger.event.EventIdsFetchedTrigger;
+import reaper.android.app.trigger.event.EventRsvpNotChangedTrigger;
 import reaper.android.app.trigger.event.EventSuggestionsTrigger;
 import reaper.android.app.trigger.event.EventsFetchForActivityTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
@@ -341,7 +342,6 @@ public class EventService
                         List<String> eventIds = new ArrayList<String>(events.size());
                         for (Event event : events)
                         {
-                            Log.d("APP", "getting event ids on thread ---- " + Thread.currentThread().getName());
                             eventIds.add(event.getId());
                         }
                         return eventIds;
@@ -358,14 +358,12 @@ public class EventService
                     @Override
                     public void onError(Throwable e)
                     {
-                        Log.d("APP", "on error while getting event ids" + e.getMessage());
                         bus.post(new GenericErrorTrigger(ErrorCode.EVENT_IDS_FETCH_FAILURE, (Exception) e));
                     }
 
                     @Override
                     public void onNext(List<String> strings)
                     {
-                        Log.d("APP", "on Next event ids fetched ---- " + strings);
                         bus.post(new EventIdsFetchedTrigger(strings));
                     }
                 });
@@ -439,7 +437,7 @@ public class EventService
                 });
     }
 
-    public void updateRsvp(final Event updatedEvent, final Event.RSVP oldRsvp)
+    public void updateRsvp(final Event updatedEvent, final Event.RSVP oldRsvp, final boolean isFromHomeFragment)
     {
         RsvpUpdateApiRequest request = new RsvpUpdateApiRequest(updatedEvent.getId(), updatedEvent
                 .getRsvp());
@@ -458,9 +456,13 @@ public class EventService
                     @Override
                     public void onError(Throwable e)
                     {
-                        updatedEvent.setRsvp(oldRsvp);
-                        handleTopicSubscription(updatedEvent);
-                        bus.post(new GenericErrorTrigger(ErrorCode.RSVP_UPDATE_FAILURE, (Exception) e));
+                        if (isFromHomeFragment)
+                        {
+                            bus.post(new GenericErrorTrigger(ErrorCode.RSVP_UPDATE_FAILURE, (Exception) e));
+                        } else
+                        {
+                            bus.post(new EventRsvpNotChangedTrigger(updatedEvent.getId(), oldRsvp));
+                        }
                     }
 
                     @Override
@@ -468,13 +470,23 @@ public class EventService
                     {
                         if (response.getStatus() == 200)
                         {
-                            eventCache.save(updatedEvent);
-                            handleTopicSubscription(updatedEvent);
+                            if (isFromHomeFragment)
+                            {
+                                eventCache.deleteCompletely(updatedEvent.getId());
+                                eventCache.save(updatedEvent);
+                                handleTopicSubscription(updatedEvent);
+                            }else{
+                                eventCache.save(updatedEvent);
+                            }
                         } else
                         {
-                            updatedEvent.setRsvp(oldRsvp);
-                            handleTopicSubscription(updatedEvent);
-                            bus.post(new GenericErrorTrigger(ErrorCode.RSVP_UPDATE_FAILURE, null));
+                            if (isFromHomeFragment)
+                            {
+                                bus.post(new GenericErrorTrigger(ErrorCode.RSVP_UPDATE_FAILURE, new Exception()));
+                            } else
+                            {
+                                bus.post(new EventRsvpNotChangedTrigger(updatedEvent.getId(), oldRsvp));
+                            }
                         }
                     }
                 });

@@ -2,10 +2,12 @@ package reaper.android.app.api.fb.response;
 
 import com.google.gson.annotations.SerializedName;
 
+import reaper.android.app.api.core.ApiResponse;
+
 /**
  * Created by Aditya on 27-08-2015.
  */
-public class FacebookProfileResponse
+public class FacebookProfileResponse extends ApiResponse
 {
     @SerializedName("id")
     private String id;

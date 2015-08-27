@@ -15,6 +15,7 @@ import reaper.android.app.model.EventDetails;
 public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAdapter.EventDetailsViewHolder>
 {
     List<EventDetails.Attendee> attendees;
+    private AttendeeClickCommunicator attendeeClickCommunicator;
 
     public EventAttendeesAdapter(List<EventDetails.Attendee> attendees)
     {
@@ -43,7 +44,12 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
         return attendees.size();
     }
 
-    public class EventDetailsViewHolder extends RecyclerView.ViewHolder
+    public void setAttendeeClickCommunicator(AttendeeClickCommunicator attendeeClickCommunicator)
+    {
+        this.attendeeClickCommunicator = attendeeClickCommunicator;
+    }
+
+    public class EventDetailsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         private ImageView pic, inviter, rsvp;
         private TextView name;
@@ -56,6 +62,8 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
             inviter = (ImageView) itemView.findViewById(R.id.iv_event_attendee_inviter);
             rsvp = (ImageView) itemView.findViewById(R.id.iv_event_attendee_rsvp);
             name = (TextView) itemView.findViewById(R.id.tv_event_attendee_name);
+
+            itemView.setOnClickListener(this);
         }
 
         public void render(EventDetails.Attendee attendee)
@@ -81,6 +89,15 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
                 case MAYBE:
                     rsvp.setImageResource(R.drawable.ic_help_black_24dp);
                     break;
+            }
+        }
+
+        @Override
+        public void onClick(View v)
+        {
+            if(attendeeClickCommunicator != null)
+            {
+                attendeeClickCommunicator.onAttendeeClicked(attendees.get(getAdapterPosition()).getName());
             }
         }
     }

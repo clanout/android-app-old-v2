@@ -35,6 +35,12 @@
     <string name="event_details_type_public">Public</string>
     <string name="event_details_type_invite_only">Invite Only</string>
 
+    <string name="cannot_edit_event_not_going">Only people who are going to the event can edit it.</string>
+    <string name="cannot_edit_event_locked">The organiser has finalised the event. You cannot edit it now.</string>
+    <string name="cannot_invite">You cannot invite other people to the event as you are not going.</string>
+    <string name="cannot_chat">People who are not going to the event cannot enter the chat room.</string>
+    <string name="cannot_change_rsvp">You cannot change the RSVP of an event created by you.</string>
+
     <!-- Toast and Blank Screen Messages -->
 
     <string name="trust_issues">We don\'t like people with trust issues</string>
@@ -67,7 +73,6 @@
 
     <string name="phone_invalid">Please enter a valid phone number.</string>
     <string name="add_phone_number">Please add your phone number to send/receive invites from your phone contacts</string>
-
 
     <!-- Facebook -->
     <string name="facebook_app_id">711701748936592</string>

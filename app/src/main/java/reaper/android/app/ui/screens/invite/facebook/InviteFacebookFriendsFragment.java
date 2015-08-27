@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,19 +21,27 @@ import android.widget.Toast;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
 import reaper.android.app.service.AccountsService;
+import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
-import reaper.android.app.trigger.user.FacebookFriendsFetchedTrigger;
+import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
+import reaper.android.app.trigger.user.AppFriendsFetchedTrigger;
+import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.ui.screens.invite.core.InviteFriendsAdapter;
 import reaper.android.common.communicator.Communicator;
 
@@ -42,14 +49,17 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
 {
     private RecyclerView recyclerView;
     private TextView noFriendsMessage;
-    private Menu menu;
     private FloatingActionButton inviteWhatsapp, shareFacebook;
+    private Menu menu;
 
     private InviteFriendsAdapter inviteFriendsAdapter;
     private UserService userService;
     private LocationService locationService;
+    private FacebookService facebookService;
     private Bus bus;
     private FragmentManager fragmentManager;
+
+    private GenericCache genericCache;
 
     private ArrayList<EventDetails.Invitee> inviteeList;
     private List<Friend> friendList;
@@ -103,6 +113,10 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
         locationService = new LocationService(bus);
+        facebookService = new FacebookService(bus);
+
+        genericCache = CacheManager.getGenericCache();
+
         inviteWhatsapp.setOnClickListener(this);
         shareFacebook.setOnClickListener(this);
         fragmentManager = getActivity().getSupportFragmentManager();
@@ -121,7 +135,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     {
         super.onResume();
         bus.register(this);
-        userService.getFacebookFriends(locationService.getUserLocation().getZone());
+        userService.getAppFriends(locationService.getUserLocation().getZone());
     }
 
     @Override
@@ -177,7 +191,18 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
-        menu.findItem(R.id.action_refresh).setVisible(false);
+        menu.findItem(R.id.action_refresh).setVisible(true);
+
+        menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                item.setActionView(R.layout.action_button_refreshing);
+                facebookService.getFacebookFriends(false);
+                return true;
+            }
+        });
     }
 
     private void initRecyclerView()
@@ -206,16 +231,61 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     }
 
     @Subscribe
-    public void onFacebookFriendsFetched(FacebookFriendsFetchedTrigger trigger)
+    public void onFacebookFriendsUpdatedOnServer(FacebookFriendsUpdatedOnServerTrigger trigger)
+    {
+        if(!trigger.isPolling())
+        {
+            userService.getAppFriends(locationService.getUserLocation().getZone());
+            genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now().toString());
+        }
+    }
+
+    @Subscribe
+    public void onFacebookFriendsNotUpdatedOnServer(GenericErrorTrigger trigger)
+    {
+        if(trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE)
+        {
+            if(menu != null)
+            {
+                menu.findItem(R.id.action_refresh).setActionView(null);
+            }
+            displayErrorView();
+        }
+    }
+
+    @Subscribe
+    public void onFacebookFriendsIdFetched(FacebookFriendsIdFetchedTrigger trigger)
+    {
+        if (!trigger.isPolling())
+        {
+            userService.updateFacebookFriends(trigger.getFriendsIdList(), trigger.isPolling());
+        }
+    }
+
+    @Subscribe
+    public void onFacebookFriendsIdNotFetched(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE)
+        {
+            if(menu != null)
+            {
+                menu.findItem(R.id.action_refresh).setActionView(null);
+            }
+            displayErrorView();
+        }
+    }
+
+    @Subscribe
+    public void onZonalAppFriendsFetched(AppFriendsFetchedTrigger trigger)
     {
         friendList = trigger.getFriends();
         refreshRecyclerView();
     }
 
     @Subscribe
-    public void onFacebookFriendsNotFetched(GenericErrorTrigger trigger)
+    public void onZonalAppFriendsNotFetched(GenericErrorTrigger trigger)
     {
-        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCH_FAILURE)
+        if (trigger.getErrorCode() == ErrorCode.USER_APP_FRIENDS_FETCH_FAILURE)
         {
             displayErrorView();
         }

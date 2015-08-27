@@ -1,5 +1,6 @@
 package reaper.android.app.ui.screens.home;
 
+import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 
@@ -23,6 +25,7 @@ import java.util.List;
 import reaper.android.R;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
+import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.ViewPagerStateChangedTrigger;
 import reaper.android.app.trigger.event.EventClickTrigger;
 import reaper.android.app.trigger.event.RsvpChangeTrigger;
@@ -30,15 +33,19 @@ import reaper.android.app.trigger.event.RsvpChangeTrigger;
 public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewHolder>
 {
     private Bus bus;
+    private UserService userService;
+    private Context context;
 
     // Data
     private List<Event> events;
     private List<SwipedState> state;
 
-    public EventsAdapter(Bus bus, List<Event> events)
+    public EventsAdapter(Bus bus, List<Event> events, Context context)
     {
+        this.context = context;
         this.bus = bus;
         this.events = events;
+        this.userService = new UserService(bus);
 
         state = new ArrayList<>();
         for (int i = 0; i < events.size(); i++)
@@ -180,15 +187,20 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 @Override
                 public void onClick(View view)
                 {
-                    state.set(getAdapterPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
-                    viewPager.setCurrentItem(state.get(getAdapterPosition()).getPosition());
+                    if (events.get(getAdapterPosition()).getOrganizerId().equals(userService.getActiveUserId()))
+                    {
+                        Toast.makeText(context, R.string.cannot_change_rsvp, Toast.LENGTH_LONG).show();
+                    } else
+                    {
+                        state.set(getAdapterPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
+                        viewPager.setCurrentItem(state.get(getAdapterPosition()).getPosition());
 
-                    Event event = events.get(getAdapterPosition());
-                    Event.RSVP oldRsvp = event.getRsvp();
-                    event.setRsvp(Event.RSVP.YES);
-                    render(event);
+                        Event.RSVP oldRsvp = events.get(getAdapterPosition()).getRsvp();
+                        events.get(getAdapterPosition()).setRsvp(Event.RSVP.YES);
+                        render(events.get(getAdapterPosition()));
 
-                    bus.post(new RsvpChangeTrigger(event, oldRsvp));
+                        bus.post(new RsvpChangeTrigger(events.get(getAdapterPosition()), oldRsvp));
+                    }
                 }
             });
 
@@ -197,15 +209,20 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 @Override
                 public void onClick(View view)
                 {
-                    state.set(getAdapterPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
-                    viewPager.setCurrentItem(state.get(getAdapterPosition()).getPosition());
+                    if (events.get(getAdapterPosition()).getOrganizerId().equals(userService.getActiveUserId()))
+                    {
+                        Toast.makeText(context, R.string.cannot_change_rsvp, Toast.LENGTH_LONG).show();
+                    } else
+                    {
+                        state.set(getAdapterPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
+                        viewPager.setCurrentItem(state.get(getAdapterPosition()).getPosition());
 
-                    Event event = events.get(getAdapterPosition());
-                    Event.RSVP oldRsvp = event.getRsvp();
-                    event.setRsvp(Event.RSVP.MAYBE);
-                    render(event);
+                        Event.RSVP oldRsvp = events.get(getAdapterPosition()).getRsvp();
+                        events.get(getAdapterPosition()).setRsvp(Event.RSVP.MAYBE);
+                        render(events.get(getAdapterPosition()));
 
-                    bus.post(new RsvpChangeTrigger(event, oldRsvp));
+                        bus.post(new RsvpChangeTrigger(events.get(getAdapterPosition()), oldRsvp));
+                    }
                 }
             });
 
@@ -214,15 +231,20 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 @Override
                 public void onClick(View view)
                 {
-                    state.set(getAdapterPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
-                    viewPager.setCurrentItem(state.get(getAdapterPosition()).getPosition());
+                    if (events.get(getAdapterPosition()).getOrganizerId().equals(userService.getActiveUserId()))
+                    {
+                        Toast.makeText(context, R.string.cannot_change_rsvp, Toast.LENGTH_LONG).show();
+                    } else
+                    {
+                        state.set(getAdapterPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
+                        viewPager.setCurrentItem(state.get(getAdapterPosition()).getPosition());
 
-                    Event event = events.get(getAdapterPosition());
-                    Event.RSVP oldRsvp = event.getRsvp();
-                    event.setRsvp(Event.RSVP.NO);
-                    render(event);
+                        Event.RSVP oldRsvp = events.get(getAdapterPosition()).getRsvp();
+                        events.get(getAdapterPosition()).setRsvp(Event.RSVP.NO);
+                        render(events.get(getAdapterPosition()));
 
-                    bus.post(new RsvpChangeTrigger(event, oldRsvp));
+                        bus.post(new RsvpChangeTrigger(events.get(getAdapterPosition()), oldRsvp));
+                    }
                 }
             });
         }
@@ -235,8 +257,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             if (event.getTitle().length() <= 20)
             {
                 title.setText(event.getTitle());
-            }
-            else
+            } else
             {
                 title.setText(event.getTitle().substring(0, 18) + "...");
             }
@@ -285,14 +306,12 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty())
             {
                 timeLocation.setText(dateTime.toString(timeFormatter) + ", (Location Not Specified)");
-            }
-            else
+            } else
             {
                 if (event.getLocation().getName().length() <= 23)
                 {
                     timeLocation.setText(dateTime.toString(timeFormatter) + ", " + event.getLocation().getName());
-                }
-                else
+                } else
                 {
                     timeLocation.setText(dateTime.toString(timeFormatter) + ", " + event.getLocation().getName().substring(0, 22) + "..");
                 }
@@ -302,12 +321,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             if (event.getFriendCount() == 0)
             {
                 attendees.setText("No friends are going");
-            }
-            else if (event.getFriendCount() == 1)
+            } else if (event.getFriendCount() == 1)
             {
                 attendees.setText("1 friend is going");
-            }
-            else
+            } else
             {
                 attendees.setText(event.getFriendCount() + " friends are going");
             }
@@ -317,13 +334,11 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             {
                 rsvpIcon.setVisibility(View.VISIBLE);
                 rsvpIcon.setImageResource(R.drawable.ic_check_circle_black_24dp);
-            }
-            else if (event.getRsvp() == Event.RSVP.MAYBE)
+            } else if (event.getRsvp() == Event.RSVP.MAYBE)
             {
                 rsvpIcon.setVisibility(View.VISIBLE);
                 rsvpIcon.setImageResource(R.drawable.ic_help_black_24dp);
-            }
-            else
+            } else
             {
                 rsvpIcon.setVisibility(View.INVISIBLE);
             }
@@ -335,8 +350,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 {
                     chatIcon.setVisibility(View.VISIBLE);
                     chatIcon.setImageResource(R.drawable.ic_chat_black_18dp);
-                }
-                else
+                } else
                 {
                     chatIcon.setVisibility(View.INVISIBLE);
                 }
@@ -346,13 +360,11 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 {
                     updatesIcon.setVisibility(View.VISIBLE);
                     updatesIcon.setImageResource(R.drawable.ic_info_black_18dp);
-                }
-                else
+                } else
                 {
                     updatesIcon.setVisibility(View.INVISIBLE);
                 }
-            }
-            else
+            } else
             {
                 chatIcon.setVisibility(View.INVISIBLE);
                 updatesIcon.setVisibility(View.INVISIBLE);

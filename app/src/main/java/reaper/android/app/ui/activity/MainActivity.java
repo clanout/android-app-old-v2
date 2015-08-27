@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -27,8 +28,10 @@ import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.NotificationConstants;
+import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
+import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.GCMService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity
     private GCMService gcmService;
     private EventService eventService;
     private LocationService locationService;
+    private FacebookService facebookService;
 
     private GenericCache genericCache;
     private EventCache eventCache;
@@ -64,6 +68,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
+        Log.d("APP", "Main activity on Create");
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
@@ -79,6 +84,7 @@ public class MainActivity extends AppCompatActivity
         gcmService = new GCMService(bus);
         eventService = new EventService(bus);
         locationService = new LocationService(bus);
+        facebookService = new FacebookService(bus);
         fragmentManager = getSupportFragmentManager();
 
         genericCache = CacheManager.getGenericCache();
@@ -90,36 +96,60 @@ public class MainActivity extends AppCompatActivity
 
         if (shouldGoToDetailsFragment.equals("yes") && eventId != null)
         {
+            Log.d("APP", "should go to details");
             eventService.fetchEventsForActivity(locationService.getUserLocation().getZone());
         } else
         {
-            String lastNotificationReceived = genericCache.get(NotificationConstants.NOTIFICATION_RECEIVED_TIMESTAMP);
-            String lastFriendRelocatedNotificationReceived = genericCache.get(NotificationConstants.FRIEND_RELOCATED_NOTIFICATION_TIMESTAMP);
+            Log.d("APP", "should go to home");
+            String lastNotificationReceived = genericCache.get(Timestamps.NOTIFICATION_RECEIVED_TIMESTAMP);
+            String lastFriendRelocatedNotificationReceived = genericCache.get(Timestamps.FRIEND_RELOCATED_NOTIFICATION_TIMESTAMP);
 
             if (lastNotificationReceived != null && lastFriendRelocatedNotificationReceived != null)
             {
+                Log.d("APP", "last notif recd not null");
                 DateTime lastNotificationTimestamp = DateTime.parse(lastNotificationReceived);
                 DateTime lastFriendRelocatedNotificationTimestamp = DateTime.parse(lastFriendRelocatedNotificationReceived);
 
-                if (DateTime.now().getMillis() - lastNotificationTimestamp.getMillis() > NotificationConstants.NOTIFICATION_NOT_RECEIVED_LIMIT)
+                if (DateTime.now().getMillis() - lastNotificationTimestamp.getMillis() > Timestamps.NOTIFICATION_NOT_RECEIVED_LIMIT)
                 {
                     eventCache.deleteAll();
                 }
 
-                if (DateTime.now().getMillis() - lastFriendRelocatedNotificationTimestamp.getMillis() > NotificationConstants.FRIEND_RELOCATED_NOTIFICATION_NOT_RECEIVED_LIMIT)
+                if (DateTime.now().getMillis() - lastFriendRelocatedNotificationTimestamp.getMillis() > Timestamps.FRIEND_RELOCATED_NOTIFICATION_NOT_RECEIVED_LIMIT)
                 {
                     userCache.deleteFriends();
                 }
             }
 
+            String lastFacebookFriendsRefreshTimestamp = genericCache.get(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP);
+
+            if (lastFacebookFriendsRefreshTimestamp != null)
+            {
+                Log.d("APP", "friends refresh last timestamp not null");
+                DateTime lastFacebookFriendsRefreshDateTime = DateTime.parse(lastFacebookFriendsRefreshTimestamp);
+
+                if (DateTime.now().getMillis() - lastFacebookFriendsRefreshDateTime.getMillis() > Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_LIMIT)
+                {
+                    Log.d("APP", "friends refresh last timestamp not null and will refresh");
+                    facebookService.getFacebookFriends(true);
+                }
+            } else
+            {
+                Log.d("APP", "friends refresh last timestamp null");
+                facebookService.getFacebookFriends(true);
+            }
+
             if (genericCache.get(CacheKeys.GCM_TOKEN) == null)
             {
+                Log.d("APP", "gcm token is null");
                 if (checkPlayServices())
                 {
                     gcmService.register();
                 }
             } else
             {
+                Log.d("APP", "gcm token is not null");
+                Log.d("APP", "user id ----- " + userService.getActiveUserId());
                 ChatHelper.init(userService.getActiveUserId());
                 FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
             }
@@ -215,6 +245,7 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onGcmRegistrationComplete(GcmRegistrationCompleteTrigger trigger)
     {
+        Log.d("APP", "userId after GCM registration complete ----- " + userService.getActiveUserId());
         ChatHelper.init(userService.getActiveUserId());
 
         runOnUiThread(new Runnable()

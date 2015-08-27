@@ -31,6 +31,7 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.NotificationConstants;
+import reaper.android.app.config.Timestamps;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.trigger.event.NewEventAddedTrigger;
@@ -78,7 +79,7 @@ public class ListenerServiceGcm extends GcmListenerService
 
         if (notificationType.equals(NotificationConstants.EVENT_ADDED))
         {
-            genericCache.put(NotificationConstants.NOTIFICATION_RECEIVED_TIMESTAMP, DateTime.now().toString());
+            genericCache.put(Timestamps.NOTIFICATION_RECEIVED_TIMESTAMP, DateTime.now().toString());
             eventService.fetchEvent(notificationAttributes.get("event_id"), false);
 
             if (!checkIfAppRunningInForeground())
@@ -90,11 +91,11 @@ public class ListenerServiceGcm extends GcmListenerService
             }
         } else if (notificationType.equals(NotificationConstants.EVENT_REMOVED))
         {
-            genericCache.put(NotificationConstants.NOTIFICATION_RECEIVED_TIMESTAMP, DateTime.now().toString());
+            genericCache.put(Timestamps.NOTIFICATION_RECEIVED_TIMESTAMP, DateTime.now().toString());
             eventService.deleteEvent(notificationAttributes.get("event_id"));
         } else if (notificationType.equals(NotificationConstants.EVENT_UPDATED))
         {
-            genericCache.put(NotificationConstants.NOTIFICATION_RECEIVED_TIMESTAMP, DateTime.now().toString());
+            genericCache.put(Timestamps.NOTIFICATION_RECEIVED_TIMESTAMP, DateTime.now().toString());
             eventCache.deleteCompletely(notificationAttributes.get("event_id"));
             eventService.fetchEvent(notificationAttributes.get("event_id"), true);
 
@@ -104,7 +105,7 @@ public class ListenerServiceGcm extends GcmListenerService
             }
         } else if (notificationType.equals(NotificationConstants.FRIEND_RELOCATED))
         {
-            genericCache.put(NotificationConstants.FRIEND_RELOCATED_NOTIFICATION_TIMESTAMP, DateTime.now().toString());
+            genericCache.put(Timestamps.FRIEND_RELOCATED_NOTIFICATION_TIMESTAMP, DateTime.now().toString());
             userCache.deleteFriends();
 
             String zone = notificationAttributes.get("zone");
@@ -116,7 +117,7 @@ public class ListenerServiceGcm extends GcmListenerService
             }
         } else if (notificationType.equals(NotificationConstants.EVENT_INVITATION))
         {
-            genericCache.put(NotificationConstants.NOTIFICATION_RECEIVED_TIMESTAMP, DateTime.now().toString());
+            genericCache.put(Timestamps.NOTIFICATION_RECEIVED_TIMESTAMP, DateTime.now().toString());
             eventCache.deleteCompletely(notificationAttributes.get("event_id"));
             eventService.fetchEvent(notificationAttributes.get("event_id"), true);
             buildNotification(message, NotificationConstants.INVITE_RECEIVED_TITLE, true, notificationAttributes.get("event_id"));

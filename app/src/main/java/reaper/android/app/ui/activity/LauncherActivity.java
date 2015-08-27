@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
@@ -72,6 +71,7 @@ public class LauncherActivity extends AppCompatActivity
         super.onResume();
 
         bus.register(this);
+
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Base_Theme_AppCompat_Light_Dialog_Alert)
@@ -111,7 +111,7 @@ public class LauncherActivity extends AppCompatActivity
                 authService.validateSession(sessionCookie);
             } else
             {
-                facebookService.getUserProfile();
+                facebookService.getUserFacebookProfile();
             }
         }
     }
@@ -190,7 +190,7 @@ public class LauncherActivity extends AppCompatActivity
     {
         if (trigger.getErrorCode() == ErrorCode.INVALID_SESSION)
         {
-            facebookService.getUserProfile();
+            facebookService.getUserFacebookProfile();
         }
     }
 

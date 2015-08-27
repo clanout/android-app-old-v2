@@ -28,13 +28,18 @@ import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
+import reaper.android.app.model.EventDetails;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
+import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.ChangeAttendeeListTrigger;
+import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
+import reaper.android.app.trigger.event.EventRsvpNotChangedTrigger;
 import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.app.ui.util.event.EventUtils;
 import reaper.android.common.communicator.Communicator;
 
 public class EventDetailsContainerFragment extends Fragment implements View.OnClickListener
@@ -42,8 +47,9 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
     private FragmentManager fragmentManager;
     private Bus bus;
 
-    // Servoces
+    // Services
     private EventService eventService;
+    private UserService userService;
 
     private GenericCache genericCache;
 
@@ -86,8 +92,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         {
             events = (List<Event>) savedInstanceState.get(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
             activePosition = savedInstanceState.getInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION);
-        }
-        else
+        } else
         {
             Bundle bundle = getArguments();
             events = (List<Event>) bundle.get(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
@@ -102,6 +107,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         bus = Communicator.getInstance().getBus();
         fragmentManager = getActivity().getSupportFragmentManager();
         eventService = new EventService(bus);
+        userService = new UserService(bus);
         genericCache = CacheManager.getGenericCache();
 
         pagerAdapter = new EventDetailsPagerAdapter(getChildFragmentManager(), events);
@@ -156,54 +162,71 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
     {
         if (view.getId() == R.id.ibtn_event_details_rsvp)
         {
-            PopupMenu rsvpMenu = new PopupMenu(getActivity(), rsvp);
-            rsvpMenu.getMenuInflater().inflate(R.menu.popup_rsvp, rsvpMenu.getMenu());
+            if(events.get(activePosition).getOrganizerId().equals(userService.getActiveUserId())){
 
-            rsvpMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+                Toast.makeText(getActivity(), R.string.cannot_change_rsvp, Toast.LENGTH_LONG).show();
+
+            }else
             {
-                @Override
-                public boolean onMenuItemClick(MenuItem menuItem)
-                {
-                    int menuItemId = menuItem.getItemId();
-                    switch (menuItemId)
-                    {
-                        case R.id.menu_rsvp_yes:
-                            bus.post(new ChangeAttendeeListTrigger(Event.RSVP.YES, events.get(activePosition).getId()));
-                            updateRsvp(Event.RSVP.YES);
-                            break;
-                        case R.id.menu_rsvp_maybe:
-                            bus.post(new ChangeAttendeeListTrigger(Event.RSVP.MAYBE, events.get(activePosition).getId()));
-                            updateRsvp(Event.RSVP.MAYBE);
-                            break;
-                        case R.id.menu_rsvp_no:
-                            bus.post(new ChangeAttendeeListTrigger(Event.RSVP.NO, events.get(activePosition).getId()));
-                            updateRsvp(Event.RSVP.NO);
-                            break;
-                        default:
-                            throw new IllegalStateException();
-                    }
-                    return false;
-                }
-            });
+                PopupMenu rsvpMenu = new PopupMenu(getActivity(), rsvp);
+                rsvpMenu.getMenuInflater().inflate(R.menu.popup_rsvp, rsvpMenu.getMenu());
 
-            rsvpMenu.show();
-        }
-        else if (view.getId() == R.id.ibtn_event_details_invite)
+                rsvpMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+                {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem)
+                    {
+                        int menuItemId = menuItem.getItemId();
+                        switch (menuItemId)
+                        {
+                            case R.id.menu_rsvp_yes:
+                                bus.post(new ChangeAttendeeListTrigger(Event.RSVP.YES, events.get(activePosition).getId()));
+                                updateRsvp(Event.RSVP.YES);
+                                break;
+                            case R.id.menu_rsvp_maybe:
+                                bus.post(new ChangeAttendeeListTrigger(Event.RSVP.MAYBE, events.get(activePosition).getId()));
+                                updateRsvp(Event.RSVP.MAYBE);
+                                break;
+                            case R.id.menu_rsvp_no:
+                                bus.post(new ChangeAttendeeListTrigger(Event.RSVP.NO, events.get(activePosition).getId()));
+                                updateRsvp(Event.RSVP.NO);
+                                break;
+                            default:
+                                throw new IllegalStateException();
+                        }
+                        return false;
+                    }
+                });
+
+                rsvpMenu.show();
+            }
+        } else if (view.getId() == R.id.ibtn_event_details_invite)
         {
-            InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT_ID, events.get(activePosition).getId());
-            bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, false);
-            inviteUsersContainerFragment.setArguments(bundle);
-            FragmentUtils.changeFragment(fragmentManager, inviteUsersContainerFragment);
-        }
-        else if (view.getId() == R.id.ibtn_event_details_chat)
+            if (EventUtils.canInviteFriends(events.get(activePosition)))
+            {
+                InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT_ID, events.get(activePosition).getId());
+                bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, false);
+                inviteUsersContainerFragment.setArguments(bundle);
+                FragmentUtils.changeFragment(fragmentManager, inviteUsersContainerFragment);
+            } else
+            {
+                Toast.makeText(getActivity(), R.string.cannot_invite, Toast.LENGTH_LONG).show();
+            }
+        } else if (view.getId() == R.id.ibtn_event_details_chat)
         {
-            ChatFragment chatFragment = new ChatFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_ID, events.get(activePosition).getId());
-            chatFragment.setArguments(bundle);
-            FragmentUtils.changeFragment(fragmentManager, chatFragment);
+            if (EventUtils.canViewChat(events.get(activePosition)))
+            {
+                ChatFragment chatFragment = new ChatFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_ID, events.get(activePosition).getId());
+                chatFragment.setArguments(bundle);
+                FragmentUtils.changeFragment(fragmentManager, chatFragment);
+            } else
+            {
+                Toast.makeText(getActivity(), R.string.cannot_chat, Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -211,10 +234,11 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
     {
         renderRsvpButton(newRsvp);
 
-        Event event = events.get(activePosition);
-        Event.RSVP oldRsvp = event.getRsvp();
-        event.setRsvp(newRsvp);
-        eventService.updateRsvp(event, oldRsvp);
+        Event.RSVP oldRsvp = events.get(activePosition).getRsvp();
+        events.get(activePosition).setRsvp(newRsvp);
+
+        eventService.updateRsvp(events.get(activePosition), oldRsvp, false);
+
     }
 
     private void renderRsvpButton(Event.RSVP rsvpStatus)
@@ -235,14 +259,12 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         }
     }
 
-
     @Subscribe
-    public void onGenericErrorTrigger(GenericErrorTrigger trigger)
+    public void onRsvpNotChanged(EventRsvpNotChangedTrigger trigger)
     {
-        ErrorCode code = trigger.getErrorCode();
-
-        if (code == ErrorCode.RSVP_UPDATE_FAILURE)
+        if (trigger.getEventId().equals(events.get(activePosition).getId()))
         {
+            events.get(activePosition).setRsvp(trigger.getOldRsvp());
             Toast.makeText(getActivity(), R.string.message_rsvp_update_failure, Toast.LENGTH_LONG).show();
         }
     }
