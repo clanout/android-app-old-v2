@@ -11,6 +11,8 @@ import com.squareup.otto.Bus;
 import reaper.android.app.api.core.ApiManager;
 import reaper.android.app.api.gcm.NotificationApi;
 import reaper.android.app.api.gcm.request.GCmRegisterUserApiRequest;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.service.UserService;
@@ -25,11 +27,13 @@ public class RegistrationIntentService extends IntentService
 {
     private static final String TAG = "RegIntentService";
     private Bus bus;
+    private GenericCache genericCache;
 
     public RegistrationIntentService()
     {
         super(TAG);
         this.bus = Communicator.getInstance().getBus();
+        genericCache = CacheManager.getGenericCache();
     }
 
     @Override
@@ -48,8 +52,8 @@ public class RegistrationIntentService extends IntentService
         catch (Exception e)
         {
             Log.d("APP", "Error = " + e.getMessage());
-            AppPreferences.set(this, CacheKeys.GCM_TOKEN, null);
-            AppPreferences.set(this, CacheKeys.GCM_TOKEN_SENT_TO_SERVER, String.valueOf(false));
+            genericCache.delete(CacheKeys.GCM_TOKEN);
+            genericCache.put(CacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
 
         }
         bus.post(new GcmRegistrationCompleteTrigger());
@@ -76,8 +80,8 @@ public class RegistrationIntentService extends IntentService
                     @Override
                     public void onError(Throwable e)
                     {
-                        AppPreferences.set(RegistrationIntentService.this, CacheKeys.GCM_TOKEN, null);
-                        AppPreferences.set(RegistrationIntentService.this, CacheKeys.GCM_TOKEN_SENT_TO_SERVER, String.valueOf(false));
+                        genericCache.delete(CacheKeys.GCM_TOKEN);
+                        genericCache.put(CacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
                     }
 
                     @Override
@@ -85,13 +89,13 @@ public class RegistrationIntentService extends IntentService
                     {
                         if (response.getStatus() == 200)
                         {
-                            AppPreferences.set(RegistrationIntentService.this, CacheKeys.GCM_TOKEN, token);
-                            AppPreferences.set(RegistrationIntentService.this, CacheKeys.GCM_TOKEN_SENT_TO_SERVER, String.valueOf(true));
+                            genericCache.put(CacheKeys.GCM_TOKEN, token);
+                            genericCache.put(CacheKeys.GCM_TOKEN_SENT_TO_SERVER, true);
                         }
                         else
                         {
-                            AppPreferences.set(RegistrationIntentService.this, CacheKeys.GCM_TOKEN, null);
-                            AppPreferences.set(RegistrationIntentService.this, CacheKeys.GCM_TOKEN_SENT_TO_SERVER, String.valueOf(false));
+                            genericCache.delete(CacheKeys.GCM_TOKEN);
+                            genericCache.put(CacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
                         }
                     }
                 });

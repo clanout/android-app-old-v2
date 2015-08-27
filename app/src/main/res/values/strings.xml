@@ -71,4 +71,5 @@
 
     <!-- Facebook -->
     <string name="facebook_app_id">711701748936592</string>
+    <string name="problem_contacting_facebook">Looks like there was a problem connecting with facebook. Please try again.</string>
 </resources>

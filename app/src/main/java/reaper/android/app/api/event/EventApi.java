@@ -34,9 +34,6 @@ public interface EventApi
     @POST("/event/details")
     Observable<EventDetailsApiResponse> getEventDetails(@Body EventDetailsApiRequest request);
 
-    @POST("/event/updates")
-    void getEventUpdates(@Body EventUpdatesApiRequest request, Callback<EventUpdatesApiResponse> callback);
-
     @POST("/event/rsvp")
     Observable<Response> updateRsvp(@Body RsvpUpdateApiRequest request);
 

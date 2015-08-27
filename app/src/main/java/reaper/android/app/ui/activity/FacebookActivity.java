@@ -6,14 +6,19 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphRequestAsyncTask;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
+import com.facebook.internal.PermissionType;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -52,8 +57,54 @@ public class FacebookActivity extends AppCompatActivity
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_facebook);
 
+        facebookLoginButton = (LoginButton) findViewById(R.id.flb_activity_facebook);
         facebookCallbackManager = CallbackManager.Factory.create();
+        setUpFacebookCallback();
+        genericCache = CacheManager.getGenericCache();
 
+        facebookLoginButton.setVisibility(View.GONE);
+        if (AccessToken.getCurrentAccessToken() == null)
+        {
+            Log.d("APP", "token is null");
+            setUpFacebookLoginButton();
+        } else
+        {
+            if (AccessToken.getCurrentAccessToken().getDeclinedPermissions().size() > 0)
+            {
+                Log.d("APP", "token is not null and declined permissions ----- " + AccessToken.getCurrentAccessToken().getDeclinedPermissions());
+                LoginManager.getInstance().logOut();
+                setUpFacebookLoginButton();
+            } else
+            {
+                Log.d("APP", "token is not null and declined permissions ------ " + AccessToken.getCurrentAccessToken().getDeclinedPermissions());
+                goToLauncherActivity();
+            }
+        }
+    }
+
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+    }
+
+    private void goToLauncherActivity()
+    {
+        Log.d("APP", "going to launcher activity");
+        Intent intent = new Intent(this, LauncherActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void setUpFacebookLoginButton()
+    {
+        facebookLoginButton.setVisibility(View.VISIBLE);
+        facebookLoginButton.setReadPermissions(Arrays.asList("email", "user_friends"));
+        facebookLoginButton.registerCallback(facebookCallbackManager, facebookCallback);
+    }
+
+    private void setUpFacebookCallback()
+    {
         facebookCallback = new FacebookCallback<LoginResult>()
         {
             @Override
@@ -63,11 +114,11 @@ public class FacebookActivity extends AppCompatActivity
                 {
                     if (loginResult.getRecentlyDeniedPermissions().size() > 0)
                     {
+                        Log.d("APP", "login result on success declined permissions --- " + loginResult.getRecentlyDeniedPermissions());
                         setUpAlertDialog(PERMISSION_REQUIRED, PERMISSION_REQUIRED_TITLE, "Grant Permission");
                     } else
                     {
-                        setUpProfileTracker();
-                        profileTracker.startTracking();
+                        goToLauncherActivity();
                     }
                 } else
                 {
@@ -79,21 +130,14 @@ public class FacebookActivity extends AppCompatActivity
             @Override
             public void onCancel()
             {
-                Log.d("APP", "onCancel");
             }
 
             @Override
             public void onError(FacebookException e)
             {
-                Log.d("APP", "on Error " + e.getMessage());
             }
         };
 
-        genericCache = CacheManager.getGenericCache();
-
-        facebookLoginButton = (LoginButton) findViewById(R.id.flb_activity_facebook);
-        facebookLoginButton.setReadPermissions(Arrays.asList("email", "user_friends"));
-        facebookLoginButton.registerCallback(facebookCallbackManager, facebookCallback);
     }
 
     private void setUpAlertDialog(String message, String title, String positiveButtonText)
@@ -122,29 +166,6 @@ public class FacebookActivity extends AppCompatActivity
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
-    }
-
-    private void setUpProfileTracker()
-    {
-        profileTracker = new ProfileTracker()
-        {
-            @Override
-            protected void onCurrentProfileChanged(Profile profile, Profile profile1)
-            {
-                if (profile1.getId() != null && profile1.getName() != null)
-                {
-                    genericCache.put(CacheKeys.USER_ID, profile1.getId());
-                    genericCache.put(CacheKeys.USER_NAME, profile1.getName());
-                    genericCache.put(CacheKeys.USER_PROFILE_PIC_URI, profile1.getProfilePictureUri(64,64));
-
-                } else
-                {
-                    setUpAlertDialog(PROBLEM_CONTACTING_FACEBOOK, PROBLEM_CONTACTING_FACEBOOK_TITLE, "OK");
-                }
-
-                profileTracker.stopTracking();
-            }
-        };
     }
 
     @Override

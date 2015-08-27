@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.facebook.login.LoginManager;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -21,8 +22,11 @@ import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.service.AuthService;
+import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
+import reaper.android.app.trigger.facebook.FacebookProfileFetchedTrigger;
+import reaper.android.app.trigger.user.NewSessionCreatedTrigger;
 import reaper.android.app.trigger.user.SessionValidatedTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshRequestTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshTrigger;
@@ -38,6 +42,7 @@ public class LauncherActivity extends AppCompatActivity
     // Services
     private AuthService authService;
     private LocationService locationService;
+    private FacebookService facebookService;
 
     // UI Elements
     private ProgressDialog progressDialog;
@@ -53,6 +58,7 @@ public class LauncherActivity extends AppCompatActivity
 
         authService = new AuthService(bus);
         locationService = new LocationService(bus);
+        facebookService = new FacebookService(bus);
 
         cache = CacheManager.getGenericCache();
 
@@ -98,16 +104,16 @@ public class LauncherActivity extends AppCompatActivity
             builder.create().show();
         } else
         {
-            // Dummy Session initialization
-            if (cache.get(CacheKeys.SESSION_ID) == null)
-            {
-                Log.d("Generic", "here");
-                cache.put(CacheKeys.SESSION_ID, "dummy_session_cookie");
-            }
-
             String sessionCookie = cache.get(CacheKeys.SESSION_ID);
-            Log.d("Generic", sessionCookie);
-            authService.validateSession(sessionCookie);
+            if (sessionCookie != null)
+            {
+                Log.d("APP", "session cookie not null");
+                authService.validateSession(sessionCookie);
+            } else
+            {
+                Log.d("APP", "session cookie null");
+                facebookService.getUserProfile();
+            }
         }
     }
 
@@ -119,15 +125,69 @@ public class LauncherActivity extends AppCompatActivity
     }
 
     @Subscribe
-    public void onSessionValidatedTrigger(SessionValidatedTrigger trigger)
+    public void onNewSessionCreated(NewSessionCreatedTrigger trigger)
     {
+        cache.put(CacheKeys.SESSION_ID, trigger.getSessionCookie());
+        Log.d("APP", "new session created");
         if (!locationService.locationExists())
         {
+            Log.d("APP", "location not exists");
             progressDialog = ProgressDialog.show(this, "Welcome", "Fetching your current location...");
             isBlocking = true;
             bus.post(new UserLocationRefreshRequestTrigger());
         } else
         {
+            Log.d("APP", "location exists");
+            isBlocking = false;
+            bus.post(new UserLocationRefreshRequestTrigger());
+            gotoMainActivity();
+        }
+    }
+
+    @Subscribe
+    public void onNewSessionNotCreated(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.NEW_SESSION_CREATION_FAILURE)
+        {
+            Log.d("APP", "new session not created");
+            Toast.makeText(this, R.string.messed_up, Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+
+    @Subscribe
+    public void onFacebookProfileFetched(FacebookProfileFetchedTrigger trigger)
+    {
+        Log.d("APP", "facebook profile fetched");
+        authService.createNewSession(trigger.getFirstName(), trigger.getLastName(), trigger.getGender(), trigger.getEmail(), trigger.getId());
+        cache.put(CacheKeys.USER_ID, trigger.getId());
+        cache.put(CacheKeys.USER_NAME, trigger.getFirstName() + " " + trigger.getLastName());
+    }
+
+    @Subscribe
+    public void onFacebookProfileNotFetched(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_PROFILE_FETCH_FAILURE)
+        {
+            Log.d("APP", "facebook profile not fetched");
+            Toast.makeText(this, R.string.problem_contacting_facebook, Toast.LENGTH_LONG).show();
+            LoginManager.getInstance().logOut();
+            finish();
+        }
+    }
+
+    @Subscribe
+    public void onSessionValidated(SessionValidatedTrigger trigger)
+    {
+        if (!locationService.locationExists())
+        {
+            Log.d("APP", "location exists");
+            progressDialog = ProgressDialog.show(this, "Welcome", "Fetching your current location...");
+            isBlocking = true;
+            bus.post(new UserLocationRefreshRequestTrigger());
+        } else
+        {
+            Log.d("APP", "location not exists");
             isBlocking = false;
             bus.post(new UserLocationRefreshRequestTrigger());
             gotoMainActivity();
@@ -139,7 +199,8 @@ public class LauncherActivity extends AppCompatActivity
     {
         if (trigger.getErrorCode() == ErrorCode.INVALID_SESSION)
         {
-            Log.d("reap3r", "Session invalid. Proceed to authentication");
+            Log.d("APP", "session is invalid");
+            facebookService.getUserProfile();
         }
     }
 
@@ -159,12 +220,12 @@ public class LauncherActivity extends AppCompatActivity
 
     public void gotoMainActivity()
     {
+        Log.d("APP", "going to main activity");
         Intent intent = new Intent(this, MainActivity.class);
 
         String shouldGoToDetailsFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);
         if (shouldGoToDetailsFragment == null)
         {
-            Log.d("APP", "shouldGoToDetailsFragment is null");
             shouldGoToDetailsFragment = "no";
             intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
 
@@ -172,15 +233,12 @@ public class LauncherActivity extends AppCompatActivity
         {
             if (shouldGoToDetailsFragment.equals("yes"))
             {
-                Log.d("APP", "shouldGoToDetailsFragment is yes");
                 String eventId = getIntent().getStringExtra("event_id");
-                Log.d("APP","eventId ------ " + eventId);
                 intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
                 intent.putExtra("event_id", eventId);
 
             } else
             {
-                Log.d("APP", "shouldGoToDetailsFragment is no");
                 intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
             }
         }

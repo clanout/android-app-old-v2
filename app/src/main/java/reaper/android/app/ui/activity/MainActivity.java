@@ -30,6 +30,7 @@ import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.NotificationConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
+import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.GCMService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
@@ -99,27 +100,32 @@ public class MainActivity extends AppCompatActivity
             String lastNotificationReceived = genericCache.get(NotificationConstants.NOTIFICATION_RECEIVED_TIMESTAMP);
             String lastFriendRelocatedNotificationReceived = genericCache.get(NotificationConstants.FRIEND_RELOCATED_NOTIFICATION_TIMESTAMP);
 
-            DateTime lastNotificationTimestamp = DateTime.parse(lastNotificationReceived);
-            DateTime lastFriendRelocatedNotificationTimestamp = DateTime.parse(lastFriendRelocatedNotificationReceived);
-
-            if (DateTime.now().getMillis() - lastNotificationTimestamp.getMillis() > NotificationConstants.NOTIFICATION_NOT_RECEIVED_LIMIT)
+            if (lastNotificationReceived != null && lastFriendRelocatedNotificationReceived != null)
             {
-                eventCache.deleteAll();
+                DateTime lastNotificationTimestamp = DateTime.parse(lastNotificationReceived);
+                DateTime lastFriendRelocatedNotificationTimestamp = DateTime.parse(lastFriendRelocatedNotificationReceived);
+
+                if (DateTime.now().getMillis() - lastNotificationTimestamp.getMillis() > NotificationConstants.NOTIFICATION_NOT_RECEIVED_LIMIT)
+                {
+                    eventCache.deleteAll();
+                }
+
+                if (DateTime.now().getMillis() - lastFriendRelocatedNotificationTimestamp.getMillis() > NotificationConstants.FRIEND_RELOCATED_NOTIFICATION_NOT_RECEIVED_LIMIT)
+                {
+                    userCache.deleteFriends();
+                }
             }
 
-            if (DateTime.now().getMillis() - lastFriendRelocatedNotificationTimestamp.getMillis() > NotificationConstants.FRIEND_RELOCATED_NOTIFICATION_NOT_RECEIVED_LIMIT)
+            if (genericCache.get(CacheKeys.GCM_TOKEN) == null)
             {
-                userCache.deleteFriends();
-            }
-
-            if (AppPreferences.get(this, CacheKeys.GCM_TOKEN) == null)
-            {
+                Log.d("APP", "GCM token is null");
                 if (checkPlayServices())
                 {
                     gcmService.register();
                 }
             } else
             {
+                Log.d("APP", "GCM token is not null");
                 ChatHelper.init(userService.getActiveUserId());
                 FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
             }
