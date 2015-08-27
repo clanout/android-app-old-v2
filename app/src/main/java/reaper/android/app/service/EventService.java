@@ -53,7 +53,6 @@ import reaper.android.app.trigger.event.EventSuggestionsTrigger;
 import reaper.android.app.trigger.event.EventsFetchForActivityTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.event.NewEventsAndUpdatesFetchedTrigger;
-import reaper.android.common.cache.AppPreferences;
 import retrofit.client.Response;
 import rx.Observable;
 import rx.Scheduler;
@@ -485,10 +484,10 @@ public class EventService
     {
         if (updatedEvent.getRsvp() == Event.RSVP.NO)
         {
-            gcmService.unsubscribeTopic(AppPreferences.get(Reaper.getReaperContext(), CacheKeys.GCM_TOKEN), updatedEvent.getId());
+            gcmService.unsubscribeTopic(genericCache.get(CacheKeys.GCM_TOKEN), updatedEvent.getId());
         } else
         {
-            gcmService.subscribeTopic(AppPreferences.get(Reaper.getReaperContext(), CacheKeys.GCM_TOKEN), updatedEvent.getId());
+            gcmService.subscribeTopic(genericCache.get(CacheKeys.GCM_TOKEN), updatedEvent.getId());
         }
     }
 
@@ -565,9 +564,9 @@ public class EventService
                     {
                         eventCache.save(event);
 
-                        if (AppPreferences.get(Reaper.getReaperContext(), CacheKeys.GCM_TOKEN) != null)
+                        if (genericCache.get(CacheKeys.GCM_TOKEN) != null)
                         {
-                            gcmService.subscribeTopic(AppPreferences.get(Reaper.getReaperContext(), CacheKeys.GCM_TOKEN), event.getId());
+                            gcmService.subscribeTopic(genericCache.get(CacheKeys.GCM_TOKEN), event.getId());
                         }
 
                         bus.post(new EventCreatedTrigger(event));
@@ -644,9 +643,9 @@ public class EventService
                         {
                             eventCache.deleteCompletely(eventId);
 
-                            if (AppPreferences.get(Reaper.getReaperContext(), CacheKeys.GCM_TOKEN) != null)
+                            if (genericCache.get(CacheKeys.GCM_TOKEN) != null)
                             {
-                                gcmService.unsubscribeTopic(AppPreferences.get(Reaper.getReaperContext(), CacheKeys.GCM_TOKEN), eventId);
+                                gcmService.unsubscribeTopic(genericCache.get(CacheKeys.GCM_TOKEN), eventId);
                             }
                         }
                     }

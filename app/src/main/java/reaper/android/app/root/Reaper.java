@@ -2,11 +2,7 @@ package reaper.android.app.root;
 
 import android.app.Application;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -16,19 +12,13 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.ThreadEnforcer;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 import reaper.android.BuildConfig;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.core.DatabaseManager;
 import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.config.AppConstants;
 import reaper.android.app.service.LocationService;
-import reaper.android.app.trigger.common.CacheCommitTrigger;
 import reaper.android.app.trigger.gcm.GcmregistrationIntentTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshRequestTrigger;
-import reaper.android.common.cache.Cache;
 import reaper.android.common.communicator.Communicator;
 import reaper.android.common.gcm.RegistrationIntentService;
 import timber.log.Timber;
@@ -63,7 +53,6 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         bus.register(this);
 
         Communicator.init(bus);
-        Cache.init(this, AppConstants.CACHE_FILE);
 
         DatabaseManager.init(this);
 
@@ -85,19 +74,6 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-    }
-
-    @Subscribe
-    public void onCacheCommitTrigger(CacheCommitTrigger trigger)
-    {
-        new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                Cache.commit(Reaper.this, AppConstants.CACHE_FILE);
-            }
-        }).start();
     }
 
     @Subscribe

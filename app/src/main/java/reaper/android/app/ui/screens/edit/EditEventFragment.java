@@ -41,6 +41,8 @@ import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.api.google.response.GooglePlaceAutocompleteApiResponse;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
@@ -66,7 +68,6 @@ import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.EventUtils;
 import reaper.android.app.ui.util.FragmentUtils;
-import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.communicator.Communicator;
 
 
@@ -80,6 +81,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     private LocationService locationService;
     private UserService userService;
     private GoogleService googleService;
+    private GenericCache genericCache;
 
     // Data
     private Event event;
@@ -150,6 +152,8 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         locationService = new LocationService(bus);
         userService = new UserService(bus);
         googleService = new GoogleService(bus);
+
+        genericCache = CacheManager.getGenericCache();
 
         placeLocation = event.getLocation();
 
@@ -251,7 +255,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     {
         super.onResume();
 
-        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EDIT);
+        genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EDIT);
 
         bus.register(this);
 

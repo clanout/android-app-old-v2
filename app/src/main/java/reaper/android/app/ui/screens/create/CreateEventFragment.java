@@ -39,6 +39,8 @@ import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.api.google.response.GooglePlaceAutocompleteApiResponse;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
@@ -56,7 +58,6 @@ import reaper.android.app.trigger.event.EventLocationFetchedTrigger;
 import reaper.android.app.trigger.event.EventSuggestionsTrigger;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
-import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.communicator.Communicator;
 
 
@@ -85,6 +86,8 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     private EventService eventService;
     private LocationService locationService;
     private GoogleService googleService;
+
+    private GenericCache genericCache;
 
     private List<Suggestion> suggestionList;
     private EventSuggestionsAdapter eventSuggestionsAdapter;
@@ -136,6 +139,8 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
         locationService = new LocationService(bus);
         googleService = new GoogleService(bus);
         placeLocation = new Location();
+
+        genericCache = CacheManager.getGenericCache();
 
         placeLocation.setZone(locationService.getUserLocation().getZone());
 
@@ -203,7 +208,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     {
         super.onResume();
 
-        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.CREATE);
+        genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.CREATE);
 
         bus.register(this);
 

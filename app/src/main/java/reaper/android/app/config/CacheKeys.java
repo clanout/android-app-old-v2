@@ -6,10 +6,7 @@ public class CacheKeys
     public static final String SESSION_ID = "session_id";
     public static final String USER_ID = "user_id";
     public static final String USER_NAME = "user_name";
-    public static final String USER_PHONE = "user_phone";
     public static final String USER_LOCATION = "user_location";
-    public static final String USER_PROFILE_PIC_URI = "user_profile_pic_uri";
-
 
     // User Cache
     public static final String MY_PHONE_NUMBER = "my_phone_number";

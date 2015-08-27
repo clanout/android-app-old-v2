@@ -24,7 +24,6 @@ import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Location;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshTrigger;
-import reaper.android.common.cache.Cache;
 import retrofit.client.Response;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -100,6 +99,7 @@ public class LocationService
                     userCache.deleteFriends();
                     userCache.deleteContacts();
                 }
+
             }
 
             updateZone(location.getZone());

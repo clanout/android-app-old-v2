@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -30,12 +29,10 @@ import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.NotificationConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
-import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.GCMService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
-import reaper.android.app.trigger.common.CacheCommitTrigger;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchForActivityTrigger;
 import reaper.android.app.trigger.gcm.GcmRegistrationCompleteTrigger;
@@ -43,7 +40,6 @@ import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
-import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.chat.ChatHelper;
 import reaper.android.common.communicator.Communicator;
 
@@ -118,14 +114,12 @@ public class MainActivity extends AppCompatActivity
 
             if (genericCache.get(CacheKeys.GCM_TOKEN) == null)
             {
-                Log.d("APP", "GCM token is null");
                 if (checkPlayServices())
                 {
                     gcmService.register();
                 }
             } else
             {
-                Log.d("APP", "GCM token is not null");
                 ChatHelper.init(userService.getActiveUserId());
                 FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
             }
@@ -148,7 +142,6 @@ public class MainActivity extends AppCompatActivity
     protected void onStop()
     {
         super.onStop();
-        Communicator.getInstance().getBus().post(new CacheCommitTrigger());
         bus.unregister(this);
         isBusRegistered = false;
     }
@@ -163,7 +156,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
-        String activeFragment = AppPreferences.get(this, CacheKeys.ACTIVE_FRAGMENT);
+        String activeFragment = genericCache.get(CacheKeys.ACTIVE_FRAGMENT);
 
         if (activeFragment == null)
         {

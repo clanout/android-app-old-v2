@@ -25,6 +25,8 @@ import com.squareup.otto.Subscribe;
 import java.util.ArrayList;
 
 import reaper.android.R;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
@@ -35,7 +37,6 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.AllFacebookFriendsFetchedTrigger;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.util.FragmentUtils;
-import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.communicator.Communicator;
 
 public class ManageFriendsFragment extends Fragment implements BlockListCommunicator, View.OnClickListener
@@ -53,6 +54,8 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     private ArrayList<String> blockList;
     private ArrayList<String> unblockList;
     private ArrayList<Friend> friendList;
+
+    private GenericCache genericCache;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -89,6 +92,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
 
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
+        genericCache = CacheManager.getGenericCache();
         fragmentManager = getActivity().getSupportFragmentManager();
 
         done.setOnClickListener(this);
@@ -109,8 +113,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     {
         super.onResume();
 
-        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.MANAGE_FRIENDS);
-
+        genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.MANAGE_FRIENDS);
         bus.register(this);
         userService.getAllFacebookFriends();
     }

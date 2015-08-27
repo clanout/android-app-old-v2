@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
@@ -33,7 +35,6 @@ import reaper.android.app.trigger.user.ManageFacebookFriendsTrigger;
 import reaper.android.app.trigger.user.ManagePhoneContactsTrigger;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
-import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.communicator.Communicator;
 
 public class InviteUsersContainerFragment extends Fragment implements TabLayout.OnTabSelectedListener, View.OnClickListener
@@ -47,6 +48,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     private EventService eventService;
     private LocationService locationService;
     private Bus bus;
+    private GenericCache genericCache;
 
     private ArrayList<EventDetails.Invitee> inviteeList;
     private String eventId;
@@ -108,6 +110,8 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
         locationService = new LocationService(bus);
         fragmentManager = getActivity().getSupportFragmentManager();
 
+        genericCache = CacheManager.getGenericCache();
+
         inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), new ArrayList<EventDetails.Invitee>());
         viewPager.setAdapter(inviteUsersPagerAdapter);
 
@@ -128,7 +132,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     public void onResume()
     {
         super.onResume();
-        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.INVITE_USERS_CONTAINER);
+        genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.INVITE_USERS_CONTAINER);
         bus.register(this);
         if (!fromCreateFragment)
         {

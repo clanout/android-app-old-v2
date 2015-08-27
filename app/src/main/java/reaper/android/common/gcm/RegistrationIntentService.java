@@ -17,7 +17,6 @@ import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.gcm.GcmRegistrationCompleteTrigger;
-import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.communicator.Communicator;
 import retrofit.client.Response;
 import rx.Subscriber;

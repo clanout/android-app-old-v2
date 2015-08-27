@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
@@ -45,7 +47,6 @@ import reaper.android.app.trigger.user.PhoneAddedTrigger;
 import reaper.android.app.trigger.user.PhoneContactsFetchedTrigger;
 import reaper.android.app.ui.screens.invite.core.InviteFriendsAdapter;
 import reaper.android.app.ui.util.PhoneUtils;
-import reaper.android.common.cache.Cache;
 import reaper.android.common.communicator.Communicator;
 
 public class InvitePhoneContactsFragment extends Fragment implements View.OnClickListener
@@ -65,6 +66,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
     private UserService userService;
     private LocationService locationService;
     private FragmentManager fragmentManager;
+    private GenericCache genericCache;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -104,8 +106,9 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         sharefacebook.setOnClickListener(this);
         addPhone.setOnClickListener(this);
         fragmentManager = getActivity().getSupportFragmentManager();
+        genericCache = CacheManager.getGenericCache();
 
-        if (Cache.getInstance().get(CacheKeys.MY_PHONE_NUMBER) == null)
+        if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null)
         {
             isPhoneAdded = false;
             displayInvitesLockedView();

@@ -65,18 +65,15 @@ public class FacebookActivity extends AppCompatActivity
         facebookLoginButton.setVisibility(View.GONE);
         if (AccessToken.getCurrentAccessToken() == null)
         {
-            Log.d("APP", "token is null");
             setUpFacebookLoginButton();
         } else
         {
             if (AccessToken.getCurrentAccessToken().getDeclinedPermissions().size() > 0)
             {
-                Log.d("APP", "token is not null and declined permissions ----- " + AccessToken.getCurrentAccessToken().getDeclinedPermissions());
                 LoginManager.getInstance().logOut();
                 setUpFacebookLoginButton();
             } else
             {
-                Log.d("APP", "token is not null and declined permissions ------ " + AccessToken.getCurrentAccessToken().getDeclinedPermissions());
                 goToLauncherActivity();
             }
         }
@@ -90,7 +87,6 @@ public class FacebookActivity extends AppCompatActivity
 
     private void goToLauncherActivity()
     {
-        Log.d("APP", "going to launcher activity");
         Intent intent = new Intent(this, LauncherActivity.class);
         startActivity(intent);
         finish();
@@ -114,7 +110,6 @@ public class FacebookActivity extends AppCompatActivity
                 {
                     if (loginResult.getRecentlyDeniedPermissions().size() > 0)
                     {
-                        Log.d("APP", "login result on success declined permissions --- " + loginResult.getRecentlyDeniedPermissions());
                         setUpAlertDialog(PERMISSION_REQUIRED, PERMISSION_REQUIRED_TITLE, "Grant Permission");
                     } else
                     {

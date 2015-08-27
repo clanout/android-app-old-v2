@@ -13,7 +13,6 @@ import reaper.android.app.api.google.response.GooglePlaceAutocompleteApiResponse
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.service.GoogleService;
 import reaper.android.app.service.LocationService;
-import reaper.android.common.cache.Cache;
 
 public class GooglePlacesAutocompleteAdapter extends ArrayAdapter<GooglePlaceAutocompleteApiResponse.Prediction> implements Filterable
 {

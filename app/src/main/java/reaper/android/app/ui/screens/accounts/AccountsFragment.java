@@ -26,6 +26,8 @@ import android.widget.Toast;
 import com.squareup.otto.Bus;
 
 import reaper.android.R;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.service.AccountsService;
@@ -33,7 +35,6 @@ import reaper.android.app.service.UserService;
 import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
-import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.communicator.Communicator;
 
 public class AccountsFragment extends Fragment implements AccountsAdapter.AccountsItemClickListener
@@ -45,6 +46,8 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
     private FragmentManager fragmentManager;
     private UserService userService;
     private Bus bus;
+
+    private GenericCache genericCache;
 
     private AccountsAdapter accountsAdapter;
 
@@ -75,6 +78,8 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
 
+        genericCache = CacheManager.getGenericCache();
+
         accountsAdapter = new AccountsAdapter(getActivity(), AccountsService.getmenuList());
         accountsAdapter.setAccountItemClickListener(this);
         recyclerView.setAdapter(accountsAdapter);
@@ -85,8 +90,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
     public void onResume()
     {
         super.onResume();
-
-        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.ACCOUNTS);
+        genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.ACCOUNTS);
     }
 
     @Override
@@ -124,8 +128,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
         if (position == 0)
         {
             FragmentUtils.changeFragment(fragmentManager, new ManageFriendsFragment());
-        }
-        else if (position == 1)
+        } else if (position == 1)
         {
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
             if (isWhatsappInstalled)
@@ -136,13 +139,11 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
                 intent.setType("text/plain");
                 intent.putExtra(Intent.EXTRA_TEXT, R.string.whatsapp_message);
                 startActivity(intent);
-            }
-            else
+            } else
             {
                 Toast.makeText(getActivity(), R.string.whatsapp_not_installed, Toast.LENGTH_LONG).show();
             }
-        }
-        else if (position == 2)
+        } else if (position == 2)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setCancelable(true);
@@ -179,8 +180,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
                     {
                         Toast.makeText(getActivity(), R.string.empty_rating, Toast.LENGTH_LONG).show();
                         wantToCloseDialog = false;
-                    }
-                    else
+                    } else
                     {
                         userService.shareFeedback(rating, comment);
                         Toast.makeText(getActivity(), R.string.feedback_submitted, Toast.LENGTH_LONG).show();
@@ -193,8 +193,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
                     }
                 }
             });
-        }
-        else if (position == 3)
+        } else if (position == 3)
         {
 
         }

@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
@@ -46,7 +48,6 @@ import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
-import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.chat.ChatHelper;
 import reaper.android.common.communicator.Communicator;
 
@@ -76,6 +77,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     private LocationService locationService;
     private FragmentManager fragmentManager;
     private Bus bus;
+
+    private GenericCache genericCache;
 
     private int loadHistoryClickCount = 1;
 
@@ -130,6 +133,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener
         locationService = new LocationService(bus);
         fragmentManager = getActivity().getSupportFragmentManager();
 
+        genericCache = CacheManager.getGenericCache();
+
         initXmppConnection();
     }
 
@@ -140,7 +145,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener
 
         bus.register(this);
 
-        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.CHAT);
+        genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.CHAT);
 
         if (connection == null)
         {

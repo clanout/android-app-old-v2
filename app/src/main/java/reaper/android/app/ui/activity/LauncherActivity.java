@@ -32,6 +32,7 @@ import reaper.android.app.trigger.user.UserLocationRefreshRequestTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshTrigger;
 import reaper.android.common.communicator.Communicator;
 
+
 public class LauncherActivity extends AppCompatActivity
 {
     private Bus bus;
@@ -107,11 +108,9 @@ public class LauncherActivity extends AppCompatActivity
             String sessionCookie = cache.get(CacheKeys.SESSION_ID);
             if (sessionCookie != null)
             {
-                Log.d("APP", "session cookie not null");
                 authService.validateSession(sessionCookie);
             } else
             {
-                Log.d("APP", "session cookie null");
                 facebookService.getUserProfile();
             }
         }
@@ -128,16 +127,13 @@ public class LauncherActivity extends AppCompatActivity
     public void onNewSessionCreated(NewSessionCreatedTrigger trigger)
     {
         cache.put(CacheKeys.SESSION_ID, trigger.getSessionCookie());
-        Log.d("APP", "new session created");
         if (!locationService.locationExists())
         {
-            Log.d("APP", "location not exists");
             progressDialog = ProgressDialog.show(this, "Welcome", "Fetching your current location...");
             isBlocking = true;
             bus.post(new UserLocationRefreshRequestTrigger());
         } else
         {
-            Log.d("APP", "location exists");
             isBlocking = false;
             bus.post(new UserLocationRefreshRequestTrigger());
             gotoMainActivity();
@@ -149,7 +145,6 @@ public class LauncherActivity extends AppCompatActivity
     {
         if (trigger.getErrorCode() == ErrorCode.NEW_SESSION_CREATION_FAILURE)
         {
-            Log.d("APP", "new session not created");
             Toast.makeText(this, R.string.messed_up, Toast.LENGTH_LONG).show();
             finish();
         }
@@ -158,7 +153,6 @@ public class LauncherActivity extends AppCompatActivity
     @Subscribe
     public void onFacebookProfileFetched(FacebookProfileFetchedTrigger trigger)
     {
-        Log.d("APP", "facebook profile fetched");
         authService.createNewSession(trigger.getFirstName(), trigger.getLastName(), trigger.getGender(), trigger.getEmail(), trigger.getId());
         cache.put(CacheKeys.USER_ID, trigger.getId());
         cache.put(CacheKeys.USER_NAME, trigger.getFirstName() + " " + trigger.getLastName());
@@ -169,7 +163,6 @@ public class LauncherActivity extends AppCompatActivity
     {
         if (trigger.getErrorCode() == ErrorCode.FACEBOOK_PROFILE_FETCH_FAILURE)
         {
-            Log.d("APP", "facebook profile not fetched");
             Toast.makeText(this, R.string.problem_contacting_facebook, Toast.LENGTH_LONG).show();
             LoginManager.getInstance().logOut();
             finish();
@@ -181,13 +174,11 @@ public class LauncherActivity extends AppCompatActivity
     {
         if (!locationService.locationExists())
         {
-            Log.d("APP", "location exists");
             progressDialog = ProgressDialog.show(this, "Welcome", "Fetching your current location...");
             isBlocking = true;
             bus.post(new UserLocationRefreshRequestTrigger());
         } else
         {
-            Log.d("APP", "location not exists");
             isBlocking = false;
             bus.post(new UserLocationRefreshRequestTrigger());
             gotoMainActivity();
@@ -199,7 +190,6 @@ public class LauncherActivity extends AppCompatActivity
     {
         if (trigger.getErrorCode() == ErrorCode.INVALID_SESSION)
         {
-            Log.d("APP", "session is invalid");
             facebookService.getUserProfile();
         }
     }
@@ -220,7 +210,6 @@ public class LauncherActivity extends AppCompatActivity
 
     public void gotoMainActivity()
     {
-        Log.d("APP", "going to main activity");
         Intent intent = new Intent(this, MainActivity.class);
 
         String shouldGoToDetailsFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);

@@ -98,7 +98,7 @@ public class UserService
                     {
                         if (response.getStatus() == 200)
                         {
-                            cache.put(CacheKeys.USER_PHONE, phoneNumber);
+                            cache.put(CacheKeys.MY_PHONE_NUMBER, phoneNumber);
                             bus.post(new PhoneAddedTrigger());
                         } else
                         {

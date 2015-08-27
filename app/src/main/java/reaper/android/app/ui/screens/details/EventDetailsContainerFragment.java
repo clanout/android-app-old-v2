@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
@@ -33,7 +35,6 @@ import reaper.android.app.trigger.event.ChangeAttendeeListTrigger;
 import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
-import reaper.android.common.cache.AppPreferences;
 import reaper.android.common.communicator.Communicator;
 
 public class EventDetailsContainerFragment extends Fragment implements View.OnClickListener
@@ -43,6 +44,8 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
 
     // Servoces
     private EventService eventService;
+
+    private GenericCache genericCache;
 
     // Data
     private List<Event> events;
@@ -99,6 +102,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         bus = Communicator.getInstance().getBus();
         fragmentManager = getActivity().getSupportFragmentManager();
         eventService = new EventService(bus);
+        genericCache = CacheManager.getGenericCache();
 
         pagerAdapter = new EventDetailsPagerAdapter(getChildFragmentManager(), events);
         viewPager.setAdapter(pagerAdapter);
@@ -136,7 +140,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
     public void onResume()
     {
         super.onResume();
-        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EVENT_DETAILS_CONTAINER);
+        genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EVENT_DETAILS_CONTAINER);
     }
 
     @Override

@@ -72,8 +72,6 @@ import reaper.android.app.ui.screens.create.CreateEventFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
-import reaper.android.common.cache.AppPreferences;
-import reaper.android.common.cache.Cache;
 import reaper.android.common.communicator.Communicator;
 
 public class HomeFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener
@@ -204,7 +202,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     {
         super.onResume();
 
-        AppPreferences.set(getActivity(), CacheKeys.ACTIVE_FRAGMENT, BackstackTags.HOME);
+        genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.HOME);
 
         bus.register(this);
         eventService.fetchEvents(userLocation.getZone());
@@ -479,7 +477,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
 
-        if (Cache.getInstance().get(CacheKeys.MY_PHONE_NUMBER) == null)
+        if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null)
         {
             menu.findItem(R.id.action_add_phone).setVisible(true);
 
