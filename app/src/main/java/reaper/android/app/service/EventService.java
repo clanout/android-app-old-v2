@@ -6,12 +6,13 @@ import com.squareup.otto.Bus;
 
 import org.joda.time.DateTime;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import reaper.android.app.api.core.ApiManager;
 import reaper.android.app.api.core.GsonProvider;
@@ -38,16 +39,17 @@ import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.ExceptionMessages;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventAttendeeComparator;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.Suggestion;
-import reaper.android.app.root.Reaper;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventCreatedTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
+import reaper.android.app.trigger.event.EventDetailsFetchedFromNetworkTrigger;
 import reaper.android.app.trigger.event.EventEditedTrigger;
 import reaper.android.app.trigger.event.EventIdsFetchedTrigger;
 import reaper.android.app.trigger.event.EventRsvpNotChangedTrigger;
@@ -55,9 +57,9 @@ import reaper.android.app.trigger.event.EventSuggestionsTrigger;
 import reaper.android.app.trigger.event.EventsFetchForActivityTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.event.NewEventsAndUpdatesFetchedTrigger;
+import retrofit.RetrofitError;
 import retrofit.client.Response;
 import rx.Observable;
-import rx.Scheduler;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -302,9 +304,9 @@ public class EventService
                         events.addAll(newEventList);
 
                         List<Event> filteredEvents = new ArrayList<Event>();
-                        for(Event event : events)
+                        for (Event event : events)
                         {
-                            if(event.getEndTime().isAfterNow())
+                            if (event.getEndTime().isAfterNow())
                             {
                                 filteredEvents.add(event);
                             }
@@ -442,6 +444,36 @@ public class EventService
                                 .getAttendees(), new EventAttendeeComparator(userService
                                 .getActiveUserId()));
                         bus.post(new EventDetailsFetchTrigger(eventDetails));
+                    }
+                });
+    }
+
+    public void fetchEventDetailsFromNetwork(String eventId)
+    {
+        EventDetailsApiRequest eventDetailsApiRequest = new EventDetailsApiRequest(eventId);
+
+        eventApi.getEventDetails(eventDetailsApiRequest)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<EventDetailsApiResponse>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        bus.post(new GenericErrorTrigger(ErrorCode.EVENT_DETAILS_FETCH_FROM_NETWORK_FAILURE, (Exception) e));
+                    }
+
+                    @Override
+                    public void onNext(EventDetailsApiResponse eventDetailsApiResponse)
+                    {
+                        eventCache.saveDetails(eventDetailsApiResponse.getEventDetails());
+                        bus.post(new EventDetailsFetchedFromNetworkTrigger(eventDetailsApiResponse.getEventDetails()));
                     }
                 });
     }
@@ -596,57 +628,54 @@ public class EventService
                 });
     }
 
-    public void editEvent(String eventId, boolean isFinalised, DateTime startTime, DateTime endTime, Location placeLocation, String description)
+    public void editEvent(final String eventId, boolean isFinalised, DateTime startTime, DateTime endTime, Location placeLocation, String description)
     {
-        EditEventApiRequest request = new EditEventApiRequest(String.valueOf(placeLocation
+        final EditEventApiRequest request = new EditEventApiRequest(String.valueOf(placeLocation
                 .getLongitude()), description, endTime, eventId, isFinalised, String
                 .valueOf(placeLocation.getLatitude()), placeLocation.getName(), placeLocation
                 .getZone(), startTime);
 
-        eventApi.editEvent(request)
-                .doOnNext(new Action1<Response>()
+        Observable.create(new Observable.OnSubscribe<Event>()
+        {
+            @Override
+            public void call(Subscriber<? super Event> subscriber)
+            {
+                try
                 {
-                    @Override
-                    public void call(Response response)
+                    Response response = eventApi.editEvent(request);
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.getBody().in()));
+
+                    String line;
+                    StringBuilder jsonBuilder = new StringBuilder();
+
+                    while ((line = bufferedReader.readLine()) != null)
                     {
-                        Timber.v(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> HERE");
-                        Timber.v(response.getStatus() + "");
+                        jsonBuilder.append(line).append("\n");
                     }
-                })
-                .map(new Func1<Response, EditEventApiResponse>()
+
+                    bufferedReader.close();
+                    String json = jsonBuilder.toString();
+                    Event event = GsonProvider.getGson().fromJson(json, EditEventApiResponse.class).getEvent();
+
+                    subscriber.onNext(event);
+
+                } catch (RetrofitError e)
                 {
-                    @Override
-                    public EditEventApiResponse call(Response response)
+                    if (e.getResponse().getStatus() == 400)
                     {
-                        if (response.getStatus() == 200)
-                        {
-                            Log.d("APP", "response code is 200");
-                            String json = response.getBody().toString();
-                            Log.d("APP", "json ------ " + json);
-                            EditEventApiResponse editEventApiResponse = GsonProvider.getGson().fromJson(json, EditEventApiResponse.class);
-                            return editEventApiResponse;
-                        } else if (response.getStatus() == 400)
-                        {
-                            Log.d("APP", "response code is 400");
-                            bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE_LOCKED, null));
-                            return null;
-                        } else
-                        {
-                            Log.d("APP", "response code is ----- " + response.getStatus());
-                            bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE, null));
-                            return null;
-                        }
+                        subscriber.onError(new Throwable(ExceptionMessages.EVENT_LOCKED));
+                    } else
+                    {
+                        subscriber.onError(new Throwable(ExceptionMessages.BAD_REQUEST));
                     }
-                })
-                .map(new Func1<EditEventApiResponse, Event>()
+
+                } catch (IOException e)
                 {
-                    @Override
-                    public Event call(EditEventApiResponse editEventApiResponse)
-                    {
-                        return editEventApiResponse.getEvent();
-                    }
-                })
-                .subscribeOn(Schedulers.newThread())
+                    subscriber.onError(new Throwable(ExceptionMessages.BAD_REQUEST));
+                }
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Event>()
                 {
@@ -659,16 +688,22 @@ public class EventService
                     @Override
                     public void onError(Throwable e)
                     {
-                        Timber.v("onError in edit ------ " + e.getMessage());
+                        if (e.getMessage().equals(ExceptionMessages.EVENT_LOCKED))
+                        {
+                            bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE_LOCKED, null));
+                        } else
+                        {
+                            bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE, null));
+                        }
                     }
 
                     @Override
                     public void onNext(Event event)
                     {
-                        eventCache.save(event);
                         bus.post(new EventEditedTrigger(event));
                     }
                 });
+
     }
 
     public void deleteEvent(final String eventId)

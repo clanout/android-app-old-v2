@@ -23,6 +23,7 @@ import reaper.android.app.api.me.response.GetAllAppFriendsApiResponse;
 import reaper.android.app.api.me.response.GetAppFriendsApiResponse;
 import reaper.android.app.api.me.response.GetPhoneContactsApiResponse;
 import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.AppConstants;
@@ -53,6 +54,7 @@ public class UserService
     private MeApi meApi;
     private UserCache userCache;
     private GenericCache cache;
+    private EventCache eventCache;
 
     public UserService(Bus bus)
     {
@@ -60,6 +62,7 @@ public class UserService
         meApi = ApiManager.getInstance().getApi(MeApi.class);
         userCache = CacheManager.getUserCache();
         cache = CacheManager.getGenericCache();
+        eventCache = CacheManager.getEventCache();
     }
 
     public String getActiveUserId()
@@ -333,7 +336,8 @@ public class UserService
                     @Override
                     public void onNext(Response response)
                     {
-
+                        userCache.deleteFriends();
+                        eventCache.deleteAll();
                     }
                 });
     }
@@ -362,7 +366,7 @@ public class UserService
                     @Override
                     public void onNext(Response response)
                     {
-                        if(response.getStatus() == 200)
+                        if (response.getStatus() == 200)
                         {
                             bus.post(new FacebookFriendsUpdatedOnServerTrigger(isPolling));
                         }

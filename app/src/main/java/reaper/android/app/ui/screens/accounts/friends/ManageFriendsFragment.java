@@ -303,12 +303,12 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
             if (isWhatsappInstalled)
             {
-                ComponentName componentName = new ComponentName("com.whatsapp", "com.whatsapp.ContactPicker");
-                Intent intent = new Intent();
-                intent.setComponent(componentName);
-                intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, R.string.whatsapp_message);
-                startActivity(intent);
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+                sendIntent.setType("text/plain");
+                sendIntent.setPackage("com.whatsapp");
+                startActivity(sendIntent);
             } else
             {
                 Toast.makeText(getActivity(), R.string.whatsapp_not_installed, Toast.LENGTH_LONG).show();

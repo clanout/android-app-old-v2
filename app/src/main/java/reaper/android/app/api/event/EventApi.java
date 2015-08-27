@@ -39,7 +39,7 @@ public interface EventApi
     Observable<EventSuggestionsApiResponse> getEventSuggestions(@Body EventSuggestionsApiRequest request);
 
     @POST("/event/edit")
-    Observable<Response> editEvent(@Body EditEventApiRequest request);
+    Response editEvent(@Body EditEventApiRequest request);
 
     @POST("/event/delete")
     Observable<Response> deleteEvent(@Body DeleteEventApiRequest request);

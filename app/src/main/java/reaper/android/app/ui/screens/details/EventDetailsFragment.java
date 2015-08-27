@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +44,7 @@ import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.ChangeAttendeeListTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
+import reaper.android.app.trigger.event.EventDetailsFetchedFromNetworkTrigger;
 import reaper.android.app.trigger.event.EventRsvpNotChangedTrigger;
 import reaper.android.app.ui.screens.edit.EditEventFragment;
 import reaper.android.app.ui.util.FragmentUtils;
@@ -67,7 +70,8 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     private ImageView icon, locationIcon;
     private TextView title, type, description, location, dateTime;
     private RecyclerView attendeeList;
-    private TextView noAttendeeMessage;
+    private TextView noAttendeeMessage, refreshDetailsTextView;
+    private ProgressBar refreshDetailsProgressBar;
 
     private EventAttendeesAdapter eventAttendeesAdapter;
 
@@ -94,6 +98,8 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         dateTime = (TextView) view.findViewById(R.id.tv_event_details_date_time);
         attendeeList = (RecyclerView) view.findViewById(R.id.rv_event_details_attendees);
         noAttendeeMessage = (TextView) view.findViewById(R.id.tv_event_details_no_attendees);
+        refreshDetailsProgressBar = (ProgressBar) view.findViewById(R.id.pb_event_details_refresh_details);
+        refreshDetailsTextView = (TextView) view.findViewById(R.id.tv_event_details_refresh_details);
 
         return view;
     }
@@ -135,6 +141,11 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         bus.register(this);
         eventCache.markSeen(event.getId());
         eventService.fetchEventDetails(event.getId());
+
+        eventService.fetchEventDetailsFromNetwork(event.getId());
+        refreshDetailsProgressBar.setVisibility(View.VISIBLE);
+        refreshDetailsTextView.setVisibility(View.VISIBLE);
+        refreshDetailsTextView.setText("Refreshing Attendee List");
     }
 
     @Override
@@ -142,6 +153,30 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     {
         super.onPause();
         bus.unregister(this);
+    }
+
+    @Subscribe
+    public void onEventDetailsFetchedFromNetwork(EventDetailsFetchedFromNetworkTrigger trigger)
+    {
+        if (trigger.getEventDetails().getId().equals(event.getId()))
+        {
+            eventDetails = trigger.getEventDetails();
+
+            if (eventDetails.getDescription() == null || eventDetails.getDescription().isEmpty())
+            {
+                description.setText(R.string.event_details_no_description);
+            } else
+            {
+                description.setText(eventDetails.getDescription());
+            }
+
+            refreshRecyclerView();
+
+            areEventDetailsFetched = true;
+
+            refreshDetailsProgressBar.setVisibility(View.GONE);
+            refreshDetailsTextView.setVisibility(View.GONE);
+        }
     }
 
     @Subscribe

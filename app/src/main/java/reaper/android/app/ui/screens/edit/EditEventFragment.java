@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +42,7 @@ import java.util.List;
 import reaper.android.R;
 import reaper.android.app.api.google.response.GooglePlaceAutocompleteApiResponse;
 import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
@@ -81,10 +83,10 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     private UserService userService;
     private GoogleService googleService;
     private GenericCache genericCache;
+    private EventCache eventCache;
 
     // Data
     private Event event;
-    private String eventId;
     private EventDetails eventDetails;
     private Location placeLocation;
     private DateTime startDateTime, endDateTime;
@@ -153,6 +155,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         googleService = new GoogleService(bus);
 
         genericCache = CacheManager.getGenericCache();
+        eventCache = CacheManager.getEventCache();
 
         placeLocation = event.getLocation();
 
@@ -640,7 +643,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     @Subscribe
     public void onEventEdited(EventEditedTrigger trigger)
     {
-        eventId = trigger.getEvent().getId();
+        event = trigger.getEvent();
         eventService.fetchEvents(locationService.getUserLocation().getZone());
     }
 
@@ -653,6 +656,11 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         activeEvent.setId(event.getId());
 
         int activePosition = events.indexOf(activeEvent);
+
+        events.set(activePosition, event);
+
+        eventCache.deleteCompletely(event.getId());
+        eventCache.save(event);
 
         EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
         Bundle bundle = new Bundle();
