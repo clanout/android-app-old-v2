@@ -1,6 +1,7 @@
 package reaper.android.app.ui.screens.accounts;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -28,6 +30,7 @@ import com.squareup.otto.Bus;
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.service.AccountsService;
@@ -35,6 +38,7 @@ import reaper.android.app.service.UserService;
 import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.communicator.Communicator;
 
 public class AccountsFragment extends Fragment implements AccountsAdapter.AccountsItemClickListener
@@ -130,6 +134,9 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
             FragmentUtils.changeFragment(fragmentManager, new ManageFriendsFragment());
         } else if (position == 1)
         {
+            displayUpdatePhoneDialog();
+        } else if (position == 2)
+        {
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
             if (isWhatsappInstalled)
             {
@@ -143,7 +150,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
             {
                 Toast.makeText(getActivity(), R.string.whatsapp_not_installed, Toast.LENGTH_LONG).show();
             }
-        } else if (position == 2)
+        } else if (position == 3)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setCancelable(true);
@@ -193,9 +200,61 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
                     }
                 }
             });
-        } else if (position == 3)
+        } else if (position == 4)
         {
 
         }
+    }
+
+    private void displayUpdatePhoneDialog()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(true);
+
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.alert_dialog_add_phone, null);
+        builder.setView(dialogView);
+
+        final EditText phoneNumber = (EditText) dialogView.findViewById(R.id.et_alert_dialog_add_phone);
+
+        builder.setPositiveButton("Done", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+
+            }
+        });
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Boolean wantToCloseDialog = false;
+                String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
+                if (parsedPhone == null)
+                {
+                    Toast.makeText(getActivity(), R.string.phone_invalid, Toast.LENGTH_LONG).show();
+                    wantToCloseDialog = false;
+                } else
+                {
+                    userService.updatePhoneNumber(parsedPhone);
+                    InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputManager.hideSoftInputFromWindow(dialogView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
+                    wantToCloseDialog = true;
+                }
+
+                if (wantToCloseDialog)
+                {
+                    alertDialog.dismiss();
+                }
+            }
+        });
+
     }
 }

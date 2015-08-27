@@ -32,6 +32,7 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.Timestamps;
+import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
 import reaper.android.app.service.AccountsService;
@@ -63,6 +64,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
 
     private ArrayList<EventDetails.Invitee> inviteeList;
     private List<Friend> friendList;
+    private Event event;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -101,11 +103,13 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
         else
         {
             inviteeList = (ArrayList<EventDetails.Invitee>) bundle.get(BundleKeys.INVITEE_LIST);
+            event = (Event) bundle.get(BundleKeys.EVENT);
 
             if (inviteeList == null)
             {
                 inviteeList = new ArrayList<>();
             }
+
         }
 
         friendList = new ArrayList<>();
@@ -207,7 +211,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
 
     private void initRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, true, bus);
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, true, bus, event);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -215,7 +219,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
 
     private void refreshRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, true, bus);
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, true, bus, event);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
 

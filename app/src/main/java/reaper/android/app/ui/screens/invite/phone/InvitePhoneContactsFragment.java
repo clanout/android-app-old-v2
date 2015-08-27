@@ -37,6 +37,7 @@ import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
 import reaper.android.app.service.AccountsService;
@@ -59,6 +60,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
 
     private ArrayList<EventDetails.Invitee> inviteeList;
     private List<Friend> friendList;
+    private Event event;
     private InviteFriendsAdapter inviteFriendsAdapter;
     private boolean isPhoneAdded;
 
@@ -129,6 +131,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         else
         {
             inviteeList = (ArrayList<EventDetails.Invitee>) bundle.get(BundleKeys.INVITEE_LIST);
+            event = (Event) bundle.get(BundleKeys.EVENT);
 
             if (inviteeList == null)
             {
@@ -251,7 +254,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
 
     private void initRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, false, bus);
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, false, bus, event);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -259,7 +262,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
 
     private void refreshRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, false, bus);
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, false, bus, event);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
 

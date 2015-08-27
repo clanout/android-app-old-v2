@@ -476,7 +476,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     {
         InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
         Bundle bundle = new Bundle();
-        bundle.putString(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT_ID, trigger.getEvent().getId());
+        bundle.putSerializable(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT, trigger.getEvent());
         bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, true);
         inviteUsersContainerFragment.setArguments(bundle);
 

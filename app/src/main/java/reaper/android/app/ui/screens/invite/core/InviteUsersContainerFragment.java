@@ -50,7 +50,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     private GenericCache genericCache;
 
     private ArrayList<EventDetails.Invitee> inviteeList;
-    private String eventId;
+    private Event event;
     private Boolean fromCreateFragment;
 
     private List<String> invitedFacebookFriends;
@@ -88,8 +88,8 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
             throw new IllegalStateException("Bundle is null");
         }
 
-        eventId = (String) bundle.get(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT_ID);
-        if (eventId == null)
+        event = (Event) bundle.get(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT);
+        if (event == null)
         {
             throw new IllegalStateException("Event Id is null");
         }
@@ -111,7 +111,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
 
         genericCache = CacheManager.getGenericCache();
 
-        inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), new ArrayList<EventDetails.Invitee>());
+        inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), new ArrayList<EventDetails.Invitee>(), event);
         viewPager.setAdapter(inviteUsersPagerAdapter);
 
         tabLayout.post(new Runnable()
@@ -135,7 +135,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
         bus.register(this);
         if (!fromCreateFragment)
         {
-            eventService.fetchEventDetails(eventId);
+            eventService.fetchEventDetails(event.getId());
         }
     }
 
@@ -201,7 +201,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
 
             if (invitedUsers.size() != 0)
             {
-                eventService.inviteUsers(eventId, invitedUsers);
+                eventService.inviteUsers(event.getId(), invitedUsers);
             }
             eventService.fetchEvents(locationService.getUserLocation().getZone());
         }
@@ -214,7 +214,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
         {
             inviteeList = (ArrayList<EventDetails.Invitee>) trigger.getEventDetails().getInvitee();
 
-            inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), inviteeList);
+            inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), inviteeList, event);
             viewPager.setAdapter(inviteUsersPagerAdapter);
         }
     }
@@ -225,7 +225,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
         List<Event> events = trigger.getEvents();
 
         Event activeEvent = new Event();
-        activeEvent.setId(eventId);
+        activeEvent.setId(event.getId());
 
         int activePosition = events.indexOf(activeEvent);
 

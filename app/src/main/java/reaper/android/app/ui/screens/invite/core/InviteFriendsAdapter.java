@@ -15,6 +15,7 @@ import com.squareup.otto.Bus;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
 import reaper.android.app.trigger.user.ManageAppFriendsTrigger;
@@ -32,8 +33,9 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
     private List<Friend> friends;
     private boolean isFacebookAdapter;
     private Bus bus;
+    private Event event;
 
-    public InviteFriendsAdapter(Context context, List<EventDetails.Invitee> invitees, List<Friend> friends, boolean isFacebookAdapter, Bus bus)
+    public InviteFriendsAdapter(Context context, List<EventDetails.Invitee> invitees, List<Friend> friends, boolean isFacebookAdapter, Bus bus, Event event)
     {
         inflater = LayoutInflater.from(context);
         this.invitees = invitees;
@@ -41,6 +43,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
         this.context = context;
         this.isFacebookAdapter = isFacebookAdapter;
         this.bus = bus;
+        this.event = event;
     }
 
     @Override
@@ -60,8 +63,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
         {
             holder.userPic.setVisibility(View.VISIBLE);
             holder.userPic.setImageResource(R.drawable.ic_local_bar_black_36dp);
-        }
-        else
+        } else
         {
             holder.userPic.setVisibility(View.GONE);
         }
@@ -71,24 +73,31 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
         EventDetails.Invitee invitee = new EventDetails.Invitee();
         invitee.setId(current.getId());
 
-        if (current.isBlocked())
+        if (event.getOrganizerId().equals(current.getId()))
         {
             holder.checkBox.setVisibility(View.GONE);
-            holder.alreadyInvited.setText("Blocked");
+            holder.alreadyInvited.setText("Created Event");
             holder.alreadyInvited.setVisibility(View.VISIBLE);
-        }
-        else
+        } else
         {
-            if (invitees.contains(invitee))
+
+            if (current.isBlocked())
             {
                 holder.checkBox.setVisibility(View.GONE);
-                holder.alreadyInvited.setText("Already Invited");
+                holder.alreadyInvited.setText("Blocked");
                 holder.alreadyInvited.setVisibility(View.VISIBLE);
-            }
-            else
+            } else
             {
-                holder.alreadyInvited.setVisibility(View.GONE);
-                holder.checkBox.setVisibility(View.VISIBLE);
+                if (invitees.contains(invitee))
+                {
+                    holder.checkBox.setVisibility(View.GONE);
+                    holder.alreadyInvited.setText("Already Invited");
+                    holder.alreadyInvited.setVisibility(View.VISIBLE);
+                } else
+                {
+                    holder.alreadyInvited.setVisibility(View.GONE);
+                    holder.checkBox.setVisibility(View.VISIBLE);
+                }
             }
         }
     }
@@ -123,11 +132,10 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
         {
             if (isFacebookAdapter)
             {
-               bus.post(new ManageAppFriendsTrigger(friends.get(getAdapterPosition()).getId()));
-            }
-            else
+                bus.post(new ManageAppFriendsTrigger(friends.get(getAdapterPosition()).getId()));
+            } else
             {
-               bus.post(new ManagePhoneContactsTrigger(friends.get(getAdapterPosition()).getId()));
+                bus.post(new ManagePhoneContactsTrigger(friends.get(getAdapterPosition()).getId()));
             }
         }
     }

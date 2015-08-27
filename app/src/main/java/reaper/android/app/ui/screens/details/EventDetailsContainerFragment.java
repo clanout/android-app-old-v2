@@ -206,7 +206,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
             {
                 InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
                 Bundle bundle = new Bundle();
-                bundle.putString(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT_ID, events.get(activePosition).getId());
+                bundle.putSerializable(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT, events.get(activePosition));
                 bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, false);
                 inviteUsersContainerFragment.setArguments(bundle);
                 FragmentUtils.changeFragment(fragmentManager, inviteUsersContainerFragment);
