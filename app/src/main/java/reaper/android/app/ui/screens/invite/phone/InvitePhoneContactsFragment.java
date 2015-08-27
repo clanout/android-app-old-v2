@@ -28,6 +28,7 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import reaper.android.R;
@@ -40,6 +41,7 @@ import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
+import reaper.android.app.model.FriendsComparator;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
@@ -263,7 +265,6 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
     private void refreshRecyclerView()
     {
         inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, false, bus, event);
-
         recyclerView.setAdapter(inviteFriendsAdapter);
 
         if (friendList.size() == 0)
@@ -280,6 +281,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
     public void onPhoneContactsFetched(PhoneContactsFetchedTrigger trigger)
     {
         friendList = trigger.getPhoneContacts();
+        Collections.sort(friendList, new FriendsComparator());
         refreshRecyclerView();
 
         if (menu != null)

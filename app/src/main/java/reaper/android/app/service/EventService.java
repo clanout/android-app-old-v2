@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import reaper.android.app.api.core.ApiManager;
+import reaper.android.app.api.core.GsonProvider;
 import reaper.android.app.api.event.EventApi;
 import reaper.android.app.api.event.request.CreateEventApiRequest;
 import reaper.android.app.api.event.request.DeleteEventApiRequest;
@@ -113,7 +114,7 @@ public class EventService
                                                 @Override
                                                 public void call(List<Event> events)
                                                 {
-                                                    genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now().toString());
+                                                    genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now());
                                                     eventCache.reset(events);
                                                 }
                                             })
@@ -177,7 +178,7 @@ public class EventService
                                                 @Override
                                                 public void call(List<Event> events)
                                                 {
-                                                    genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now().toString());
+                                                    genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now());
                                                     eventCache.reset(events);
                                                 }
                                             })
@@ -239,7 +240,6 @@ public class EventService
                     @Override
                     public void onError(Throwable e)
                     {
-                        Log.d("APP", "Exception while fetching event ------ " + e.getMessage());
                     }
 
                     @Override
@@ -256,7 +256,7 @@ public class EventService
                 });
     }
 
-    public void fetchNewEventsAndUpdatesFromNetwork(String zone, final List<String> eventIdList, String lastUpdateTimestamp)
+    public void fetchNewEventsAndUpdatesFromNetwork(String zone, final List<String> eventIdList, DateTime lastUpdateTimestamp)
     {
         Observable<FetchNewEventsAndUpdatesApiResponse> updatesObservable = eventApi.fetchNewEventsAndUpdates(new FetchNewEventsAndUpdatesApiRequest(zone, eventIdList, lastUpdateTimestamp));
         Observable<List<Event>> cachedEventsObservable = eventCache.getEvents();
@@ -301,7 +301,16 @@ public class EventService
 
                         events.addAll(newEventList);
 
-                        return events;
+                        List<Event> filteredEvents = new ArrayList<Event>();
+                        for(Event event : events)
+                        {
+                            if(event.getEndTime().isAfterNow())
+                            {
+                                filteredEvents.add(event);
+                            }
+                        }
+
+                        return filteredEvents;
                     }
                 });
 
@@ -324,7 +333,7 @@ public class EventService
                     @Override
                     public void onNext(List<Event> events)
                     {
-                        genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now().toString());
+                        genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now());
                         eventCache.reset(events);
                         bus.post(new NewEventsAndUpdatesFetchedTrigger(events));
                     }
@@ -475,7 +484,8 @@ public class EventService
                                 eventCache.deleteCompletely(updatedEvent.getId());
                                 eventCache.save(updatedEvent);
                                 handleTopicSubscription(updatedEvent);
-                            }else{
+                            } else
+                            {
                                 eventCache.save(updatedEvent);
                             }
                         } else
@@ -594,6 +604,40 @@ public class EventService
                 .getZone(), startTime);
 
         eventApi.editEvent(request)
+                .doOnNext(new Action1<Response>()
+                {
+                    @Override
+                    public void call(Response response)
+                    {
+                        Timber.v(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> HERE");
+                        Timber.v(response.getStatus() + "");
+                    }
+                })
+                .map(new Func1<Response, EditEventApiResponse>()
+                {
+                    @Override
+                    public EditEventApiResponse call(Response response)
+                    {
+                        if (response.getStatus() == 200)
+                        {
+                            Log.d("APP", "response code is 200");
+                            String json = response.getBody().toString();
+                            Log.d("APP", "json ------ " + json);
+                            EditEventApiResponse editEventApiResponse = GsonProvider.getGson().fromJson(json, EditEventApiResponse.class);
+                            return editEventApiResponse;
+                        } else if (response.getStatus() == 400)
+                        {
+                            Log.d("APP", "response code is 400");
+                            bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE_LOCKED, null));
+                            return null;
+                        } else
+                        {
+                            Log.d("APP", "response code is ----- " + response.getStatus());
+                            bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE, null));
+                            return null;
+                        }
+                    }
+                })
                 .map(new Func1<EditEventApiResponse, Event>()
                 {
                     @Override
@@ -615,7 +659,7 @@ public class EventService
                     @Override
                     public void onError(Throwable e)
                     {
-                        bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE, (Exception) e));
+                        Timber.v("onError in edit ------ " + e.getMessage());
                     }
 
                     @Override

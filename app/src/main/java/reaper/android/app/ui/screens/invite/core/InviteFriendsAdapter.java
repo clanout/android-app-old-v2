@@ -11,10 +11,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.config.AppConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
@@ -62,7 +64,15 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
         if (isFacebookAdapter)
         {
             holder.userPic.setVisibility(View.VISIBLE);
-            holder.userPic.setImageResource(R.drawable.ic_local_bar_black_36dp);
+
+            Picasso.with(context)
+                    .load(AppConstants.FACEBOOK_END_POINT + current.getId() + "/picture")
+                    .placeholder(R.drawable.ic_person_black_36dp)
+                    .fit()
+                    .centerInside()
+                    .into(holder.userPic);
+
+
         } else
         {
             holder.userPic.setVisibility(View.GONE);

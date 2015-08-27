@@ -7,6 +7,9 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 import org.joda.time.DateTime;
 
@@ -18,7 +21,10 @@ public class GsonProvider
 
     static
     {
-        gson = (Converters.registerAll(new GsonBuilder())).registerTypeAdapter(DateTime.class, new DateTimeParser()).create();
+        gson = new GsonBuilder()
+                .registerTypeAdapter(DateTime.class, new DateTimeDeserializer())
+                .registerTypeAdapter(DateTime.class, new DateTimeSerializer())
+                .create();
     }
 
     public static Gson getGson()
@@ -26,13 +32,22 @@ public class GsonProvider
         return gson;
     }
 
-    private static class DateTimeParser implements JsonDeserializer<DateTime>
+    private static class DateTimeDeserializer implements JsonDeserializer<DateTime>
     {
         @Override
         public DateTime deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext
                 jsonDeserializationContext) throws JsonParseException
         {
-            return DateTime.parse(jsonElement.getAsString());
+            return DateTime.parse(jsonElement.getAsString());//.replaceAll("[^\\w\\s\\-+:]", ""));
+        }
+    }
+
+    public static class DateTimeSerializer implements JsonSerializer<DateTime>
+    {
+        @Override
+        public JsonElement serialize(DateTime src, Type typeOfSrc, JsonSerializationContext context)
+        {
+            return new JsonPrimitive(src.toString());
         }
     }
 }

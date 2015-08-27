@@ -11,4 +11,7 @@ public class AppConstants
 
     //GCM
     public static final String GCM_SENDER_ID = "1014674558116";
+
+    // Facebook
+    public static final String FACEBOOK_END_POINT = "https://graph.facebook.com/v2.4/";
 }

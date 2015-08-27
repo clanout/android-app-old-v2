@@ -87,7 +87,6 @@ public class AuthService
                     @Override
                     public void onError(Throwable e)
                     {
-                        Log.d("APP", "onError in createNewSession ===== " + e.getMessage());
                         bus.post(new GenericErrorTrigger(ErrorCode.NEW_SESSION_CREATION_FAILURE, (Exception) e));
                     }
 

@@ -169,7 +169,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     {
         attendeeList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        eventAttendeesAdapter = new EventAttendeesAdapter(new ArrayList<EventDetails.Attendee>());
+        eventAttendeesAdapter = new EventAttendeesAdapter(new ArrayList<EventDetails.Attendee>(), getActivity());
         eventAttendeesAdapter.setAttendeeClickCommunicator(this);
         attendeeList.setAdapter(eventAttendeesAdapter);
     }
@@ -207,7 +207,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
             eventDetails.getAttendees().add(attendee);
         }
 
-        eventAttendeesAdapter = new EventAttendeesAdapter(eventDetails.getAttendees());
+        eventAttendeesAdapter = new EventAttendeesAdapter(eventDetails.getAttendees(), getActivity());
         eventAttendeesAdapter.setAttendeeClickCommunicator(this);
         attendeeList.setAdapter(eventAttendeesAdapter);
     }

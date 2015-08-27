@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.api.core.GsonProvider;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
@@ -45,6 +46,7 @@ import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.chat.ChatHelper;
 import reaper.android.common.communicator.Communicator;
+import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -68,7 +70,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
-        Log.d("APP", "Main activity on Create");
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
@@ -96,17 +97,14 @@ public class MainActivity extends AppCompatActivity
 
         if (shouldGoToDetailsFragment.equals("yes") && eventId != null)
         {
-            Log.d("APP", "should go to details");
             eventService.fetchEventsForActivity(locationService.getUserLocation().getZone());
         } else
         {
-            Log.d("APP", "should go to home");
             String lastNotificationReceived = genericCache.get(Timestamps.NOTIFICATION_RECEIVED_TIMESTAMP);
             String lastFriendRelocatedNotificationReceived = genericCache.get(Timestamps.FRIEND_RELOCATED_NOTIFICATION_TIMESTAMP);
 
             if (lastNotificationReceived != null && lastFriendRelocatedNotificationReceived != null)
             {
-                Log.d("APP", "last notif recd not null");
                 DateTime lastNotificationTimestamp = DateTime.parse(lastNotificationReceived);
                 DateTime lastFriendRelocatedNotificationTimestamp = DateTime.parse(lastFriendRelocatedNotificationReceived);
 
@@ -121,35 +119,28 @@ public class MainActivity extends AppCompatActivity
                 }
             }
 
-            String lastFacebookFriendsRefreshTimestamp = genericCache.get(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP);
+            DateTime lastFacebookFriendsRefreshTimestamp = genericCache.get(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.class);
 
             if (lastFacebookFriendsRefreshTimestamp != null)
             {
-                Log.d("APP", "friends refresh last timestamp not null");
-                DateTime lastFacebookFriendsRefreshDateTime = DateTime.parse(lastFacebookFriendsRefreshTimestamp);
 
-                if (DateTime.now().getMillis() - lastFacebookFriendsRefreshDateTime.getMillis() > Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_LIMIT)
+                if (DateTime.now().minusDays(2).isAfter(lastFacebookFriendsRefreshTimestamp))
                 {
-                    Log.d("APP", "friends refresh last timestamp not null and will refresh");
                     facebookService.getFacebookFriends(true);
                 }
             } else
             {
-                Log.d("APP", "friends refresh last timestamp null");
                 facebookService.getFacebookFriends(true);
             }
 
             if (genericCache.get(CacheKeys.GCM_TOKEN) == null)
             {
-                Log.d("APP", "gcm token is null");
                 if (checkPlayServices())
                 {
                     gcmService.register();
                 }
             } else
             {
-                Log.d("APP", "gcm token is not null");
-                Log.d("APP", "user id ----- " + userService.getActiveUserId());
                 ChatHelper.init(userService.getActiveUserId());
                 FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
             }
@@ -245,7 +236,6 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onGcmRegistrationComplete(GcmRegistrationCompleteTrigger trigger)
     {
-        Log.d("APP", "userId after GCM registration complete ----- " + userService.getActiveUserId());
         ChatHelper.init(userService.getActiveUserId());
 
         runOnUiThread(new Runnable()
@@ -293,6 +283,15 @@ public class MainActivity extends AppCompatActivity
                     FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
                 }
             });
+        }
+    }
+
+    @Subscribe
+    public void onEventEditFailedAsFinalised(GenericErrorTrigger trigger)
+    {
+        if(trigger.getErrorCode() == ErrorCode.EVENT_EDIT_FAILURE_LOCKED)
+        {
+            Toast.makeText(this, R.string.event_edit_failed_locked, Toast.LENGTH_LONG).show();
         }
     }
 }

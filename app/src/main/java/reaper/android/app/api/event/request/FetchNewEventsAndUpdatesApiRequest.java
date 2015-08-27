@@ -21,9 +21,9 @@ public class FetchNewEventsAndUpdatesApiRequest extends ApiRequest
     private String eventIdList;
 
     @SerializedName("last_updated")
-    private String lastUpdateTimestamp;
+    private DateTime lastUpdateTimestamp;
 
-    public FetchNewEventsAndUpdatesApiRequest(String zone, List<String> eventIdList, String lastUpdateTimestamp)
+    public FetchNewEventsAndUpdatesApiRequest(String zone, List<String> eventIdList, DateTime lastUpdateTimestamp)
     {
         this.zone = zone;
         this.eventIdList = GsonProvider.getGson().toJson(eventIdList);

@@ -1,5 +1,6 @@
 package reaper.android.app.ui.screens.details;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,19 +8,24 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.config.AppConstants;
 import reaper.android.app.model.EventDetails;
 
 public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAdapter.EventDetailsViewHolder>
 {
+    private Context context;
     List<EventDetails.Attendee> attendees;
     private AttendeeClickCommunicator attendeeClickCommunicator;
 
-    public EventAttendeesAdapter(List<EventDetails.Attendee> attendees)
+    public EventAttendeesAdapter(List<EventDetails.Attendee> attendees, Context context)
     {
         this.attendees = attendees;
+        this.context = context;
     }
 
     @Override
@@ -68,15 +74,20 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
 
         public void render(EventDetails.Attendee attendee)
         {
-            pic.setImageResource(R.drawable.ic_person_black_36dp);
+            Picasso.with(context)
+                    .load(AppConstants.FACEBOOK_END_POINT + attendee.getId() + "/picture")
+                    .placeholder(R.drawable.ic_person_black_36dp)
+                    .fit()
+                    .centerInside()
+                    .into(pic);
+
             name.setText(attendee.getName());
 
             if (attendee.isInviter())
             {
                 inviter.setVisibility(View.VISIBLE);
                 inviter.setImageResource(R.drawable.ic_person_add_black_24dp);
-            }
-            else
+            } else
             {
                 inviter.setVisibility(View.INVISIBLE);
             }
@@ -95,9 +106,12 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
         @Override
         public void onClick(View v)
         {
-            if(attendeeClickCommunicator != null)
+            if (attendeeClickCommunicator != null)
             {
-                attendeeClickCommunicator.onAttendeeClicked(attendees.get(getAdapterPosition()).getName());
+                if (attendees.get(getAdapterPosition()).isInviter())
+                {
+                    attendeeClickCommunicator.onAttendeeClicked(attendees.get(getAdapterPosition()).getName());
+                }
             }
         }
     }

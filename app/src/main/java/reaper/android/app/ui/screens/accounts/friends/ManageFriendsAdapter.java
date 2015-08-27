@@ -10,10 +10,13 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.config.AppConstants;
 import reaper.android.app.model.Friend;
 
 /**
@@ -50,7 +53,12 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
     {
         Friend current = friends.get(position);
 
-        holder.userPic.setImageResource(R.drawable.ic_local_bar_black_36dp);
+        Picasso.with(context)
+                .load(AppConstants.FACEBOOK_END_POINT + current.getId() + "/picture")
+                .placeholder(R.drawable.ic_person_black_36dp)
+                .fit()
+                .centerInside()
+                .into(holder.userPic);
 
         holder.username.setText(current.getName());
 

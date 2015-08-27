@@ -310,10 +310,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     {
         if (genericCache.get(CacheKeys.LAST_UPDATE_TIMESTAMP) != null)
         {
-            eventService.fetchNewEventsAndUpdatesFromNetwork(locationService.getUserLocation().getZone(), trigger.getEventIdList(), genericCache.get(CacheKeys.LAST_UPDATE_TIMESTAMP));
+            eventService.fetchNewEventsAndUpdatesFromNetwork(locationService.getUserLocation().getZone(), trigger.getEventIdList(), genericCache.get(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.class));
         } else
         {
-            genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now().toString());
+            genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now());
         }
     }
 

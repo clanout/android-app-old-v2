@@ -24,6 +24,7 @@ import com.squareup.otto.Subscribe;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import reaper.android.R;
@@ -35,12 +36,14 @@ import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
+import reaper.android.app.model.FriendsComparator;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
+import reaper.android.app.trigger.user.AppFriendsFetchedFromNetworkTrigger;
 import reaper.android.app.trigger.user.AppFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.ui.screens.invite.core.InviteFriendsAdapter;
@@ -99,8 +102,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
         if (bundle == null)
         {
             inviteeList = new ArrayList<>();
-        }
-        else
+        } else
         {
             inviteeList = (ArrayList<EventDetails.Invitee>) bundle.get(BundleKeys.INVITEE_LIST);
             event = (Event) bundle.get(BundleKeys.EVENT);
@@ -227,8 +229,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
         {
             displayNoFriendsView();
 
-        }
-        else
+        } else
         {
             displayBasicView();
         }
@@ -237,19 +238,19 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     @Subscribe
     public void onFacebookFriendsUpdatedOnServer(FacebookFriendsUpdatedOnServerTrigger trigger)
     {
-        if(!trigger.isPolling())
+        if (!trigger.isPolling())
         {
-            userService.getAppFriends(locationService.getUserLocation().getZone());
-            genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now().toString());
+            userService.getAppFriendsFromNetwork(locationService.getUserLocation().getZone());
+            genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now());
         }
     }
 
     @Subscribe
     public void onFacebookFriendsNotUpdatedOnServer(GenericErrorTrigger trigger)
     {
-        if(trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE)
+        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE)
         {
-            if(menu != null)
+            if (menu != null)
             {
                 menu.findItem(R.id.action_refresh).setActionView(null);
             }
@@ -271,7 +272,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     {
         if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE)
         {
-            if(menu != null)
+            if (menu != null)
             {
                 menu.findItem(R.id.action_refresh).setActionView(null);
             }
@@ -283,6 +284,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     public void onZonalAppFriendsFetched(AppFriendsFetchedTrigger trigger)
     {
         friendList = trigger.getFriends();
+        Collections.sort(friendList, new FriendsComparator());
         refreshRecyclerView();
     }
 
@@ -295,6 +297,32 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
         }
     }
 
+    @Subscribe
+    public void onZonalFriendsFetchedFromNetwork(AppFriendsFetchedFromNetworkTrigger trigger)
+    {
+        if (menu != null)
+        {
+            menu.findItem(R.id.action_refresh).setActionView(null);
+        }
+        friendList = trigger.getFriends();
+        Collections.sort(friendList, new FriendsComparator());
+        refreshRecyclerView();
+    }
+
+    @Subscribe
+    public void onZonalFriendsNotFetchedFromNetwork(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.APP_FRIENDS_FETCH_FROM_NETWORK_FAILURE)
+        {
+            if (menu != null)
+            {
+                menu.findItem(R.id.action_refresh).setActionView(null);
+            }
+
+            displayErrorView();
+        }
+    }
+
     @Override
     public void onClick(View view)
     {
@@ -303,19 +331,16 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
             if (isWhatsappInstalled)
             {
-                ComponentName componentName = new ComponentName("com.whatsapp", "com.whatsapp.ContactPicker");
-                Intent intent = new Intent();
-                intent.setComponent(componentName);
-                intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, R.string.whatsapp_message);
-                startActivity(intent);
-            }
-            else
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
+            } else
             {
                 Toast.makeText(getActivity(), R.string.whatsapp_not_installed, Toast.LENGTH_LONG).show();
             }
-        }
-        else if (view.getId() == R.id.fib_fragment_invite_facebook_friends_share_facebook)
+        } else if (view.getId() == R.id.fib_fragment_invite_facebook_friends_share_facebook)
         {
             Toast.makeText(getActivity(), "Facebook", Toast.LENGTH_LONG).show();
         }

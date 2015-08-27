@@ -127,11 +127,11 @@ public class SQLiteGenericCache implements GenericCache
                         .query(SQLiteCacheContract.Generic.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
                 cursor.moveToFirst();
 
-                if (!cursor.isAfterLast())
+                try
                 {
                     value = cursor.getString(0);
                 }
-                else
+                catch (Exception e)
                 {
                     Timber.d("Unable to find '" + key + "' in cache");
                 }
@@ -221,6 +221,7 @@ public class SQLiteGenericCache implements GenericCache
         {
             Timber.e("Unable to parse json into object for key = " + key + " [" + e
                     .getMessage() + "]");
+            e.printStackTrace();
             value = null;
         }
         return value;

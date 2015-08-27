@@ -66,15 +66,18 @@ public class FacebookActivity extends AppCompatActivity
         facebookLoginButton.setVisibility(View.GONE);
         if (AccessToken.getCurrentAccessToken() == null)
         {
+            Log.d("APP", "access token is null");
             setUpFacebookLoginButton();
         } else
         {
             if (AccessToken.getCurrentAccessToken().getDeclinedPermissions().size() > 0)
             {
+                Log.d("APP", "access token not null but declined permissions");
                 LoginManager.getInstance().logOut();
                 setUpFacebookLoginButton();
             } else
             {
+                Log.d("APP", "access token not null and no declined permissions");
                 goToLauncherActivity();
             }
         }

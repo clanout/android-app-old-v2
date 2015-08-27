@@ -179,7 +179,6 @@ public class FacebookService
                                @Override
                                public void onError(Throwable e)
                                {
-                                   Log.d("APP", "onError" + e.getMessage());
                                    bus.post(new GenericErrorTrigger(ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE, (Exception) e));
                                }
 

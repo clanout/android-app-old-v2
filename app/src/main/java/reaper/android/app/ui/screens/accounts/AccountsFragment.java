@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.otto.Bus;
+import com.squareup.picasso.Picasso;
 
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
@@ -94,6 +95,16 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
     public void onResume()
     {
         super.onResume();
+
+        userName.setText(userService.getActiveUserName());
+
+        Picasso.with(getActivity())
+                .load("https://graph.facebook.com/v2.4/" + userService.getActiveUserId() + "/picture")
+                .placeholder(R.drawable.ic_person_black_36dp)
+                .fit()
+                .centerInside()
+                .into(userPic);
+
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.ACCOUNTS);
     }
 
@@ -140,12 +151,13 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
             if (isWhatsappInstalled)
             {
-                ComponentName componentName = new ComponentName("com.whatsapp", "com.whatsapp.ContactPicker");
-                Intent intent = new Intent();
-                intent.setComponent(componentName);
-                intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, R.string.whatsapp_message);
-                startActivity(intent);
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+                sendIntent.setType("text/plain");
+                sendIntent.setPackage("com.whatsapp");
+                startActivity(sendIntent);
+
             } else
             {
                 Toast.makeText(getActivity(), R.string.whatsapp_not_installed, Toast.LENGTH_LONG).show();

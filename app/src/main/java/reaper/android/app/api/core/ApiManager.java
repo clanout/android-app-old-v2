@@ -22,6 +22,7 @@ public class ApiManager
                 .setClient(new OkClient(new OkHttpClient()))
                 .setConverter(new GsonConverter(GsonProvider.getGson()))
                 .setEndpoint(AppConstants.SERVER_URL)
+                .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build();
     }
 

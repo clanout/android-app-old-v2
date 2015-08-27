@@ -65,21 +65,8 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
 
         DatabaseManager.init(this);
 
-        // Testing
-        GenericCache genericCache = CacheManager.getGenericCache();
-        String key = "hello_message";
-        String value = genericCache.get(key);
-        if (value == null)
-        {
-            genericCache.put(key, "Hello, World!");
-        } else
-        {
-            Timber.d("[Cache Valid] " + key + " = " + value);
-        }
-
         locationService = new LocationService(bus);
         userService = new UserService(bus);
-
         genericCache = CacheManager.getGenericCache();
 
         googleApiClient = new GoogleApiClient.Builder(this)
@@ -110,7 +97,6 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     {
         if(trigger.isPolling())
         {
-            Log.d("APP", "updating friends in application");
             userService.updateFacebookFriends(trigger.getFriendsIdList(), trigger.isPolling());
         }
     }
@@ -120,9 +106,7 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     {
         if(trigger.isPolling())
         {
-            Log.d("APP", "friends updated on server");
-            genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now().toString());
-            Log.d("APP", "timestamp after updating ------ " + genericCache.get(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP));
+            genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now());
         }
     }
 

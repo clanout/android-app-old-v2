@@ -39,7 +39,6 @@ public class GCMService
                 }
                 catch (IOException e)
                 {
-                    Log.d("APP", "exception subscribing topic ----- " + e.getMessage());
                 }
             }
         }).start();
@@ -58,7 +57,6 @@ public class GCMService
                 }
                 catch (IOException e)
                 {
-                    Log.d("APP", "exception unsubscribing topic ----- " + e.getMessage());
                 }
             }
         }).start();

@@ -4,6 +4,7 @@ import com.facebook.AccessToken;
 import com.squareup.okhttp.OkHttpClient;
 
 import reaper.android.app.api.fb.FacebookApi;
+import reaper.android.app.config.AppConstants;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.client.OkClient;
@@ -20,12 +21,10 @@ public class FacebookApiManager
 
     private FacebookApiManager()
     {
-        // TODO: Shift endpoint to ca constant file
-        // TODO : Remove logging
         restAdapter = new RestAdapter.Builder()
                 .setClient(new OkClient(new OkHttpClient()))
                 .setConverter(new GsonConverter(GsonProvider.getGson()))
-                .setEndpoint("https://graph.facebook.com/v2.4/")
+                .setEndpoint(AppConstants.FACEBOOK_END_POINT)
                 .setRequestInterceptor(new RequestInterceptor()
                 {
                     @Override
@@ -40,7 +39,7 @@ public class FacebookApiManager
 
     public static FacebookApiManager getInstance()
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = new FacebookApiManager();
         }

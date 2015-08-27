@@ -111,7 +111,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             @Override
             public void onPageScrollStateChanged(int state)
             {
-                Log.d("APP", "state changed ------ " + state);
 
                 bus.post(new ViewPagerStateChangedTrigger(state));
             }

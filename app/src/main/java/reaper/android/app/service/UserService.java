@@ -3,7 +3,6 @@ package reaper.android.app.service;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract;
-import android.util.Log;
 
 import com.squareup.otto.Bus;
 
@@ -32,6 +31,7 @@ import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Friend;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.AllAppFriendsFetchedTrigger;
+import reaper.android.app.trigger.user.AppFriendsFetchedFromNetworkTrigger;
 import reaper.android.app.trigger.user.AppFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.trigger.user.PhoneAddedTrigger;
@@ -106,6 +106,35 @@ public class UserService
                         {
                             bus.post(new GenericErrorTrigger(ErrorCode.PHONE_ADD_FAILURE, null));
                         }
+                    }
+                });
+    }
+
+    public void getAppFriendsFromNetwork(final String zone)
+    {
+        meApi.getAppFriends(new GetAppFriendsApiRequest(zone))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<GetAppFriendsApiResponse>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        bus.post(new GenericErrorTrigger(ErrorCode.APP_FRIENDS_FETCH_FROM_NETWORK_FAILURE, (Exception) e));
+                    }
+
+                    @Override
+                    public void onNext(GetAppFriendsApiResponse getAppFriendsApiResponse)
+                    {
+                        bus.post(new AppFriendsFetchedFromNetworkTrigger(getAppFriendsApiResponse.getFriends()));
+                        userCache.deleteFriends();
+                        userCache.saveFriends(getAppFriendsApiResponse.getFriends());
                     }
                 });
     }
@@ -299,7 +328,6 @@ public class UserService
                     @Override
                     public void onError(Throwable e)
                     {
-                        Log.d("APP", e.getMessage());
                     }
 
                     @Override
@@ -360,7 +388,6 @@ public class UserService
                     @Override
                     public void onError(Throwable e)
                     {
-                        Log.d("APP", e.getMessage());
                     }
 
                     @Override

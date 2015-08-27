@@ -74,6 +74,8 @@
     <string name="phone_invalid">Please enter a valid phone number.</string>
     <string name="add_phone_number">Please add your phone number to send/receive invites from your phone contacts</string>
 
+    <string name="event_edit_failed_locked">The event could not be edited as the organiser has already finalised it.</string>
+
     <!-- Facebook -->
     <string name="facebook_app_id">711701748936592</string>
     <string name="problem_contacting_facebook">Looks like there was a problem connecting with facebook. Please try again.</string>
