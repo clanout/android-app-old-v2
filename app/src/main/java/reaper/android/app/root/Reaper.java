@@ -18,9 +18,11 @@ import reaper.android.BuildConfig;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.core.DatabaseManager;
 import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.Timestamps;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.gcm.GcmregistrationIntentTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
@@ -109,7 +111,6 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
             genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now());
         }
     }
-
 
     // GOOGLE API CLIENT CALLBACKS
     @Override

@@ -108,7 +108,16 @@ public class EventService
                                                 @Override
                                                 public List<Event> call(EventsApiResponse eventsApiResponse)
                                                 {
-                                                    return eventsApiResponse.getEvents();
+                                                    List<Event> filteredEvents = new ArrayList<Event>();
+                                                    for (Event event : eventsApiResponse.getEvents())
+                                                    {
+                                                        if (event.getEndTime().isAfterNow())
+                                                        {
+                                                            filteredEvents.add(event);
+                                                        }
+                                                    }
+
+                                                    return filteredEvents;
                                                 }
                                             })
                                             .doOnNext(new Action1<List<Event>>()
@@ -123,7 +132,15 @@ public class EventService
                                             .subscribeOn(Schedulers.newThread());
                                 } else
                                 {
-                                    return Observable.just(events);
+                                    List<Event> filteredEvents = new ArrayList<Event>();
+                                    for (Event event : events)
+                                    {
+                                        if (event.getEndTime().isAfterNow())
+                                        {
+                                            filteredEvents.add(event);
+                                        }
+                                    }
+                                    return Observable.just(filteredEvents);
                                 }
                             }
                         });
@@ -171,7 +188,16 @@ public class EventService
                                                 @Override
                                                 public List<Event> call(EventsApiResponse eventsApiResponse)
                                                 {
-                                                    return eventsApiResponse.getEvents();
+                                                    List<Event> filteredEvents = new ArrayList<Event>();
+                                                    for (Event event : eventsApiResponse.getEvents())
+                                                    {
+                                                        if (event.getEndTime().isAfterNow())
+                                                        {
+                                                            filteredEvents.add(event);
+                                                        }
+                                                    }
+
+                                                    return filteredEvents;
                                                 }
 
                                             })
@@ -187,7 +213,16 @@ public class EventService
                                             .subscribeOn(Schedulers.newThread());
                                 } else
                                 {
-                                    return Observable.just(events);
+                                    List<Event> filteredEvents = new ArrayList<Event>();
+                                    for (Event event : events)
+                                    {
+                                        if (event.getEndTime().isAfterNow())
+                                        {
+                                            filteredEvents.add(event);
+                                        }
+                                    }
+
+                                    return Observable.just(filteredEvents);
                                 }
                             }
                         });

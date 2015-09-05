@@ -33,7 +33,6 @@ public class Event implements Model
     private DateTime endTime;
     private String organizerId;
     private Location location;
-    private int attendeeCount;
     private String chatId;
     private DateTime lastUpdated;
 
@@ -132,16 +131,6 @@ public class Event implements Model
     public void setLocation(Location location)
     {
         this.location = location;
-    }
-
-    public int getAttendeeCount()
-    {
-        return attendeeCount;
-    }
-
-    public void setAttendeeCount(int attendeeCount)
-    {
-        this.attendeeCount = attendeeCount;
     }
 
     public String getChatId()

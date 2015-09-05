@@ -141,7 +141,6 @@ public class MainActivity extends AppCompatActivity
                 }
             } else
             {
-                ChatHelper.init(userService.getActiveUserId());
                 FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
             }
         }
@@ -236,8 +235,6 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onGcmRegistrationComplete(GcmRegistrationCompleteTrigger trigger)
     {
-        ChatHelper.init(userService.getActiveUserId());
-
         runOnUiThread(new Runnable()
         {
             @Override
@@ -251,8 +248,6 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onEventsFetched(EventsFetchForActivityTrigger trigger)
     {
-        ChatHelper.init(userService.getActiveUserId());
-
         List<Event> eventList = trigger.getEvents();
 
         Event activeEvent = new Event();
@@ -273,8 +268,6 @@ public class MainActivity extends AppCompatActivity
     {
         if (trigger.getErrorCode() == ErrorCode.EVENTS_FETCH_FOR_ACTIVITY_FAILURE)
         {
-            ChatHelper.init(userService.getActiveUserId());
-
             runOnUiThread(new Runnable()
             {
                 @Override
