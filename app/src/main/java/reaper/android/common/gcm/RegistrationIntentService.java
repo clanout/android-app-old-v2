@@ -50,7 +50,6 @@ public class RegistrationIntentService extends IntentService
         }
         catch (Exception e)
         {
-            Log.d("APP", "Error = " + e.getMessage());
             genericCache.delete(CacheKeys.GCM_TOKEN);
             genericCache.put(CacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
 

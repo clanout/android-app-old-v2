@@ -27,7 +27,9 @@ import java.util.Arrays;
 
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.service.FacebookService;
 
@@ -42,6 +44,8 @@ public class FacebookActivity extends AppCompatActivity
     private ProfileTracker profileTracker;
 
     private GenericCache genericCache;
+    private EventCache eventCache;
+    private UserCache userCache;
 
     private static final String PERMISSION_REQUIRED = "This app requires your basic information, email and friends information to function properly. Don\\'t worry, we will not misuse this in any way.";
     private static final String PERMISSION_REQUIRED_TITLE = "Permission Required";
@@ -62,22 +66,21 @@ public class FacebookActivity extends AppCompatActivity
         facebookCallbackManager = CallbackManager.Factory.create();
         setUpFacebookCallback();
         genericCache = CacheManager.getGenericCache();
+        eventCache = CacheManager.getEventCache();
+        userCache = CacheManager.getUserCache();
 
         facebookLoginButton.setVisibility(View.GONE);
         if (AccessToken.getCurrentAccessToken() == null)
         {
-            Log.d("APP", "access token is null");
             setUpFacebookLoginButton();
         } else
         {
             if (AccessToken.getCurrentAccessToken().getDeclinedPermissions().size() > 0)
             {
-                Log.d("APP", "access token not null but declined permissions");
                 LoginManager.getInstance().logOut();
                 setUpFacebookLoginButton();
             } else
             {
-                Log.d("APP", "access token not null and no declined permissions");
                 goToLauncherActivity();
             }
         }
@@ -117,6 +120,21 @@ public class FacebookActivity extends AppCompatActivity
                         setUpAlertDialog(PERMISSION_REQUIRED, PERMISSION_REQUIRED_TITLE, "Grant Permission");
                     } else
                     {
+                        genericCache.delete(CacheKeys.ACTIVE_FRAGMENT);
+                        genericCache.delete(CacheKeys.GCM_TOKEN);
+                        genericCache.delete(CacheKeys.GCM_TOKEN_SENT_TO_SERVER);
+                        genericCache.delete(CacheKeys.LAST_UPDATE_TIMESTAMP);
+                        genericCache.delete(CacheKeys.MY_PHONE_NUMBER);
+                        genericCache.delete(CacheKeys.SESSION_ID);
+                        genericCache.delete(CacheKeys.USER_ID);
+                        genericCache.delete(CacheKeys.USER_LOCATION);
+                        genericCache.delete(CacheKeys.USER_NAME);
+
+                        userCache.deleteFriends();
+                        userCache.deleteContacts();
+
+                        eventCache.deleteAll();
+
                         goToLauncherActivity();
                     }
                 } else

@@ -12,6 +12,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.lang.reflect.Type;
 
@@ -38,7 +39,7 @@ public class GsonProvider
         public DateTime deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext
                 jsonDeserializationContext) throws JsonParseException
         {
-            return DateTime.parse(jsonElement.getAsString());//.replaceAll("[^\\w\\s\\-+:]", ""));
+            return DateTime.parse(jsonElement.getAsString()).toDateTime(DateTimeZone.getDefault());
         }
     }
 

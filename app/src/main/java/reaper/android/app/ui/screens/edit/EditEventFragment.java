@@ -576,6 +576,9 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         startDatePicker.setMinDate(System.currentTimeMillis() - 1000);
         endDatePicker.setMinDate(System.currentTimeMillis() - 1000);
 
+        startDateTime = event.getStartTime();
+        endDateTime = event.getEndTime();
+
         if (startDateTime == null || endDateTime == null)
         {
             startTimePicker.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));

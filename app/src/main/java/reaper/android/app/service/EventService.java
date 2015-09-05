@@ -519,6 +519,7 @@ public class EventService
                             } else
                             {
                                 eventCache.save(updatedEvent);
+                                handleTopicSubscription(updatedEvent);
                             }
                         } else
                         {

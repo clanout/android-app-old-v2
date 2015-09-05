@@ -23,6 +23,7 @@ public class GCMService
 
     public void register()
     {
+        Log.d("APP", "in gcm service");
         bus.post(new GcmregistrationIntentTrigger());
     }
 
@@ -35,9 +36,11 @@ public class GCMService
             {
                 try
                 {
-                    gcmPubSub.subscribe(token, "/topics/" + topic, null);
-                }
-                catch (IOException e)
+                    if (token != null)
+                    {
+                        gcmPubSub.subscribe(token, "/topics/" + topic, null);
+                    }
+                } catch (IOException e)
                 {
                 }
             }
@@ -53,9 +56,11 @@ public class GCMService
             {
                 try
                 {
-                    gcmPubSub.unsubscribe(token, "/topics/" + topic);
-                }
-                catch (IOException e)
+                    if (token != null)
+                    {
+                        gcmPubSub.unsubscribe(token, "/topics/" + topic);
+                    }
+                } catch (IOException e)
                 {
                 }
             }

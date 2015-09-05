@@ -161,7 +161,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical|center_horizontal"
         android:orientation="horizontal">
-        
+
         <ProgressBar
             android:id="@+id/pb_event_details_refresh_details"
             style="@android:style/Widget.DeviceDefault.ProgressBar.Small"
