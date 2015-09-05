@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -101,14 +102,18 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
 
         if (bundle == null)
         {
+            Log.d("APP", "invitee list null in fb");
             inviteeList = new ArrayList<>();
         } else
         {
+            Log.d("APP", "invitee list not null in fb");
             inviteeList = (ArrayList<EventDetails.Invitee>) bundle.get(BundleKeys.INVITEE_LIST);
+            Log.d("APP", "invitee list size ----- " + inviteeList.size());
             event = (Event) bundle.get(BundleKeys.EVENT);
 
             if (inviteeList == null)
             {
+                Log.d("APP", "invitee list not null but null in fb");
                 inviteeList = new ArrayList<>();
             }
 
@@ -221,6 +226,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
 
     private void refreshRecyclerView()
     {
+        Log.d("APP", "inside refresh recycler view");
         inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, true, bus, event);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
@@ -283,6 +289,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     @Subscribe
     public void onZonalAppFriendsFetched(AppFriendsFetchedTrigger trigger)
     {
+        Log.d("APP", "zonla app friends fetched");
         friendList = trigger.getFriends();
         Collections.sort(friendList, new FriendsComparator());
         refreshRecyclerView();

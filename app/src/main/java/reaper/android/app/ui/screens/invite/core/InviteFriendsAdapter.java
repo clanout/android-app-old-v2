@@ -2,6 +2,7 @@ package reaper.android.app.ui.screens.invite.core;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,8 +40,17 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
 
     public InviteFriendsAdapter(Context context, List<EventDetails.Invitee> invitees, List<Friend> friends, boolean isFacebookAdapter, Bus bus, Event event)
     {
+        Log.d("APP", "in constructor");
         inflater = LayoutInflater.from(context);
         this.invitees = invitees;
+
+        Log.d("APP", "in constructor invitee list size ----- " + this.invitees.size());
+
+        for(EventDetails.Invitee invitee : this.invitees)
+        {
+            Log.d("APP", " constructor invitee ----- " + invitee.getName());
+        }
+
         this.friends = friends;
         this.context = context;
         this.isFacebookAdapter = isFacebookAdapter;

@@ -6,6 +6,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +43,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     private ImageButton done;
     private TabLayout tabLayout;
 
-    private InviteUsersPagerAdapter inviteUsersPagerAdapter;
+//    private InviteUsersPagerAdapter inviteUsersPagerAdapter;
     private FragmentManager fragmentManager;
     private EventService eventService;
     private LocationService locationService;
@@ -111,7 +112,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
 
         genericCache = CacheManager.getGenericCache();
 
-        inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), new ArrayList<EventDetails.Invitee>(), event);
+        InviteUsersPagerAdapter inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), new ArrayList<EventDetails.Invitee>(), event);
         viewPager.setAdapter(inviteUsersPagerAdapter);
 
         tabLayout.post(new Runnable()
@@ -212,10 +213,13 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     {
         if (!fromCreateFragment)
         {
+            Log.d("APP", "event details fetched in container");
             inviteeList = (ArrayList<EventDetails.Invitee>) trigger.getEventDetails().getInvitee();
 
-            inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), inviteeList, event);
-            viewPager.setAdapter(inviteUsersPagerAdapter);
+            Log.d("APP", "invitee list size in container ------ " + trigger.getEventDetails().getInvitee().size());
+
+            InviteUsersPagerAdapter inviteUsersPagerAdapterA = new InviteUsersPagerAdapter(getChildFragmentManager(), inviteeList, event);
+            viewPager.setAdapter(inviteUsersPagerAdapterA);
         }
     }
 
