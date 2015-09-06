@@ -505,6 +505,60 @@ public class SQLiteEventCache implements EventCache
     }
 
     @Override
+    public void deleteDetails(final String eventId)
+    {
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        synchronized (TAG)
+                        {
+                            Timber.v("EventCache.deleteDetails() on thread = " + Thread
+                                    .currentThread()
+                                    .getName());
+
+                            SQLiteDatabase db = databaseManager.openConnection();
+
+                            SQLiteStatement statement = db
+                                    .compileStatement(SQLiteCacheContract.EventDetails.SQL_DELETE_ONE);
+                            statement.bindString(1, eventId);
+                            statement.execute();
+                            statement.clearBindings();
+                            statement.close();
+                            databaseManager.closeConnection();
+
+                            subscriber.onCompleted();
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+                        Timber.d("Deleted details for event [" + eventId + "] from cache");
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Timber.e("Unable to delete details event_id = " + eventId + " [" + e
+                                .getMessage() + "]");
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
+    }
+
+    @Override
     public void deleteCompletely(final String eventId)
     {
         Observable

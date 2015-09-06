@@ -11,4 +11,6 @@ public interface GenericCache
     void put(String key, Object value);
 
     <T> T get(String key, Class<T> type);
+
+    void deleteAll();
 }

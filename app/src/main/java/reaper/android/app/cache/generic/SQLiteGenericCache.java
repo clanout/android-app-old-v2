@@ -226,4 +226,57 @@ public class SQLiteGenericCache implements GenericCache
         }
         return value;
     }
+
+    @Override
+    public void deleteAll()
+    {
+        memoryStore = new HashMap<>();
+        Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        synchronized (TAG)
+                        {
+                            Timber.v("GeneticCache.deleteAll() on thread = " + Thread
+                                    .currentThread()
+                                    .getName());
+
+                            SQLiteDatabase db = databaseManager.openConnection();
+
+                            SQLiteStatement statement = db
+                                    .compileStatement(SQLiteCacheContract.Generic.SQL_DELETE_ALL);
+                            statement.execute();
+                            statement.close();
+
+                            databaseManager.closeConnection();
+
+                            subscriber.onCompleted();
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+                        Timber.d("[Cleared Generic Cache]");
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Timber.e("Unable to clear generic cache " + "[" + e.getMessage() + "]");
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+
+                    }
+                });
+    }
 }

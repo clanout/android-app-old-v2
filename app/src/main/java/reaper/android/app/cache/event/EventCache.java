@@ -24,6 +24,8 @@ public interface EventCache
 
     void delete(String eventId);
 
+    void deleteDetails(String eventId);
+
     void deleteCompletely(String eventId);
 
     void markUpdated(List<String> eventIds);

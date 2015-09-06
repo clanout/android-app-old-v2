@@ -39,9 +39,9 @@ public abstract class SQLiteCacheContract
 
         public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
-        public static final String SQL_INSERT = "INSERT INTO " + TABLE_NAME +" VALUES (?,?)";
+        public static final String SQL_INSERT = "INSERT INTO " + TABLE_NAME + " VALUES (?,?)";
         public static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME;
-        public static final String SQL_DELETE_ONE = "DELETE FROM " + TABLE_NAME +" WHERE " + COLUMN_ID + " = ?";
+        public static final String SQL_DELETE_ONE = "DELETE FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + " = ?";
     }
 
     public static abstract class FacebookFriends
@@ -95,5 +95,6 @@ public abstract class SQLiteCacheContract
 
         public static final String SQL_INSERT = "INSERT INTO " + TABLE_NAME + " VALUES (?,?)";
         public static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME + " where key = ?";
+        public static final String SQL_DELETE_ALL = "DELETE FROM " + TABLE_NAME;
     }
 }
