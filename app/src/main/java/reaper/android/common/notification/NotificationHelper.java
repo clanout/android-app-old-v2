@@ -1,8 +1,13 @@
 package reaper.android.common.notification;
 
+import android.graphics.drawable.Drawable;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
+
 import java.util.Map;
 
 import reaper.android.R;
+import reaper.android.app.root.Reaper;
 
 public class NotificationHelper
 {
@@ -31,7 +36,7 @@ public class NotificationHelper
 
     public static int getIcon(int type)
     {
-        return R.drawable.ic_action_important;
+        return R.drawable.ic_btn_rsvp_going;
     }
 
     private static String getEventCreatedMessage(Map<String, String> args)

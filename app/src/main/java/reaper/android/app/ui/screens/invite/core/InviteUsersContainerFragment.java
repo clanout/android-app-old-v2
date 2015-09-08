@@ -1,5 +1,6 @@
 package reaper.android.app.ui.screens.invite.core;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -14,6 +15,8 @@ import android.widget.ImageButton;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +45,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     private ViewPager viewPager;
     private ImageButton done;
     private TabLayout tabLayout;
+    private Drawable checkDrawable;
 
 //    private InviteUsersPagerAdapter inviteUsersPagerAdapter;
     private FragmentManager fragmentManager;
@@ -105,6 +109,8 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
         invitedPhoneContacts = new ArrayList<>();
         invitedUsers = new ArrayList<>();
 
+        generateDrawables();
+
         bus = Communicator.getInstance().getBus();
         eventService = new EventService(bus);
         locationService = new LocationService(bus);
@@ -126,6 +132,16 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
         tabLayout.setOnTabSelectedListener(this);
 
         done.setOnClickListener(this);
+        done.setImageDrawable(checkDrawable);
+    }
+
+    private void generateDrawables()
+    {
+        checkDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(24)
+                .build();
     }
 
     @Override
@@ -213,10 +229,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     {
         if (!fromCreateFragment)
         {
-            Log.d("APP", "event details fetched in container");
             inviteeList = (ArrayList<EventDetails.Invitee>) trigger.getEventDetails().getInvitee();
-
-            Log.d("APP", "invitee list size in container ------ " + trigger.getEventDetails().getInvitee().size());
 
             InviteUsersPagerAdapter inviteUsersPagerAdapterA = new InviteUsersPagerAdapter(getChildFragmentManager(), inviteeList, event);
             viewPager.setAdapter(inviteUsersPagerAdapterA);

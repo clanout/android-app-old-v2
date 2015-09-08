@@ -31,6 +31,7 @@ public class EventSuggestionsAdapter extends RecyclerView.Adapter<EventSuggestio
     private Context context;
     private EventSuggestionsClickListener eventSuggestionsClickListener;
     private Drawable highRatingDrawable, lowRatingDrawable;
+    private Drawable placeDrawable;
 
     public EventSuggestionsAdapter(Context context, List<Suggestion> data)
     {
@@ -54,6 +55,12 @@ public class EventSuggestionsAdapter extends RecyclerView.Adapter<EventSuggestio
                 .setColor(Color.CYAN)
                 .setSizeDp(24)
                 .build();
+
+        placeDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD)
+                .setColor(Color.CYAN)
+                .setSizeDp(24)
+                .build();
     }
 
     @Override
@@ -73,8 +80,8 @@ public class EventSuggestionsAdapter extends RecyclerView.Adapter<EventSuggestio
 
         Picasso.with(context)
                 .load(current.getIconUrl())
-                .placeholder(R.drawable.ic_action_add_person)
-                .error(R.drawable.ic_action_add_person)
+                .placeholder(placeDrawable)
+                .error(placeDrawable)
                 .fit()
                 .centerCrop()
                 .into(holder.placeIcon);

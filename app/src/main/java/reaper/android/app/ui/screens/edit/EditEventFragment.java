@@ -110,6 +110,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
 
     private List<Suggestion> suggestionList;
     private EventSuggestionsAdapter eventSuggestionsAdapter;
+    private Drawable checkDrawable;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -151,8 +152,6 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             throw new IllegalStateException("Event/EventDetails cannot be null while creating EditEventFragment instance");
         }
 
-        Log.d("APP", "event location ------ " + event.getLocation());
-
         editedEvent = new Event();
         editedEvent.setId(event.getId());
         editedEvent.setIsFinalized(event.isFinalized());
@@ -180,6 +179,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         save.setOnClickListener(this);
 
         generateDrawables();
+        save.setImageDrawable(checkDrawable);
 
         render();
         initGoogleAutocompleteAdapter();
@@ -204,6 +204,12 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                 .setIcon(MaterialDrawableBuilder.IconValue.LOCK_OPEN)
                 .setColor(getResources().getColor(R.color.white))
                 .setSizeDp(36)
+                .build();
+
+        checkDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(24)
                 .build();
     }
 

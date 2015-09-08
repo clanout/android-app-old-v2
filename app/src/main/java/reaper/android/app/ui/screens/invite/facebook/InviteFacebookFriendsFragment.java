@@ -57,7 +57,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
 {
     private RecyclerView recyclerView;
     private TextView noFriendsMessage;
-    private FloatingActionButton inviteWhatsapp, shareFacebook;
+    private FloatingActionButton inviteWhatsapp;
     private Menu menu;
     private Drawable refreshDrawable;
 
@@ -73,6 +73,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     private ArrayList<EventDetails.Invitee> inviteeList;
     private List<Friend> friendList;
     private Event event;
+    private Drawable whatsappDrawable;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -90,7 +91,6 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_invite_facebook_friends);
         noFriendsMessage = (TextView) view.findViewById(R.id.tv_invite_facebook_friends_no_users);
         inviteWhatsapp = (FloatingActionButton) view.findViewById(R.id.fib_fragment_invite_facebook_friends_invite_people_whatsapp);
-        shareFacebook = (FloatingActionButton) view.findViewById(R.id.fib_fragment_invite_facebook_friends_share_facebook);
 
         return view;
     }
@@ -106,18 +106,14 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
 
         if (bundle == null)
         {
-            Log.d("APP", "invitee list null in fb");
             inviteeList = new ArrayList<>();
         } else
         {
-            Log.d("APP", "invitee list not null in fb");
             inviteeList = (ArrayList<EventDetails.Invitee>) bundle.get(BundleKeys.INVITEE_LIST);
-            Log.d("APP", "invitee list size ----- " + inviteeList.size());
             event = (Event) bundle.get(BundleKeys.EVENT);
 
             if (inviteeList == null)
             {
-                Log.d("APP", "invitee list not null but null in fb");
                 inviteeList = new ArrayList<>();
             }
 
@@ -133,10 +129,11 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
         genericCache = CacheManager.getGenericCache();
 
         inviteWhatsapp.setOnClickListener(this);
-        shareFacebook.setOnClickListener(this);
         fragmentManager = getActivity().getSupportFragmentManager();
 
         generateDrawables();
+
+        inviteWhatsapp.setImageDrawable(whatsappDrawable);
 
         initRecyclerView();
     }
@@ -147,6 +144,12 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
                 .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
                 .setColor(getResources().getColor(R.color.white))
                 .setSizeDp(36)
+                .build();
+
+        whatsappDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.WHATSAPP)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(24)
                 .build();
     }
 
@@ -175,7 +178,6 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     {
         recyclerView.setVisibility(View.VISIBLE);
         noFriendsMessage.setVisibility(View.GONE);
-        shareFacebook.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
     }
 
@@ -183,7 +185,6 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     {
         recyclerView.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.VISIBLE);
-        shareFacebook.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.VISIBLE);
 
         noFriendsMessage.setText(R.string.no_local_facebook_friends);
@@ -193,7 +194,6 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     {
         recyclerView.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.VISIBLE);
-        shareFacebook.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
 
         noFriendsMessage.setText(R.string.facebook_friends_not_fetched);
@@ -242,7 +242,6 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
 
     private void refreshRecyclerView()
     {
-        Log.d("APP", "inside refresh recycler view");
         inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, true, bus, event);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
@@ -305,7 +304,6 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     @Subscribe
     public void onZonalAppFriendsFetched(AppFriendsFetchedTrigger trigger)
     {
-        Log.d("APP", "zonla app friends fetched");
         friendList = trigger.getFriends();
         Collections.sort(friendList, new FriendsComparator());
         refreshRecyclerView();
@@ -363,9 +361,6 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
             {
                 Toast.makeText(getActivity(), R.string.whatsapp_not_installed, Toast.LENGTH_LONG).show();
             }
-        } else if (view.getId() == R.id.fib_fragment_invite_facebook_friends_share_facebook)
-        {
-            Toast.makeText(getActivity(), "Facebook", Toast.LENGTH_LONG).show();
         }
     }
 }

@@ -1,6 +1,8 @@
 package reaper.android.app.ui.screens.chat;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,6 +25,8 @@ import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.MessageListener;
@@ -90,6 +94,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     private int loadHistoryClickCount = 1;
 
     private MessageListener messageListener;
+    private Drawable sendDrawable;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -121,6 +126,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener
         send.setOnClickListener(this);
         loadHistory.setOnClickListener(this);
 
+        generateDrawables();
+        send.setImageDrawable(sendDrawable);
+
         Bundle bundle = getArguments();
         if (bundle == null)
         {
@@ -142,6 +150,15 @@ public class ChatFragment extends Fragment implements View.OnClickListener
         fragmentManager = getActivity().getSupportFragmentManager();
 
         genericCache = CacheManager.getGenericCache();
+    }
+
+    private void generateDrawables()
+    {
+        sendDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.SEND)
+                .setColor(getResources().getColor(R.color.accent))
+                .setSizeDp(24)
+                .build();
     }
 
     @Override

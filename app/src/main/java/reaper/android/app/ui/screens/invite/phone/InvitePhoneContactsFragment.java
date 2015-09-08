@@ -60,8 +60,8 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
     private TextView noContactsMessage, invitesLockedMessage;
     private Menu menu;
     private LinearLayout lockedContent, mainContent;
-    private FloatingActionButton addPhone, inviteWhatsapp, sharefacebook;
-    private Drawable refreshDrawable;
+    private FloatingActionButton addPhone, inviteWhatsapp;
+    private Drawable refreshDrawable, whatsappDrawable;
 
     private ArrayList<EventDetails.Invitee> inviteeList;
     private List<Friend> friendList;
@@ -74,6 +74,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
     private LocationService locationService;
     private FragmentManager fragmentManager;
     private GenericCache genericCache;
+    private Drawable phoneDrawable;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -93,7 +94,6 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         invitesLockedMessage = (TextView) view.findViewById(R.id.tv_fragment_invte_phone_contacts_locked);
         addPhone = (FloatingActionButton) view.findViewById(R.id.fib_fragment_invite_phone_contacts_add_phone);
         inviteWhatsapp = (FloatingActionButton) view.findViewById(R.id.fib_fragment_invite_phone_contacts_invite_people_whatsapp);
-        sharefacebook = (FloatingActionButton) view.findViewById(R.id.fib_fragment_invite_phone_contacts_share_facebook);
         lockedContent = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_phone_contacts_locked_content);
         mainContent = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_phone_contacts_main_content);
 
@@ -110,20 +110,20 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         locationService = new LocationService(bus);
         isPhoneAdded = false;
         inviteWhatsapp.setOnClickListener(this);
-        sharefacebook.setOnClickListener(this);
         addPhone.setOnClickListener(this);
         fragmentManager = getActivity().getSupportFragmentManager();
         genericCache = CacheManager.getGenericCache();
 
         generateDrawables();
+        inviteWhatsapp.setImageDrawable(whatsappDrawable);
+        addPhone.setImageDrawable(phoneDrawable);
 
         if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null)
         {
             isPhoneAdded = false;
             displayInvitesLockedView();
             return;
-        }
-        else
+        } else
         {
             isPhoneAdded = true;
             displayBasicView();
@@ -134,8 +134,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         if (bundle == null)
         {
             inviteeList = new ArrayList<>();
-        }
-        else
+        } else
         {
             inviteeList = (ArrayList<EventDetails.Invitee>) bundle.get(BundleKeys.INVITEE_LIST);
             event = (Event) bundle.get(BundleKeys.EVENT);
@@ -157,6 +156,18 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
                 .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
                 .setColor(getResources().getColor(R.color.white))
                 .setSizeDp(36)
+                .build();
+
+        whatsappDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.WHATSAPP)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(24)
+                .build();
+
+        phoneDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE_ANDROID)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(24)
                 .build();
     }
 
@@ -190,14 +201,13 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         mainContent.setVisibility(View.GONE);
         lockedContent.setVisibility(View.VISIBLE);
         invitesLockedMessage.setText(R.string.add_phone_number);
-        addPhone.setImageResource(R.drawable.ic_action_add_person);
+        addPhone.setImageDrawable(phoneDrawable);
     }
 
     private void displayNoContactsView()
     {
         noContactsMessage.setText(R.string.no_local_phone_contacts);
         noContactsMessage.setVisibility(View.VISIBLE);
-        sharefacebook.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
         lockedContent.setVisibility(View.GONE);
@@ -209,7 +219,6 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         mainContent.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.GONE);
-        sharefacebook.setVisibility(View.GONE);
         noContactsMessage.setVisibility(View.GONE);
         lockedContent.setVisibility(View.GONE);
     }
@@ -219,7 +228,6 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         mainContent.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
-        sharefacebook.setVisibility(View.GONE);
         noContactsMessage.setVisibility(View.VISIBLE);
         noContactsMessage.setText(R.string.phone_contacts_not_fetched);
         lockedContent.setVisibility(View.GONE);
@@ -256,8 +264,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
                 {
                     Toast.makeText(getActivity(), R.string.add_phone_number, Toast.LENGTH_LONG).show();
                     return true;
-                }
-                else
+                } else
                 {
 
                     menuItem.setActionView(R.layout.action_button_refreshing);
@@ -285,8 +292,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         if (friendList.size() == 0)
         {
             displayNoContactsView();
-        }
-        else
+        } else
         {
             displayBasicView();
         }
@@ -375,8 +381,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
                     {
                         Toast.makeText(getActivity(), R.string.phone_invalid, Toast.LENGTH_LONG).show();
                         wantToCloseDialog = false;
-                    }
-                    else
+                    } else
                     {
                         userService.updatePhoneNumber(parsedPhone);
 
@@ -394,8 +399,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
                 }
             });
 
-        }
-        else if (view.getId() == R.id.fib_fragment_invite_phone_contacts_invite_people_whatsapp)
+        } else if (view.getId() == R.id.fib_fragment_invite_phone_contacts_invite_people_whatsapp)
         {
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
             if (isWhatsappInstalled)
@@ -406,15 +410,10 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
                 sendIntent.setType("text/plain");
                 sendIntent.setPackage("com.whatsapp");
                 startActivity(sendIntent);
-            }
-            else
+            } else
             {
                 Toast.makeText(getActivity(), R.string.whatsapp_not_installed, Toast.LENGTH_LONG).show();
             }
-        }
-        else if (view.getId() == R.id.fib_fragment_invite_phone_contacts_share_facebook)
-        {
-            Toast.makeText(getActivity(), "Facebook", Toast.LENGTH_LONG).show();
         }
     }
 }

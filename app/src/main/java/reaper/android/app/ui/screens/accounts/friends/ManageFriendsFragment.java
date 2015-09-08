@@ -56,7 +56,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     private ImageButton done;
     private FloatingActionButton shareFacebook, inviteWhatsapp;
     private Menu menu;
-    private Drawable refreshDrawable;
+    private Drawable refreshDrawable, checkDrawable;
 
     private ManageFriendsAdapter manageFriendsAdapter;
     private UserService userService;
@@ -114,6 +114,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
         shareFacebook.setOnClickListener(this);
 
         generateDrawable();
+        done.setImageDrawable(checkDrawable);
 
         initRecyclerView();
     }
@@ -124,6 +125,12 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
                 .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
                 .setColor(getResources().getColor(R.color.white))
                 .setSizeDp(36)
+                .build();
+
+        checkDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(24)
                 .build();
     }
 
@@ -238,7 +245,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     @Subscribe
     public void onFacebookFriendsUpdatedOnServer(FacebookFriendsUpdatedOnServerTrigger trigger)
     {
-        if(!trigger.isPolling())
+        if (!trigger.isPolling())
         {
             userService.getAllAppFriends();
             genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now().toString());
@@ -248,9 +255,9 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     @Subscribe
     public void onFacebookFriendsNotUpdatedOnServer(GenericErrorTrigger trigger)
     {
-        if(trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE)
+        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE)
         {
-            if(menu != null)
+            if (menu != null)
             {
                 menu.findItem(R.id.action_refresh).setActionView(null);
             }
@@ -272,7 +279,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     {
         if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE)
         {
-            if(menu != null)
+            if (menu != null)
             {
                 menu.findItem(R.id.action_refresh).setActionView(null);
             }
@@ -283,7 +290,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     @Subscribe
     public void onAllAppFriendsFetched(AllAppFriendsFetchedTrigger trigger)
     {
-        if(menu != null)
+        if (menu != null)
         {
             menu.findItem(R.id.action_refresh).setActionView(null);
         }
@@ -297,7 +304,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     {
         if (trigger.getErrorCode() == ErrorCode.USER_ALL_APP_FRIENDS_FETCH_FAILURE)
         {
-            if(menu != null)
+            if (menu != null)
             {
                 menu.findItem(R.id.action_refresh).setActionView(null);
             }

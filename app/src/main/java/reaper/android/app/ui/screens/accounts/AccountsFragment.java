@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -50,7 +51,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
     private TextView userName;
     private RecyclerView recyclerView;
     private ImageView userPic;
-    private Drawable homeDrawable;
+    private Drawable homeDrawable, personDrawable;
 
     private FragmentManager fragmentManager;
     private UserService userService;
@@ -104,6 +105,12 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
                 .setColor(getResources().getColor(R.color.white))
                 .setSizeDp(36)
                 .build();
+
+        personDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
+                .setColor(Color.BLACK)
+                .setSizeDp(36)
+                .build();
     }
 
     @Override
@@ -115,7 +122,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
 
         Picasso.with(getActivity())
                 .load("https://graph.facebook.com/v2.4/" + userService.getActiveUserId() + "/picture")
-                .placeholder(R.drawable.ic_person_black_36dp)
+                .placeholder(personDrawable)
                 .fit()
                 .centerInside()
                 .into(userPic);

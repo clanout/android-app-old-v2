@@ -2,6 +2,7 @@ package reaper.android.app.ui.screens.create;
 
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -94,6 +95,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
 
     private List<Suggestion> suggestionList;
     private EventSuggestionsAdapter eventSuggestionsAdapter;
+    private Drawable checkDrawable;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -152,14 +154,26 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
         isPlaceDetailsRunning = false;
         isSaveButtonClicked = false;
 
+        generateDrawables();
+
         save.setOnClickListener(this);
         timing.setOnClickListener(this);
+        save.setImageDrawable(checkDrawable);
 
         renderEventDetails(title, isInviteOnly, eventCategory);
 
         initGoogleAutocompleteAdapter();
         initRecyclerView();
 
+    }
+
+    private void generateDrawables()
+    {
+        checkDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(24)
+                .build();
     }
 
     private void initGoogleAutocompleteAdapter()

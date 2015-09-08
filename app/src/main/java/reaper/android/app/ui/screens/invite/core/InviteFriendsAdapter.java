@@ -1,6 +1,8 @@
 package reaper.android.app.ui.screens.invite.core;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +15,8 @@ import android.widget.TextView;
 
 import com.squareup.otto.Bus;
 import com.squareup.picasso.Picasso;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import java.util.List;
 
@@ -37,25 +41,28 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
     private boolean isFacebookAdapter;
     private Bus bus;
     private Event event;
+    private Drawable personDrawable;
 
     public InviteFriendsAdapter(Context context, List<EventDetails.Invitee> invitees, List<Friend> friends, boolean isFacebookAdapter, Bus bus, Event event)
     {
-        Log.d("APP", "in constructor");
         inflater = LayoutInflater.from(context);
         this.invitees = invitees;
-
-        Log.d("APP", "in constructor invitee list size ----- " + this.invitees.size());
-
-        for(EventDetails.Invitee invitee : this.invitees)
-        {
-            Log.d("APP", " constructor invitee ----- " + invitee.getName());
-        }
-
         this.friends = friends;
         this.context = context;
         this.isFacebookAdapter = isFacebookAdapter;
         this.bus = bus;
         this.event = event;
+
+        generateDrawables();
+    }
+
+    private void generateDrawables()
+    {
+        personDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.HOME)
+                .setColor(Color.BLACK)
+                .setSizeDp(24)
+                .build();
     }
 
     @Override
@@ -77,7 +84,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
 
             Picasso.with(context)
                     .load(AppConstants.FACEBOOK_END_POINT + current.getId() + "/picture")
-                    .placeholder(R.drawable.ic_person_black_36dp)
+                    .placeholder(personDrawable)
                     .fit()
                     .centerInside()
                     .into(holder.userPic);

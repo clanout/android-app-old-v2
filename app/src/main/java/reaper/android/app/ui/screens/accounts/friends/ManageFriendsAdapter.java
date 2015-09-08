@@ -36,6 +36,7 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
     private Context context;
     private List<Boolean> blockStatusList;
     private Drawable blockedDrawable, unblockedDrawable;
+    private Drawable personDrawable;
 
     public ManageFriendsAdapter(Context context, List<Friend> friends, BlockListCommunicator blockListCommunicator)
     {
@@ -51,14 +52,20 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
     private void generateDrawables()
     {
         blockedDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                .setIcon(MaterialDrawableBuilder.IconValue.STOP)
+                .setIcon(MaterialDrawableBuilder.IconValue.STAR)
                 .setColor(Color.RED)
                 .setSizeDp(24)
                 .build();
 
-        blockedDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                .setIcon(MaterialDrawableBuilder.IconValue.STOP)
+        unblockedDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
+                .setIcon(MaterialDrawableBuilder.IconValue.STAR_OUTLINE)
                 .setColor(Color.BLUE)
+                .setSizeDp(24)
+                .build();
+
+        personDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
+                .setColor(Color.BLACK)
                 .setSizeDp(24)
                 .build();
     }
@@ -78,7 +85,7 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
 
         Picasso.with(context)
                 .load(AppConstants.FACEBOOK_END_POINT + current.getId() + "/picture")
-                .placeholder(R.drawable.ic_person_black_36dp)
+                .placeholder(personDrawable)
                 .fit()
                 .centerInside()
                 .into(holder.userPic);

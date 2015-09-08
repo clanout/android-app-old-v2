@@ -26,6 +26,7 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
     List<EventDetails.Attendee> attendees;
     private AttendeeClickCommunicator attendeeClickCommunicator;
     private Drawable goingDrawable, maybeDrawable, invitedDrawable;
+    private Drawable personDrawable;
 
     public EventAttendeesAdapter(List<EventDetails.Attendee> attendees, Context context)
     {
@@ -53,6 +54,12 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
                 .setIcon(MaterialDrawableBuilder.IconValue.EMAIL)
                 .setColor(context.getResources().getColor(R.color.primary))
                 .setSizeDp(18)
+                .build();
+
+        personDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
+                .setColor(Color.BLACK)
+                .setSizeDp(24)
                 .build();
     }
 
@@ -104,7 +111,7 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
         {
             Picasso.with(context)
                     .load(AppConstants.FACEBOOK_END_POINT + attendee.getId() + "/picture")
-                    .placeholder(R.drawable.ic_person_black_36dp)
+                    .placeholder(personDrawable)
                     .fit()
                     .centerInside()
                     .into(pic);

@@ -426,7 +426,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 if (isChatUpdated)
                 {
                     chatIcon.setVisibility(View.VISIBLE);
-                    chatIcon.setImageResource(R.drawable.ic_info_black_18dp);
                 } else
                 {
                     chatIcon.setVisibility(View.INVISIBLE);
@@ -436,7 +435,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 if (event.isUpdated())
                 {
                     updatesIcon.setVisibility(View.VISIBLE);
-                    updatesIcon.setImageResource(R.drawable.ic_info_black_18dp);
                 } else
                 {
                     updatesIcon.setVisibility(View.INVISIBLE);
