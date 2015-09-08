@@ -67,7 +67,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     private EventDetails eventDetails;
 
     // UI Elements
-    private ImageView icon, locationIcon;
+    private ImageView icon;
     private TextView title, type, description, location, dateTime;
     private RecyclerView attendeeList;
     private TextView noAttendeeMessage, refreshDetailsTextView;
@@ -90,7 +90,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         View view = inflater.inflate(R.layout.fragment_event_details, container, false);
 
         icon = (ImageView) view.findViewById(R.id.iv_event_details_icon);
-        locationIcon = (ImageView) view.findViewById(R.id.iv_event_details_location);
         title = (TextView) view.findViewById(R.id.tv_event_details_title);
         type = (TextView) view.findViewById(R.id.tv_event_details_type);
         description = (TextView) view.findViewById(R.id.tv_event_details_description);

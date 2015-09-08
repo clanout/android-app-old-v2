@@ -37,6 +37,7 @@ import org.joda.time.format.DateTimeFormatter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import reaper.android.R;
@@ -86,10 +87,8 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     private EventCache eventCache;
 
     // Data
-    private Event event;
+    private Event event, editedEvent;
     private EventDetails eventDetails;
-    private Location placeLocation;
-    private DateTime startDateTime, endDateTime;
 
     // UI Elements
     private TextView title;
@@ -102,7 +101,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     private TextView noSuggestions;
     private ImageButton save;
 
-    private boolean isPlaceDetailsRunning, isSaveButtonClicked, isFinalised;
+    private boolean isPlaceDetailsRunning, isSaveButtonClicked;
 
     private List<Suggestion> suggestionList;
     private EventSuggestionsAdapter eventSuggestionsAdapter;
@@ -147,6 +146,15 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             throw new IllegalStateException("Event/EventDetails cannot be null while creating EditEventFragment instance");
         }
 
+        Log.d("APP", "event location ------ " + event.getLocation());
+
+        editedEvent = new Event();
+        editedEvent.setId(event.getId());
+        editedEvent.setIsFinalized(event.isFinalized());
+        editedEvent.setEndTime(event.getEndTime());
+        editedEvent.setStartTime(event.getStartTime());
+        editedEvent.setLocation(event.getLocation());
+
         bus = Communicator.getInstance().getBus();
         fragmentManager = getActivity().getSupportFragmentManager();
         eventService = new EventService(bus);
@@ -157,13 +165,10 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         genericCache = CacheManager.getGenericCache();
         eventCache = CacheManager.getEventCache();
 
-        placeLocation = event.getLocation();
-
         suggestionList = new ArrayList<>();
 
         isPlaceDetailsRunning = false;
         isSaveButtonClicked = false;
-        isFinalised = event.isFinalized();
 
         schedule.setOnClickListener(this);
         save.setOnClickListener(this);
@@ -220,17 +225,15 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             eventLocation.setText(event.getLocation().getName());
         }
 
-        DateTime start = event.getStartTime();
-        DateTime end = event.getEndTime();
         DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("dd MMM");
         DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("HH:mm");
 
-        if (start.toString(dateFormatter).equals(end.toString(dateFormatter)))
+        if (event.getStartTime().toString(dateFormatter).equals(event.getEndTime().toString(dateFormatter)))
         {
-            schedule.setText(start.toString(timeFormatter) + " - " + end.toString(timeFormatter) + " (" + start.toString(dateFormatter) + ")");
+            schedule.setText(event.getStartTime().toString(timeFormatter) + " - " + event.getEndTime().toString(timeFormatter) + " (" + event.getStartTime().toString(dateFormatter) + ")");
         } else
         {
-            schedule.setText(start.toString(timeFormatter) + " (" + start.toString(dateFormatter) + ") - " + end.toString(timeFormatter) + " (" + end.toString(dateFormatter) + ")");
+            schedule.setText(event.getStartTime().toString(timeFormatter) + " (" + event.getStartTime().toString(dateFormatter) + ") - " + event.getEndTime().toString(timeFormatter) + " (" + event.getEndTime().toString(dateFormatter) + ")");
         }
 
         if (event.getType() == Event.Type.PUBLIC)
@@ -363,7 +366,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
 
         if (EventUtils.canFinaliseEvent(event, userService.getActiveUserId()))
         {
-            if (isFinalised)
+            if (editedEvent.isFinalized())
             {
                 menu.findItem(R.id.action_finalize_event).setIcon(R.drawable.ic_action_secure);
                 menu.findItem(R.id.action_finalize_event).setVisible(true);
@@ -379,15 +382,15 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                 public boolean onMenuItemClick(MenuItem menuItem)
                 {
 
-                    if (isFinalised)
+                    if (editedEvent.isFinalized())
                     {
-                        isFinalised = false;
+                        editedEvent.setIsFinalized(false);
                         menu.findItem(R.id.action_finalize_event).setIcon(R.drawable.ic_action_error);
                         Toast.makeText(getActivity(), R.string.event_not_finalised, Toast.LENGTH_SHORT).show();
                     } else
                     {
                         menu.findItem(R.id.action_finalize_event).setIcon(R.drawable.ic_action_secure);
-                        isFinalised = true;
+                        editedEvent.setIsFinalized(true);
                         Toast.makeText(getActivity(), R.string.event_finalised, Toast.LENGTH_SHORT).show();
                     }
 
@@ -422,18 +425,27 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     {
         eventLocation.setText(suggestionList.get(position).getName());
 
-        placeLocation.setName(suggestionList.get(position).getName());
-        placeLocation.setLatitude(suggestionList.get(position).getLatitude());
-        placeLocation.setLongitude(suggestionList.get(position).getLongitude());
+        Location editedEventLocation = new Location();
+        editedEventLocation.setName(suggestionList.get(position).getName());
+        editedEventLocation.setLatitude(suggestionList.get(position).getLatitude());
+        editedEventLocation.setLongitude(suggestionList.get(position).getLongitude());
+        editedEventLocation.setZone(locationService.getUserLocation().getZone());
+
+        editedEvent.setLocation(editedEventLocation);
 
     }
 
     @Subscribe
     public void onEventLocationFetched(EventLocationFetchedTrigger trigger)
     {
-        placeLocation.setName(trigger.getLocation().getName());
-        placeLocation.setLatitude(trigger.getLocation().getLatitude());
-        placeLocation.setLongitude(trigger.getLocation().getLongitude());
+        Location editedEventLocation = new Location();
+
+        editedEventLocation.setName(trigger.getLocation().getName());
+        editedEventLocation.setLatitude(trigger.getLocation().getLatitude());
+        editedEventLocation.setLongitude(trigger.getLocation().getLongitude());
+        editedEventLocation.setZone(locationService.getUserLocation().getZone());
+
+        editedEvent.setLocation(editedEventLocation);
 
         isPlaceDetailsRunning = false;
 
@@ -450,9 +462,14 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         {
             Toast.makeText(getActivity(), R.string.location_not_found, Toast.LENGTH_LONG).show();
             eventLocation.setText("");
-            placeLocation.setName(null);
-            placeLocation.setLatitude(null);
-            placeLocation.setLongitude(null);
+
+            Location editedEventLocation = new Location();
+            editedEventLocation.setName(null);
+            editedEventLocation.setLatitude(null);
+            editedEventLocation.setLongitude(null);
+            editedEventLocation.setZone(null);
+
+            editedEvent.setLocation(editedEventLocation);
 
             isPlaceDetailsRunning = false;
 
@@ -500,8 +517,8 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                 @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
-                    startDateTime = getTime(startDatePicker, startTimePicker);
-                    endDateTime = getTime(endDatePicker, endTimePicker);
+                    DateTime startDateTime = getTime(startDatePicker, startTimePicker);
+                    DateTime endDateTime = getTime(endDatePicker, endTimePicker);
 
                     renderEventTimings(startDateTime, endDateTime);
                 }
@@ -522,13 +539,15 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         if (_startDateTime.isAfter(_endDateTime))
         {
             schedule.setText("Select event timings");
-            startDateTime = null;
-            endDateTime = null;
+
+            editedEvent.setEndTime(null);
+            editedEvent.setStartTime(null);
+
             Toast.makeText(getActivity(), R.string.event_end_before_start, Toast.LENGTH_LONG).show();
         } else
         {
-            startDateTime = _startDateTime;
-            endDateTime = _endDateTime;
+            editedEvent.setStartTime(_startDateTime);
+            editedEvent.setEndTime(_endDateTime);
 
             if (_startDateTime.toString(dateFormatter).equals(_endDateTime.toString(dateFormatter)))
             {
@@ -576,23 +595,20 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         startDatePicker.setMinDate(System.currentTimeMillis() - 1000);
         endDatePicker.setMinDate(System.currentTimeMillis() - 1000);
 
-        startDateTime = event.getStartTime();
-        endDateTime = event.getEndTime();
-
-        if (startDateTime == null || endDateTime == null)
+        if (editedEvent.getStartTime() == null || editedEvent.getEndTime() == null)
         {
             startTimePicker.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
             endTimePicker.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
         } else
         {
-            startTimePicker.setCurrentHour(startDateTime.getHourOfDay());
-            startTimePicker.setCurrentMinute(startDateTime.getMinuteOfHour());
+            startTimePicker.setCurrentHour(editedEvent.getStartTime().getHourOfDay());
+            startTimePicker.setCurrentMinute(editedEvent.getStartTime().getMinuteOfHour());
 
-            endTimePicker.setCurrentHour(endDateTime.getHourOfDay());
-            endTimePicker.setCurrentMinute(endDateTime.getMinuteOfHour());
+            endTimePicker.setCurrentHour(editedEvent.getEndTime().getHourOfDay());
+            endTimePicker.setCurrentMinute(editedEvent.getEndTime().getMinuteOfHour());
 
-            startDatePicker.updateDate(startDateTime.getYear(), startDateTime.getMonthOfYear() - 1, startDateTime.getDayOfMonth());
-            endDatePicker.updateDate(endDateTime.getYear(), endDateTime.getMonthOfYear() - 1, endDateTime.getDayOfMonth());
+            startDatePicker.updateDate(editedEvent.getStartTime().getYear(), editedEvent.getStartTime().getMonthOfYear() - 1, editedEvent.getStartTime().getDayOfMonth());
+            endDatePicker.updateDate(editedEvent.getEndTime().getYear(), editedEvent.getEndTime().getMonthOfYear() - 1, editedEvent.getEndTime().getDayOfMonth());
         }
     }
 
@@ -640,7 +656,48 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             descriptionEvent = "";
         }
 
-        eventService.editEvent(event.getId(), isFinalised, startDateTime, endDateTime, placeLocation, descriptionEvent);
+        if (eventLocation.getText().toString().isEmpty() || eventLocation.getText().toString() == null)
+        {
+            Location editedEventLocation = new Location();
+            editedEventLocation.setName(null);
+            editedEventLocation.setLatitude(null);
+            editedEventLocation.setLongitude(null);
+            editedEventLocation.setZone(locationService.getUserLocation().getZone());
+
+            editedEvent.setLocation(editedEventLocation);
+        }
+
+        if((event.getStartTime().equals(editedEvent.getStartTime())) && (event.getEndTime().equals(editedEvent.getEndTime())))
+        {
+            editedEvent.setEndTime(null);
+            editedEvent.setStartTime(null);
+        }
+
+        if(descriptionEvent.equals(eventDetails.getDescription()))
+        {
+            descriptionEvent = null;
+        }
+
+        Log.d("APP", "request event location ----- " + event.getLocation());
+        Log.d("APP", "request event edit location ----- " + editedEvent.getLocation());
+
+        if((event.getLocation().getName().equals(editedEvent.getLocation().getName()) ) && (event.getLocation().getLatitude().equals(editedEvent.getLocation().getLatitude())) && (event.getLocation().getLongitude().equals(editedEvent.getLocation().getLongitude())) && (event.getLocation().getZone().equals(editedEvent.getLocation().getZone())))
+        {
+            Location editedEventLocation = new Location();
+            editedEventLocation.setZone(null);
+            editedEventLocation.setLongitude(null);
+            editedEventLocation.setLatitude(null);
+            editedEventLocation.setName(null);
+
+            editedEvent.setLocation(editedEventLocation);
+        }
+
+        if(event.isFinalized().equals(editedEvent.isFinalized()))
+        {
+            editedEvent.setIsFinalized(null);
+        }
+
+        eventService.editEvent(event.getId(), editedEvent.isFinalized(), editedEvent.getStartTime(), editedEvent.getEndTime(), editedEvent.getLocation(), descriptionEvent);
     }
 
     @Subscribe

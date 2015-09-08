@@ -32,10 +32,10 @@ public class CreateEventApiRequest extends ApiRequest
     private String locationZone;
 
     @SerializedName("location_latitude")
-    private String latitude;
+    private Double latitude;
 
     @SerializedName("location_longitude")
-    private String longitude;
+    private Double longitude;
 
     @SerializedName("start_time")
     private DateTime startTime;
@@ -43,7 +43,7 @@ public class CreateEventApiRequest extends ApiRequest
     @SerializedName("end_time")
     private DateTime endTime;
 
-    public CreateEventApiRequest(String eventTitle, Event.Type eventType, EventCategory eventCategory, String description, String locationName, String locationZone, String latitude, String longitude, DateTime startTime, DateTime endTime)
+    public CreateEventApiRequest(String eventTitle, Event.Type eventType, EventCategory eventCategory, String description, String locationName, String locationZone, Double latitude, Double longitude, DateTime startTime, DateTime endTime)
     {
         this.eventTitle = eventTitle;
         this.eventType = eventType;

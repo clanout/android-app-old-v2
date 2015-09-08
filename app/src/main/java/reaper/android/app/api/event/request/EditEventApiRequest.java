@@ -21,10 +21,10 @@ public class EditEventApiRequest extends ApiRequest
     private DateTime endTime;
 
     @SerializedName("location_latitude")
-    private String locationLatitude;
+    private Double locationLatitude;
 
     @SerializedName("location_longitude")
-    private String locationLongitude;
+    private Double locationLongitude;
 
     @SerializedName("location_name")
     private String locationName;
@@ -35,7 +35,7 @@ public class EditEventApiRequest extends ApiRequest
     @SerializedName("description")
     private String description;
 
-    public EditEventApiRequest(String locationLongitude, String description, DateTime endTime, String eventId, boolean isFinalized, String locationLatitude, String locationName, String locationZone, DateTime startTime)
+    public EditEventApiRequest(Double locationLongitude, String description, DateTime endTime, String eventId, boolean isFinalized, Double locationLatitude, String locationName, String locationZone, DateTime startTime)
     {
         this.locationLongitude = locationLongitude;
         this.description = description;

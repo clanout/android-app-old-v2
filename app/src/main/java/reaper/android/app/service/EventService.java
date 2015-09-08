@@ -620,9 +620,7 @@ public class EventService
     public void createEvent(String title, Event.Type eventType, EventCategory eventCategory, String description, Location placeLocation, DateTime startTime, DateTime endTime)
     {
         CreateEventApiRequest request = new CreateEventApiRequest(title, eventType, eventCategory, description, placeLocation
-                .getName(), placeLocation.getZone(), String
-                .valueOf(placeLocation.getLatitude()), String
-                .valueOf(placeLocation.getLongitude()), startTime, endTime);
+                .getName(), placeLocation.getZone(), placeLocation.getLatitude(), placeLocation.getLongitude(), startTime, endTime);
 
         eventApi.createEvent(request)
                 .map(new Func1<CreateEventApiResponse, Event>()
@@ -666,9 +664,8 @@ public class EventService
 
     public void editEvent(final String eventId, boolean isFinalised, DateTime startTime, DateTime endTime, Location placeLocation, String description)
     {
-        final EditEventApiRequest request = new EditEventApiRequest(String.valueOf(placeLocation
-                .getLongitude()), description, endTime, eventId, isFinalised, String
-                .valueOf(placeLocation.getLatitude()), placeLocation.getName(), placeLocation
+        final EditEventApiRequest request = new EditEventApiRequest(placeLocation
+                .getLongitude(), description, endTime, eventId, isFinalised, placeLocation.getLatitude(), placeLocation.getName(), placeLocation
                 .getZone(), startTime);
 
         Observable.create(new Observable.OnSubscribe<Event>()

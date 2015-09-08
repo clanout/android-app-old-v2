@@ -28,7 +28,7 @@ public class Event implements Model
     private String title;
     private Type type;
     private String category;
-    private boolean isFinalized;
+    private Boolean isFinalized;
     private DateTime startTime;
     private DateTime endTime;
     private String organizerId;
@@ -83,14 +83,13 @@ public class Event implements Model
         this.category = category;
     }
 
-    public boolean isFinalized()
+    public Boolean isFinalized()
     {
+        if(isFinalized == null)
+        {
+            return false;
+        }
         return isFinalized;
-    }
-
-    public void setFinalized(boolean isFinalized)
-    {
-        this.isFinalized = isFinalized;
     }
 
     public DateTime getStartTime()
@@ -183,7 +182,7 @@ public class Event implements Model
         this.inviterCount = inviterCount;
     }
 
-    public void setIsFinalized(boolean isFinalized)
+    public void setIsFinalized(Boolean isFinalized)
     {
         this.isFinalized = isFinalized;
     }
