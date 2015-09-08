@@ -1,10 +1,12 @@
 package reaper.android.app.ui.screens.details;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
@@ -17,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -72,6 +75,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     private RecyclerView attendeeList;
     private TextView noAttendeeMessage, refreshDetailsTextView;
     private ProgressBar refreshDetailsProgressBar;
+    private CoordinatorLayout.Behavior behavior;
 
     private EventAttendeesAdapter eventAttendeesAdapter;
 
@@ -152,6 +156,41 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     {
         super.onPause();
         bus.unregister(this);
+    }
+
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+
+        if(behavior != null)
+        {
+            return;
+        }
+
+        FrameLayout layout =(FrameLayout) getActivity().findViewById(R.id.fl_main);
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
+
+        behavior = params.getBehavior();
+        params.setBehavior(null);
+    }
+
+    @Override
+    public void onDetach()
+    {
+        super.onDetach();
+
+        if(behavior == null)
+            return;
+
+        FrameLayout layout =(FrameLayout) getActivity().findViewById(R.id.fl_main);
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
+
+        params.setBehavior(behavior);
+
+        layout.setLayoutParams(params);
+
+        behavior = null;
     }
 
     @Subscribe

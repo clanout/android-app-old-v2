@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
-import reaper.android.app.api.core.GsonProvider;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
@@ -28,7 +26,6 @@ import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
-import reaper.android.app.config.NotificationConstants;
 import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
@@ -46,7 +43,6 @@ import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.chat.ChatHelper;
 import reaper.android.common.communicator.Communicator;
-import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity
 {

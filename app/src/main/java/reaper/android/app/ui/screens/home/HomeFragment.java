@@ -1,9 +1,11 @@
 package reaper.android.app.ui.screens.home;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -24,6 +26,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -79,8 +82,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     private FragmentManager fragmentManager;
     private Bus bus;
 
-    private Sort sort;
-    private Filter filter;
+//    private Sort sort;
+//    private Filter filter;
 
     // Services
     private UserService userService;
@@ -89,7 +92,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
 
     //Cache
     private GenericCache genericCache;
-    private EventCache eventCache;
 
     // Data
     private List<Event> events;
@@ -99,11 +101,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     // UI Elements
     private TextView noEventsMessage;
     private RecyclerView eventList;
-    private LinearLayout buttonBar;
-    private Button filterButton, sortButton;
+//    private LinearLayout buttonBar;
+//    private Button filterButton, sortButton;
     private FloatingActionButton createEvent;
     private SwipeRefreshLayout swipeRefreshLayout;
     private Snackbar snackbar;
+    private CoordinatorLayout.Behavior behavior;
 
     private EventsAdapter eventsAdapter;
 
@@ -138,9 +141,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
 
         eventList = (RecyclerView) view.findViewById(R.id.rv_home_events);
         noEventsMessage = (TextView) view.findViewById(R.id.tv_home_no_events);
-        buttonBar = (LinearLayout) view.findViewById(R.id.ll_home_btn_bar);
-        filterButton = (Button) view.findViewById(R.id.btn_home_filter);
-        sortButton = (Button) view.findViewById(R.id.btn_home_sort);
+//        buttonBar = (LinearLayout) view.findViewById(R.id.ll_home_btn_bar);
+//        filterButton = (Button) view.findViewById(R.id.btn_home_filter);
+//        sortButton = (Button) view.findViewById(R.id.btn_home_sort);
         createEvent = (FloatingActionButton) view.findViewById(R.id.fib_home_create);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.srl_home);
 
@@ -161,13 +164,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         locationService = new LocationService(bus);
 
         genericCache = CacheManager.getGenericCache();
-        eventCache = CacheManager.getEventCache();
-
-        filterButton.setText(R.string.filter_all);
-        sortButton.setText(R.string.sort_relevance);
-
-        sortButton.setOnClickListener(this);
-        filterButton.setOnClickListener(this);
+//
+//        filterButton.setText(R.string.filter_all);
+//        sortButton.setText(R.string.sort_relevance);
+//
+//        sortButton.setOnClickListener(this);
+//        filterButton.setOnClickListener(this);
         createEvent.setOnClickListener(this);
 
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -176,26 +178,26 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         userLocation = locationService.getUserLocation();
         eventCategory = EventCategory.GENERAL;
 
-        if (savedInstanceState != null)
-        {
-            sort = (Sort) savedInstanceState.getSerializable("sort");
-            filter = (Filter) savedInstanceState.getSerializable("filter");
-        } else
-        {
-            sort = Sort.RELEVANCE;
-            filter = Filter.ALL;
-        }
+//        if (savedInstanceState != null)
+//        {
+//            sort = (Sort) savedInstanceState.getSerializable("sort");
+//            filter = (Filter) savedInstanceState.getSerializable("filter");
+//        } else
+//        {
+//            sort = Sort.RELEVANCE;
+//            filter = Filter.ALL;
+//        }
 
         initRecyclerView();
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable("sort", sort);
-        outState.putSerializable("filter", filter);
-    }
+//    @Override
+//    public void onSaveInstanceState(Bundle outState)
+//    {
+//        super.onSaveInstanceState(outState);
+//        outState.putSerializable("sort", sort);
+//        outState.putSerializable("filter", filter);
+//    }
 
     @Override
     public void onResume()
@@ -218,6 +220,41 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         {
             snackbar.dismiss();
         }
+    }
+
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+
+        if(behavior != null)
+        {
+            return;
+        }
+
+        FrameLayout layout =(FrameLayout) getActivity().findViewById(R.id.fl_main);
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
+
+        behavior = params.getBehavior();
+        params.setBehavior(null);
+    }
+
+    @Override
+    public void onDetach()
+    {
+        super.onDetach();
+
+        if(behavior == null)
+            return;
+
+        FrameLayout layout =(FrameLayout) getActivity().findViewById(R.id.fl_main);
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
+
+        params.setBehavior(behavior);
+
+        layout.setLayoutParams(params);
+
+        behavior = null;
     }
 
     @Subscribe
@@ -295,10 +332,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
             public void onClick(View v)
             {
                 eventService.fetchEvents(locationService.getUserLocation().getZone());
-                sort = Sort.RELEVANCE;
-                filter = Filter.ALL;
-                filterButton.setText("ALL EVENTS");
-                sortButton.setText("RELEVANCE");
+//                sort = Sort.RELEVANCE;
+//                filter = Filter.ALL;
+//                filterButton.setText("ALL EVENTS");
+//                sortButton.setText("RELEVANCE");
                 snackbar.dismiss();
             }
         });
@@ -331,10 +368,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     {
         events = trigger.getEventList();
 
-        sort = Sort.RELEVANCE;
-        filter = Filter.ALL;
-        filterButton.setText("ALL EVENTS");
-        sortButton.setText("RELEVANCE");
+//        sort = Sort.RELEVANCE;
+//        filter = Filter.ALL;
+//        filterButton.setText("ALL EVENTS");
+//        sortButton.setText("RELEVANCE");
 
         refreshRecyclerView();
         swipeRefreshLayout.setRefreshing(false);
@@ -391,47 +428,52 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
             dispayBasicView();
         }
 
-        switch (sort)
-        {
-            case RELEVANCE:
-                Collections.sort(events, new EventComparator.Relevance(userService.getActiveUserId()));
-                break;
-            case DATE_TIME:
-                Collections.sort(events, new EventComparator.DateTime());
-                break;
-            case DISTANCE:
-                Collections.sort(events, new EventComparator.Distance(userLocation.getLongitude(), userLocation.getLatitude()));
-                break;
-            default:
-                break;
-        }
+//        switch (sort)
+//        {
+//            case RELEVANCE:
+//                Collections.sort(events, new EventComparator.Relevance(userService.getActiveUserId()));
+//                break;
+//            case DATE_TIME:
+//                Collections.sort(events, new EventComparator.DateTime());
+//                break;
+//            case DISTANCE:
+//                Collections.sort(events, new EventComparator.Distance(userLocation.getLongitude(), userLocation.getLatitude()));
+//                break;
+//            default:
+//                break;
+//        }
 
-        if (filter == Filter.ALL)
-        {
-            eventsAdapter = new EventsAdapter(bus, events, getActivity());
-            eventList.setAdapter(eventsAdapter);
-        } else
-        {
-            DateTime now = DateTime.now();
-            DateTime todayEnd = DateTime.now().withHourOfDay(23).withMinuteOfHour(59);
-            List<Event> visibleEvents = new ArrayList<>();
-            for (Event event : events)
-            {
-                if (event.getStartTime().isBefore(todayEnd) && event.getEndTime().isAfter(now))
-                {
-                    visibleEvents.add(event);
-                }
-            }
+        Collections.sort(events, new EventComparator.Relevance(userService.getActiveUserId()));
 
-            if (visibleEvents.size() == 0)
-            {
-                displayNoEventsView();
-            } else
-            {
-                eventsAdapter = new EventsAdapter(bus, visibleEvents, getActivity());
-                eventList.setAdapter(eventsAdapter);
-            }
-        }
+//        if (filter == Filter.ALL)
+//        {
+//            eventsAdapter = new EventsAdapter(bus, events, getActivity());
+//            eventList.setAdapter(eventsAdapter);
+//        } else
+//        {
+//            DateTime now = DateTime.now();
+//            DateTime todayEnd = DateTime.now().withHourOfDay(23).withMinuteOfHour(59);
+//            List<Event> visibleEvents = new ArrayList<>();
+//            for (Event event : events)
+//            {
+//                if (event.getStartTime().isBefore(todayEnd) && event.getEndTime().isAfter(now))
+//                {
+//                    visibleEvents.add(event);
+//                }
+//            }
+//
+//            if (visibleEvents.size() == 0)
+//            {
+//                displayNoEventsView();
+//            } else
+//            {
+//                eventsAdapter = new EventsAdapter(bus, visibleEvents, getActivity());
+//                eventList.setAdapter(eventsAdapter);
+//            }
+//        }
+
+        eventsAdapter = new EventsAdapter(bus, events, getActivity());
+        eventList.setAdapter(eventsAdapter);
     }
 
     private void dispayBasicView()
@@ -439,7 +481,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         noEventsMessage.setVisibility(View.GONE);
         createEvent.setVisibility(View.GONE);
         eventList.setVisibility(View.VISIBLE);
-        buttonBar.setVisibility(View.VISIBLE);
+//        buttonBar.setVisibility(View.VISIBLE);
     }
 
     private void displayNoEventsView()
@@ -448,7 +490,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         noEventsMessage.setVisibility(View.VISIBLE);
         createEvent.setVisibility(View.VISIBLE);
         eventList.setVisibility(View.GONE);
-        buttonBar.setVisibility(View.VISIBLE);
+//        buttonBar.setVisibility(View.VISIBLE);
     }
 
     private void displayErrorView()
@@ -457,7 +499,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         noEventsMessage.setText(R.string.home_events_fetch_error);
         createEvent.setVisibility(View.GONE);
         eventList.setVisibility(View.GONE);
-        buttonBar.setVisibility(View.GONE);
+//        buttonBar.setVisibility(View.GONE);
     }
 
     @Override
@@ -725,64 +767,64 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     @Override
     public void onClick(View view)
     {
-        if (view.getId() == R.id.btn_home_filter)
-        {
-            PopupMenu filterMenu = new PopupMenu(getActivity(), filterButton);
-            filterMenu.getMenuInflater().inflate(R.menu.popup_filter, filterMenu.getMenu());
-
-            filterMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
-            {
-                @Override
-                public boolean onMenuItemClick(MenuItem menuItem)
-                {
-                    if (menuItem.getItemId() == R.id.menu_filter_today)
-                    {
-                        filterButton.setText(menuItem.getTitle().toString());
-                        filter = Filter.TODAY;
-                        refreshRecyclerView();
-                    } else if (menuItem.getItemId() == R.id.menu_filter_all)
-                    {
-                        filterButton.setText(menuItem.getTitle().toString());
-                        filter = Filter.ALL;
-                        refreshRecyclerView();
-                    }
-                    return true;
-                }
-            });
-
-            filterMenu.show();
-        } else if (view.getId() == R.id.btn_home_sort)
-        {
-            PopupMenu sortMenu = new PopupMenu(getActivity(), sortButton);
-            sortMenu.getMenuInflater().inflate(R.menu.popup_sort, sortMenu.getMenu());
-
-            sortMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
-            {
-                @Override
-                public boolean onMenuItemClick(MenuItem menuItem)
-                {
-                    if (menuItem.getItemId() == R.id.menu_sort_relevance)
-                    {
-                        sortButton.setText(menuItem.getTitle().toString());
-                        sort = Sort.RELEVANCE;
-                        refreshRecyclerView();
-                    } else if (menuItem.getItemId() == R.id.menu_sort_time)
-                    {
-                        sortButton.setText(menuItem.getTitle().toString());
-                        sort = Sort.DATE_TIME;
-                        refreshRecyclerView();
-                    } else if (menuItem.getItemId() == R.id.menu_sort_distance)
-                    {
-                        sortButton.setText(menuItem.getTitle().toString());
-                        sort = Sort.DISTANCE;
-                        refreshRecyclerView();
-                    }
-                    return true;
-                }
-            });
-
-            sortMenu.show();
-        } else if (view.getId() == R.id.fib_home_create)
+//        if (view.getId() == R.id.btn_home_filter)
+//        {
+//            PopupMenu filterMenu = new PopupMenu(getActivity(), filterButton);
+//            filterMenu.getMenuInflater().inflate(R.menu.popup_filter, filterMenu.getMenu());
+//
+//            filterMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+//            {
+//                @Override
+//                public boolean onMenuItemClick(MenuItem menuItem)
+//                {
+//                    if (menuItem.getItemId() == R.id.menu_filter_today)
+//                    {
+//                        filterButton.setText(menuItem.getTitle().toString());
+//                        filter = Filter.TODAY;
+//                        refreshRecyclerView();
+//                    } else if (menuItem.getItemId() == R.id.menu_filter_all)
+//                    {
+//                        filterButton.setText(menuItem.getTitle().toString());
+//                        filter = Filter.ALL;
+//                        refreshRecyclerView();
+//                    }
+//                    return true;
+//                }
+//            });
+//
+//            filterMenu.show();
+//        } else if (view.getId() == R.id.btn_home_sort)
+//        {
+//            PopupMenu sortMenu = new PopupMenu(getActivity(), sortButton);
+//            sortMenu.getMenuInflater().inflate(R.menu.popup_sort, sortMenu.getMenu());
+//
+//            sortMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+//            {
+//                @Override
+//                public boolean onMenuItemClick(MenuItem menuItem)
+//                {
+//                    if (menuItem.getItemId() == R.id.menu_sort_relevance)
+//                    {
+//                        sortButton.setText(menuItem.getTitle().toString());
+//                        sort = Sort.RELEVANCE;
+//                        refreshRecyclerView();
+//                    } else if (menuItem.getItemId() == R.id.menu_sort_time)
+//                    {
+//                        sortButton.setText(menuItem.getTitle().toString());
+//                        sort = Sort.DATE_TIME;
+//                        refreshRecyclerView();
+//                    } else if (menuItem.getItemId() == R.id.menu_sort_distance)
+//                    {
+//                        sortButton.setText(menuItem.getTitle().toString());
+//                        sort = Sort.DISTANCE;
+//                        refreshRecyclerView();
+//                    }
+//                    return true;
+//                }
+//            });
+//
+//            sortMenu.show();
+        if (view.getId() == R.id.fib_home_create)
         {
             displayCreateEventDialog();
         }
