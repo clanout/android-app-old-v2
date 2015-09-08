@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -75,7 +76,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     private RecyclerView attendeeList;
     private TextView noAttendeeMessage, refreshDetailsTextView;
     private ProgressBar refreshDetailsProgressBar;
-    private CoordinatorLayout.Behavior behavior;
 
     private EventAttendeesAdapter eventAttendeesAdapter;
 
@@ -156,41 +156,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     {
         super.onPause();
         bus.unregister(this);
-    }
-
-    @Override
-    public void onAttach(Activity activity)
-    {
-        super.onAttach(activity);
-
-        if(behavior != null)
-        {
-            return;
-        }
-
-        FrameLayout layout =(FrameLayout) getActivity().findViewById(R.id.fl_main);
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
-
-        behavior = params.getBehavior();
-        params.setBehavior(null);
-    }
-
-    @Override
-    public void onDetach()
-    {
-        super.onDetach();
-
-        if(behavior == null)
-            return;
-
-        FrameLayout layout =(FrameLayout) getActivity().findViewById(R.id.fl_main);
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
-
-        params.setBehavior(behavior);
-
-        layout.setLayoutParams(params);
-
-        behavior = null;
     }
 
     @Subscribe
@@ -424,7 +389,8 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
                 Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
                         Uri.parse("http://maps.google.com/maps?daddr=" + event.getLocation().getLatitude() + "," + event.getLocation().getLongitude()));
                 startActivity(intent);
-            }else{
+            } else
+            {
                 Toast.makeText(getActivity(), R.string.location_not_available_on_map, Toast.LENGTH_LONG).show();
             }
         } else if (view.getId() == R.id.tv_event_details_description)

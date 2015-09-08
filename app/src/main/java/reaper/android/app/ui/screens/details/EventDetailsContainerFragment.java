@@ -3,6 +3,7 @@ package reaper.android.app.ui.screens.details;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -65,8 +66,6 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
     private ImageButton rsvp, invite, chat;
 
     private PagerAdapter pagerAdapter;
-
-    private CoordinatorLayout.Behavior behavior;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -160,41 +159,6 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         super.onSaveInstanceState(outState);
         outState.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, (ArrayList<Event>) events);
         outState.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
-    }
-
-    @Override
-    public void onAttach(Activity activity)
-    {
-        super.onAttach(activity);
-
-        if(behavior != null)
-        {
-            return;
-        }
-
-        FrameLayout layout =(FrameLayout) getActivity().findViewById(R.id.fl_main);
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
-
-        behavior = params.getBehavior();
-        params.setBehavior(null);
-    }
-
-    @Override
-    public void onDetach()
-    {
-        super.onDetach();
-
-        if(behavior == null)
-            return;
-
-        FrameLayout layout =(FrameLayout) getActivity().findViewById(R.id.fl_main);
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
-
-        params.setBehavior(behavior);
-
-        layout.setLayoutParams(params);
-
-        behavior = null;
     }
 
     @Override

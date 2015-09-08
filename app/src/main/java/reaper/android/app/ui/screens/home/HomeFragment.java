@@ -3,6 +3,7 @@ package reaper.android.app.ui.screens.home;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -35,6 +36,8 @@ import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+
+import net.steamcrafted.materialiconlib.MaterialIconView;
 
 import org.joda.time.DateTime;
 
@@ -101,12 +104,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     // UI Elements
     private TextView noEventsMessage;
     private RecyclerView eventList;
-//    private LinearLayout buttonBar;
+    //    private LinearLayout buttonBar;
 //    private Button filterButton, sortButton;
     private FloatingActionButton createEvent;
     private SwipeRefreshLayout swipeRefreshLayout;
     private Snackbar snackbar;
-    private CoordinatorLayout.Behavior behavior;
+    private MaterialIconView generalIcon, eatOutIcon, drinksIcon, cafeIcon, movieIcon, outdoorsIcon, partyIcon, eventsIcon, shoppingIcon;
 
     private EventsAdapter eventsAdapter;
 
@@ -220,41 +223,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         {
             snackbar.dismiss();
         }
-    }
-
-    @Override
-    public void onAttach(Activity activity)
-    {
-        super.onAttach(activity);
-
-        if(behavior != null)
-        {
-            return;
-        }
-
-        FrameLayout layout =(FrameLayout) getActivity().findViewById(R.id.fl_main);
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
-
-        behavior = params.getBehavior();
-        params.setBehavior(null);
-    }
-
-    @Override
-    public void onDetach()
-    {
-        super.onDetach();
-
-        if(behavior == null)
-            return;
-
-        FrameLayout layout =(FrameLayout) getActivity().findViewById(R.id.fl_main);
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
-
-        params.setBehavior(behavior);
-
-        layout.setLayoutParams(params);
-
-        behavior = null;
     }
 
     @Subscribe
@@ -631,12 +599,23 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         LinearLayout shopping = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_shopping);
         final CheckBox checkBox = (CheckBox) createEventDialogView.findViewById(R.id.cb_dialog_fragment_create_event);
 
+        generalIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_general);
+        eatOutIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_eat_out);
+        drinksIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_drinks);
+        cafeIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_cafe);
+        movieIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_movie);
+        outdoorsIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_outdoors);
+        partyIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_party);
+        eventsIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_local_events);
+        shoppingIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_shopping);
+
         general.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 eventCategory = EventCategory.GENERAL;
+                changeIconColor(generalIcon);
             }
         });
 
@@ -646,6 +625,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
             public void onClick(View v)
             {
                 eventCategory = EventCategory.EAT_OUT;
+                changeIconColor(eatOutIcon);
             }
         });
 
@@ -655,6 +635,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
             public void onClick(View v)
             {
                 eventCategory = EventCategory.DRINKS;
+                changeIconColor(drinksIcon);
             }
         });
 
@@ -664,6 +645,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
             public void onClick(View v)
             {
                 eventCategory = EventCategory.CAFE;
+                changeIconColor(cafeIcon);
             }
         });
 
@@ -673,6 +655,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
             public void onClick(View v)
             {
                 eventCategory = EventCategory.MOVIES;
+                changeIconColor(movieIcon);
             }
         });
 
@@ -682,6 +665,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
             public void onClick(View v)
             {
                 eventCategory = EventCategory.OUTDOORS;
+                changeIconColor(outdoorsIcon);
             }
         });
 
@@ -691,6 +675,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
             public void onClick(View v)
             {
                 eventCategory = EventCategory.PARTY;
+                changeIconColor(partyIcon);
             }
         });
 
@@ -700,6 +685,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
             public void onClick(View v)
             {
                 eventCategory = EventCategory.LOCAL_EVENTS;
+                changeIconColor(eventsIcon);
             }
         });
 
@@ -709,6 +695,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
             public void onClick(View v)
             {
                 eventCategory = EventCategory.SHOPPING;
+                changeIconColor(shoppingIcon);
             }
         });
 
@@ -762,6 +749,50 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
 
             }
         });
+    }
+
+    private void changeIconColor(MaterialIconView icon)
+    {
+        // TODO : Change colors according to our needs
+
+        icon.setColor(R.color.accent);
+
+        if (icon != generalIcon)
+        {
+            generalIcon.setColor(R.color.primary);
+        }
+        if (icon != eatOutIcon)
+        {
+            eatOutIcon.setColor(R.color.primary);
+        }
+        if (icon != drinksIcon)
+        {
+            drinksIcon.setColor(R.color.primary);
+        }
+        if (icon != cafeIcon)
+        {
+            cafeIcon.setColor(R.color.primary);
+        }
+        if (icon != movieIcon)
+        {
+            movieIcon.setColor(R.color.primary);
+        }
+        if (icon != outdoorsIcon)
+        {
+            outdoorsIcon.setColor(R.color.primary);
+        }
+        if (icon != partyIcon)
+        {
+            partyIcon.setColor(R.color.primary);
+        }
+        if (icon != eventsIcon)
+        {
+            eventsIcon.setColor(R.color.primary);
+        }
+        if (icon != shoppingIcon)
+        {
+            shoppingIcon.setColor(R.color.primary);
+        }
     }
 
     @Override

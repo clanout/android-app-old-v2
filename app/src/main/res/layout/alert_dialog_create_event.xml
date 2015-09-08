@@ -42,10 +42,16 @@
                 android:gravity="center_horizontal"
                 android:id="@+id/ll_dialog_fragment_create_event_general">
 
-                <ImageView
+                <net.steamcrafted.materialiconlib.MaterialIconView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_event_black_48dp"/>
+                    android:scaleType="center"
+                    app:materialIcon="bulletin_board"
+                    app:materialIconColor="@color/primary"
+                    app:materialIconSize="48dp"
+                    android:id="@+id/miv_general"
+                    />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -62,10 +68,16 @@
                 android:gravity="center_horizontal"
                 android:id="@+id/ll_dialog_fragment_create_event_eat_out">
 
-                <ImageView
+                <net.steamcrafted.materialiconlib.MaterialIconView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_local_restaurant_black_48dp"/>
+                    android:scaleType="center"
+                    app:materialIcon="food"
+                    app:materialIconColor="@color/primary"
+                    app:materialIconSize="48dp"
+                    android:id="@+id/miv_eat_out"
+                    />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -82,10 +94,16 @@
                 android:gravity="center_horizontal"
                 android:id="@+id/ll_dialog_fragment_create_event_drinks">
 
-                <ImageView
+                <net.steamcrafted.materialiconlib.MaterialIconView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_local_bar_black_48dp"/>
+                    android:scaleType="center"
+                    app:materialIcon="martini"
+                    app:materialIconColor="@color/primary"
+                    app:materialIconSize="48dp"
+                    android:id="@+id/miv_drinks"
+                    />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -109,10 +127,16 @@
                 android:gravity="center_horizontal"
                 android:id="@+id/ll_dialog_fragment_create_event_cafe">
 
-                <ImageView
+                <net.steamcrafted.materialiconlib.MaterialIconView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_local_cafe_black_48dp"/>
+                    android:scaleType="center"
+                    app:materialIcon="coffee"
+                    app:materialIconColor="@color/primary"
+                    app:materialIconSize="48dp"
+                    android:id="@+id/miv_cafe"
+                    />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -129,10 +153,16 @@
                 android:gravity="center_horizontal"
                 android:id="@+id/ll_dialog_fragment_create_event_movie">
 
-                <ImageView
+                <net.steamcrafted.materialiconlib.MaterialIconView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_local_movies_black_48dp"/>
+                    android:scaleType="center"
+                    app:materialIcon="movie"
+                    app:materialIconColor="@color/primary"
+                    app:materialIconSize="48dp"
+                    android:id="@+id/miv_movie"
+                    />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -149,11 +179,16 @@
                 android:gravity="center_horizontal"
                 android:id="@+id/ll_dialog_fragment_create_event_outdoors">
 
-                <ImageView
+                <net.steamcrafted.materialiconlib.MaterialIconView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_directions_bike_black_48dp"/>
-
+                    android:scaleType="center"
+                    app:materialIcon="tennis"
+                    app:materialIconColor="@color/primary"
+                    app:materialIconSize="48dp"
+                    android:id="@+id/miv_outdoors"
+                    />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -176,10 +211,16 @@
                 android:gravity="center_horizontal"
                 android:id="@+id/ll_dialog_fragment_create_event_party">
 
-                <ImageView
+                <net.steamcrafted.materialiconlib.MaterialIconView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_location_city_black_48dp"/>
+                    android:scaleType="center"
+                    app:materialIcon="gift"
+                    app:materialIconColor="@color/primary"
+                    app:materialIconSize="48dp"
+                    android:id="@+id/miv_party"
+                    />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -196,10 +237,16 @@
                 android:gravity="center_horizontal"
                 android:id="@+id/ll_dialog_fragment_create_event_local_events">
 
-                <ImageView
+                <net.steamcrafted.materialiconlib.MaterialIconView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_local_attraction_black_48dp"/>
+                    android:scaleType="center"
+                    app:materialIcon="city"
+                    app:materialIconColor="@color/primary"
+                    app:materialIconSize="48dp"
+                    android:id="@+id/miv_local_events"
+                    />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -216,11 +263,16 @@
                 android:gravity="center_horizontal"
                 android:id="@+id/ll_dialog_fragment_create_event_shopping">
 
-                <ImageView
+                <net.steamcrafted.materialiconlib.MaterialIconView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_local_mall_black_48dp"/>
-
+                    android:scaleType="center"
+                    app:materialIcon="shopping"
+                    app:materialIconColor="@color/primary"
+                    app:materialIconSize="48dp"
+                    android:id="@+id/miv_shopping"
+                    />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
