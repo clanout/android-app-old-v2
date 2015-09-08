@@ -53,10 +53,17 @@
                 android:layout_marginRight="16dp"
                 android:gravity="center_vertical">
 
-                <ImageView
-                    android:id="@+id/iv_event_details_icon"
+                <net.steamcrafted.materialiconlib.MaterialIconView
+                    android:id="@+id/miv_event_details_icon"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:scaleType="center"
+                    app:materialIcon="bulletin_board"
+                    app:materialIconColor="@color/cyan"
+                    app:materialIconSize="48dp"
+                    />
+
             </LinearLayout>
         </LinearLayout>
 
@@ -81,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:scaleType="center"
                 app:materialIcon="map_marker"
-                app:materialIconColor="#ff0000"
+                app:materialIconColor="@color/accent"
                 app:materialIconSize="18dp"
                 />
 
@@ -118,7 +125,7 @@
                 android:layout_height="wrap_content"
                 android:scaleType="center"
                 app:materialIcon="clock"
-                app:materialIconColor="#ff0000"
+                app:materialIconColor="@color/accent"
                 app:materialIconSize="18dp"
                 />
             <TextView
@@ -154,7 +161,7 @@
                 android:layout_height="wrap_content"
                 android:scaleType="center"
                 app:materialIcon="note_text"
-                app:materialIconColor="#ff0000"
+                app:materialIconColor="@color/accent"
                 app:materialIconSize="18dp"
                 />
             <TextView

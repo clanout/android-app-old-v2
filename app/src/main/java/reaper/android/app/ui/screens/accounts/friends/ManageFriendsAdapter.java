@@ -1,6 +1,8 @@
 package reaper.android.app.ui.screens.accounts.friends;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,12 +14,15 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.model.Friend;
+import reaper.android.app.root.Reaper;
 
 /**
  * Created by harsh on 13-05-2015.
@@ -30,6 +35,7 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
     private BlockListCommunicator blockListCommunicator;
     private Context context;
     private List<Boolean> blockStatusList;
+    private Drawable blockedDrawable, unblockedDrawable;
 
     public ManageFriendsAdapter(Context context, List<Friend> friends, BlockListCommunicator blockListCommunicator)
     {
@@ -38,6 +44,23 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
         this.context = context;
         this.blockListCommunicator = blockListCommunicator;
         blockStatusList = new ArrayList<>();
+
+        generateDrawables();
+    }
+
+    private void generateDrawables()
+    {
+        blockedDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
+                .setIcon(MaterialDrawableBuilder.IconValue.STOP)
+                .setColor(Color.RED)
+                .setSizeDp(24)
+                .build();
+
+        blockedDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
+                .setIcon(MaterialDrawableBuilder.IconValue.STOP)
+                .setColor(Color.BLUE)
+                .setSizeDp(24)
+                .build();
     }
 
     @Override
@@ -64,12 +87,12 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
 
         if (current.isBlocked())
         {
-            holder.blockIcon.setImageResource(R.drawable.ic_action_important);
+            holder.blockIcon.setImageDrawable(blockedDrawable);
             blockStatusList.add(position, true);
         }
         else
         {
-            holder.blockIcon.setImageResource(R.drawable.ic_action_not_important);
+            holder.blockIcon.setImageDrawable(unblockedDrawable);
             blockStatusList.add(position, false);
         }
 
@@ -106,12 +129,12 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
             if (blockStatusList.get(getAdapterPosition()))
             {
                 blockStatusList.set(getAdapterPosition(), false);
-                blockIcon.setImageResource(R.drawable.ic_action_not_important);
+                blockIcon.setImageDrawable(unblockedDrawable);
             }
             else
             {
                 blockStatusList.set(getAdapterPosition(), true);
-                blockIcon.setImageResource(R.drawable.ic_action_important);
+                blockIcon.setImageDrawable(blockedDrawable);
             }
 
             if(blockListCommunicator!=null)

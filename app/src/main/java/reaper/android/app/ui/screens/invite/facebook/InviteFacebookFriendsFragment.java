@@ -2,6 +2,7 @@ package reaper.android.app.ui.screens.invite.facebook;
 
 import android.content.ComponentName;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -21,6 +22,8 @@ import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import org.joda.time.DateTime;
 
@@ -56,6 +59,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     private TextView noFriendsMessage;
     private FloatingActionButton inviteWhatsapp, shareFacebook;
     private Menu menu;
+    private Drawable refreshDrawable;
 
     private InviteFriendsAdapter inviteFriendsAdapter;
     private UserService userService;
@@ -132,7 +136,18 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
         shareFacebook.setOnClickListener(this);
         fragmentManager = getActivity().getSupportFragmentManager();
 
+        generateDrawables();
+
         initRecyclerView();
+    }
+
+    private void generateDrawables()
+    {
+        refreshDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(36)
+                .build();
     }
 
     @Override
@@ -197,12 +212,13 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
         menu.findItem(R.id.action_account).setVisible(false);
         menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
-        menu.findItem(R.id.action_search).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(true);
+
+        menu.findItem(R.id.action_refresh).setIcon(refreshDrawable);
 
         menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {

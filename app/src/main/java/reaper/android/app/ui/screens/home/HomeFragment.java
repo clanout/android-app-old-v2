@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -37,6 +38,7 @@ import android.widget.Toast;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 import net.steamcrafted.materialiconlib.MaterialIconView;
 
 import org.joda.time.DateTime;
@@ -110,6 +112,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     private SwipeRefreshLayout swipeRefreshLayout;
     private Snackbar snackbar;
     private MaterialIconView generalIcon, eatOutIcon, drinksIcon, cafeIcon, movieIcon, outdoorsIcon, partyIcon, eventsIcon, shoppingIcon;
+    private Drawable phoneDrawable, plusDrawable, accountsDrawable;
 
     private EventsAdapter eventsAdapter;
 
@@ -174,6 +177,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
 //        sortButton.setOnClickListener(this);
 //        filterButton.setOnClickListener(this);
         createEvent.setOnClickListener(this);
+        createEvent.setImageDrawable(phoneDrawable);
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -191,7 +195,29 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
 //            filter = Filter.ALL;
 //        }
 
+        generateDrawables();
         initRecyclerView();
+    }
+
+    private void generateDrawables()
+    {
+        phoneDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE_ANDROID)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(36)
+                .build();
+
+        plusDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.PLUS)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(36)
+                .build();
+
+        accountsDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(36)
+                .build();
     }
 
 //    @Override
@@ -482,14 +508,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         menu.findItem(R.id.action_create_event).setVisible(true);
         menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
-        menu.findItem(R.id.action_search).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
 
+        menu.findItem(R.id.action_account).setIcon(accountsDrawable);
+        menu.findItem(R.id.action_create_event).setIcon(plusDrawable);
+
         if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null)
         {
             menu.findItem(R.id.action_add_phone).setVisible(true);
+            menu.findItem(R.id.action_add_phone).setIcon(phoneDrawable);
 
             menu.findItem(R.id.action_add_phone).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
             {

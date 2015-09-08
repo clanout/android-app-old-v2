@@ -29,14 +29,12 @@
             android:id="@+id/fib_fragment_invite_facebook_friends_invite_people_whatsapp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:src="@drawable/ic_action_add_person"/>
+            android:layout_marginBottom="10dp"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fib_fragment_invite_facebook_friends_share_facebook"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_add_person"/>
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
 </LinearLayout>

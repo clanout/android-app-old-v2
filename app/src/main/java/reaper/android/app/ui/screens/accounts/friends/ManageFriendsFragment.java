@@ -2,6 +2,7 @@ package reaper.android.app.ui.screens.accounts.friends;
 
 import android.content.ComponentName;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -22,6 +23,8 @@ import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import org.joda.time.DateTime;
 
@@ -53,6 +56,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     private ImageButton done;
     private FloatingActionButton shareFacebook, inviteWhatsapp;
     private Menu menu;
+    private Drawable refreshDrawable;
 
     private ManageFriendsAdapter manageFriendsAdapter;
     private UserService userService;
@@ -109,7 +113,18 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
         inviteWhatsapp.setOnClickListener(this);
         shareFacebook.setOnClickListener(this);
 
+        generateDrawable();
+
         initRecyclerView();
+    }
+
+    private void generateDrawable()
+    {
+        refreshDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(36)
+                .build();
     }
 
     @Override
@@ -176,12 +191,13 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
         menu.findItem(R.id.action_account).setVisible(false);
         menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
-        menu.findItem(R.id.action_search).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(true);
+
+        menu.findItem(R.id.action_refresh).setIcon(refreshDrawable);
 
         menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {

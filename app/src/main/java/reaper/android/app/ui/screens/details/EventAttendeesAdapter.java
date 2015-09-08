@@ -1,6 +1,8 @@
 package reaper.android.app.ui.screens.details;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import java.util.List;
 
@@ -21,11 +25,35 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
     private Context context;
     List<EventDetails.Attendee> attendees;
     private AttendeeClickCommunicator attendeeClickCommunicator;
+    private Drawable goingDrawable, maybeDrawable, invitedDrawable;
 
     public EventAttendeesAdapter(List<EventDetails.Attendee> attendees, Context context)
     {
         this.attendees = attendees;
         this.context = context;
+
+        generateDrawables();
+    }
+
+    private void generateDrawables()
+    {
+        goingDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
+                .setColor(context.getResources().getColor(R.color.green))
+                .setSizeDp(18)
+                .build();
+
+        maybeDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.HELP)
+                .setColor(context.getResources().getColor(R.color.yellow))
+                .setSizeDp(18)
+                .build();
+
+        invitedDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.EMAIL)
+                .setColor(context.getResources().getColor(R.color.primary))
+                .setSizeDp(18)
+                .build();
     }
 
     @Override
@@ -86,7 +114,7 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
             if (attendee.isInviter())
             {
                 inviter.setVisibility(View.VISIBLE);
-                inviter.setImageResource(R.drawable.ic_person_add_black_24dp);
+                inviter.setImageDrawable(invitedDrawable);
             } else
             {
                 inviter.setVisibility(View.INVISIBLE);
@@ -95,10 +123,10 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
             switch (attendee.getRsvp())
             {
                 case YES:
-                    rsvp.setImageResource(R.drawable.ic_check_circle_black_24dp);
+                    rsvp.setImageDrawable(goingDrawable);
                     break;
                 case MAYBE:
-                    rsvp.setImageResource(R.drawable.ic_help_black_24dp);
+                    rsvp.setImageDrawable(maybeDrawable);
                     break;
             }
         }

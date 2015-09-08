@@ -5,7 +5,6 @@
 
     <item
         android:id="@+id/action_add_phone"
-        android:icon="@drawable/ic_action_error"
         android:orderInCategory="1"
         android:title="Add Phone Number"
         app:showAsAction="always"
@@ -13,7 +12,6 @@
 
     <item
         android:id="@+id/action_create_event"
-        android:icon="@drawable/ic_action_new"
         android:orderInCategory="2"
         android:title="@string/action_create_event"
         app:showAsAction="always"
@@ -21,57 +19,42 @@
 
     <item
         android:id="@+id/action_account"
-        android:icon="@drawable/ic_action_accounts"
         android:orderInCategory="3"
         android:title="@string/action_account"
         app:showAsAction="always"
         />
 
     <item
-        android:id="@+id/action_search"
-        android:icon="@drawable/ic_action_search"
-        android:orderInCategory="4"
-        android:title="@string/action_search"
-        app:actionViewClass="android.widget.SearchView"
-        app:showAsAction="always"
-        />
-
-    <item
         android:id="@+id/action_home"
-        android:icon="@drawable/ic_action_event"
-        android:orderInCategory="5"
+        android:orderInCategory="4"
         android:title="@string/action_home"
         app:showAsAction="always"
         />
 
     <item
         android:id="@+id/action_edit_event"
-        android:icon="@drawable/ic_action_edit"
-        android:orderInCategory="6"
+        android:orderInCategory="5"
         android:title="@string/action_edit_event"
         app:showAsAction="always"
         />
 
     <item
         android:id="@+id/action_finalize_event"
-        android:icon="@drawable/ic_action_secure"
-        android:orderInCategory="7"
+        android:orderInCategory="6"
         android:title="@string/action_finalize_event"
         app:showAsAction="always"
         />
 
     <item
         android:id="@+id/action_delete_event"
-        android:icon="@drawable/ic_action_discard"
-        android:orderInCategory="8"
+        android:orderInCategory="7"
         android:title="@string/action_delete_event"
         app:showAsAction="always"
         />
 
     <item
         android:id="@+id/action_refresh"
-        android:icon="@drawable/ic_action_refresh"
-        android:orderInCategory="9"
+        android:orderInCategory="8"
         android:title="Refresh Friend List"
         app:showAsAction="always"
         />

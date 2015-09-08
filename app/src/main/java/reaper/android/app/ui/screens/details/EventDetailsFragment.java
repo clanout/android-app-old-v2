@@ -3,6 +3,7 @@ package reaper.android.app.ui.screens.details;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -28,6 +29,9 @@ import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
+import net.steamcrafted.materialiconlib.MaterialIconView;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -71,11 +75,12 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     private EventDetails eventDetails;
 
     // UI Elements
-    private ImageView icon;
+    private MaterialIconView icon;
     private TextView title, type, description, location, dateTime;
     private RecyclerView attendeeList;
     private TextView noAttendeeMessage, refreshDetailsTextView;
     private ProgressBar refreshDetailsProgressBar;
+    private Drawable pencilDrawable;
 
     private EventAttendeesAdapter eventAttendeesAdapter;
 
@@ -93,7 +98,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     {
         View view = inflater.inflate(R.layout.fragment_event_details, container, false);
 
-        icon = (ImageView) view.findViewById(R.id.iv_event_details_icon);
+        icon = (MaterialIconView) view.findViewById(R.id.miv_event_details_icon);
         title = (TextView) view.findViewById(R.id.tv_event_details_title);
         type = (TextView) view.findViewById(R.id.tv_event_details_type);
         description = (TextView) view.findViewById(R.id.tv_event_details_description);
@@ -131,8 +136,19 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 
         eventCache = CacheManager.getEventCache();
 
+        generateDrawables();
+
         renderEventSummary();
         initRecyclerView();
+    }
+
+    private void generateDrawables()
+    {
+        pencilDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.PENCIL)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(36)
+                .build();
     }
 
     @Override
@@ -269,34 +285,34 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         switch (category)
         {
             case GENERAL:
-                icon.setImageResource(R.drawable.ic_event_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD);
                 break;
             case EAT_OUT:
-                icon.setImageResource(R.drawable.ic_local_restaurant_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.FOOD);
                 break;
             case DRINKS:
-                icon.setImageResource(R.drawable.ic_local_bar_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.MARTINI);
                 break;
             case CAFE:
-                icon.setImageResource(R.drawable.ic_local_cafe_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.COFFEE);
                 break;
             case MOVIES:
-                icon.setImageResource(R.drawable.ic_local_movies_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.MOVIE);
                 break;
             case OUTDOORS:
-                icon.setImageResource(R.drawable.ic_directions_bike_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.TENNIS);
                 break;
             case PARTY:
-                icon.setImageResource(R.drawable.ic_location_city_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.GIFT);
                 break;
             case LOCAL_EVENTS:
-                icon.setImageResource(R.drawable.ic_local_attraction_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.CITY);
                 break;
             case SHOPPING:
-                icon.setImageResource(R.drawable.ic_local_mall_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.SHOPPING);
                 break;
             default:
-                icon.setImageResource(R.drawable.ic_event_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD);
         }
 
         title.setText(event.getTitle());
@@ -343,12 +359,13 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         menu.findItem(R.id.action_account).setVisible(false);
         menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
-        menu.findItem(R.id.action_search).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(true);
+
+        menu.findItem(R.id.action_edit_event).setIcon(pencilDrawable);
 
         menu.findItem(R.id.action_edit_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {

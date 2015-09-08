@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Theme -->
-    <color name="primary">#E53935</color>
-    <color name="primary_dark">#C62828</color>
-    <color name="primary_light">#C5CAE9</color>
-    <color name="accent">#ff4081</color>
+    <color name="primary">#4D394B</color>
+    <color name="primary_dark">#352734</color>
+    <color name="primary_light">#B2EBF2</color>
+    <color name="accent">#4C9689</color>
     <color name="accent_secondary">#EF9A9A</color>
 
     <!-- Background -->
@@ -14,6 +14,9 @@
     <!-- Miscellaneous -->
     <color name="white">#FFFFFF</color>
     <color name="divider">#FAFAFA</color>
+    <color name="cyan">#0097A7</color>
+    <color name="green">#4CAF50</color>
+    <color name="yellow">#FFC107</color>
 
     <!-- Fonts -->
     <color name="text_title">#AA000000</color>

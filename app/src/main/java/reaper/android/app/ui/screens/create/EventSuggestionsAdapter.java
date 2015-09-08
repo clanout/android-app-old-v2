@@ -1,6 +1,8 @@
 package reaper.android.app.ui.screens.create;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,12 +30,30 @@ public class EventSuggestionsAdapter extends RecyclerView.Adapter<EventSuggestio
     private List<Suggestion> data = Collections.emptyList();
     private Context context;
     private EventSuggestionsClickListener eventSuggestionsClickListener;
+    private Drawable highRatingDrawable, lowRatingDrawable;
 
     public EventSuggestionsAdapter(Context context, List<Suggestion> data)
     {
         inflater = LayoutInflater.from(context);
         this.data = data;
         this.context = context;
+
+        generateDrawables();
+    }
+
+    private void generateDrawables()
+    {
+        highRatingDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.STAR)
+                .setColor(Color.CYAN)
+                .setSizeDp(24)
+                .build();
+
+        lowRatingDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.STAR_OUTLINE)
+                .setColor(Color.CYAN)
+                .setSizeDp(24)
+                .build();
     }
 
     @Override
@@ -51,8 +73,8 @@ public class EventSuggestionsAdapter extends RecyclerView.Adapter<EventSuggestio
 
         Picasso.with(context)
                 .load(current.getIconUrl())
-                .placeholder(R.drawable.ic_event_black_36dp)
-                .error(R.drawable.ic_event_black_36dp)
+                .placeholder(R.drawable.ic_action_add_person)
+                .error(R.drawable.ic_action_add_person)
                 .fit()
                 .centerCrop()
                 .into(holder.placeIcon);
@@ -63,18 +85,18 @@ public class EventSuggestionsAdapter extends RecyclerView.Adapter<EventSuggestio
         {
             if (Double.parseDouble(current.getRating()) > 4.0)
             {
-                holder.ratingIcon.setImageResource(R.drawable.ic_action_important);
+                holder.ratingIcon.setImageDrawable(highRatingDrawable);
                 holder.placeRating.setText(current.getRating() + "/5.0");
             }
             else
             {
-                holder.ratingIcon.setImageResource(R.drawable.ic_action_not_important);
+                holder.ratingIcon.setImageDrawable(lowRatingDrawable);
                 holder.placeRating.setText(current.getRating() + "/5.0");
             }
         }
         catch (Exception e)
         {
-            holder.ratingIcon.setImageResource(R.drawable.ic_action_not_important);
+            holder.ratingIcon.setImageDrawable(lowRatingDrawable);
             holder.placeRating.setText("NA");
         }
     }

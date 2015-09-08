@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity
         {
             bus.register(this);
         }
-        getSupportActionBar().setTitle("reap3r");
+        getSupportActionBar().setTitle("clanOut");
     }
 
     @Override

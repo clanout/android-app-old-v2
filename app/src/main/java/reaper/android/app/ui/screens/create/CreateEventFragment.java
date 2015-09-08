@@ -28,6 +28,9 @@ import android.widget.Toast;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
+import net.steamcrafted.materialiconlib.MaterialIconView;
+
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -68,7 +71,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
 {
     private TextView eventTitle, eventType, timing, noSuggestionsMessage;
     private EditText description;
-    private ImageView eventIcon;
+    private MaterialIconView eventIcon;
     private AutoCompleteTextView location;
     private RecyclerView recyclerView;
     private ImageButton save;
@@ -109,7 +112,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
         timing = (TextView) view.findViewById(R.id.tv_create_event_date_time);
         description = (EditText) view.findViewById(R.id.et_create_event_description);
         noSuggestionsMessage = (TextView) view.findViewById(R.id.tv_create_event_no_suggestions);
-        eventIcon = (ImageView) view.findViewById(R.id.iv_create_event_icon);
+        eventIcon = (MaterialIconView) view.findViewById(R.id.miv_create_event_icon);
         location = (AutoCompleteTextView) view.findViewById(R.id.actv_create_event_location);
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_create_event_suggestions);
         save = (ImageButton) view.findViewById(R.id.ib_create_event_save);
@@ -234,34 +237,34 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
         switch (eventCategory)
         {
             case GENERAL:
-                eventIcon.setImageResource(R.drawable.ic_event_black_48dp);
+                eventIcon.setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD);
                 break;
             case EAT_OUT:
-                eventIcon.setImageResource(R.drawable.ic_local_restaurant_black_48dp);
+                eventIcon.setIcon(MaterialDrawableBuilder.IconValue.FOOD);
                 break;
             case DRINKS:
-                eventIcon.setImageResource(R.drawable.ic_local_bar_black_48dp);
+                eventIcon.setIcon(MaterialDrawableBuilder.IconValue.MARTINI);
                 break;
             case CAFE:
-                eventIcon.setImageResource(R.drawable.ic_local_cafe_black_48dp);
+                eventIcon.setIcon(MaterialDrawableBuilder.IconValue.COFFEE);
                 break;
             case MOVIES:
-                eventIcon.setImageResource(R.drawable.ic_local_movies_black_48dp);
+                eventIcon.setIcon(MaterialDrawableBuilder.IconValue.MOVIE);
                 break;
             case OUTDOORS:
-                eventIcon.setImageResource(R.drawable.ic_directions_bike_black_48dp);
+                eventIcon.setIcon(MaterialDrawableBuilder.IconValue.TENNIS);
                 break;
             case PARTY:
-                eventIcon.setImageResource(R.drawable.ic_location_city_black_48dp);
+                eventIcon.setIcon(MaterialDrawableBuilder.IconValue.GIFT);
                 break;
             case LOCAL_EVENTS:
-                eventIcon.setImageResource(R.drawable.ic_local_attraction_black_48dp);
+                eventIcon.setIcon(MaterialDrawableBuilder.IconValue.CITY);
                 break;
             case SHOPPING:
-                eventIcon.setImageResource(R.drawable.ic_local_mall_black_48dp);
+                eventIcon.setIcon(MaterialDrawableBuilder.IconValue.SHOPPING);
                 break;
             default:
-                eventIcon.setImageResource(R.drawable.ic_event_black_48dp);
+                eventIcon.setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD);
         }
     }
 
@@ -284,7 +287,6 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
         menu.findItem(R.id.action_account).setVisible(false);
         menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
-        menu.findItem(R.id.action_search).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);

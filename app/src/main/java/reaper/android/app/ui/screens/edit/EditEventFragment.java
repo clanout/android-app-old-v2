@@ -2,6 +2,7 @@ package reaper.android.app.ui.screens.edit;
 
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -29,6 +30,9 @@ import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
+import net.steamcrafted.materialiconlib.MaterialIconView;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -93,13 +97,14 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     // UI Elements
     private TextView title;
     private TextView type;
-    private ImageView icon;
+    private MaterialIconView icon;
     private AutoCompleteTextView eventLocation;
     private TextView schedule;
     private EditText description;
     private RecyclerView recommendationList;
     private TextView noSuggestions;
     private ImageButton save;
+    private Drawable deleteDrawable, lockedDrawable, unlockedDrawable;
 
     private boolean isPlaceDetailsRunning, isSaveButtonClicked, shouldDeleteEventFromCache;
 
@@ -121,7 +126,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
 
         title = (TextView) view.findViewById(R.id.tv_edit_event_title);
         type = (TextView) view.findViewById(R.id.tv_edit_event_type);
-        icon = (ImageView) view.findViewById(R.id.iv_edit_event_icon);
+        icon = (MaterialIconView) view.findViewById(R.id.miv_edit_event_icon);
         eventLocation = (AutoCompleteTextView) view.findViewById(R.id.actv_edit_event_location);
         schedule = (TextView) view.findViewById(R.id.tv_edit_event_date_time);
         description = (EditText) view.findViewById(R.id.et_edit_event_description);
@@ -174,9 +179,32 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         schedule.setOnClickListener(this);
         save.setOnClickListener(this);
 
+        generateDrawables();
+
         render();
         initGoogleAutocompleteAdapter();
         initRecyclerView();
+    }
+
+    private void generateDrawables()
+    {
+        deleteDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.DELETE)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(36)
+                .build();
+
+        lockedDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.LOCK)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(36)
+                .build();
+
+        unlockedDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.LOCK_OPEN)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(36)
+                .build();
     }
 
     private void render()
@@ -185,34 +213,34 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         switch (category)
         {
             case GENERAL:
-                icon.setImageResource(R.drawable.ic_event_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD);
                 break;
             case EAT_OUT:
-                icon.setImageResource(R.drawable.ic_local_restaurant_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.FOOD);
                 break;
             case DRINKS:
-                icon.setImageResource(R.drawable.ic_local_bar_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.MARTINI);
                 break;
             case CAFE:
-                icon.setImageResource(R.drawable.ic_local_cafe_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.COFFEE);
                 break;
             case MOVIES:
-                icon.setImageResource(R.drawable.ic_local_movies_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.MOVIE);
                 break;
             case OUTDOORS:
-                icon.setImageResource(R.drawable.ic_directions_bike_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.TENNIS);
                 break;
             case PARTY:
-                icon.setImageResource(R.drawable.ic_location_city_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.GIFT);
                 break;
             case LOCAL_EVENTS:
-                icon.setImageResource(R.drawable.ic_local_attraction_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.CITY);
                 break;
             case SHOPPING:
-                icon.setImageResource(R.drawable.ic_local_mall_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.SHOPPING);
                 break;
             default:
-                icon.setImageResource(R.drawable.ic_event_black_48dp);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.SHOPPING);
         }
 
 
@@ -316,7 +344,6 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         menu.findItem(R.id.action_account).setVisible(false);
         menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
-        menu.findItem(R.id.action_search).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
@@ -324,6 +351,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         if (EventUtils.canDeleteEvent(event, userService.getActiveUserId()))
         {
             menu.findItem(R.id.action_delete_event).setVisible(true);
+            menu.findItem(R.id.action_delete_event).setIcon(deleteDrawable);
             menu.findItem(R.id.action_delete_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
             {
                 @Override
@@ -369,11 +397,11 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         {
             if (editedEvent.isFinalized())
             {
-                menu.findItem(R.id.action_finalize_event).setIcon(R.drawable.ic_action_secure);
+                menu.findItem(R.id.action_finalize_event).setIcon(lockedDrawable);
                 menu.findItem(R.id.action_finalize_event).setVisible(true);
             } else
             {
-                menu.findItem(R.id.action_finalize_event).setIcon(R.drawable.ic_action_error);
+                menu.findItem(R.id.action_finalize_event).setIcon(unlockedDrawable);
                 menu.findItem(R.id.action_finalize_event).setVisible(true);
             }
 

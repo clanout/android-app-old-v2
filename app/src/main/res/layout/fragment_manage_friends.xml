@@ -37,14 +37,12 @@
                 android:id="@+id/fib_fragment_manage_friends_invite_people_whatsapp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:src="@drawable/ic_action_add_person"/>
+                android:layout_marginBottom="10dp"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fib_fragment_manage_friends_share_facebook"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_action_add_person"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -57,8 +55,7 @@
             android:id="@+id/ib_manage_friends_done"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:background="@drawable/custom_button_background"
-            android:src="@drawable/ic_check_white_24dp"/>
+            android:background="@drawable/custom_button_background"/>
 
     </LinearLayout>
 </LinearLayout>

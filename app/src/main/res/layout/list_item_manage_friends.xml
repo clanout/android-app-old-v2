@@ -14,7 +14,6 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_local_bar_black_36dp"
             android:id="@+id/iv_list_item_manage_friends_user_pic"/>
 
     </LinearLayout>
@@ -33,7 +32,6 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:id="@+id/ib_list_item_manage_friends_block"
-        android:src="@drawable/ic_action_important"
         android:gravity="center_vertical|center_horizontal"/>
 
 

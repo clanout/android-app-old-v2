@@ -14,7 +14,6 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_local_bar_black_36dp"
             android:id="@+id/iv_list_item_invite_friends_user_pic"/>
 
     </LinearLayout>

@@ -1,9 +1,9 @@
 package reaper.android.app.ui.screens.invite.phone;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -26,6 +26,8 @@ import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,6 +61,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
     private Menu menu;
     private LinearLayout lockedContent, mainContent;
     private FloatingActionButton addPhone, inviteWhatsapp, sharefacebook;
+    private Drawable refreshDrawable;
 
     private ArrayList<EventDetails.Invitee> inviteeList;
     private List<Friend> friendList;
@@ -112,6 +115,8 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         fragmentManager = getActivity().getSupportFragmentManager();
         genericCache = CacheManager.getGenericCache();
 
+        generateDrawables();
+
         if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null)
         {
             isPhoneAdded = false;
@@ -146,6 +151,15 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         initRecyclerView();
     }
 
+    private void generateDrawables()
+    {
+        refreshDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(36)
+                .build();
+    }
+
     @Override
     public void onStop()
     {
@@ -176,7 +190,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         mainContent.setVisibility(View.GONE);
         lockedContent.setVisibility(View.VISIBLE);
         invitesLockedMessage.setText(R.string.add_phone_number);
-        addPhone.setImageResource(R.drawable.ic_action_phone);
+        addPhone.setImageResource(R.drawable.ic_action_add_person);
     }
 
     private void displayNoContactsView()
@@ -224,12 +238,13 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         menu.findItem(R.id.action_account).setVisible(false);
         menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
-        menu.findItem(R.id.action_search).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(true);
+
+        menu.findItem(R.id.action_refresh).setIcon(refreshDrawable);
 
         menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {

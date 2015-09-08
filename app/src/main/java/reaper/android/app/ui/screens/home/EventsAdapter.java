@@ -1,6 +1,9 @@
 package reaper.android.app.ui.screens.home;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.otto.Bus;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -35,6 +40,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
     private Bus bus;
     private UserService userService;
     private Context context;
+    private Drawable generalEventDrawable, eatoutDrawable, drinksDrawable, cafeDrawable, movieDrawable, outdoorsDrawable, partyDrawable, eventsDrawable, shoppingDrawable, goingDrawable, maybeDrawable;
 
     // Data
     private List<Event> events;
@@ -52,6 +58,78 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         {
             state.add(SwipedState.SHOWING_PRIMARY_CONTENT);
         }
+
+        generateDrawables();
+    }
+
+    private void generateDrawables()
+    {
+        generalEventDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD)
+                .setColor(context.getResources().getColor(R.color.cyan))
+                .setSizeDp(36)
+                .build();
+
+        eatoutDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.FOOD)
+                .setColor(context.getResources().getColor(R.color.cyan))
+                .setSizeDp(36)
+                .build();
+
+        drinksDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.MARTINI)
+                .setColor(context.getResources().getColor(R.color.cyan))
+                .setSizeDp(36)
+                .build();
+
+        cafeDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.COFFEE)
+                .setColor(context.getResources().getColor(R.color.cyan))
+                .setSizeDp(36)
+                .build();
+
+        movieDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.MOVIE)
+                .setColor(context.getResources().getColor(R.color.cyan))
+                .setSizeDp(36)
+                .build();
+
+        outdoorsDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.TENNIS)
+                .setColor(context.getResources().getColor(R.color.cyan))
+                .setSizeDp(36)
+                .build();
+
+        partyDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.GIFT)
+                .setColor(context.getResources().getColor(R.color.cyan))
+                .setSizeDp(36)
+                .build();
+
+        eventsDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.CITY)
+                .setColor(context.getResources().getColor(R.color.cyan))
+                .setSizeDp(36)
+                .build();
+
+        shoppingDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.SHOPPING)
+                .setColor(context.getResources().getColor(R.color.cyan))
+                .setSizeDp(36)
+                .build();
+
+        goingDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
+                .setColor(context.getResources().getColor(R.color.green))
+                .setSizeDp(24)
+                .setStyle(Paint.Style.STROKE)
+                .build();
+
+        maybeDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.HELP)
+                .setColor(context.getResources().getColor(R.color.yellow))
+                .setSizeDp(24)
+                .build();
     }
 
     @Override
@@ -266,34 +344,34 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             switch (category)
             {
                 case GENERAL:
-                    eventIcon.setImageResource(R.drawable.ic_event_black_36dp);
+                    eventIcon.setImageDrawable(generalEventDrawable);
                     break;
                 case EAT_OUT:
-                    eventIcon.setImageResource(R.drawable.ic_local_restaurant_black_36dp);
+                    eventIcon.setImageDrawable(eatoutDrawable);
                     break;
                 case DRINKS:
-                    eventIcon.setImageResource(R.drawable.ic_local_bar_black_36dp);
+                    eventIcon.setImageDrawable(drinksDrawable);
                     break;
                 case CAFE:
-                    eventIcon.setImageResource(R.drawable.ic_local_cafe_black_36dp);
+                    eventIcon.setImageDrawable(cafeDrawable);
                     break;
                 case MOVIES:
-                    eventIcon.setImageResource(R.drawable.ic_local_movies_black_36dp);
+                    eventIcon.setImageDrawable(movieDrawable);
                     break;
                 case OUTDOORS:
-                    eventIcon.setImageResource(R.drawable.ic_directions_bike_black_36dp);
+                    eventIcon.setImageDrawable(outdoorsDrawable);
                     break;
                 case PARTY:
-                    eventIcon.setImageResource(R.drawable.ic_location_city_black_36dp);
+                    eventIcon.setImageDrawable(partyDrawable);
                     break;
                 case LOCAL_EVENTS:
-                    eventIcon.setImageResource(R.drawable.ic_local_attraction_black_36dp);
+                    eventIcon.setImageDrawable(eventsDrawable);
                     break;
                 case SHOPPING:
-                    eventIcon.setImageResource(R.drawable.ic_local_mall_black_36dp);
+                    eventIcon.setImageDrawable(shoppingDrawable);
                     break;
                 default:
-                    eventIcon.setImageResource(R.drawable.ic_event_black_36dp);
+                    eventIcon.setImageDrawable(generalEventDrawable);
             }
 
             // Date, Time and Location
@@ -332,11 +410,11 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             if (event.getRsvp() == Event.RSVP.YES)
             {
                 rsvpIcon.setVisibility(View.VISIBLE);
-                rsvpIcon.setImageResource(R.drawable.ic_check_circle_black_24dp);
+                rsvpIcon.setImageDrawable(goingDrawable);
             } else if (event.getRsvp() == Event.RSVP.MAYBE)
             {
                 rsvpIcon.setVisibility(View.VISIBLE);
-                rsvpIcon.setImageResource(R.drawable.ic_help_black_24dp);
+                rsvpIcon.setImageDrawable(maybeDrawable);
             } else
             {
                 rsvpIcon.setVisibility(View.INVISIBLE);
@@ -348,7 +426,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 if (isChatUpdated)
                 {
                     chatIcon.setVisibility(View.VISIBLE);
-                    chatIcon.setImageResource(R.drawable.ic_chat_black_18dp);
+                    chatIcon.setImageResource(R.drawable.ic_info_black_18dp);
                 } else
                 {
                     chatIcon.setVisibility(View.INVISIBLE);

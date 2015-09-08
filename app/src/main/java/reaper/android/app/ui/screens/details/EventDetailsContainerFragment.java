@@ -1,6 +1,7 @@
 package reaper.android.app.ui.screens.details;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -20,6 +21,8 @@ import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +67,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
     // UI Elements
     private ViewPager viewPager;
     private ImageButton rsvp, invite, chat;
+    private Drawable goingDrawable, maybeDrawable, notGoingDrawable, inviteDrawable, chatDrawable;
 
     private PagerAdapter pagerAdapter;
 
@@ -114,6 +118,11 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         userService = new UserService(bus);
         genericCache = CacheManager.getGenericCache();
 
+        generateDrawables();
+
+        chat.setImageDrawable(chatDrawable);
+        invite.setImageDrawable(inviteDrawable);
+
         pagerAdapter = new EventDetailsPagerAdapter(getChildFragmentManager(), events);
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(activePosition);
@@ -144,6 +153,39 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         chat.setOnClickListener(this);
 
         renderRsvpButton(events.get(activePosition).getRsvp());
+    }
+
+    private void generateDrawables()
+    {
+        goingDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(24)
+                .build();
+
+        maybeDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.HELP)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(24)
+                .build();
+
+        notGoingDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.CLOSE)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(24)
+                .build();
+
+        chatDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(24)
+                .build();
+
+        inviteDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_MULTIPLE_PLUS)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(24)
+                .build();
     }
 
     @Override
@@ -250,13 +292,13 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         switch (rsvpStatus)
         {
             case YES:
-                rsvp.setImageResource(R.drawable.ic_check_circle_white_24dp);
+                rsvp.setImageDrawable(goingDrawable);
                 break;
             case MAYBE:
-                rsvp.setImageResource(R.drawable.ic_help_white_24dp);
+                rsvp.setImageDrawable(maybeDrawable);
                 break;
             case NO:
-                rsvp.setImageResource(R.drawable.ic_cancel_white_24dp);
+                rsvp.setImageDrawable(notGoingDrawable);
                 break;
             default:
                 throw new IllegalStateException();

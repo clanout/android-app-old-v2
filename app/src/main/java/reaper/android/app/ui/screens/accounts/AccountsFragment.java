@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -28,6 +29,8 @@ import android.widget.Toast;
 import com.squareup.otto.Bus;
 import com.squareup.picasso.Picasso;
 
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
+
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
@@ -47,6 +50,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
     private TextView userName;
     private RecyclerView recyclerView;
     private ImageView userPic;
+    private Drawable homeDrawable;
 
     private FragmentManager fragmentManager;
     private UserService userService;
@@ -85,10 +89,21 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
 
         genericCache = CacheManager.getGenericCache();
 
+        generateDrawables();
+
         accountsAdapter = new AccountsAdapter(getActivity(), AccountsService.getmenuList());
         accountsAdapter.setAccountItemClickListener(this);
         recyclerView.setAdapter(accountsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    private void generateDrawables()
+    {
+        homeDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.HOME)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(36)
+                .build();
     }
 
     @Override
@@ -119,12 +134,13 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
         menu.findItem(R.id.action_account).setVisible(false);
         menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(true);
-        menu.findItem(R.id.action_search).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
+
+        menu.findItem(R.id.action_home).setIcon(homeDrawable);
 
         menu.findItem(R.id.action_home).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {

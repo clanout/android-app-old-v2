@@ -27,8 +27,7 @@
                 android:id="@+id/ibtn_event_details_rsvp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/custom_button_background"
-                android:src="@drawable/ic_check_circle_white_24dp"/>
+                android:background="@drawable/custom_button_background"/>
         </LinearLayout>
 
         <LinearLayout
@@ -41,8 +40,7 @@
                 android:id="@+id/ibtn_event_details_invite"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/custom_button_background"
-                android:src="@drawable/ic_person_add_white_24dp"/>
+                android:background="@drawable/custom_button_background"/>
         </LinearLayout>
 
         <LinearLayout
@@ -57,7 +55,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/custom_button_background"
-                android:src="@drawable/ic_chat_white_24dp"
                 />
         </LinearLayout>
     </LinearLayout>

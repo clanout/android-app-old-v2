@@ -42,7 +42,7 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.Accoun
     {
         AccountsListItem current = data.get(position);
         holder.title.setText(current.title);
-        holder.icon.setImageResource(current.icon);
+        holder.icon.setImageDrawable(current.drawable);
     }
 
     public void setAccountItemClickListener(AccountsItemClickListener accountsItemClickListener){
