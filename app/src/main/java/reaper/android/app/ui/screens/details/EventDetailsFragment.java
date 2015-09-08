@@ -304,7 +304,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         } else
         {
             location.setText(event.getLocation().getName());
-//            location.setOnClickListener(this);
         }
 
         DateTime start = event.getStartTime();
@@ -381,9 +380,14 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     {
         if (view.getId() == R.id.tv_event_details_location)
         {
-            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                    Uri.parse("http://maps.google.com/maps?daddr=" + event.getLocation().getLatitude() + "," + event.getLocation().getLongitude()));
-            startActivity(intent);
+            if (event.getLocation().getLatitude() != null && event.getLocation().getLongitude() != null)
+            {
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                        Uri.parse("http://maps.google.com/maps?daddr=" + event.getLocation().getLatitude() + "," + event.getLocation().getLongitude()));
+                startActivity(intent);
+            }else{
+                Toast.makeText(getActivity(), R.string.location_not_available_on_map, Toast.LENGTH_LONG).show();
+            }
         } else if (view.getId() == R.id.tv_event_details_description)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.Base_Theme_AppCompat_Light_Dialog_Alert);

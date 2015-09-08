@@ -518,6 +518,14 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
             return;
         }
 
+        if(location.getText().toString() == null || location.getText().toString().isEmpty())
+        {
+            placeLocation.setName(null);
+            placeLocation.setLongitude(null);
+            placeLocation.setLatitude(null);
+            placeLocation.setZone(locationService.getUserLocation().getZone());
+        }
+
         if (descriptionEvent == null)
         {
             descriptionEvent = "";

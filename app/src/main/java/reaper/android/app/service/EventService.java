@@ -25,6 +25,7 @@ import reaper.android.app.api.event.request.EventSuggestionsApiRequest;
 import reaper.android.app.api.event.request.EventsApiRequest;
 import reaper.android.app.api.event.request.FetchEventApiRequest;
 import reaper.android.app.api.event.request.FetchNewEventsAndUpdatesApiRequest;
+import reaper.android.app.api.event.request.FinaliseEventApiRequest;
 import reaper.android.app.api.event.request.InviteUsersApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
 import reaper.android.app.api.event.response.CreateEventApiResponse;
@@ -662,10 +663,58 @@ public class EventService
                 });
     }
 
-    public void editEvent(final String eventId, boolean isFinalised, DateTime startTime, DateTime endTime, Location placeLocation, String description)
+    public void finaliseEvent(final Event event, final boolean isFinalised)
+    {
+        eventApi.finaliseEvent(new FinaliseEventApiRequest(event.getId(), isFinalised))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Response>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        if(isFinalised)
+                        {
+                            event.setIsFinalized(false);
+                            eventCache.save(event);
+                            bus.post(new GenericErrorTrigger(ErrorCode.EVENT_COULD_NOT_BE_FINALISED, (Exception) e));
+                        }else{
+                            event.setIsFinalized(true);
+                            eventCache.save(event);
+                            bus.post(new GenericErrorTrigger(ErrorCode.EVENT_COULD_NOT_BE_UNFINALISED, (Exception) e));
+                        }
+                    }
+
+                    @Override
+                    public void onNext(Response response)
+                    {
+                        if(response.getStatus() != 200)
+                        {
+                            if(isFinalised)
+                            {
+                                event.setIsFinalized(false);
+                                eventCache.save(event);
+                                bus.post(new GenericErrorTrigger(ErrorCode.EVENT_COULD_NOT_BE_FINALISED, null));
+                            }else{
+                                event.setIsFinalized(true);
+                                eventCache.save(event);
+                                bus.post(new GenericErrorTrigger(ErrorCode.EVENT_COULD_NOT_BE_UNFINALISED, null));
+                            }
+                        }
+                    }
+                });
+    }
+
+    public void editEvent(final String eventId, DateTime startTime, DateTime endTime, Location placeLocation, String description)
     {
         final EditEventApiRequest request = new EditEventApiRequest(placeLocation
-                .getLongitude(), description, endTime, eventId, isFinalised, placeLocation.getLatitude(), placeLocation.getName(), placeLocation
+                .getLongitude(), description, endTime, eventId, placeLocation.getLatitude(), placeLocation.getName(), placeLocation
                 .getZone(), startTime);
 
         Observable.create(new Observable.OnSubscribe<Event>()

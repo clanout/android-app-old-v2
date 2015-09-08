@@ -101,7 +101,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     private TextView noSuggestions;
     private ImageButton save;
 
-    private boolean isPlaceDetailsRunning, isSaveButtonClicked;
+    private boolean isPlaceDetailsRunning, isSaveButtonClicked, shouldDeleteEventFromCache;
 
     private List<Suggestion> suggestionList;
     private EventSuggestionsAdapter eventSuggestionsAdapter;
@@ -169,6 +169,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
 
         isPlaceDetailsRunning = false;
         isSaveButtonClicked = false;
+        shouldDeleteEventFromCache = false;
 
         schedule.setOnClickListener(this);
         save.setOnClickListener(this);
@@ -219,7 +220,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
 
         if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty())
         {
-            eventLocation.setText(R.string.event_details_no_location);
+            eventLocation.setText("");
         } else
         {
             eventLocation.setText(event.getLocation().getName());
@@ -384,14 +385,72 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
 
                     if (editedEvent.isFinalized())
                     {
-                        editedEvent.setIsFinalized(false);
-                        menu.findItem(R.id.action_finalize_event).setIcon(R.drawable.ic_action_error);
-                        Toast.makeText(getActivity(), R.string.event_not_finalised, Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setCancelable(true);
+                        builder.setMessage("Are you sure you wan't to unfinalise this event? Other people will now be able to edit the event.");
+
+                        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                shouldDeleteEventFromCache = false;
+                                event.setIsFinalized(false);
+                                eventCache.save(event);
+
+                                eventService.finaliseEvent(event, false);
+
+                                eventService.fetchEvents(locationService.getUserLocation().getZone());
+                                Toast.makeText(getActivity(), R.string.event_not_finalised, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        builder.setNegativeButton("No", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                dialog.dismiss();
+                            }
+                        });
+
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+
                     } else
                     {
-                        menu.findItem(R.id.action_finalize_event).setIcon(R.drawable.ic_action_secure);
-                        editedEvent.setIsFinalized(true);
-                        Toast.makeText(getActivity(), R.string.event_finalised, Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setCancelable(true);
+                        builder.setMessage("Are you sure you wan't to finalise this event? Other people will not be able to edit the event.");
+
+                        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                shouldDeleteEventFromCache = false;
+                                event.setIsFinalized(true);
+                                eventCache.save(event);
+
+                                eventService.finaliseEvent(event, true);
+
+                                eventService.fetchEvents(locationService.getUserLocation().getZone());
+                                Toast.makeText(getActivity(), R.string.event_finalised, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        builder.setNegativeButton("No", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                dialog.dismiss();
+                            }
+                        });
+
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+
                     }
 
                     return true;
@@ -658,46 +717,90 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
 
         if (eventLocation.getText().toString().isEmpty() || eventLocation.getText().toString() == null)
         {
-            Location editedEventLocation = new Location();
-            editedEventLocation.setName(null);
-            editedEventLocation.setLatitude(null);
-            editedEventLocation.setLongitude(null);
-            editedEventLocation.setZone(locationService.getUserLocation().getZone());
+            if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty())
+            {
+                Location editedEventLocation = new Location();
+                editedEventLocation.setName(null);
+                editedEventLocation.setLatitude(null);
+                editedEventLocation.setLongitude(null);
+                editedEventLocation.setZone(null);
 
-            editedEvent.setLocation(editedEventLocation);
+                editedEvent.setLocation(editedEventLocation);
+            } else
+            {
+                Location editedEventLocation = new Location();
+                editedEventLocation.setName(null);
+                editedEventLocation.setLatitude(null);
+                editedEventLocation.setLongitude(null);
+                editedEventLocation.setZone(locationService.getUserLocation().getZone());
+
+                editedEvent.setLocation(editedEventLocation);
+            }
+        } else
+        {
+            if (event.getLocation().getName() == null || event.getLocation().getLatitude() == null || event.getLocation().getLongitude() == null || event.getLocation().getZone() == null)
+            {
+                if (event.getLocation().getName() == null)
+                {
+                    if (editedEvent.getLocation().getLongitude() == null || editedEvent.getLocation().getLatitude() == null)
+                    {
+                        Location editedEventLocation = new Location();
+                        editedEventLocation.setZone(locationService.getUserLocation().getZone());
+                        editedEventLocation.setLongitude(null);
+                        editedEventLocation.setLatitude(null);
+                        editedEventLocation.setName(eventLocation.getText().toString());
+
+                        editedEvent.setLocation(editedEventLocation);
+                    }
+
+                } else
+                {
+                    if (editedEvent.getLocation().getLongitude() == null || editedEvent.getLocation().getLatitude() == null)
+                    {
+                        if (event.getLocation().getName().equals(eventLocation.getText().toString()))
+                        {
+                            Location editedEventLocation = new Location();
+                            editedEventLocation.setZone(null);
+                            editedEventLocation.setLongitude(null);
+                            editedEventLocation.setLatitude(null);
+                            editedEventLocation.setName(null);
+
+                            editedEvent.setLocation(editedEventLocation);
+                        } else
+                        {
+                            Location editedEventLocation = new Location();
+                            editedEventLocation.setZone(locationService.getUserLocation().getZone());
+                            editedEventLocation.setLongitude(null);
+                            editedEventLocation.setLatitude(null);
+                            editedEventLocation.setName(eventLocation.getText().toString());
+
+                            editedEvent.setLocation(editedEventLocation);
+                        }
+                    }
+                }
+            } else
+            {
+                if ((event.getLocation().getName().equals(editedEvent.getLocation().getName())) && (event.getLocation().getLatitude().equals(editedEvent.getLocation().getLatitude())) && (event.getLocation().getLongitude().equals(editedEvent.getLocation().getLongitude())) && (event.getLocation().getZone().equals(editedEvent.getLocation().getZone())))
+                {
+                    Location editedEventLocation = new Location();
+                    editedEventLocation.setZone(null);
+                    editedEventLocation.setLongitude(null);
+                    editedEventLocation.setLatitude(null);
+                    editedEventLocation.setName(null);
+
+                    editedEvent.setLocation(editedEventLocation);
+                }
+            }
         }
 
-        if((event.getStartTime().equals(editedEvent.getStartTime())) && (event.getEndTime().equals(editedEvent.getEndTime())))
+        if ((event.getStartTime().equals(editedEvent.getStartTime())) && (event.getEndTime().equals(editedEvent.getEndTime())))
         {
             editedEvent.setEndTime(null);
             editedEvent.setStartTime(null);
         }
 
-        if(descriptionEvent.equals(eventDetails.getDescription()))
-        {
-            descriptionEvent = null;
-        }
-
-        Log.d("APP", "request event location ----- " + event.getLocation());
-        Log.d("APP", "request event edit location ----- " + editedEvent.getLocation());
-
-        if((event.getLocation().getName().equals(editedEvent.getLocation().getName()) ) && (event.getLocation().getLatitude().equals(editedEvent.getLocation().getLatitude())) && (event.getLocation().getLongitude().equals(editedEvent.getLocation().getLongitude())) && (event.getLocation().getZone().equals(editedEvent.getLocation().getZone())))
-        {
-            Location editedEventLocation = new Location();
-            editedEventLocation.setZone(null);
-            editedEventLocation.setLongitude(null);
-            editedEventLocation.setLatitude(null);
-            editedEventLocation.setName(null);
-
-            editedEvent.setLocation(editedEventLocation);
-        }
-
-        if(event.isFinalized().equals(editedEvent.isFinalized()))
-        {
-            editedEvent.setIsFinalized(null);
-        }
-
-        eventService.editEvent(event.getId(), editedEvent.isFinalized(), editedEvent.getStartTime(), editedEvent.getEndTime(), editedEvent.getLocation(), descriptionEvent);
+        shouldDeleteEventFromCache = true;
+        eventService.editEvent(event.getId(), editedEvent.getStartTime(), editedEvent.getEndTime(), editedEvent.getLocation(), descriptionEvent);
     }
 
     @Subscribe
@@ -719,8 +822,11 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
 
         events.set(activePosition, event);
 
-        eventCache.deleteCompletely(event.getId());
-        eventCache.save(event);
+        if (shouldDeleteEventFromCache)
+        {
+            eventCache.deleteCompletely(event.getId());
+            eventCache.save(event);
+        }
 
         EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
         Bundle bundle = new Bundle();
@@ -744,6 +850,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     {
         if (trigger.getActiveFragment().equals(BackstackTags.EDIT))
         {
+            shouldDeleteEventFromCache = false;
             eventService.fetchEvents(locationService.getUserLocation().getZone());
         }
     }

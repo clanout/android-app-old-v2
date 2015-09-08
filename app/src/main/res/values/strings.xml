@@ -45,6 +45,7 @@
 
     <string name="trust_issues">We don\'t like people with trust issues</string>
     <string name="location_not_found">Could not find the location. Please try again.</string>
+    <string name="location_not_available_on_map">This location is not available on map.</string>
 
     <string name="no_facebook_friends">None of your facebook friends are on the app. Invite people through whatsapp or share the app on facebook.</string>
     <string name="no_local_facebook_friends">None of your zonal facebook friends are on the app. Invite people through whatsapp or share the app on facebook.</string>
@@ -75,6 +76,8 @@
     <string name="add_phone_number">Please add your phone number to send/receive invites from your phone contacts</string>
 
     <string name="event_edit_failed_locked">The event could not be edited as the organiser has already finalised it.</string>
+    <string name="event_finalisation_failed">The event could not be finalised. Please try again</string>
+    <string name="event_unfinalisation_failed">The event could not be unfinalised. Please try again</string>
 
     <!-- Facebook -->
     <string name="facebook_app_id">711701748936592</string>

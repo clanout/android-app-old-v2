@@ -287,4 +287,22 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, R.string.event_edit_failed_locked, Toast.LENGTH_LONG).show();
         }
     }
+
+    @Subscribe
+    public void onEventFinalisationFailed(GenericErrorTrigger trigger)
+    {
+        if(trigger.getErrorCode() == ErrorCode.EVENT_COULD_NOT_BE_FINALISED)
+        {
+            Toast.makeText(this, R.string.event_finalisation_failed, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Subscribe
+    public void onEventUnFinalisationFailed(GenericErrorTrigger trigger)
+    {
+        if(trigger.getErrorCode() == ErrorCode.EVENT_COULD_NOT_BE_UNFINALISED)
+        {
+            Toast.makeText(this, R.string.event_unfinalisation_failed, Toast.LENGTH_LONG).show();
+        }
+    }
 }
