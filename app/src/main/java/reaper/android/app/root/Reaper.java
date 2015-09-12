@@ -136,6 +136,7 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     public void onConnectionFailed(ConnectionResult connectionResult)
     {
         Log.d("reap3r", "Unable to connect to Google API client");
+        Timber.v("Has resolution : " + connectionResult.hasResolution());
     }
 
     public static Reaper getReaperContext()

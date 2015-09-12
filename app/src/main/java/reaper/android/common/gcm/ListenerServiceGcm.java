@@ -10,7 +10,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
 import com.google.gson.reflect.TypeToken;
@@ -37,6 +36,7 @@ import reaper.android.app.service.LocationService;
 import reaper.android.app.trigger.event.NewEventAddedTrigger;
 import reaper.android.app.ui.activity.LauncherActivity;
 import reaper.android.common.communicator.Communicator;
+import timber.log.Timber;
 
 public class ListenerServiceGcm extends GcmListenerService
 {
@@ -51,30 +51,47 @@ public class ListenerServiceGcm extends GcmListenerService
 
     public ListenerServiceGcm()
     {
-        bus = Communicator.getInstance().getBus();
-        eventService = new EventService(bus);
-        locationService = new LocationService(bus);
-        userCache = CacheManager.getUserCache();
-        eventCache = CacheManager.getEventCache();
-        genericCache = CacheManager.getGenericCache();
-        type = new TypeToken<Map<String, String>>()
-        {
-        }.getType();
-
-        DatabaseManager.init(this);
+//        bus = Communicator.getInstance().getBus();
+//        eventService = new EventService(bus);
+//        locationService = new LocationService(bus);
+//        userCache = CacheManager.getUserCache();
+//        eventCache = CacheManager.getEventCache();
+//        genericCache = CacheManager.getGenericCache();
+//        type = new TypeToken<Map<String, String>>()
+//        {
+//        }.getType();
+//
+//        DatabaseManager.init(this);
+        Timber.d("GCM Listener init");
     }
 
     @Override
     public void onMessageReceived(String from, Bundle data)
     {
-        doProcessing(data);
+        Timber.d("GCM message received : " + data.toString());
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_action_important)
+                .setContentTitle("clanOut")
+                .setContentText(data.getString("message"))
+                .setAutoCancel(true);
+
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify((int) (Math.random() * 1000), notificationBuilder.build());
+//        doProcessing(data);
     }
 
     private void doProcessing(Bundle data)
     {
         String notificationType = data.getString("type");
-        Map<String, String> notificationAttributes = GsonProvider.getGson().fromJson(data.getString("parameters"), type);
+        Map<String, String> notificationAttributes = GsonProvider.getGson().fromJson(data
+                .getString("parameters"), type);
         String message = data.getString("message");
+
+        Timber.d("[NOTIFICATION] " + message);
 
         if (notificationType.equals(NotificationConstants.EVENT_ADDED))
         {
@@ -83,26 +100,35 @@ public class ListenerServiceGcm extends GcmListenerService
 
             if (!checkIfAppRunningInForeground())
             {
-                buildNotification(message, NotificationConstants.EVENT_ADDED_TITLE, true, notificationAttributes.get("event_id"));
-            } else
+                buildNotification(message, NotificationConstants.EVENT_ADDED_TITLE, true, notificationAttributes
+                        .get("event_id"));
+            }
+            else
             {
                 bus.post(new NewEventAddedTrigger());
             }
-        } else if (notificationType.equals(NotificationConstants.EVENT_REMOVED))
+        }
+        else if (notificationType.equals(NotificationConstants.EVENT_REMOVED))
         {
             genericCache.put(Timestamps.NOTIFICATION_RECEIVED_TIMESTAMP, DateTime.now());
             eventService.deleteEvent(notificationAttributes.get("event_id"));
-        } else if (notificationType.equals(NotificationConstants.EVENT_UPDATED))
+        }
+        else if (notificationType.equals(NotificationConstants.EVENT_UPDATED))
         {
+            Timber.v("Event Updated Notification start");
             genericCache.put(Timestamps.NOTIFICATION_RECEIVED_TIMESTAMP, DateTime.now());
             eventCache.deleteCompletely(notificationAttributes.get("event_id"));
             eventService.fetchEvent(notificationAttributes.get("event_id"), true);
 
             if (!checkIfAppRunningInForeground())
             {
-                buildNotification(message, NotificationConstants.EVENT_UPDATED_TITLE, true, notificationAttributes.get("event_id"));
+                buildNotification(message, NotificationConstants.EVENT_UPDATED_TITLE, true, notificationAttributes
+                        .get("event_id"));
             }
-        } else if (notificationType.equals(NotificationConstants.FRIEND_RELOCATED))
+
+            Timber.v("Event Updated Notification end");
+        }
+        else if (notificationType.equals(NotificationConstants.FRIEND_RELOCATED))
         {
             genericCache.put(Timestamps.FRIEND_RELOCATED_NOTIFICATION_TIMESTAMP, DateTime.now());
             userCache.deleteFriends();
@@ -114,12 +140,14 @@ public class ListenerServiceGcm extends GcmListenerService
                 String friendName = notificationAttributes.get("name");
                 buildNotification(friendName + " is in " + zone + ". You can invite " + friendName + " to local events.", NotificationConstants.FRIEND_RELOCATED_TITLE, false, "");
             }
-        } else if (notificationType.equals(NotificationConstants.EVENT_INVITATION))
+        }
+        else if (notificationType.equals(NotificationConstants.EVENT_INVITATION))
         {
             genericCache.put(Timestamps.NOTIFICATION_RECEIVED_TIMESTAMP, DateTime.now());
             eventCache.deleteCompletely(notificationAttributes.get("event_id"));
             eventService.fetchEvent(notificationAttributes.get("event_id"), true);
-            buildNotification(message, NotificationConstants.INVITE_RECEIVED_TITLE, true, notificationAttributes.get("event_id"));
+            buildNotification(message, NotificationConstants.INVITE_RECEIVED_TITLE, true, notificationAttributes
+                    .get("event_id"));
         }
     }
 
@@ -132,12 +160,14 @@ public class ListenerServiceGcm extends GcmListenerService
         {
             intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "yes");
             intent.putExtra("event_id", eventId);
-        } else
+        }
+        else
         {
             intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "no");
         }
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent
+                .getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
@@ -158,18 +188,22 @@ public class ListenerServiceGcm extends GcmListenerService
     {
         try
         {
-            ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
-            List<ActivityManager.RunningTaskInfo> runningTaskInfo = activityManager.getRunningTasks(1);
+            ActivityManager activityManager = (ActivityManager) this
+                    .getSystemService(ACTIVITY_SERVICE);
+            List<ActivityManager.RunningTaskInfo> runningTaskInfo = activityManager
+                    .getRunningTasks(1);
 
             ComponentName componentName = runningTaskInfo.get(0).topActivity;
             if (componentName.getPackageName().equalsIgnoreCase("reaper.android"))
             {
                 return true;
-            } else
+            }
+            else
             {
                 return false;
             }
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             return false;
         }

@@ -2,11 +2,11 @@ package reaper.android.app.config;
 
 public class NotificationConstants
 {
-    public static final String EVENT_ADDED = "event_added";
-    public static final String EVENT_REMOVED = "event_removed";
-    public static final String EVENT_UPDATED = "event_updated";
-    public static final String FRIEND_RELOCATED = "friend_relocated";
-    public static final String EVENT_INVITATION = "event_invitation";
+    public static final String EVENT_ADDED = "EVENT_ADDED";
+    public static final String EVENT_REMOVED = "EVENT_REMOVED";
+    public static final String EVENT_UPDATED = "EVENT_UPDATED";
+    public static final String FRIEND_RELOCATED = "FRIEND_RELOCATED";
+    public static final String EVENT_INVITATION = "EVENT_INVITATION";
 
     public static final String EVENT_ADDED_TITLE = "New Event Created";
     public static final String EVENT_UPDATED_TITLE = "Event Updated";
