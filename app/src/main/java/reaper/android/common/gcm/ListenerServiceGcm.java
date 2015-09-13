@@ -23,8 +23,6 @@ import java.util.Map;
 
 import reaper.android.R;
 import reaper.android.app.api.core.GsonProvider;
-import reaper.android.app.cache.core.CacheManager;
-import reaper.android.app.cache.core.DatabaseManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
@@ -35,7 +33,9 @@ import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.trigger.event.NewEventAddedTrigger;
 import reaper.android.app.ui.activity.LauncherActivity;
-import reaper.android.common.communicator.Communicator;
+import reaper.android.common.notification.Notification;
+import reaper.android.common.notification.NotificationFactory;
+import reaper.android.common.notification.NotificationHelper;
 import timber.log.Timber;
 
 public class ListenerServiceGcm extends GcmListenerService
@@ -47,7 +47,9 @@ public class ListenerServiceGcm extends GcmListenerService
     private EventCache eventCache;
     private GenericCache genericCache;
 
-    private static Type type;
+    private static Type type = new TypeToken<Map<String, String>>()
+    {
+    }.getType();
 
     public ListenerServiceGcm()
     {
@@ -61,8 +63,8 @@ public class ListenerServiceGcm extends GcmListenerService
 //        {
 //        }.getType();
 //
-//        DatabaseManager.init(this);
         Timber.d("GCM Listener init");
+//        DatabaseManager.init(this);
     }
 
     @Override
@@ -70,18 +72,18 @@ public class ListenerServiceGcm extends GcmListenerService
     {
         Timber.d("GCM message received : " + data.toString());
 
+        Notification notification = NotificationFactory.create(data);
+
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_action_important)
-                .setContentTitle("clanOut")
-                .setContentText(data.getString("message"))
+                .setSmallIcon(NotificationHelper.getIcon(notification.getType()))
+                .setContentTitle(notification.getTitle())
+                .setContentText(notification.getMessage())
                 .setAutoCancel(true);
 
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify((int) (Math.random() * 1000), notificationBuilder.build());
-//        doProcessing(data);
+        notificationManager.notify(notification.getId(), notificationBuilder.build());
     }
 
     private void doProcessing(Bundle data)
