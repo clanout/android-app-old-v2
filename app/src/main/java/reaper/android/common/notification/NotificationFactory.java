@@ -35,8 +35,7 @@ public class NotificationFactory
                             .type(typeCode)
                             .title(TITLE)
                             .eventId(args.get("event_id"))
-                            .timestamp(GsonProvider.getGson()
-                                                   .fromJson(args.get("timestamp"), DateTime.class))
+                            .timestamp(DateTime.now())
                             .message(NotificationHelper.getMessage(typeCode, args))
                             .build();
 

@@ -91,4 +91,7 @@ dependencies {
 
     // Material Icon Library
     compile 'net.steamcrafted:materialiconlib:1.0.4'
+
+    // Stetho (debugging)
+    compile 'com.facebook.stetho:stetho:1.2.0'
 }

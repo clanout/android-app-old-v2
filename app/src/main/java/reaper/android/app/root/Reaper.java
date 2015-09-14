@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 
+import com.facebook.stetho.Stetho;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -56,6 +57,7 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     {
         super.onCreate();
         init();
+        Stetho.initializeWithDefaults(this);
     }
 
     protected void init()

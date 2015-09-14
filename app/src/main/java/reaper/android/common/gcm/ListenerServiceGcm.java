@@ -23,8 +23,10 @@ import java.util.Map;
 
 import reaper.android.R;
 import reaper.android.app.api.core.GsonProvider;
+import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.cache.notification.NotificationCache;
 import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.NotificationConstants;
@@ -36,6 +38,8 @@ import reaper.android.app.ui.activity.LauncherActivity;
 import reaper.android.common.notification.Notification;
 import reaper.android.common.notification.NotificationFactory;
 import reaper.android.common.notification.NotificationHelper;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 public class ListenerServiceGcm extends GcmListenerService
@@ -72,18 +76,43 @@ public class ListenerServiceGcm extends GcmListenerService
     {
         Timber.d("GCM message received : " + data.toString());
 
-        Notification notification = NotificationFactory.create(data);
+        final Notification notification = NotificationFactory.create(data);
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(NotificationHelper.getIcon(notification.getType()))
-                .setContentTitle(notification.getTitle())
-                .setContentText(notification.getMessage())
-                .setAutoCancel(true);
+        NotificationCache notificationCache = CacheManager.getNotificationCache();
+
+        notificationCache.put(notification)
+                         .observeOn(Schedulers.newThread())
+                         .subscribe(new Subscriber<Object>()
+                         {
+                             @Override
+                             public void onCompleted()
+                             {
+                                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(ListenerServiceGcm.this)
+                                         .setSmallIcon(NotificationHelper
+                                                 .getIcon(notification.getType()))
+                                         .setContentTitle(notification.getTitle())
+                                         .setContentText(notification.getMessage())
+                                         .setAutoCancel(true);
 
 
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(notification.getId(), notificationBuilder.build());
+                                 NotificationManager notificationManager =
+                                         (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                                 notificationManager
+                                         .notify(notification.getId(), notificationBuilder.build());
+                             }
+
+                             @Override
+                             public void onError(Throwable e)
+                             {
+                                 Timber.e("Unable to put notification :" + e.getMessage());
+                             }
+
+                             @Override
+                             public void onNext(Object o)
+                             {
+
+                             }
+                         });
     }
 
     private void doProcessing(Bundle data)

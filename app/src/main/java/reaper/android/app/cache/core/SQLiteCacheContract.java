@@ -97,4 +97,30 @@ public abstract class SQLiteCacheContract
         public static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME + " where key = ?";
         public static final String SQL_DELETE_ALL = "DELETE FROM " + TABLE_NAME;
     }
+
+    public static final class Notification
+    {
+        public static final String TABLE_NAME = "notification_cache";
+
+        public static final String COLUMN_ID = "id";
+        public static final String COLUMN_TYPE = "type";
+        public static final String COLUMN_TITLE = "title";
+        public static final String COLUMN_MESSAGE = "message";
+        public static final String COLUMN_EVENT_ID = "event_id";
+        public static final String COLUMN_TIMESTAMP = "timestamp";
+        public static final String COLUMN_TIMESTAMP_RECEIVED = "timestamp_received";
+
+        public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_ID + " INTEGER PRIMARY KEY, " +
+                COLUMN_TYPE + " INTEGER, " +
+                COLUMN_TITLE + " TEXT, " +
+                COLUMN_MESSAGE + " TEXT, " +
+                COLUMN_EVENT_ID + " TEXT, " +
+                COLUMN_TIMESTAMP + " INTEGER, " +
+                COLUMN_TIMESTAMP_RECEIVED + " INTEGER)";
+
+        public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+
+        public static final String SQL_INSERT = "INSERT INTO " + TABLE_NAME + "  VALUES (?,?,?,?,?,?,?)";
+    }
 }

@@ -12,10 +12,12 @@ public class Notification
     private String eventId;
     private String message;
     private DateTime timestamp;
+    private DateTime timestampReceived;
 
     private Notification(int id)
     {
         this.id = id;
+        timestampReceived = DateTime.now();
     }
 
     public int getId()
@@ -41,6 +43,11 @@ public class Notification
     public DateTime getTimestamp()
     {
         return timestamp;
+    }
+
+    public DateTime getTimestampReceived()
+    {
+        return timestampReceived;
     }
 
     public String getTitle()
