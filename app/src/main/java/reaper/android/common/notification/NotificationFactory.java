@@ -37,6 +37,7 @@ public class NotificationFactory
                             .eventId(args.get("event_id"))
                             .timestamp(DateTime.now())
                             .message(NotificationHelper.getMessage(typeCode, args))
+                            .isNew(true)
                             .build();
 
             return notification;
