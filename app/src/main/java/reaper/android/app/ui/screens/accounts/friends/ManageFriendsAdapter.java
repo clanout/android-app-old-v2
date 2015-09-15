@@ -21,8 +21,10 @@ import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.config.AppConstants;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Friend;
 import reaper.android.app.root.Reaper;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 /**
  * Created by harsh on 13-05-2015.
@@ -135,11 +137,13 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
         {
             if (blockStatusList.get(getAdapterPosition()))
             {
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.PERSON_UNBLOCKED, null);
                 blockStatusList.set(getAdapterPosition(), false);
                 blockIcon.setImageDrawable(unblockedDrawable);
             }
             else
             {
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.PERSON_BLOCKED, null);
                 blockStatusList.set(getAdapterPosition(), true);
                 blockIcon.setImageDrawable(blockedDrawable);
             }

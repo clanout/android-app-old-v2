@@ -7,6 +7,9 @@ import reaper.android.app.api.core.GsonProvider;
 public class Notification
 {
     public static final int EVENT_CREATED = 0;
+    public static final int EVENT_INVITATION = 1;
+    public static final int RSVP = 2;
+    public static final int EVENT_REMOVED = 3;
 
     private int id;
     private int type;

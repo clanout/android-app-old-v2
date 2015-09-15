@@ -24,13 +24,21 @@ public class GoogleAnalyticsConstants
 
     // Event CATEGORY
     public static final String BUTTON_CLICK = "button_click";
-    public static final String MENU_ITEM_CLICK = "menu_item_click";
+    public static final String LIST_ITEM_CLICK = "list_item_click";
+    public static final String GENERAL = "general";
 
     // Event Actions
-    public static final String FACEBOOK_PERMISSION_GRANRED = "facebook_permission_granted";
+    public static final String FACEBOOK_PERMISSION_GRANTED = "facebook_permission_granted";
     public static final String FACEBOOK_PERMISSION_DENIED = "facebook_permission_denied";
     public static final String LOCATION_GRANTED = "location_granted";
     public static final String LOCATION_DENIED = "location_denied";
+    public static final String LOCATION_REFRESHED = "location_refreshed";
+    public static final String FB_ACCESS_TOKEN_NULL = "fb_access_token_null";
+    public static final String NOTIFICATION_NOT_RECEIVED_LIMIT_CROSSED = "notification_not_received_limit_crossed";
+    public static final String FRIEND_RELOCATED_NOTIFICATION_NOT_RECEIVED_LIMIT_CROSSED = "friend_relocated_notification_not_received_limit_crossed";
+    public static final String FACEBOOK_FRIEND_REFRESHED_LIMIT_CROSSED = "facebook_friends_refresh_limit_crossed";
+    public static final String PERSON_BLOCKED = "person_blocked";
+    public static final String PERSON_UNBLOCKED = "person_unblocked";
 
 
 }

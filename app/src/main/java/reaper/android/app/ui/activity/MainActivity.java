@@ -112,11 +112,13 @@ public class MainActivity extends AppCompatActivity
 
                 if (DateTime.now().getMillis() - lastNotificationTimestamp.getMillis() > Timestamps.NOTIFICATION_NOT_RECEIVED_LIMIT)
                 {
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.NOTIFICATION_NOT_RECEIVED_LIMIT_CROSSED, null);
                     eventCache.deleteAll();
                 }
 
                 if (DateTime.now().getMillis() - lastFriendRelocatedNotificationTimestamp.getMillis() > Timestamps.FRIEND_RELOCATED_NOTIFICATION_NOT_RECEIVED_LIMIT)
                 {
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FRIEND_RELOCATED_NOTIFICATION_NOT_RECEIVED_LIMIT_CROSSED, null);
                     userCache.deleteFriends();
                 }
             }
@@ -125,9 +127,9 @@ public class MainActivity extends AppCompatActivity
 
             if (lastFacebookFriendsRefreshTimestamp != null)
             {
-
                 if (DateTime.now().minusDays(2).isAfter(lastFacebookFriendsRefreshTimestamp))
                 {
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FACEBOOK_FRIEND_REFRESHED_LIMIT_CROSSED, null);
                     facebookService.getFacebookFriends(true);
                 }
             } else
@@ -140,6 +142,8 @@ public class MainActivity extends AppCompatActivity
                 if (checkPlayServices())
                 {
                     gcmService.register();
+                }else{
+                    // TODO - do something
                 }
             } else
             {

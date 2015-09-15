@@ -17,8 +17,6 @@ import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 
 import java.util.Arrays;
 
@@ -29,7 +27,6 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
-import reaper.android.app.root.Reaper;
 import reaper.android.common.analytics.AnalyticsHelper;
 
 /**
@@ -71,6 +68,7 @@ public class FacebookActivity extends AppCompatActivity
         facebookLoginButton.setVisibility(View.GONE);
         if (AccessToken.getCurrentAccessToken() == null)
         {
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FB_ACCESS_TOKEN_NULL, null);
             setUpFacebookLoginButton();
         } else
         {
@@ -175,7 +173,7 @@ public class FacebookActivity extends AppCompatActivity
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.FACEBOOK_PERMISSION_GRANRED, null);
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.FACEBOOK_PERMISSION_GRANTED, null);
                 LoginManager.getInstance().logInWithReadPermissions(FacebookActivity.this, Arrays.asList("email", "user_friends"));
             }
         });

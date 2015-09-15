@@ -214,6 +214,8 @@ public class LauncherActivity extends AppCompatActivity
     @Subscribe
     public void onUserLocationRefreshTrigger(UserLocationRefreshTrigger trigger)
     {
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.LOCATION_REFRESHED, null);
+
         if (progressDialog != null)
         {
             progressDialog.dismiss();
