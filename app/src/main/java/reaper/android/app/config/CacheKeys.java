@@ -7,6 +7,10 @@ public class CacheKeys
     public static final String USER_ID = "user_id";
     public static final String USER_NAME = "user_name";
     public static final String USER_LOCATION = "user_location";
+    public static final String USER_FIRST_NAME = "user_first_name";
+    public static final String USER_LAST_NAME = "user_last_name";
+    public static final String USER_GENDER = "user_gender";
+    public static final String USER_EMAIL = "user_email";
 
     // User Cache
     public static final String MY_PHONE_NUMBER = "my_phone_number";

@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.squareup.otto.Bus;
 
+import java.util.List;
+
 import reaper.android.app.api.auth.AuthApi;
 import reaper.android.app.api.auth.request.CreateNewSessionApiRequest;
 import reaper.android.app.api.auth.request.ValidateSessionApiRequest;
@@ -50,7 +52,7 @@ public class AuthService
         });
     }
 
-    public void createNewSession(String firstName, String lastName, String gender, String email, String id)
+    public void createNewSession(String firstName, String lastName, String gender, String email, String id, List<String> friendList)
     {
         if(firstName == null)
         {
@@ -72,7 +74,7 @@ public class AuthService
             email = id;
         }
 
-        CreateNewSessionApiRequest request = new CreateNewSessionApiRequest(firstName, lastName, gender, id, email);
+        CreateNewSessionApiRequest request = new CreateNewSessionApiRequest(firstName, lastName, gender, id, email, friendList);
         authApi.createNewSession(request)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())

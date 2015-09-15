@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -69,6 +70,7 @@ import reaper.android.app.trigger.event.EventEditedTrigger;
 import reaper.android.app.trigger.event.EventLocationFetchedTrigger;
 import reaper.android.app.trigger.event.EventSuggestionsTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
+import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.create.EventSuggestionsAdapter;
 import reaper.android.app.ui.screens.create.GooglePlacesAutocompleteAdapter;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
@@ -107,6 +109,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     private TextView noSuggestions;
     private ImageButton save;
     private Drawable deleteDrawable, lockedDrawable, unlockedDrawable;
+    private Toolbar toolbar;
 
     private boolean isPlaceDetailsRunning, isSaveButtonClicked, shouldDeleteEventFromCache;
 
@@ -136,6 +139,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         recommendationList = (RecyclerView) view.findViewById(R.id.rv_edit_event_suggestions);
         noSuggestions = (TextView) view.findViewById(R.id.tv_edit_event_no_suggestions);
         save = (ImageButton) view.findViewById(R.id.ib_edit_event_save);
+        toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_edit);
 
         return view;
     }
@@ -153,6 +157,8 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         {
             throw new IllegalStateException("Event/EventDetails cannot be null while creating EditEventFragment instance");
         }
+
+        ((MainActivity)getActivity()).setSupportActionBar(toolbar);
 
         editedEvent = new Event();
         editedEvent.setId(event.getId());
@@ -298,6 +304,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EDIT_EVENT_FRAGMENT);
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle("Edit");
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EDIT);
 

@@ -7,6 +7,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +41,7 @@ import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.user.ManageAppFriendsTrigger;
 import reaper.android.app.trigger.user.ManagePhoneContactsTrigger;
+import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
@@ -51,6 +53,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     private ImageButton done;
     private TabLayout tabLayout;
     private Drawable checkDrawable;
+    private Toolbar toolbar;
 
 //    private InviteUsersPagerAdapter inviteUsersPagerAdapter;
     private FragmentManager fragmentManager;
@@ -83,6 +86,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
         viewPager = (ViewPager) view.findViewById(R.id.vp_invite_friends_container);
         done = (ImageButton) view.findViewById(R.id.ib_invite_friends_container_done);
         tabLayout = (TabLayout) view.findViewById(R.id.tl_invite_friends_container);
+        toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_invite_container);
 
         return view;
     }
@@ -109,6 +113,8 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
         {
             throw new IllegalStateException("fromCreateFragment can't be null");
         }
+
+        ((MainActivity)getActivity()).setSupportActionBar(toolbar);
 
         invitedFacebookFriends = new ArrayList<>();
         invitedPhoneContacts = new ArrayList<>();
@@ -155,6 +161,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_USERS_CONTAINER_FRAGMENT);
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle("Invite Friends");
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.INVITE_USERS_CONTAINER);
         bus.register(this);

@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,6 +49,7 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.ChangeAttendeeListTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventRsvpNotChangedTrigger;
+import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
@@ -74,6 +76,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
     private ViewPager viewPager;
     private ImageButton rsvp, invite, chat;
     private Drawable goingDrawable, maybeDrawable, notGoingDrawable, inviteDrawable, chatDrawable;
+    private Toolbar toolbar;
 
     private PagerAdapter pagerAdapter;
 
@@ -93,6 +96,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         rsvp = (ImageButton) view.findViewById(R.id.ibtn_event_details_rsvp);
         invite = (ImageButton) view.findViewById(R.id.ibtn_event_details_invite);
         chat = (ImageButton) view.findViewById(R.id.ibtn_event_details_chat);
+        toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_event_details_container);
 
         return view;
     }
@@ -117,6 +121,8 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         {
             throw new IllegalStateException("Event cannot be null while creating EventDetailsFragment instance");
         }
+
+        ((MainActivity)getActivity()).setSupportActionBar(toolbar);
 
         bus = Communicator.getInstance().getBus();
         fragmentManager = getActivity().getSupportFragmentManager();
@@ -144,6 +150,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
             public void onPageSelected(int i)
             {
                 activePosition = i;
+                ((MainActivity)getActivity()).getSupportActionBar().setTitle(events.get(activePosition).getCategory());
                 renderRsvpButton(events.get(activePosition).getRsvp());
             }
 
@@ -200,6 +207,8 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EVENT_DETAILS_CONTAINER_FRAGMENT);
+
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle(events.get(activePosition).getCategory());
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EVENT_DETAILS_CONTAINER);
     }

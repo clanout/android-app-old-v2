@@ -4,12 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.squareup.otto.Bus;
@@ -32,12 +28,10 @@ import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Event;
-import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.GCMService;
 import reaper.android.app.service.LocationService;
-import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchForActivityTrigger;
@@ -54,7 +48,6 @@ public class MainActivity extends AppCompatActivity
 {
     private FragmentManager fragmentManager;
     private Bus bus;
-    private UserService userService;
     private GCMService gcmService;
     private EventService eventService;
     private LocationService locationService;
@@ -76,14 +69,10 @@ public class MainActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_main);
 
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         bus = Communicator.getInstance().getBus();
         bus.register(this);
         isBusRegistered = true;
 
-        userService = new UserService(bus);
         gcmService = new GCMService(bus);
         eventService = new EventService(bus);
         locationService = new LocationService(bus);
@@ -162,7 +151,6 @@ public class MainActivity extends AppCompatActivity
         {
             bus.register(this);
         }
-        getSupportActionBar().setTitle("clanOut");
     }
 
     @Override

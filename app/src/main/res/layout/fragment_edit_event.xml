@@ -5,6 +5,21 @@
               android:layout_height="match_parent"
               android:background="@color/background_default"
               android:orientation="vertical">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/tb_fragment_edit"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+    </android.support.design.widget.AppBarLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,10 +30,10 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
+            android:layout_marginBottom="8dp"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -30,12 +45,12 @@
                     android:id="@+id/tv_edit_event_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
                     android:layout_marginLeft="16dp"
                     android:maxLines="2"
                     android:text="Movie at Forum"
                     android:textColor="@color/text_title"
                     android:textSize="24sp"
-                    android:layout_marginBottom="4dp"
                     />
 
                 <TextView
@@ -44,16 +59,16 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:text="Public"
-                    android:textSize="12sp"
                     android:textColor="@color/text_subtitle_light"
+                    android:textSize="12sp"
                     />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:layout_marginRight="16dp">
+                android:layout_marginRight="16dp"
+                android:gravity="center_vertical">
 
                 <net.steamcrafted.materialiconlib.MaterialIconView
                     android:id="@+id/miv_edit_event_icon"
@@ -76,11 +91,11 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
             android:layout_marginBottom="8dp"
             android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <net.steamcrafted.materialiconlib.MaterialIconView
                 android:id="@+id/iv_edit_event_location"
@@ -114,11 +129,11 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
             android:layout_marginBottom="8dp"
             android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <net.steamcrafted.materialiconlib.MaterialIconView
                 android:id="@+id/iv_edit_event_date_time"
@@ -151,11 +166,11 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
             android:layout_marginBottom="8dp"
             android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <net.steamcrafted.materialiconlib.MaterialIconView
                 android:id="@+id/iv_edit_event_description"
@@ -176,8 +191,8 @@
                 android:layout_marginRight="16dp"
                 android:layout_weight="1"
                 android:clickable="true"
-                android:maxLines="3"
                 android:hint="More Details?"
+                android:maxLines="3"
                 android:textSize="14sp"/>
         </LinearLayout>
     </LinearLayout>
@@ -207,8 +222,8 @@
 
         <ImageButton
             android:id="@+id/ib_edit_event_save"
-            android:layout_height="48dp"
             android:layout_width="match_parent"
+            android:layout_height="48dp"
             android:background="@drawable/custom_button_background"/>
     </LinearLayout>
 </LinearLayout>

@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -49,6 +50,7 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.user.AllAppFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
+import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
@@ -62,6 +64,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     private FloatingActionButton shareFacebook, inviteWhatsapp;
     private Menu menu;
     private Drawable refreshDrawable, checkDrawable;
+    private Toolbar toolbar;
 
     private ManageFriendsAdapter manageFriendsAdapter;
     private UserService userService;
@@ -93,6 +96,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
         done = (ImageButton) view.findViewById(R.id.ib_manage_friends_done);
         shareFacebook = (FloatingActionButton) view.findViewById(R.id.fib_fragment_manage_friends_share_facebook);
         inviteWhatsapp = (FloatingActionButton) view.findViewById(R.id.fib_fragment_manage_friends_invite_people_whatsapp);
+        toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_manage_friends);
 
         return view;
     }
@@ -101,6 +105,8 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+
+        ((MainActivity)getActivity()).setSupportActionBar(toolbar);
 
         displayBasicView();
 
@@ -151,6 +157,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.MANAGE_FRIENDS_FRAGMENT);
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle("Friends");
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.MANAGE_FRIENDS);
         bus.register(this);

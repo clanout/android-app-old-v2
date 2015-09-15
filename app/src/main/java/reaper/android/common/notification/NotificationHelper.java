@@ -33,6 +33,9 @@ public class NotificationHelper
         }else if(name.equals(NotificationConstants.FRIEND_RELOCATED))
         {
             return Notification.FRIEND_RELOCATED;
+        }else if(name.equals(NotificationConstants.NEW_FRIEND_JOINED))
+        {
+            return Notification.NEW_FRIEND_ADDED;
         }
         else
         {
@@ -60,9 +63,16 @@ public class NotificationHelper
                 return getUnblockedMessage(args);
             case Notification.FRIEND_RELOCATED:
                 return getFriendRelocatedMessage(args);
+            case Notification.NEW_FRIEND_ADDED:
+                return newFriendJoinedAppMessage(args);
             default:
                 return "";
         }
+    }
+
+    private static String newFriendJoinedAppMessage(Map<String, String> args)
+    {
+        return args.get("user_name") + "joined clanOut.";
     }
 
     private static String getFriendRelocatedMessage(Map<String, String> args)

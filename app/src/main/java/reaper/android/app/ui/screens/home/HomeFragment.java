@@ -14,6 +14,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -70,6 +71,7 @@ import reaper.android.app.trigger.event.RsvpChangeTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationReceivedTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationsAvailableTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationsNotAvailableTrigger;
+import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.create.CreateEventFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
@@ -113,6 +115,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     private Snackbar snackbar;
     private MaterialIconView generalIcon, eatOutIcon, drinksIcon, cafeIcon, movieIcon, outdoorsIcon, partyIcon, eventsIcon, shoppingIcon;
     private Drawable phoneDrawable, plusDrawable, accountsDrawable;
+    private Toolbar toolbar;
 
     private EventsAdapter eventsAdapter;
     private Drawable whiteNotificationdrawable;
@@ -155,6 +158,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
 //        sortButton = (Button) view.findViewById(R.id.btn_home_sort);
         createEvent = (FloatingActionButton) view.findViewById(R.id.fib_home_create);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.srl_home);
+        toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_home);
 
         return view;
     }
@@ -163,6 +167,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+
+        ((MainActivity)getActivity()).setSupportActionBar(toolbar);
 
         generateDrawables();
         dispayBasicView();
@@ -255,6 +261,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
 
         bus.register(this);
         eventService.fetchEvents(userLocation.getZone());
+
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle("clanOut");
     }
 
     @Override

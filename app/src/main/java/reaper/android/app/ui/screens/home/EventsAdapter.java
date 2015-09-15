@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.config.Dimensions;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.service.UserService;
@@ -67,55 +68,55 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         generalEventDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD)
                 .setColor(context.getResources().getColor(R.color.cyan))
-                .setSizeDp(36)
+                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         eatoutDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.FOOD)
                 .setColor(context.getResources().getColor(R.color.cyan))
-                .setSizeDp(36)
+                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         drinksDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.MARTINI)
                 .setColor(context.getResources().getColor(R.color.cyan))
-                .setSizeDp(36)
+                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         cafeDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.COFFEE)
                 .setColor(context.getResources().getColor(R.color.cyan))
-                .setSizeDp(36)
+                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         movieDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.MOVIE)
                 .setColor(context.getResources().getColor(R.color.cyan))
-                .setSizeDp(36)
+                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         outdoorsDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.TENNIS)
                 .setColor(context.getResources().getColor(R.color.cyan))
-                .setSizeDp(36)
+                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         partyDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.GIFT)
                 .setColor(context.getResources().getColor(R.color.cyan))
-                .setSizeDp(36)
+                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         eventsDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.CITY)
                 .setColor(context.getResources().getColor(R.color.cyan))
-                .setSizeDp(36)
+                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         shoppingDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.SHOPPING)
                 .setColor(context.getResources().getColor(R.color.cyan))
-                .setSizeDp(36)
+                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         goingDrawable = MaterialDrawableBuilder.with(context)

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -61,6 +62,7 @@ import reaper.android.app.trigger.chat.XmppConnectionAuthenticatedTrigger;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
+import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
@@ -100,6 +102,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener
 
     private MessageListener messageListener;
     private Drawable sendDrawable;
+    private Toolbar toolbar;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -119,6 +122,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener
         noSessionMessage = (TextView) view.findViewById(R.id.tv_fragment_chat_no_session);
         mainContent = (LinearLayout) view.findViewById(R.id.ll_fragment_chat_main_content);
         loadHistory = (Button) view.findViewById(R.id.b_chat_fragment_load_history);
+        toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_chat);
 
         return view;
     }
@@ -127,6 +131,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+
+        ((MainActivity)getActivity()).setSupportActionBar(toolbar);
 
         send.setOnClickListener(this);
         loadHistory.setOnClickListener(this);
@@ -172,6 +178,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.CHAT_FRAGMENT);
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle("Discussion");
 
         bus.register(this);
 

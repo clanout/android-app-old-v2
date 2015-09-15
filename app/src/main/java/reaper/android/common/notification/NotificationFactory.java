@@ -31,7 +31,7 @@ public class NotificationFactory
 
             int typeCode = NotificationHelper.getType(type);
 
-            if ((typeCode == Notification.BLOCKED) || (typeCode == Notification.UNBLOCKED) || (typeCode == Notification.FRIEND_RELOCATED))
+            if ((typeCode == Notification.BLOCKED) || (typeCode == Notification.UNBLOCKED) || (typeCode == Notification.FRIEND_RELOCATED) || (typeCode == Notification.NEW_FRIEND_ADDED))
             {
                 Notification notification =
                         new Notification.Builder(Integer.parseInt(args.get("notification_id")))

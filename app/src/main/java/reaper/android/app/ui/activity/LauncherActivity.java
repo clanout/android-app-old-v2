@@ -29,6 +29,7 @@ import reaper.android.app.service.AuthService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
+import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.facebook.FacebookProfileFetchedTrigger;
 import reaper.android.app.trigger.user.NewSessionCreatedTrigger;
 import reaper.android.app.trigger.user.SessionValidatedTrigger;
@@ -170,9 +171,30 @@ public class LauncherActivity extends AppCompatActivity
     @Subscribe
     public void onFacebookProfileFetched(FacebookProfileFetchedTrigger trigger)
     {
-        authService.createNewSession(trigger.getFirstName(), trigger.getLastName(), trigger.getGender(), trigger.getEmail(), trigger.getId());
         cache.put(CacheKeys.USER_ID, trigger.getId());
+        cache.put(CacheKeys.USER_FIRST_NAME, trigger.getFirstName());
+        cache.put(CacheKeys.USER_LAST_NAME, trigger.getLastName());
+        cache.put(CacheKeys.USER_GENDER, trigger.getGender());
+        cache.put(CacheKeys.USER_EMAIL, trigger.getEmail());
         cache.put(CacheKeys.USER_NAME, trigger.getFirstName() + " " + trigger.getLastName());
+        facebookService.getFacebookFriends(false);
+    }
+
+    @Subscribe
+    public void onFacebookFriendsFetched(FacebookFriendsIdFetchedTrigger trigger)
+    {
+        authService.createNewSession(cache.get(CacheKeys.USER_FIRST_NAME), cache.get(CacheKeys.USER_LAST_NAME), cache.get(CacheKeys.USER_GENDER), cache.get(CacheKeys.USER_EMAIL), cache.get(CacheKeys.USER_ID), trigger.getFriendsIdList());
+    }
+
+    @Subscribe
+    public void onFacebookFriendsNotFetched(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE)
+        {
+            Toast.makeText(this, R.string.problem_contacting_facebook, Toast.LENGTH_LONG).show();
+            LoginManager.getInstance().logOut();
+            finish();
+        }
     }
 
     @Subscribe

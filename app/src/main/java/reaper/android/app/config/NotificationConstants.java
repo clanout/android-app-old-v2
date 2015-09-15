@@ -11,5 +11,5 @@ public class NotificationConstants
     public static final String FRIEND_RELOCATED = "FRIEND_RELOCATED";
     public static final String BLOCKED = "BLOCKED";
     public static final String UNBLOCKED = "UNBLOCKED";
-    public static final String NEW_FRIEND_JOINED = "NEW_FRIEND_JOINED";
+    public static final String NEW_FRIEND_JOINED = "NEW_FRIEND";
 }

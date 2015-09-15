@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,6 +45,7 @@ import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.root.Reaper;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
@@ -57,6 +59,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
     private RecyclerView recyclerView;
     private ImageView userPic;
     private Drawable homeDrawable, personDrawable;
+    private Toolbar toolbar;
 
     private FragmentManager fragmentManager;
     private UserService userService;
@@ -81,6 +84,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
         userName = (TextView) view.findViewById(R.id.tv_account_fragment_user_name);
         userPic = (ImageView) view.findViewById(R.id.iv_account_fragment_user_pic);
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_accounts_fragment);
+        toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_accounts);
         return view;
     }
 
@@ -88,6 +92,8 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+
+        ((MainActivity)getActivity()).setSupportActionBar(toolbar);
 
         fragmentManager = getActivity().getSupportFragmentManager();
         bus = Communicator.getInstance().getBus();
@@ -124,6 +130,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.ACCOUNTS_FRAGMENT);
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle("Accounts");
 
         userName.setText(userService.getActiveUserName());
 

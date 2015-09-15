@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,6 +44,7 @@ import reaper.android.app.service.NotificationService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.notifications.NotificationsFetchedTrigger;
+import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
@@ -60,6 +62,7 @@ public class NotificationFragment extends Fragment implements NotificationClickC
     private NotificationsAdapter notificationsAdapter;
     private Menu menu;
     private Drawable homeDrawable;
+    private Toolbar toolbar;
     private NotificationService notificationService;
     private Bus bus;
     private EventService eventService;
@@ -84,6 +87,7 @@ public class NotificationFragment extends Fragment implements NotificationClickC
         notificationRecyclerView = (RecyclerView) view.findViewById(R.id.rv_fragment_notificatiosn);
         noNotificationsMessage = (TextView) view.findViewById(R.id.tv_fragemnt_notification_no_notifications);
         clearAll = (TextView) view.findViewById(R.id.tv_fragment_notification_clear_all);
+        toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_notifications);
         return view;
     }
 
@@ -91,6 +95,8 @@ public class NotificationFragment extends Fragment implements NotificationClickC
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+
+        ((MainActivity)getActivity()).setSupportActionBar(toolbar);
 
         bus = Communicator.getInstance().getBus();
         notificationService = new NotificationService(bus);
@@ -135,6 +141,7 @@ public class NotificationFragment extends Fragment implements NotificationClickC
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.NOTIFICATIONS);
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.NOTIFICATION_FRAGMENT);
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle("Notifications");
 
         bus.register(this);
         notificationService.fetchAllNotifications();
