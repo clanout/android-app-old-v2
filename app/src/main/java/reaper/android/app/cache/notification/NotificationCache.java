@@ -14,4 +14,8 @@ public interface NotificationCache
     Observable<Object> clear();
 
     Observable<Object> markRead();
+
+    Observable<Object> clear(int notificationId);
+
+    Observable<Boolean> isAvaliable();
 }

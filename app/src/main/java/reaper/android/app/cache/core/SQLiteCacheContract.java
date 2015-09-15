@@ -126,5 +126,7 @@ public abstract class SQLiteCacheContract
         public static final String SQL_INSERT = "INSERT INTO " + TABLE_NAME + "  VALUES (?,?,?,?,?,?,?,?)";
         public static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME;
         public static final String SQL_MARK_READ = "UPDATE " + TABLE_NAME + " SET " + COLUMN_IS_NEW + " = ?";
+        public static final String SQL_DELETE_ONE = "DELETE FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + " = ?";
+        public static final String SQL_COUNT_NEW = "SELECT count(*) as new_count FROM " + TABLE_NAME + " WHERE " + COLUMN_IS_NEW + " = 'true'";
     }
 }
