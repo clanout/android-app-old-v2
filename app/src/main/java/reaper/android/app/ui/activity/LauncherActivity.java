@@ -11,6 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
+import com.facebook.shimmer.ShimmerFrameLayout;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -20,6 +23,8 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GoogleAnalyticsConstants;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.AuthService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.LocationService;
@@ -48,11 +53,19 @@ public class LauncherActivity extends AppCompatActivity
     private ProgressDialog progressDialog;
 
     private boolean isBlocking;
+    private Tracker tracker;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_launcher);
+        ShimmerFrameLayout container =
+                (ShimmerFrameLayout) findViewById(R.id.shimmer_view_container);
+        container.startShimmerAnimation();
+
+        tracker = Reaper.getAnalyticsTracker();
 
         bus = Communicator.getInstance().getBus();
 
@@ -70,13 +83,17 @@ public class LauncherActivity extends AppCompatActivity
     {
         super.onResume();
 
+        tracker.setScreenName(GoogleAnalyticsConstants.LAUNCHER_ACTIVITY);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+
         bus.register(this);
 
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Base_Theme_AppCompat_Light_Dialog_Alert)
-                    .setMessage("Turn on GPS")
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener()
+                    .setTitle(R.string.location_permission_heading)
+                    .setMessage(R.string.location_permission_message)
+                    .setPositiveButton(R.string.location_permission_positive_button, new DialogInterface.OnClickListener()
                     {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i)
@@ -84,12 +101,12 @@ public class LauncherActivity extends AppCompatActivity
                             startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                         }
                     })
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                    .setNegativeButton(R.string.location_permission_negative_button, new DialogInterface.OnClickListener()
                     {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i)
                         {
-                            Toast.makeText(LauncherActivity.this, R.string.trust_issues, Toast.LENGTH_LONG).show();
+                            Toast.makeText(LauncherActivity.this, R.string.location_denied, Toast.LENGTH_LONG).show();
                             finish();
                         }
                     })
@@ -98,7 +115,7 @@ public class LauncherActivity extends AppCompatActivity
                         @Override
                         public void onCancel(DialogInterface dialogInterface)
                         {
-                            Toast.makeText(LauncherActivity.this, R.string.trust_issues, Toast.LENGTH_LONG).show();
+                            Toast.makeText(LauncherActivity.this, R.string.location_denied, Toast.LENGTH_LONG).show();
                             finish();
                         }
                     });

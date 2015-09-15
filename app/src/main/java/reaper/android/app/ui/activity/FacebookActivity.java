@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -14,14 +13,12 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphRequestAsyncTask;
-import com.facebook.Profile;
 import com.facebook.ProfileTracker;
-import com.facebook.internal.PermissionType;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
 import java.util.Arrays;
 
@@ -31,7 +28,8 @@ import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.CacheKeys;
-import reaper.android.app.service.FacebookService;
+import reaper.android.app.config.GoogleAnalyticsConstants;
+import reaper.android.app.root.Reaper;
 
 /**
  * Created by Aditya on 23-08-2015.
@@ -47,6 +45,8 @@ public class FacebookActivity extends AppCompatActivity
     private EventCache eventCache;
     private UserCache userCache;
 
+    private Tracker tracker;
+
     private static final String PERMISSION_REQUIRED = "This app requires your basic information, email and friends information to function properly. Don\\'t worry, we will not misuse this in any way.";
     private static final String PERMISSION_REQUIRED_TITLE = "Permission Required";
     private static final String PROBLEM_CONTACTING_FACEBOOK_TITLE = "Problem contacting Facebook";
@@ -61,6 +61,8 @@ public class FacebookActivity extends AppCompatActivity
 
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_facebook);
+
+        tracker = Reaper.getAnalyticsTracker();
 
         facebookLoginButton = (LoginButton) findViewById(R.id.flb_activity_facebook);
         facebookCallbackManager = CallbackManager.Factory.create();
@@ -84,6 +86,15 @@ public class FacebookActivity extends AppCompatActivity
                 goToLauncherActivity();
             }
         }
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        tracker.setScreenName(GoogleAnalyticsConstants.FACEBOOK_ACTIVITY);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     @Override
@@ -176,7 +187,7 @@ public class FacebookActivity extends AppCompatActivity
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                Toast.makeText(FacebookActivity.this, R.string.trust_issues, Toast.LENGTH_LONG).show();
+                Toast.makeText(FacebookActivity.this, R.string.location_denied, Toast.LENGTH_LONG).show();
                 FacebookActivity.this.finish();
             }
         });

@@ -27,6 +27,8 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.picasso.Picasso;
 
@@ -38,6 +40,8 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GoogleAnalyticsConstants;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
@@ -60,12 +64,15 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
     private GenericCache genericCache;
 
     private AccountsAdapter accountsAdapter;
+    private Tracker tracker;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -117,6 +124,9 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
     public void onResume()
     {
         super.onResume();
+
+        tracker.setScreenName(GoogleAnalyticsConstants.ACCOUNTS_FRAGMENT);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
 
         userName.setText(userService.getActiveUserName());
 

@@ -8,6 +8,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -19,6 +20,8 @@ import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -34,8 +37,10 @@ import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
@@ -70,11 +75,13 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
     private Drawable goingDrawable, maybeDrawable, notGoingDrawable, inviteDrawable, chatDrawable;
 
     private PagerAdapter pagerAdapter;
+    private Tracker tracker;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -192,6 +199,10 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
     public void onResume()
     {
         super.onResume();
+
+        tracker.setScreenName(GoogleAnalyticsConstants.EVENT_DETAILS_CONTAINER_FRAGMENT);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EVENT_DETAILS_CONTAINER);
     }
 

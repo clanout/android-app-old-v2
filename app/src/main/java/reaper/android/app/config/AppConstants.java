@@ -14,4 +14,7 @@ public class AppConstants
 
     // Facebook
     public static final String FACEBOOK_END_POINT = "https://graph.facebook.com/v2.4/";
+
+    // Google Analytics
+    public static final String GOOGLE_ANALYTICS_TRACKING_KEY = "UA-67721019-1";
 }

@@ -24,6 +24,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -40,10 +42,12 @@ import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
 import reaper.android.app.model.FriendsComparator;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
@@ -75,12 +79,15 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
     private FragmentManager fragmentManager;
     private GenericCache genericCache;
     private Drawable phoneDrawable;
+    private Tracker tracker;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -188,6 +195,9 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
     public void onResume()
     {
         super.onResume();
+
+        tracker.setScreenName(GoogleAnalyticsConstants.INVITE_PHONEBOOK_CONTACTS_FRAGMENT);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
         bus.register(this);
 
         if (isPhoneAdded)

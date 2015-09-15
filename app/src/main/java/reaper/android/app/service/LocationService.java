@@ -69,6 +69,7 @@ public class LocationService
                 List<Address> addresses = null;
                 addresses = gcd.getFromLocation(googleApiLocation.getLatitude(), googleApiLocation
                         .getLongitude(), 1);
+
                 if (addresses == null || addresses.size() == 0)
                 {
                     throw new IllegalStateException();
@@ -78,6 +79,7 @@ public class LocationService
             }
             catch (Exception e)
             {
+                e.printStackTrace();
                 Log.d("APP", "Unable to refresh user location (" + e.getMessage() + ")");
                 bus.post(new GenericErrorTrigger(ErrorCode.GOOGLE_API_LOCATION_FETCH_FAILURE, null));
                 return;

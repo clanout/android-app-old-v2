@@ -11,7 +11,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,11 +22,12 @@ import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -41,7 +41,6 @@ import org.joda.time.format.DateTimeFormatter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import reaper.android.R;
@@ -53,11 +52,13 @@ import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.Suggestion;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.GoogleService;
 import reaper.android.app.service.LocationService;
@@ -111,12 +112,15 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     private List<Suggestion> suggestionList;
     private EventSuggestionsAdapter eventSuggestionsAdapter;
     private Drawable checkDrawable;
+    private Tracker tracker;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -295,6 +299,9 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     {
         super.onResume();
 
+        tracker.setScreenName(GoogleAnalyticsConstants.EDIT_EVENT_FRAGMENT);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EDIT);
 
         bus.register(this);
@@ -366,20 +373,19 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setCancelable(true);
-                    builder.setMessage(R.string.event_delete_confirmation);
 
-                    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                    builder.setPositiveButton(R.string.even_delete_positive_button, new DialogInterface.OnClickListener()
                     {
                         @Override
                         public void onClick(DialogInterface dialog, int which)
                         {
                             eventService.deleteEvent(event.getId());
-                            Toast.makeText(getActivity(), "The event has been deleted", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), R.string.event_delete_confirmation, Toast.LENGTH_SHORT).show();
                             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
                         }
                     });
 
-                    builder.setNegativeButton("No", new DialogInterface.OnClickListener()
+                    builder.setNegativeButton(R.string.even_delete_negative_button, new DialogInterface.OnClickListener()
                     {
                         @Override
                         public void onClick(DialogInterface dialog, int which)
@@ -423,7 +429,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                         builder.setCancelable(true);
                         builder.setMessage("Are you sure you wan't to unfinalise this event? Other people will now be able to edit the event.");
 
-                        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                        builder.setPositiveButton(R.string.event_unlock_positive_button, new DialogInterface.OnClickListener()
                         {
                             @Override
                             public void onClick(DialogInterface dialog, int which)
@@ -439,7 +445,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                             }
                         });
 
-                        builder.setNegativeButton("No", new DialogInterface.OnClickListener()
+                        builder.setNegativeButton(R.string.event_unlock_negative_button, new DialogInterface.OnClickListener()
                         {
                             @Override
                             public void onClick(DialogInterface dialog, int which)
@@ -457,7 +463,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                         builder.setCancelable(true);
                         builder.setMessage("Are you sure you wan't to finalise this event? Other people will not be able to edit the event.");
 
-                        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                        builder.setPositiveButton(R.string.event_lock_positive_button, new DialogInterface.OnClickListener()
                         {
                             @Override
                             public void onClick(DialogInterface dialog, int which)
@@ -473,7 +479,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                             }
                         });
 
-                        builder.setNegativeButton("No", new DialogInterface.OnClickListener()
+                        builder.setNegativeButton(R.string.event_lock_negative_button, new DialogInterface.OnClickListener()
                         {
                             @Override
                             public void onClick(DialogInterface dialog, int which)

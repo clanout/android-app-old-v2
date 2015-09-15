@@ -20,6 +20,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -36,11 +38,13 @@ import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
 import reaper.android.app.model.FriendsComparator;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.LocationService;
@@ -74,12 +78,15 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     private List<Friend> friendList;
     private Event event;
     private Drawable whatsappDrawable;
+    private Tracker tracker;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -163,6 +170,10 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     public void onResume()
     {
         super.onResume();
+
+        tracker.setScreenName(GoogleAnalyticsConstants.INVITE_FACEBOOK_FRIENDS_FRAGMENT);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+
         bus.register(this);
         userService.getAppFriends(locationService.getUserLocation().getZone());
     }

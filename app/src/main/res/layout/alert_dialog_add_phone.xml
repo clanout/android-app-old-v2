@@ -13,19 +13,9 @@
         android:layout_marginRight ="12dp"
         android:layout_marginTop="15dp"
         android:textSize="18sp"
-        android:text="Enter your phone number to get invited by your phonebook contacts"
+        android:text="Join your phonebook friends on the app"
         android:gravity="center_horizontal" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_alert_dialog_add_phone_note"
-        android:layout_marginLeft ="12dp"
-        android:layout_marginRight ="12dp"
-        android:layout_marginTop="6dp"
-        android:textSize="14sp"
-        android:text="We don't share your information with anyone."
-        android:gravity="center_horizontal" />
 
     <EditText
         android:layout_width="match_parent"
@@ -36,6 +26,7 @@
         android:layout_marginBottom="10dp"
         android:hint="Your 10 digit phone number"
         android:textSize="14sp"
-        android:id="@+id/et_alert_dialog_add_phone"/>
+        android:id="@+id/et_alert_dialog_add_phone"
+        android:text="+91 - "/>
 
 </LinearLayout>

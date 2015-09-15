@@ -1,13 +1,10 @@
 package reaper.android.app.ui.screens.home;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -25,16 +22,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -47,22 +42,21 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
-import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventComparator;
 import reaper.android.app.model.Location;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
@@ -70,7 +64,6 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.common.ViewPagerStateChangedTrigger;
 import reaper.android.app.trigger.event.EventClickTrigger;
 import reaper.android.app.trigger.event.EventIdsFetchedTrigger;
-import reaper.android.app.trigger.event.EventUpdatesFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.event.NewEventAddedTrigger;
 import reaper.android.app.trigger.event.NewEventsAndUpdatesFetchedTrigger;
@@ -81,6 +74,7 @@ import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.communicator.Communicator;
+import timber.log.Timber;
 
 public class HomeFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener
 {
@@ -115,6 +109,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     private Drawable phoneDrawable, plusDrawable, accountsDrawable;
 
     private EventsAdapter eventsAdapter;
+    private Tracker tracker;
 
     @Override
     public void onRefresh()
@@ -137,6 +132,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -232,6 +229,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     public void onResume()
     {
         super.onResume();
+
+        tracker.setScreenName(GoogleAnalyticsConstants.HOME_FRAGMENT);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.HOME);
 

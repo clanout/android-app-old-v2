@@ -23,6 +23,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -46,8 +48,10 @@ import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.ChatMessage;
 import reaper.android.app.model.Event;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.ChatService;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
@@ -95,12 +99,15 @@ public class ChatFragment extends Fragment implements View.OnClickListener
 
     private MessageListener messageListener;
     private Drawable sendDrawable;
+    private Tracker tracker;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Override
@@ -165,6 +172,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     public void onResume()
     {
         super.onResume();
+
+        tracker.setScreenName(GoogleAnalyticsConstants.CHAT_FRAGMENT);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
 
         bus.register(this);
 

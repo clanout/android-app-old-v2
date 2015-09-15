@@ -46,7 +46,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:autoText="true"
-                android:hint="Your Message"
+                android:hint="Type a Message"
                 />
 
             <ImageButton

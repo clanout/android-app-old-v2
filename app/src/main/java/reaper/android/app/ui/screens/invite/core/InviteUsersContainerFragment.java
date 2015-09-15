@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -27,8 +29,10 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
@@ -61,12 +65,15 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     private List<String> invitedFacebookFriends;
     private List<String> invitedPhoneContacts;
     private List<String> invitedUsers;
+    private Tracker tracker;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -148,6 +155,10 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     public void onResume()
     {
         super.onResume();
+
+        tracker.setScreenName(GoogleAnalyticsConstants.INVITE_USERS_CONTAINER_FRAGMENT);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.INVITE_USERS_CONTAINER);
         bus.register(this);
         if (!fromCreateFragment)

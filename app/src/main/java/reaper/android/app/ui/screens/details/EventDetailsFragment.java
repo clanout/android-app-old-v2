@@ -27,6 +27,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -44,9 +46,11 @@ import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
@@ -85,12 +89,15 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     private EventAttendeesAdapter eventAttendeesAdapter;
 
     private boolean areEventDetailsFetched;
+    private Tracker tracker;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Override
@@ -155,6 +162,9 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     public void onResume()
     {
         super.onResume();
+
+        tracker.setScreenName(GoogleAnalyticsConstants.EVENT_DETAILS_FRAGMENT);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
 
         areEventDetailsFetched = false;
         bus.register(this);

@@ -15,7 +15,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="10dp"
-            android:hint="Event Title"/>
+            android:hint="Title"/>
     </LinearLayout>
 
     <LinearLayout
@@ -292,6 +292,7 @@
             android:id="@+id/cb_dialog_fragment_create_event"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Invite Only Event"/>
+            android:text="Invite Only"
+            android:checked="false"/>
     </LinearLayout>
 </LinearLayout>

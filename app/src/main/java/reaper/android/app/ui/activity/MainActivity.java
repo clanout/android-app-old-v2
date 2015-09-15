@@ -5,8 +5,11 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.squareup.otto.Bus;
@@ -26,8 +29,10 @@ import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Event;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.GCMService;
@@ -61,12 +66,16 @@ public class MainActivity extends AppCompatActivity
     private String eventId;
     private boolean isBusRegistered;
 
+    private Tracker tracker;
+
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        tracker = Reaper.getAnalyticsTracker();
 
         setContentView(R.layout.activity_main);
 
@@ -152,6 +161,15 @@ public class MainActivity extends AppCompatActivity
             bus.register(this);
         }
         getSupportActionBar().setTitle("clanOut");
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        tracker.setScreenName(GoogleAnalyticsConstants.MAIN_ACTIVITY);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     @Override

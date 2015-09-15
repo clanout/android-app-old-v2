@@ -102,7 +102,8 @@
                 android:layout_weight="1"
                 android:hint="Event location"
                 android:maxLines="2"
-                android:textSize="14sp"/>
+                android:textSize="14sp"
+                android:text="Location"/>
         </LinearLayout>
 
         <View
@@ -178,7 +179,8 @@
                 android:clickable="true"
                 android:maxLines="3"
                 android:hint="Event Description"
-                android:textSize="14sp"/>
+                android:textSize="14sp"
+                android:text="More Details?"/>
         </LinearLayout>
     </LinearLayout>
 

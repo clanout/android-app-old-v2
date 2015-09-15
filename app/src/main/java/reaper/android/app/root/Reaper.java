@@ -10,6 +10,8 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.facebook.stetho.Stetho;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -26,6 +28,7 @@ import reaper.android.BuildConfig;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.core.DatabaseManager;
 import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.Timestamps;
 import reaper.android.app.service.LocationService;
@@ -41,6 +44,7 @@ import timber.log.Timber;
 
 public class Reaper extends Application implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {
+    private static Tracker tracker;
     private Bus bus;
     private GoogleApiClient googleApiClient;
 
@@ -106,7 +110,7 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     @Subscribe
     public void onFacebookFriendsIdFetched(FacebookFriendsIdFetchedTrigger trigger)
     {
-        if(trigger.isPolling())
+        if (trigger.isPolling())
         {
             userService.updateFacebookFriends(trigger.getFriendsIdList(), trigger.isPolling());
         }
@@ -115,7 +119,7 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     @Subscribe
     public void onFacebookFriendsUpdatedOnServer(FacebookFriendsUpdatedOnServerTrigger trigger)
     {
-        if(trigger.isPolling())
+        if (trigger.isPolling())
         {
             genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now());
         }
@@ -144,6 +148,15 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     public static Reaper getReaperContext()
     {
         return instance;
+    }
+
+    synchronized public static Tracker getAnalyticsTracker()
+    {
+        if(tracker == null)
+        {
+            tracker = GoogleAnalytics.getInstance(instance).newTracker(AppConstants.GOOGLE_ANALYTICS_TRACKING_KEY);
+        }
+        return tracker;
     }
 
 }

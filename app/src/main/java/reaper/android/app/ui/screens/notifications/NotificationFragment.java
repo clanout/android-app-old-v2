@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -27,7 +29,9 @@ import java.util.List;
 import reaper.android.R;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.NotificationService;
@@ -57,12 +61,15 @@ public class NotificationFragment extends Fragment implements NotificationClickC
     private Notification notification;
     private ItemTouchHelper itemTouchHelper;
     private List<Notification> notificationList;
+    private Tracker tracker;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -116,6 +123,10 @@ public class NotificationFragment extends Fragment implements NotificationClickC
     public void onResume()
     {
         super.onResume();
+
+        tracker.setScreenName(GoogleAnalyticsConstants.NOTIFICATION_FRAGMENT);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+
         bus.register(this);
         notificationService.fetchAllNotifications();
     }

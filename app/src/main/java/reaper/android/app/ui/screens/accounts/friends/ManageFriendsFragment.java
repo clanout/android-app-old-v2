@@ -21,6 +21,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -36,8 +38,10 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Friend;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.UserService;
@@ -69,12 +73,15 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     private ArrayList<Friend> friendList;
 
     private GenericCache genericCache;
+    private Tracker tracker;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -144,6 +151,9 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     public void onResume()
     {
         super.onResume();
+
+        tracker.setScreenName(GoogleAnalyticsConstants.MANAGE_FRIENDS_FRAGMENT);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.MANAGE_FRIENDS);
         bus.register(this);
