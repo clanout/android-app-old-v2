@@ -3,6 +3,7 @@ package reaper.android.app.service;
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.util.Log;
 
 import com.squareup.otto.Bus;
 
@@ -15,8 +16,11 @@ import reaper.android.app.api.event.response.FetchEventApiResponse;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.notification.NotificationCache;
+import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Event;
 import reaper.android.app.root.Reaper;
+import reaper.android.app.trigger.common.GenericErrorTrigger;
+import reaper.android.app.trigger.notifications.NotificationsFetchedTrigger;
 import reaper.android.common.notification.Notification;
 import rx.Observable;
 import rx.Subscriber;
@@ -42,7 +46,7 @@ public class NotificationService
         this.bus = bus;
     }
 
-    public void showNotification(Notification notification)
+    public void handleNotification(Notification notification)
     {
         int notificationType = notification.getType();
 
@@ -56,6 +60,7 @@ public class NotificationService
 
     private void showCreateEventNotification(final Notification notification)
     {
+
         fetchEvent(notification.getEventId())
                 .observeOn(Schedulers.newThread())
                 .subscribe(new Subscriber<Event>()
@@ -145,6 +150,75 @@ public class NotificationService
 
     public void fetchAllNotifications()
     {
+        Log.d("APP", "fetching all notifications");
+        notificationCache.getAll().observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<List<Notification>>()
+        {
+            @Override
+            public void onCompleted()
+            {
+            }
 
+            @Override
+            public void onError(Throwable e)
+            {
+                Log.d("APP", "onError -------- " + e.getMessage());
+                bus.post(new GenericErrorTrigger(ErrorCode.NOTIFICATIONS_FETCH_FAILURE, (Exception) e));
+            }
+
+            @Override
+            public void onNext(List<Notification> notifications)
+            {
+                Log.d("APP", "on Next ------- " + notifications.size());
+                bus.post(new NotificationsFetchedTrigger(notifications));
+            }
+        });
+    }
+
+    public void deleteAllNotificationsFromCache()
+    {
+        notificationCache.clear().observeOn(Schedulers.newThread()).subscribe(new Subscriber<Object>()
+        {
+            @Override
+            public void onCompleted()
+            {
+
+            }
+
+            @Override
+            public void onError(Throwable e)
+            {
+
+            }
+
+            @Override
+            public void onNext(Object o)
+            {
+
+            }
+        });
+    }
+
+    public void markAllNotificationsAsRead()
+    {
+        notificationCache.markRead().observeOn(Schedulers.newThread()).subscribe(new Subscriber<Object>()
+        {
+            @Override
+            public void onCompleted()
+            {
+
+            }
+
+            @Override
+            public void onError(Throwable e)
+            {
+
+            }
+
+            @Override
+            public void onNext(Object o)
+            {
+
+            }
+        });
     }
 }

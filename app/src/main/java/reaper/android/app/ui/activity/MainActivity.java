@@ -220,6 +220,9 @@ public class MainActivity extends AppCompatActivity
         } else if (activeFragment.equals(BackstackTags.CHAT))
         {
             bus.post(new BackPressedTrigger(BackstackTags.CHAT));
+        } else if (activeFragment.equals(BackstackTags.NOTIFICATIONS))
+        {
+            FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
         }
     }
 
@@ -292,7 +295,7 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onEventEditFailedAsFinalised(GenericErrorTrigger trigger)
     {
-        if(trigger.getErrorCode() == ErrorCode.EVENT_EDIT_FAILURE_LOCKED)
+        if (trigger.getErrorCode() == ErrorCode.EVENT_EDIT_FAILURE_LOCKED)
         {
             Toast.makeText(this, R.string.event_edit_failed_locked, Toast.LENGTH_LONG).show();
         }
@@ -301,7 +304,7 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onEventFinalisationFailed(GenericErrorTrigger trigger)
     {
-        if(trigger.getErrorCode() == ErrorCode.EVENT_COULD_NOT_BE_FINALISED)
+        if (trigger.getErrorCode() == ErrorCode.EVENT_COULD_NOT_BE_FINALISED)
         {
             Toast.makeText(this, R.string.event_finalisation_failed, Toast.LENGTH_LONG).show();
         }
@@ -310,7 +313,7 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onEventUnFinalisationFailed(GenericErrorTrigger trigger)
     {
-        if(trigger.getErrorCode() == ErrorCode.EVENT_COULD_NOT_BE_UNFINALISED)
+        if (trigger.getErrorCode() == ErrorCode.EVENT_COULD_NOT_BE_UNFINALISED)
         {
             Toast.makeText(this, R.string.event_unfinalisation_failed, Toast.LENGTH_LONG).show();
         }

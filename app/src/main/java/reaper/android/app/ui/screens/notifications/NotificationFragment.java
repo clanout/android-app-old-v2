@@ -27,7 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
@@ -48,10 +52,10 @@ import reaper.android.common.notification.Notification;
 /**
  * Created by Aditya on 08-09-2015.
  */
-public class NotificationFragment extends Fragment implements NotificationClickCommunicator
+public class NotificationFragment extends Fragment implements NotificationClickCommunicator, View.OnClickListener
 {
     private RecyclerView notificationRecyclerView;
-    private TextView noNotificationsMessage;
+    private TextView noNotificationsMessage, clearAll;
     private NotificationsAdapter notificationsAdapter;
     private Menu menu;
     private Drawable homeDrawable;
@@ -62,6 +66,7 @@ public class NotificationFragment extends Fragment implements NotificationClickC
     private Notification notification;
     private ItemTouchHelper itemTouchHelper;
     private List<Notification> notificationList;
+    private GenericCache genericCache;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -77,6 +82,7 @@ public class NotificationFragment extends Fragment implements NotificationClickC
         View view = inflater.inflate(R.layout.fragment_notification, container, false);
         notificationRecyclerView = (RecyclerView) view.findViewById(R.id.rv_fragment_notificatiosn);
         noNotificationsMessage = (TextView) view.findViewById(R.id.tv_fragemnt_notification_no_notifications);
+        clearAll = (TextView) view.findViewById(R.id.tv_fragment_notification_clear_all);
         return view;
     }
 
@@ -89,12 +95,15 @@ public class NotificationFragment extends Fragment implements NotificationClickC
         notificationService = new NotificationService(bus);
         eventService = new EventService(bus);
         locationService = new LocationService(bus);
+        genericCache = CacheManager.getGenericCache();
+
+        clearAll.setOnClickListener(this);
 
         notificationList = new ArrayList<>();
 
+        notificationService.markAllNotificationsAsRead();
+
         generateDrawables();
-        displayBasicView();
-        initRecyclerView();
 
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)
         {
@@ -115,6 +124,8 @@ public class NotificationFragment extends Fragment implements NotificationClickC
         };
 
         itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        initRecyclerView();
+        displayBasicView();
     }
 
     @Override
@@ -122,6 +133,7 @@ public class NotificationFragment extends Fragment implements NotificationClickC
     {
         super.onResume();
 
+        genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.NOTIFICATIONS);
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.NOTIFICATION_FRAGMENT);
 
         bus.register(this);
@@ -151,7 +163,8 @@ public class NotificationFragment extends Fragment implements NotificationClickC
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
-        menu.findItem(R.id.action_refresh).setVisible(true);
+        menu.findItem(R.id.action_refresh).setVisible(false);
+        menu.findItem(R.id.action_notifications).setVisible(false);
 
         menu.findItem(R.id.action_home).setIcon(homeDrawable);
 
@@ -185,6 +198,7 @@ public class NotificationFragment extends Fragment implements NotificationClickC
     {
         notificationRecyclerView.setVisibility(View.GONE);
         noNotificationsMessage.setVisibility(View.VISIBLE);
+        clearAll.setVisibility(View.GONE);
         noNotificationsMessage.setText("Could not load notifications");
     }
 
@@ -192,12 +206,14 @@ public class NotificationFragment extends Fragment implements NotificationClickC
     {
         notificationRecyclerView.setVisibility(View.GONE);
         noNotificationsMessage.setVisibility(View.VISIBLE);
+        clearAll.setVisibility(View.GONE);
         noNotificationsMessage.setText("No notifications to show");
     }
 
     private void initRecyclerView()
     {
         notificationsAdapter = new NotificationsAdapter(getActivity(), notificationList);
+        notificationsAdapter.setCommunicator(this);
 
         notificationRecyclerView.setAdapter(notificationsAdapter);
         notificationRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -207,6 +223,7 @@ public class NotificationFragment extends Fragment implements NotificationClickC
     private void refreshRecyclerView()
     {
         notificationsAdapter = new NotificationsAdapter(getActivity(), notificationList);
+        notificationsAdapter.setCommunicator(this);
         notificationRecyclerView.setAdapter(notificationsAdapter);
         itemTouchHelper.attachToRecyclerView(notificationRecyclerView);
 
@@ -270,5 +287,16 @@ public class NotificationFragment extends Fragment implements NotificationClickC
         bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
         eventDetailsContainerFragment.setArguments(bundle);
         FragmentUtils.changeFragment(getActivity().getSupportFragmentManager(), eventDetailsContainerFragment);
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        if(v.getId() == R.id.tv_fragment_notification_clear_all)
+        {
+            notificationService.deleteAllNotificationsFromCache();
+            notificationList = new ArrayList<>();
+            refreshRecyclerView();
+        }
     }
 }

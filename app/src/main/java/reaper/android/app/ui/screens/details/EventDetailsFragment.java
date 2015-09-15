@@ -59,6 +59,7 @@ import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchedFromNetworkTrigger;
 import reaper.android.app.trigger.event.EventRsvpNotChangedTrigger;
 import reaper.android.app.ui.screens.edit.EditEventFragment;
+import reaper.android.app.ui.screens.notifications.NotificationFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.event.EventUtils;
 import reaper.android.app.ui.util.event.EventUtilsConstants;
@@ -90,6 +91,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     private EventAttendeesAdapter eventAttendeesAdapter;
 
     private boolean areEventDetailsFetched;
+    private Drawable notificationDrawable;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -151,6 +153,12 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     {
         pencilDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.PENCIL)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(36)
+                .build();
+
+        notificationDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.BELL)
                 .setColor(getResources().getColor(R.color.white))
                 .setSizeDp(36)
                 .build();
@@ -370,8 +378,20 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(true);
+        menu.findItem(R.id.action_notifications).setVisible(true);
 
         menu.findItem(R.id.action_edit_event).setIcon(pencilDrawable);
+        menu.findItem(R.id.action_notifications).setIcon(notificationDrawable);
+
+        menu.findItem(R.id.action_notifications).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                FragmentUtils.changeFragment(fragmentManager, new NotificationFragment());
+                return true;
+            }
+        });
 
         menu.findItem(R.id.action_edit_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {

@@ -209,6 +209,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(true);
+        menu.findItem(R.id.action_notifications).setVisible(false);
 
         menu.findItem(R.id.action_refresh).setIcon(refreshDrawable);
 

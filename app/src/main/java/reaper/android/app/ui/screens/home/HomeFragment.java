@@ -71,6 +71,7 @@ import reaper.android.app.trigger.event.RsvpChangeTrigger;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.create.CreateEventFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
+import reaper.android.app.ui.screens.notifications.NotificationFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
@@ -110,6 +111,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     private Drawable phoneDrawable, plusDrawable, accountsDrawable;
 
     private EventsAdapter eventsAdapter;
+    private Drawable notificationdrawable;
 
     @Override
     public void onRefresh()
@@ -210,6 +212,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
 
         accountsDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
+                .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(36)
+                .build();
+
+        notificationdrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.BELL)
                 .setColor(getResources().getColor(R.color.white))
                 .setSizeDp(36)
                 .build();
@@ -507,8 +515,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
+        menu.findItem(R.id.action_notifications).setVisible(true);
 
         menu.findItem(R.id.action_account).setIcon(accountsDrawable);
+        menu.findItem(R.id.action_notifications).setIcon(notificationdrawable);
+
+        menu.findItem(R.id.action_notifications).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                FragmentUtils.changeFragment(fragmentManager, new NotificationFragment());
+                return true;
+            }
+        });
 
         if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null)
         {

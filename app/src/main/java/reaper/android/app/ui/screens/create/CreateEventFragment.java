@@ -312,6 +312,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
+        menu.findItem(R.id.action_notifications).setVisible(false);
     }
 
     @Override
