@@ -73,6 +73,7 @@ import reaper.android.app.ui.screens.create.CreateEventFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 import timber.log.Timber;
 
@@ -109,7 +110,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     private Drawable phoneDrawable, plusDrawable, accountsDrawable;
 
     private EventsAdapter eventsAdapter;
-    private Tracker tracker;
 
     @Override
     public void onRefresh()
@@ -132,8 +132,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -158,6 +156,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     {
         super.onActivityCreated(savedInstanceState);
 
+        generateDrawables();
         dispayBasicView();
 
         bus = Communicator.getInstance().getBus();
@@ -173,8 +172,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
 //
 //        sortButton.setOnClickListener(this);
 //        filterButton.setOnClickListener(this);
+
         createEvent.setOnClickListener(this);
-        createEvent.setImageDrawable(phoneDrawable);
+        createEvent.setImageDrawable(plusDrawable);
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -191,8 +191,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
 //            sort = Sort.RELEVANCE;
 //            filter = Filter.ALL;
 //        }
-
-        generateDrawables();
         initRecyclerView();
     }
 
@@ -230,8 +228,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     {
         super.onResume();
 
-        tracker.setScreenName(GoogleAnalyticsConstants.HOME_FRAGMENT);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.HOME_FRAGMENT);
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.HOME);
 
@@ -473,7 +470,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     private void dispayBasicView()
     {
         noEventsMessage.setVisibility(View.GONE);
-        createEvent.setVisibility(View.GONE);
+        createEvent.setVisibility(View.VISIBLE);
         eventList.setVisibility(View.VISIBLE);
 //        buttonBar.setVisibility(View.VISIBLE);
     }
@@ -491,7 +488,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     {
         noEventsMessage.setVisibility(View.VISIBLE);
         noEventsMessage.setText(R.string.home_events_fetch_error);
-        createEvent.setVisibility(View.GONE);
+        createEvent.setVisibility(View.VISIBLE);
         eventList.setVisibility(View.GONE);
 //        buttonBar.setVisibility(View.GONE);
     }
@@ -505,7 +502,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         inflater.inflate(R.menu.action_button, menu);
 
         menu.findItem(R.id.action_account).setVisible(true);
-        menu.findItem(R.id.action_create_event).setVisible(true);
         menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
@@ -513,7 +509,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         menu.findItem(R.id.action_refresh).setVisible(false);
 
         menu.findItem(R.id.action_account).setIcon(accountsDrawable);
-        menu.findItem(R.id.action_create_event).setIcon(plusDrawable);
 
         if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null)
         {
@@ -592,16 +587,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
             public boolean onMenuItemClick(MenuItem menuItem)
             {
                 FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
-                return true;
-            }
-        });
-
-        menu.findItem(R.id.action_create_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem)
-            {
-                displayCreateEventDialog();
                 return true;
             }
         });

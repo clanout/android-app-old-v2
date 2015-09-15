@@ -56,6 +56,7 @@ import reaper.android.app.trigger.user.PhoneAddedTrigger;
 import reaper.android.app.trigger.user.PhoneContactsFetchedTrigger;
 import reaper.android.app.ui.screens.invite.core.InviteFriendsAdapter;
 import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 public class InvitePhoneContactsFragment extends Fragment implements View.OnClickListener
@@ -79,15 +80,12 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
     private FragmentManager fragmentManager;
     private GenericCache genericCache;
     private Drawable phoneDrawable;
-    private Tracker tracker;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -196,8 +194,8 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
     {
         super.onResume();
 
-        tracker.setScreenName(GoogleAnalyticsConstants.INVITE_PHONEBOOK_CONTACTS_FRAGMENT);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_PHONEBOOK_CONTACTS_FRAGMENT);
+
         bus.register(this);
 
         if (isPhoneAdded)
@@ -254,7 +252,6 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         this.menu = menu;
 
         menu.findItem(R.id.action_account).setVisible(false);
-        menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);

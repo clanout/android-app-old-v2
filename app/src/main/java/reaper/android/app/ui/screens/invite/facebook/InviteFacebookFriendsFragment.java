@@ -55,6 +55,7 @@ import reaper.android.app.trigger.user.AppFriendsFetchedFromNetworkTrigger;
 import reaper.android.app.trigger.user.AppFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.ui.screens.invite.core.InviteFriendsAdapter;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 public class InviteFacebookFriendsFragment extends Fragment implements View.OnClickListener
@@ -78,15 +79,12 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     private List<Friend> friendList;
     private Event event;
     private Drawable whatsappDrawable;
-    private Tracker tracker;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -171,8 +169,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     {
         super.onResume();
 
-        tracker.setScreenName(GoogleAnalyticsConstants.INVITE_FACEBOOK_FRIENDS_FRAGMENT);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_FACEBOOK_FRIENDS_FRAGMENT);
 
         bus.register(this);
         userService.getAppFriends(locationService.getUserLocation().getZone());
@@ -221,7 +218,6 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
         this.menu = menu;
 
         menu.findItem(R.id.action_account).setVisible(false);
-        menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);

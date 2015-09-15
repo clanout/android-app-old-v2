@@ -51,6 +51,7 @@ import reaper.android.app.trigger.user.AllAppFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 public class ManageFriendsFragment extends Fragment implements BlockListCommunicator, View.OnClickListener
@@ -73,15 +74,12 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     private ArrayList<Friend> friendList;
 
     private GenericCache genericCache;
-    private Tracker tracker;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -152,8 +150,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
     {
         super.onResume();
 
-        tracker.setScreenName(GoogleAnalyticsConstants.MANAGE_FRIENDS_FRAGMENT);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.MANAGE_FRIENDS_FRAGMENT);
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.MANAGE_FRIENDS);
         bus.register(this);
@@ -206,7 +203,6 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
         this.menu = menu;
 
         menu.findItem(R.id.action_account).setVisible(false);
-        menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);

@@ -51,8 +51,8 @@ public class ListenerServiceGcm extends GcmListenerService
 
     public ListenerServiceGcm()
     {
-//        bus = Communicator.getInstance().getBus();
-//        notificationService = new NotificationService(bus);
+        bus = Communicator.getInstance().getBus();
+        notificationService = new NotificationService(bus);
     }
 
     @Override
@@ -60,8 +60,8 @@ public class ListenerServiceGcm extends GcmListenerService
     {
         Timber.d("GCM message received : " + data.toString());
 
-//        final Notification notification = NotificationFactory.create(data);
-//        notificationService.showNotification(notification);
+        final Notification notification = NotificationFactory.create(data);
+        notificationService.showNotification(notification);
 
     }
 

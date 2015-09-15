@@ -42,6 +42,7 @@ import reaper.android.app.trigger.user.ManageAppFriendsTrigger;
 import reaper.android.app.trigger.user.ManagePhoneContactsTrigger;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 public class InviteUsersContainerFragment extends Fragment implements TabLayout.OnTabSelectedListener, View.OnClickListener
@@ -65,15 +66,12 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     private List<String> invitedFacebookFriends;
     private List<String> invitedPhoneContacts;
     private List<String> invitedUsers;
-    private Tracker tracker;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -156,8 +154,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
     {
         super.onResume();
 
-        tracker.setScreenName(GoogleAnalyticsConstants.INVITE_USERS_CONTAINER_FRAGMENT);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_USERS_CONTAINER_FRAGMENT);
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.INVITE_USERS_CONTAINER);
         bus.register(this);

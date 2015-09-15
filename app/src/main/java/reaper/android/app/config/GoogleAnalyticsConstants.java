@@ -22,7 +22,15 @@ public class GoogleAnalyticsConstants
     public static final String EDIT_EVENT_FRAGMENT = "EDIT_EVENT_FRAGMENT";
     public static final String NOTIFICATION_FRAGMENT = "notification_fragment";
 
-    // Event Names
+    // Event CATEGORY
+    public static final String BUTTON_CLICK = "button_click";
+    public static final String MENU_ITEM_CLICK = "menu_item_click";
+
+    // Event Actions
+    public static final String FACEBOOK_PERMISSION_GRANRED = "facebook_permission_granted";
+    public static final String FACEBOOK_PERMISSION_DENIED = "facebook_permission_denied";
+    public static final String LOCATION_GRANTED = "location_granted";
+    public static final String LOCATION_DENIED = "location_denied";
 
 
 }

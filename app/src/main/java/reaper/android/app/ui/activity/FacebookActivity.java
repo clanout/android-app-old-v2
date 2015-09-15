@@ -30,6 +30,7 @@ import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.root.Reaper;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 /**
  * Created by Aditya on 23-08-2015.
@@ -45,8 +46,6 @@ public class FacebookActivity extends AppCompatActivity
     private EventCache eventCache;
     private UserCache userCache;
 
-    private Tracker tracker;
-
     private static final String PERMISSION_REQUIRED = "This app requires your basic information, email and friends information to function properly. Don\\'t worry, we will not misuse this in any way.";
     private static final String PERMISSION_REQUIRED_TITLE = "Permission Required";
     private static final String PROBLEM_CONTACTING_FACEBOOK_TITLE = "Problem contacting Facebook";
@@ -61,8 +60,6 @@ public class FacebookActivity extends AppCompatActivity
 
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_facebook);
-
-        tracker = Reaper.getAnalyticsTracker();
 
         facebookLoginButton = (LoginButton) findViewById(R.id.flb_activity_facebook);
         facebookCallbackManager = CallbackManager.Factory.create();
@@ -93,8 +90,7 @@ public class FacebookActivity extends AppCompatActivity
     {
         super.onResume();
 
-        tracker.setScreenName(GoogleAnalyticsConstants.FACEBOOK_ACTIVITY);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.FACEBOOK_ACTIVITY);
     }
 
     @Override
@@ -179,6 +175,7 @@ public class FacebookActivity extends AppCompatActivity
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.FACEBOOK_PERMISSION_GRANRED, null);
                 LoginManager.getInstance().logInWithReadPermissions(FacebookActivity.this, Arrays.asList("email", "user_friends"));
             }
         });
@@ -188,6 +185,7 @@ public class FacebookActivity extends AppCompatActivity
             public void onClick(DialogInterface dialog, int which)
             {
                 Toast.makeText(FacebookActivity.this, R.string.location_denied, Toast.LENGTH_LONG).show();
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.FACEBOOK_PERMISSION_DENIED, null);
                 FacebookActivity.this.finish();
             }
         });

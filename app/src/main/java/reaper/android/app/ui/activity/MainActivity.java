@@ -46,6 +46,7 @@ import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.chat.ChatHelper;
 import reaper.android.common.communicator.Communicator;
 
@@ -66,16 +67,12 @@ public class MainActivity extends AppCompatActivity
     private String eventId;
     private boolean isBusRegistered;
 
-    private Tracker tracker;
-
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-        tracker = Reaper.getAnalyticsTracker();
 
         setContentView(R.layout.activity_main);
 
@@ -168,8 +165,7 @@ public class MainActivity extends AppCompatActivity
     {
         super.onResume();
 
-        tracker.setScreenName(GoogleAnalyticsConstants.MAIN_ACTIVITY);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.MAIN_ACTIVITY);
     }
 
     @Override

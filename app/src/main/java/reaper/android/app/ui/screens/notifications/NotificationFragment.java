@@ -41,6 +41,7 @@ import reaper.android.app.trigger.notifications.NotificationsFetchedTrigger;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 import reaper.android.common.notification.Notification;
 
@@ -61,15 +62,12 @@ public class NotificationFragment extends Fragment implements NotificationClickC
     private Notification notification;
     private ItemTouchHelper itemTouchHelper;
     private List<Notification> notificationList;
-    private Tracker tracker;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -124,8 +122,7 @@ public class NotificationFragment extends Fragment implements NotificationClickC
     {
         super.onResume();
 
-        tracker.setScreenName(GoogleAnalyticsConstants.NOTIFICATION_FRAGMENT);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.NOTIFICATION_FRAGMENT);
 
         bus.register(this);
         notificationService.fetchAllNotifications();
@@ -149,7 +146,6 @@ public class NotificationFragment extends Fragment implements NotificationClickC
         this.menu = menu;
 
         menu.findItem(R.id.action_account).setVisible(false);
-        menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(true);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);

@@ -66,6 +66,7 @@ import reaper.android.app.trigger.event.EventLocationFetchedTrigger;
 import reaper.android.app.trigger.event.EventSuggestionsTrigger;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 
@@ -100,15 +101,12 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     private List<Suggestion> suggestionList;
     private EventSuggestionsAdapter eventSuggestionsAdapter;
     private Drawable checkDrawable;
-    private Tracker tracker;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -232,8 +230,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     {
         super.onResume();
 
-        tracker.setScreenName(GoogleAnalyticsConstants.CREATE_EVENT_FRAGMENT);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.CREATE_EVENT_FRAGMENT);
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.CREATE);
 
@@ -309,7 +306,6 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
         inflater.inflate(R.menu.action_button, menu);
 
         menu.findItem(R.id.action_account).setVisible(false);
-        menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);

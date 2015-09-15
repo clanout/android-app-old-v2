@@ -52,6 +52,7 @@ import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.event.EventUtils;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 public class EventDetailsContainerFragment extends Fragment implements View.OnClickListener
@@ -75,13 +76,11 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
     private Drawable goingDrawable, maybeDrawable, notGoingDrawable, inviteDrawable, chatDrawable;
 
     private PagerAdapter pagerAdapter;
-    private Tracker tracker;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -200,8 +199,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
     {
         super.onResume();
 
-        tracker.setScreenName(GoogleAnalyticsConstants.EVENT_DETAILS_CONTAINER_FRAGMENT);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EVENT_DETAILS_CONTAINER_FRAGMENT);
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EVENT_DETAILS_CONTAINER);
     }

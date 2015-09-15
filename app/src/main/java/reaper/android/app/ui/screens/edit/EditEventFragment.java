@@ -75,6 +75,7 @@ import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.event.EventUtils;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 
@@ -112,15 +113,12 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     private List<Suggestion> suggestionList;
     private EventSuggestionsAdapter eventSuggestionsAdapter;
     private Drawable checkDrawable;
-    private Tracker tracker;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -299,8 +297,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
     {
         super.onResume();
 
-        tracker.setScreenName(GoogleAnalyticsConstants.EDIT_EVENT_FRAGMENT);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EDIT_EVENT_FRAGMENT);
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EDIT);
 
@@ -355,7 +352,6 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         inflater.inflate(R.menu.action_button, menu);
 
         menu.findItem(R.id.action_account).setVisible(false);
-        menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);

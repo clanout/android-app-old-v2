@@ -63,6 +63,7 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.chat.ChatHelper;
 import reaper.android.common.communicator.Communicator;
 
@@ -99,15 +100,12 @@ public class ChatFragment extends Fragment implements View.OnClickListener
 
     private MessageListener messageListener;
     private Drawable sendDrawable;
-    private Tracker tracker;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Override
@@ -173,8 +171,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener
     {
         super.onResume();
 
-        tracker.setScreenName(GoogleAnalyticsConstants.CHAT_FRAGMENT);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.CHAT_FRAGMENT);
 
         bus.register(this);
 
@@ -219,7 +216,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener
         inflater.inflate(R.menu.action_button, menu);
 
         menu.findItem(R.id.action_account).setVisible(false);
-        menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);

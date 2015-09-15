@@ -62,6 +62,7 @@ import reaper.android.app.ui.screens.edit.EditEventFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.event.EventUtils;
 import reaper.android.app.ui.util.event.EventUtilsConstants;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 public class EventDetailsFragment extends Fragment implements View.OnClickListener, AttendeeClickCommunicator
@@ -89,15 +90,12 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     private EventAttendeesAdapter eventAttendeesAdapter;
 
     private boolean areEventDetailsFetched;
-    private Tracker tracker;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Override
@@ -163,8 +161,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     {
         super.onResume();
 
-        tracker.setScreenName(GoogleAnalyticsConstants.EVENT_DETAILS_FRAGMENT);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EVENT_DETAILS_FRAGMENT);
 
         areEventDetailsFetched = false;
         bus.register(this);
@@ -367,7 +364,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         inflater.inflate(R.menu.action_button, menu);
 
         menu.findItem(R.id.action_account).setVisible(false);
-        menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);

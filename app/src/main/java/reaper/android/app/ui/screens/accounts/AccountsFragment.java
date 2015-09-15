@@ -48,6 +48,7 @@ import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 public class AccountsFragment extends Fragment implements AccountsAdapter.AccountsItemClickListener
@@ -64,15 +65,12 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
     private GenericCache genericCache;
 
     private AccountsAdapter accountsAdapter;
-    private Tracker tracker;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        tracker = Reaper.getAnalyticsTracker();
     }
 
     @Nullable
@@ -125,8 +123,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
     {
         super.onResume();
 
-        tracker.setScreenName(GoogleAnalyticsConstants.ACCOUNTS_FRAGMENT);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.ACCOUNTS_FRAGMENT);
 
         userName.setText(userService.getActiveUserName());
 
@@ -149,7 +146,6 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
         inflater.inflate(R.menu.action_button, menu);
 
         menu.findItem(R.id.action_account).setVisible(false);
-        menu.findItem(R.id.action_create_event).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(true);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);

@@ -34,6 +34,7 @@ import reaper.android.app.trigger.user.NewSessionCreatedTrigger;
 import reaper.android.app.trigger.user.SessionValidatedTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshRequestTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshTrigger;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 
@@ -53,7 +54,6 @@ public class LauncherActivity extends AppCompatActivity
     private ProgressDialog progressDialog;
 
     private boolean isBlocking;
-    private Tracker tracker;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -64,8 +64,6 @@ public class LauncherActivity extends AppCompatActivity
         ShimmerFrameLayout container =
                 (ShimmerFrameLayout) findViewById(R.id.shimmer_view_container);
         container.startShimmerAnimation();
-
-        tracker = Reaper.getAnalyticsTracker();
 
         bus = Communicator.getInstance().getBus();
 
@@ -83,8 +81,7 @@ public class LauncherActivity extends AppCompatActivity
     {
         super.onResume();
 
-        tracker.setScreenName(GoogleAnalyticsConstants.LAUNCHER_ACTIVITY);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.LAUNCHER_ACTIVITY);
 
         bus.register(this);
 
@@ -98,6 +95,7 @@ public class LauncherActivity extends AppCompatActivity
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i)
                         {
+                            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.LOCATION_GRANTED, null);
                             startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                         }
                     })
@@ -106,6 +104,7 @@ public class LauncherActivity extends AppCompatActivity
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i)
                         {
+                            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.LOCATION_DENIED, null);
                             Toast.makeText(LauncherActivity.this, R.string.location_denied, Toast.LENGTH_LONG).show();
                             finish();
                         }
@@ -115,6 +114,7 @@ public class LauncherActivity extends AppCompatActivity
                         @Override
                         public void onCancel(DialogInterface dialogInterface)
                         {
+                            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.LOCATION_DENIED, null);
                             Toast.makeText(LauncherActivity.this, R.string.location_denied, Toast.LENGTH_LONG).show();
                             finish();
                         }
