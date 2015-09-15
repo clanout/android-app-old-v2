@@ -1,6 +1,11 @@
 package reaper.android.common.notification;
 
+import android.util.Log;
+
 import org.joda.time.DateTime;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import reaper.android.app.api.core.GsonProvider;
 
@@ -10,6 +15,10 @@ public class Notification
     public static final int EVENT_INVITATION = 1;
     public static final int RSVP = 2;
     public static final int EVENT_REMOVED = 3;
+    public static final int EVENT_UPDATED = 4;
+    public static final int BLOCKED = 5;
+    public static final int UNBLOCKED = 6;
+    public static final int FRIEND_RELOCATED = 7;
 
     private int id;
     private int type;
@@ -19,11 +28,13 @@ public class Notification
     private DateTime timestamp;
     private DateTime timestampReceived;
     private boolean isNew;
+    private Map<String, String> args;
 
     private Notification(int id)
     {
         this.id = id;
         timestampReceived = DateTime.now();
+        args = new HashMap<>();
     }
 
     public int getId()
@@ -46,6 +57,11 @@ public class Notification
         return message;
     }
 
+    public void setMessage(String message)
+    {
+        this.message = message;
+    }
+
     public DateTime getTimestamp()
     {
         return timestamp;
@@ -64,6 +80,11 @@ public class Notification
     public boolean isNew()
     {
         return isNew;
+    }
+
+    public Map<String, String> getArgs()
+    {
+        return args;
     }
 
     @Override
@@ -143,6 +164,12 @@ public class Notification
         public Builder isNew(boolean isNew)
         {
             notification.isNew = isNew;
+            return this;
+        }
+
+        public Builder args(Map<String, String> args)
+        {
+            notification.args = args;
             return this;
         }
     }

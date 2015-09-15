@@ -1,34 +1,26 @@
 package reaper.android.app.ui.screens.details;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -45,19 +37,19 @@ import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.config.BundleKeys;
-import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
-import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
+import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
-import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.ChangeAttendeeListTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchedFromNetworkTrigger;
 import reaper.android.app.trigger.event.EventRsvpNotChangedTrigger;
+import reaper.android.app.trigger.notifications.NewNotificationsAvailableTrigger;
+import reaper.android.app.trigger.notifications.NewNotificationsNotAvailableTrigger;
 import reaper.android.app.ui.screens.edit.EditEventFragment;
 import reaper.android.app.ui.screens.notifications.NotificationFragment;
 import reaper.android.app.ui.util.FragmentUtils;
@@ -65,6 +57,7 @@ import reaper.android.app.ui.util.event.EventUtils;
 import reaper.android.app.ui.util.event.EventUtilsConstants;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
+import timber.log.Timber;
 
 public class EventDetailsFragment extends Fragment implements View.OnClickListener, AttendeeClickCommunicator
 {
@@ -74,6 +67,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     // Services
     private UserService userService;
     private EventService eventService;
+    private NotificationService notificationService;
     private EventCache eventCache;
 
     // Data
@@ -91,7 +85,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     private EventAttendeesAdapter eventAttendeesAdapter;
 
     private boolean areEventDetailsFetched;
-    private Drawable notificationDrawable;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -136,6 +129,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         fragmentManager = getActivity().getSupportFragmentManager();
         userService = new UserService(bus);
         eventService = new EventService(bus);
+        notificationService = new NotificationService(bus);
 
         location.setOnClickListener(this);
         description.setOnClickListener(this);
@@ -153,12 +147,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     {
         pencilDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.PENCIL)
-                .setColor(getResources().getColor(R.color.white))
-                .setSizeDp(36)
-                .build();
-
-        notificationDrawable = MaterialDrawableBuilder.with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.BELL)
                 .setColor(getResources().getColor(R.color.white))
                 .setSizeDp(36)
                 .build();
@@ -378,20 +366,9 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(true);
-        menu.findItem(R.id.action_notifications).setVisible(true);
+        menu.findItem(R.id.action_notifications).setVisible(false);
 
         menu.findItem(R.id.action_edit_event).setIcon(pencilDrawable);
-        menu.findItem(R.id.action_notifications).setIcon(notificationDrawable);
-
-        menu.findItem(R.id.action_notifications).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
-            @Override
-            public boolean onMenuItemClick(MenuItem item)
-            {
-                FragmentUtils.changeFragment(fragmentManager, new NotificationFragment());
-                return true;
-            }
-        });
 
         menu.findItem(R.id.action_edit_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {

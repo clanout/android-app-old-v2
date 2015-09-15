@@ -100,10 +100,9 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_weight="1"
-                android:hint="Event location"
+                android:hint="Location"
                 android:maxLines="2"
-                android:textSize="14sp"
-                android:text="Location"/>
+                android:textSize="14sp"/>
         </LinearLayout>
 
         <View
@@ -178,9 +177,8 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:maxLines="3"
-                android:hint="Event Description"
-                android:textSize="14sp"
-                android:text="More Details?"/>
+                android:hint="More Details?"
+                android:textSize="14sp"/>
         </LinearLayout>
     </LinearLayout>
 

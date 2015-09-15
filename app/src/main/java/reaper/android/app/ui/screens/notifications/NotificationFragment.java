@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -116,10 +117,9 @@ public class NotificationFragment extends Fragment implements NotificationClickC
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction)
             {
+                notificationService.deleteNotificationFromCache(notificationList.get(viewHolder.getAdapterPosition()).getId());
                 notificationList.remove(viewHolder.getAdapterPosition());
                 refreshRecyclerView();
-
-                // TODO : remove notification from cache
             }
         };
 
@@ -183,9 +183,8 @@ public class NotificationFragment extends Fragment implements NotificationClickC
     public void onNotificationClicked(Notification notification)
     {
         this.notification = notification;
+        notificationService.deleteNotificationFromCache(notification.getId());
         eventService.fetchEvents(locationService.getUserLocation().getZone());
-
-        // TODO : remove notification from cache
     }
 
     private void displayBasicView()
@@ -217,6 +216,7 @@ public class NotificationFragment extends Fragment implements NotificationClickC
 
         notificationRecyclerView.setAdapter(notificationsAdapter);
         notificationRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        notificationRecyclerView.setItemAnimator(new DefaultItemAnimator());
         itemTouchHelper.attachToRecyclerView(notificationRecyclerView);
     }
 

@@ -28,8 +28,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -45,6 +43,7 @@ import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
@@ -56,9 +55,9 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventComparator;
 import reaper.android.app.model.Location;
-import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
+import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.common.ViewPagerStateChangedTrigger;
@@ -68,6 +67,9 @@ import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.event.NewEventAddedTrigger;
 import reaper.android.app.trigger.event.NewEventsAndUpdatesFetchedTrigger;
 import reaper.android.app.trigger.event.RsvpChangeTrigger;
+import reaper.android.app.trigger.notifications.NewNotificationReceivedTrigger;
+import reaper.android.app.trigger.notifications.NewNotificationsAvailableTrigger;
+import reaper.android.app.trigger.notifications.NewNotificationsNotAvailableTrigger;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.create.CreateEventFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
@@ -76,7 +78,8 @@ import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
-import timber.log.Timber;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
 public class HomeFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener
 {
@@ -90,6 +93,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     private UserService userService;
     private EventService eventService;
     private LocationService locationService;
+    private NotificationService notificationService;
 
     //Cache
     private GenericCache genericCache;
@@ -111,7 +115,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     private Drawable phoneDrawable, plusDrawable, accountsDrawable;
 
     private EventsAdapter eventsAdapter;
-    private Drawable notificationdrawable;
+    private Drawable whiteNotificationdrawable;
+    private Menu menu;
+    private Drawable greenNotificationdrawable;
 
     @Override
     public void onRefresh()
@@ -166,6 +172,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         userService = new UserService(bus);
         eventService = new EventService(bus);
         locationService = new LocationService(bus);
+        notificationService = new NotificationService(bus);
 
         genericCache = CacheManager.getGenericCache();
 //
@@ -216,9 +223,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
                 .setSizeDp(36)
                 .build();
 
-        notificationdrawable = MaterialDrawableBuilder.with(getActivity())
+        whiteNotificationdrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.BELL)
                 .setColor(getResources().getColor(R.color.white))
+                .setSizeDp(36)
+                .build();
+
+        greenNotificationdrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.BELL)
+                .setColor(getResources().getColor(R.color.accent))
                 .setSizeDp(36)
                 .build();
     }
@@ -509,6 +522,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         menu.clear();
         inflater.inflate(R.menu.action_button, menu);
 
+        this.menu = menu;
+        notificationService.areNewNotificationsAvailable();
+
         menu.findItem(R.id.action_account).setVisible(true);
         menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
@@ -518,7 +534,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         menu.findItem(R.id.action_notifications).setVisible(true);
 
         menu.findItem(R.id.action_account).setIcon(accountsDrawable);
-        menu.findItem(R.id.action_notifications).setIcon(notificationdrawable);
 
         menu.findItem(R.id.action_notifications).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {
@@ -893,5 +908,30 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         {
             displayCreateEventDialog();
         }
+    }
+
+    @Subscribe
+    public void newNotificationsAvailable(NewNotificationsAvailableTrigger trigger)
+    {
+        menu.findItem(R.id.action_notifications).setIcon(greenNotificationdrawable);
+    }
+
+    @Subscribe
+    public void newNotificationsNotAvailable(NewNotificationsNotAvailableTrigger trigger)
+    {
+        menu.findItem(R.id.action_notifications).setIcon(whiteNotificationdrawable);
+    }
+
+    @Subscribe
+    public void newNotificationReceived(NewNotificationReceivedTrigger trigger)
+    {
+        getActivity().runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                menu.findItem(R.id.action_notifications).setIcon(greenNotificationdrawable);
+            }
+        });
     }
 }

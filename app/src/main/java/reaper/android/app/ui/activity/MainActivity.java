@@ -142,7 +142,8 @@ public class MainActivity extends AppCompatActivity
                 if (checkPlayServices())
                 {
                     gcmService.register();
-                }else{
+                } else
+                {
                     // TODO - do something
                 }
             } else
@@ -168,8 +169,16 @@ public class MainActivity extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
-
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.MAIN_ACTIVITY);
+        genericCache.put(CacheKeys.IS_APP_IN_FOREGROUND, true);
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+
+        genericCache.put(CacheKeys.IS_APP_IN_FOREGROUND, false);
     }
 
     @Override
@@ -270,7 +279,12 @@ public class MainActivity extends AppCompatActivity
         Event activeEvent = new Event();
         activeEvent.setId(eventId);
 
-        int activePosition = eventList.indexOf(activeEvent);
+        int activePosition = 0;
+
+        if (eventList.contains(activeEvent))
+        {
+            activePosition = eventList.indexOf(activeEvent);
+        }
 
         EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
         Bundle bundle = new Bundle();

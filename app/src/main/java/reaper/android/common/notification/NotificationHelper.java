@@ -21,6 +21,18 @@ public class NotificationHelper
         }else if(name.equals(NotificationConstants.EVENT_REMOVED))
         {
             return Notification.EVENT_REMOVED;
+        }else if(name.equals(NotificationConstants.EVENT_UPDATED))
+        {
+            return Notification.EVENT_UPDATED;
+        }else if(name.equals(NotificationConstants.BLOCKED))
+        {
+            return Notification.BLOCKED;
+        }else if(name.equals(NotificationConstants.UNBLOCKED))
+        {
+            return Notification.UNBLOCKED;
+        }else if(name.equals(NotificationConstants.FRIEND_RELOCATED))
+        {
+            return Notification.FRIEND_RELOCATED;
         }
         else
         {
@@ -40,14 +52,42 @@ public class NotificationHelper
                 return getRSVPChangeMessage(args);
             case Notification.EVENT_REMOVED:
                 return getEventRemovedMessage(args);
+            case Notification.EVENT_UPDATED:
+                return getEventUpdatedMessage(args);
+            case Notification.BLOCKED:
+                return getBlockedMessage(args);
+            case Notification.UNBLOCKED:
+                return getUnblockedMessage(args);
+            case Notification.FRIEND_RELOCATED:
+                return getFriendRelocatedMessage(args);
             default:
                 return "";
         }
     }
 
+    private static String getFriendRelocatedMessage(Map<String, String> args)
+    {
+        return "";
+    }
+
+    private static String getUnblockedMessage(Map<String, String> args)
+    {
+        return "";
+    }
+
+    private static String getBlockedMessage(Map<String, String> args)
+    {
+        return "";
+    }
+
+    private static String getEventUpdatedMessage(Map<String, String> args)
+    {
+        return args.get("user_name") + " has updated the clan ---- " + args.get("event_name");
+    }
+
     private static String getEventRemovedMessage(Map<String, String> args)
     {
-        return args.get("user_name") + " removed the clan ---- " + args.get("event_name");
+        return " Deleted clan ---- " + args.get("event_name");
     }
 
     private static String getRSVPChangeMessage(Map<String, String> args)
@@ -57,7 +97,7 @@ public class NotificationHelper
 
     private static String getEventInvitationMessage(Map<String, String> args)
     {
-        return args.get("user_name") + "has invited you to the clan" + args.get("event_name");
+        return args.get("user_name") + "has invited you to the clan ----- " + args.get("event_name");
     }
 
     public static int getIcon(int type)
