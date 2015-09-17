@@ -2,6 +2,8 @@ package reaper.android.common.notification;
 
 import org.joda.time.DateTime;
 
+import reaper.android.app.api.core.GsonProvider;
+
 public class Notification
 {
     public static final int EVENT_CREATED = 0;
@@ -13,6 +15,7 @@ public class Notification
     private String message;
     private DateTime timestamp;
     private DateTime timestampReceived;
+    private boolean isNew;
 
     private Notification(int id)
     {
@@ -55,6 +58,11 @@ public class Notification
         return title;
     }
 
+    public boolean isNew()
+    {
+        return isNew;
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -77,6 +85,12 @@ public class Notification
     public int hashCode()
     {
         return id;
+    }
+
+    @Override
+    public String toString()
+    {
+        return GsonProvider.getGson().toJson(this);
     }
 
     public static class Builder
@@ -120,6 +134,12 @@ public class Notification
         public Builder title(String title)
         {
             notification.title = title;
+            return this;
+        }
+
+        public Builder isNew(boolean isNew)
+        {
+            notification.isNew = isNew;
             return this;
         }
     }
