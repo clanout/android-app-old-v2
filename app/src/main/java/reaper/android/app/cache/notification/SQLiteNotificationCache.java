@@ -9,9 +9,7 @@ import com.google.gson.Gson;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import reaper.android.app.api.core.GsonProvider;
 import reaper.android.app.cache.core.DatabaseManager;
@@ -205,6 +203,87 @@ public class SQLiteNotificationCache implements NotificationCache
 
                             databaseManager.closeConnection();
 
+                            subscriber.onCompleted();
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Observable<Object> clear(final int notificationId)
+    {
+        return Observable
+                .create(new Observable.OnSubscribe<Object>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber)
+                    {
+                        synchronized (TAG)
+                        {
+                            Timber.v("NotificationCache.remove(id) on thread = " + Thread
+                                    .currentThread()
+                                    .getName());
+
+                            SQLiteDatabase db = databaseManager.openConnection();
+
+                            SQLiteStatement statement = db
+                                    .compileStatement(SQLiteCacheContract.Notification.SQL_DELETE_ONE);
+                            statement.bindLong(1, notificationId);
+                            statement.execute();
+                            statement.close();
+
+                            databaseManager.closeConnection();
+
+                            subscriber.onCompleted();
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Observable<Boolean> isAvaliable()
+    {
+        return Observable
+                .create(new Observable.OnSubscribe<Boolean>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Boolean> subscriber)
+                    {
+                        synchronized (TAG)
+                        {
+                            Timber.v("NotificationCache.isAvailable() on thread = " + Thread
+                                    .currentThread()
+                                    .getName());
+
+                            boolean isAvailable = false;
+
+                            SQLiteDatabase db = databaseManager.openConnection();;
+
+                            Cursor cursor = db.rawQuery(SQLiteCacheContract.Notification.SQL_COUNT_NEW, null);
+                            if(cursor.moveToFirst())
+                            {
+                                do
+                                {
+                                    try
+                                    {
+                                        int count = Integer.parseInt(cursor.getString(0));
+                                        if(count > 0)
+                                        {
+                                            isAvailable = true;
+                                            break;
+                                        }
+                                    }
+                                    catch (Exception e)
+                                    {}
+                                }
+                                while (cursor.moveToNext());
+                            }
+                            cursor.close();
+                            databaseManager.closeConnection();
+
+                            subscriber.onNext(isAvailable);
                             subscriber.onCompleted();
                         }
                     }
