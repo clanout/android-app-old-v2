@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -29,6 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.desarrollodroide.libraryfragmenttransactionextended.FragmentTransactionExtended;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -168,7 +170,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     {
         super.onActivityCreated(savedInstanceState);
 
-        ((MainActivity)getActivity()).setSupportActionBar(toolbar);
+        ((MainActivity) getActivity()).setSupportActionBar(toolbar);
 
         generateDrawables();
         dispayBasicView();
@@ -262,7 +264,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         bus.register(this);
         eventService.fetchEvents(userLocation.getZone());
 
-        ((MainActivity)getActivity()).getSupportActionBar().setTitle("clanOut");
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle("clanOut");
     }
 
     @Override

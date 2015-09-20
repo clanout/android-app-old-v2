@@ -1,9 +1,13 @@
 package reaper.android.app.ui.activity;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -60,12 +64,19 @@ public class MainActivity extends AppCompatActivity
     private String eventId;
     private boolean isBusRegistered;
 
+    private NotificationManager notificationManager;
+
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        DateTime start = DateTime.now();
+        DateTime end = start.plusDays(1).withTimeAtStartOfDay();
+
+        Log.d("APP", "start ------- " + start + "          end ------- " + end);
 
         setContentView(R.layout.activity_main);
 
@@ -78,6 +89,7 @@ public class MainActivity extends AppCompatActivity
         locationService = new LocationService(bus);
         facebookService = new FacebookService(bus);
         fragmentManager = getSupportFragmentManager();
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         genericCache = CacheManager.getGenericCache();
         eventCache = CacheManager.getEventCache();
@@ -159,6 +171,8 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.MAIN_ACTIVITY);
         genericCache.put(CacheKeys.IS_APP_IN_FOREGROUND, true);
+
+        notificationManager.cancelAll();
     }
 
     @Override

@@ -51,6 +51,7 @@ public class NotificationService
     private NotificationCache notificationCache;
     private GenericCache genericCache;
     private UserCache userCache;
+    private UserService userService;
     private Bus bus;
 
     public NotificationService(Bus bus)
@@ -61,6 +62,7 @@ public class NotificationService
         genericCache = CacheManager.getGenericCache();
         userCache = CacheManager.getUserCache();
         this.bus = bus;
+        this.userService = new UserService(bus);
     }
 
     public void handleNotification(Notification notification)
@@ -152,51 +154,54 @@ public class NotificationService
             @Override
             public void onCompleted()
             {
-                boolean isLocationUpdated = Boolean.parseBoolean(notification.getArgs().get("is_location_updated"));
-                boolean isTimeUpdated = Boolean.parseBoolean(notification.getArgs().get("is_time_updated"));
+                if (!(notification.getArgs().get("user_id").equals(userService.getActiveUserId())))
+                {
+                    boolean isLocationUpdated = Boolean.parseBoolean(notification.getArgs().get("is_location_updated"));
+                    boolean isTimeUpdated = Boolean.parseBoolean(notification.getArgs().get("is_time_updated"));
 
-                if (isLocationUpdated)
-                {
-                    if (isTimeUpdated)
+                    if (isLocationUpdated)
                     {
-                        notification.setMessage(notification.getArgs().get("user_name") + "has updated the clan ---- " + notification.getArgs().get("event_name"));
-                    } else
-                    {
-                        notification.setMessage(notification.getArgs().get("user_name") + "has updated the location of the clan ---- " + notification.getArgs().get("event_name"));
-                    }
-                } else
-                {
-                    if (isTimeUpdated)
-                    {
-                        notification.setMessage(notification.getArgs().get("user_name") + "has updated the timings of the clan ---- " + notification.getArgs().get("event_name"));
-                    }
-                }
-
-                notificationCache.put(notification).observeOn(Schedulers.newThread()).subscribe(new Subscriber<Object>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
-                        if (ifAppRunningInForeground())
+                        if (isTimeUpdated)
                         {
-                            bus.post(new NewNotificationReceivedTrigger());
-
+                            notification.setMessage(notification.getArgs().get("user_name") + "has updated the clan ---- " + notification.getArgs().get("event_name"));
                         } else
                         {
-                            buildNotification(notification, true);
+                            notification.setMessage(notification.getArgs().get("user_name") + "has updated the location of the clan ---- " + notification.getArgs().get("event_name"));
+                        }
+                    } else
+                    {
+                        if (isTimeUpdated)
+                        {
+                            notification.setMessage(notification.getArgs().get("user_name") + "has updated the timings of the clan ---- " + notification.getArgs().get("event_name"));
                         }
                     }
 
-                    @Override
-                    public void onError(Throwable e)
+                    notificationCache.put(notification).observeOn(Schedulers.newThread()).subscribe(new Subscriber<Object>()
                     {
-                    }
+                        @Override
+                        public void onCompleted()
+                        {
+                            if (ifAppRunningInForeground())
+                            {
+                                bus.post(new NewNotificationReceivedTrigger());
 
-                    @Override
-                    public void onNext(Object o)
-                    {
-                    }
-                });
+                            } else
+                            {
+                                buildNotification(notification, true);
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e)
+                        {
+                        }
+
+                        @Override
+                        public void onNext(Object o)
+                        {
+                        }
+                    });
+                }
             }
 
             @Override
@@ -215,33 +220,37 @@ public class NotificationService
     private void showEventRemovedNotification(final Notification notification)
     {
         eventCache.delete(notification.getEventId());
-        notificationCache.put(notification).observeOn(Schedulers.newThread()).subscribe(new Subscriber<Object>()
+
+        if (!(notification.getArgs().get("user_id").equals(userService.getActiveUserId())))
         {
-            @Override
-            public void onCompleted()
+            notificationCache.put(notification).observeOn(Schedulers.newThread()).subscribe(new Subscriber<Object>()
             {
-                if (ifAppRunningInForeground())
+                @Override
+                public void onCompleted()
                 {
-                    bus.post(new NewNotificationReceivedTrigger());
+                    if (ifAppRunningInForeground())
+                    {
+                        bus.post(new NewNotificationReceivedTrigger());
 
-                } else
-                {
-                    buildNotification(notification, false);
+                    } else
+                    {
+                        buildNotification(notification, false);
+                    }
                 }
-            }
 
-            @Override
-            public void onError(Throwable e)
-            {
+                @Override
+                public void onError(Throwable e)
+                {
 
-            }
+                }
 
-            @Override
-            public void onNext(Object o)
-            {
+                @Override
+                public void onNext(Object o)
+                {
 
-            }
-        });
+                }
+            });
+        }
     }
 
     private void showRSVPChangedNotification(final Notification notification)

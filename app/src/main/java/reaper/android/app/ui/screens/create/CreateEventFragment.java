@@ -209,8 +209,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
             noSuggestionsMessage.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
 
-        }
-        else
+        } else
         {
             recyclerView.setVisibility(View.VISIBLE);
             noSuggestionsMessage.setVisibility(View.GONE);
@@ -248,8 +247,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
         {
             eventType.setText("Invite Only");
             type = Event.Type.INVITE_ONLY;
-        }
-        else
+        } else
         {
             eventType.setText("Public");
             type = Event.Type.PUBLIC;
@@ -324,8 +322,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
             if (isPlaceDetailsRunning)
             {
                 isSaveButtonClicked = true;
-            }
-            else
+            } else
             {
                 isSaveButtonClicked = false;
                 sendCreateEventRequest();
@@ -342,11 +339,9 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
             builder.setView(selectTimingsDialogView);
 
             final TimePicker startTimePicker = (TimePicker) selectTimingsDialogView.findViewById(R.id.tp_select_time_start);
-            final TimePicker endTimePicker = (TimePicker) selectTimingsDialogView.findViewById(R.id.tp_select_time_end);
             final DatePicker startDatePicker = (DatePicker) selectTimingsDialogView.findViewById(R.id.dp_select_date_start);
-            final DatePicker endDatePicker = (DatePicker) selectTimingsDialogView.findViewById(R.id.dp_select_date_end);
 
-            renderDateAndTimePickers(startDatePicker, endDatePicker, startTimePicker, endTimePicker);
+            renderDateAndTimePickers(startDatePicker, startTimePicker);
 
             builder.setPositiveButton("Done", new DialogInterface.OnClickListener()
             {
@@ -354,7 +349,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
                 public void onClick(DialogInterface dialog, int which)
                 {
                     startDateTime = getTime(startDatePicker, startTimePicker);
-                    endDateTime = getTime(endDatePicker, endTimePicker);
+                    endDateTime = startDateTime.plusDays(1).withTimeAtStartOfDay();
 
                     renderEventTimings(startDateTime, endDateTime);
                 }
@@ -376,20 +371,12 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
             startDateTime = null;
             endDateTime = null;
             Toast.makeText(getActivity(), R.string.event_end_before_start, Toast.LENGTH_LONG).show();
-        }
-        else
+        } else
         {
             startDateTime = _startDateTime;
             endDateTime = _endDateTime;
 
-            if (_startDateTime.toString(dateFormatter).equals(_endDateTime.toString(dateFormatter)))
-            {
-                timing.setText(_startDateTime.toString(timeFormatter) + " - " + _endDateTime.toString(timeFormatter) + " (" + _startDateTime.toString(dateFormatter) + ")");
-            }
-            else
-            {
-                timing.setText(_startDateTime.toString(timeFormatter) + " (" + _startDateTime.toString(dateFormatter) + ") - " + _endDateTime.toString(timeFormatter) + " (" + _endDateTime.toString(dateFormatter) + ")");
-            }
+            timing.setText(_startDateTime.toString(timeFormatter) + " (" + _startDateTime.toString(dateFormatter) + ")");
         }
     }
 
@@ -419,31 +406,22 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
         return dateTime;
     }
 
-    private void renderDateAndTimePickers(DatePicker startDatePicker, DatePicker endDatePicker, TimePicker startTimePicker, TimePicker endTimePicker)
+    private void renderDateAndTimePickers(DatePicker startDatePicker, TimePicker startTimePicker)
     {
         startTimePicker.setIs24HourView(true);
-        endTimePicker.setIs24HourView(true);
 
         hideYearinDatePicker(startDatePicker);
-        hideYearinDatePicker(endDatePicker);
         startDatePicker.setMinDate(System.currentTimeMillis() - 1000);
-        endDatePicker.setMinDate(System.currentTimeMillis() - 1000);
 
         if (startDateTime == null || endDateTime == null)
         {
             startTimePicker.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-            endTimePicker.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-        }
-        else
+        } else
         {
             startTimePicker.setCurrentHour(startDateTime.getHourOfDay());
             startTimePicker.setCurrentMinute(startDateTime.getMinuteOfHour());
 
-            endTimePicker.setCurrentHour(endDateTime.getHourOfDay());
-            endTimePicker.setCurrentMinute(endDateTime.getMinuteOfHour());
-
             startDatePicker.updateDate(startDateTime.getYear(), startDateTime.getMonthOfYear() - 1, startDateTime.getDayOfMonth());
-            endDatePicker.updateDate(endDateTime.getYear(), endDateTime.getMonthOfYear() - 1, endDateTime.getDayOfMonth());
         }
     }
 
@@ -460,8 +438,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
                     yearSpinner.setVisibility(View.GONE);
                 }
             }
-        }
-        else
+        } else
         {
             try
             {
@@ -476,8 +453,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
                         ((View) yearPicker).setVisibility(View.GONE);
                     }
                 }
-            }
-            catch (Exception e)
+            } catch (Exception e)
             {
                 e.printStackTrace();
             }
@@ -541,7 +517,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
             return;
         }
 
-        if(location.getText().toString() == null || location.getText().toString().isEmpty())
+        if (location.getText().toString() == null || location.getText().toString().isEmpty())
         {
             placeLocation.setName(null);
             placeLocation.setLongitude(null);

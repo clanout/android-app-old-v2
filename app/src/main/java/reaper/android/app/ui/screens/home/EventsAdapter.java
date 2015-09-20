@@ -36,7 +36,7 @@ import reaper.android.app.trigger.common.ViewPagerStateChangedTrigger;
 import reaper.android.app.trigger.event.EventClickTrigger;
 import reaper.android.app.trigger.event.RsvpChangeTrigger;
 
-public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewHolder>
+public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
     private Bus bus;
     private UserService userService;
@@ -46,6 +46,9 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
     // Data
     private List<Event> events;
     private List<SwipedState> state;
+
+    public static final int CREATE_VIEW_TYPE = 0;
+    public static final int EVENT_VIEW_TYPE = 1;
 
     public EventsAdapter(Bus bus, List<Event> events, Context context)
     {
@@ -61,61 +64,63 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         }
 
         generateDrawables();
+
+        Log.d("APP", "event list size ------- " + events.size());
     }
 
     private void generateDrawables()
     {
         generalEventDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD)
-                .setColor(context.getResources().getColor(R.color.cyan))
+                .setColor(context.getResources().getColor(R.color.accent))
                 .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         eatoutDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.FOOD)
-                .setColor(context.getResources().getColor(R.color.cyan))
+                .setColor(context.getResources().getColor(R.color.accent))
                 .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         drinksDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.MARTINI)
-                .setColor(context.getResources().getColor(R.color.cyan))
+                .setColor(context.getResources().getColor(R.color.accent))
                 .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         cafeDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.COFFEE)
-                .setColor(context.getResources().getColor(R.color.cyan))
+                .setColor(context.getResources().getColor(R.color.accent))
                 .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         movieDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.MOVIE)
-                .setColor(context.getResources().getColor(R.color.cyan))
+                .setColor(context.getResources().getColor(R.color.accent))
                 .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         outdoorsDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.TENNIS)
-                .setColor(context.getResources().getColor(R.color.cyan))
+                .setColor(context.getResources().getColor(R.color.accent))
                 .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         partyDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.GIFT)
-                .setColor(context.getResources().getColor(R.color.cyan))
+                .setColor(context.getResources().getColor(R.color.accent))
                 .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         eventsDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.CITY)
-                .setColor(context.getResources().getColor(R.color.cyan))
+                .setColor(context.getResources().getColor(R.color.accent))
                 .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
         shoppingDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.SHOPPING)
-                .setColor(context.getResources().getColor(R.color.cyan))
+                .setColor(context.getResources().getColor(R.color.accent))
                 .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
                 .build();
 
@@ -134,27 +139,68 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
     }
 
     @Override
-    public EventViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    public int getItemViewType(int position)
     {
-        // Create a new view which is basically just a ViewPager in this case
-        ViewPager v = (ViewPager) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item_event, parent, false);
+        if (position == 0)
+        {
+            return CREATE_VIEW_TYPE;
+        } else
+        {
+            return EVENT_VIEW_TYPE;
+        }
+    }
 
-        //Perhaps the first most crucial part. The ViewPager loses its width information when it is put
-        //inside a RecyclerView. It needs to be explicitly resized, in this case to the width of the
-        //screen. The height must be provided as a fixed value.
+    @Override
+    public int getItemCount()
+    {
+        return events.size() + 1;
+    }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    {
+        switch (viewType)
+        {
+            case EVENT_VIEW_TYPE:
+                // Create a new view which is basically just a ViewPager in this case
+                ViewPager v = (ViewPager) LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.list_item_event, parent, false);
+
+                //Perhaps the first most crucial part. The ViewPager loses its width information when it is put
+                //inside a RecyclerView. It needs to be explicitly resized, in this case to the width of the
+                //screen. The height must be provided as a fixed value.
 //        DisplayMetrics displayMetrics = Resources.getSystem().getDisplayMetrics();
 //        v.getLayoutParams().width = displayMetrics.widthPixels;
 //        v.requestLayout();
 
-        EventViewHolder vh = new EventViewHolder(v);
-        return vh;
+                EventViewHolder vh = new EventViewHolder(v);
+                return vh;
+            case CREATE_VIEW_TYPE:
+                View view = LayoutInflater.from(context).inflate(R.layout.list_item_create, parent, false);
+                CreateViewHolder createViewHolder = new CreateViewHolder(view);
+                return createViewHolder;
+        }
+        return null;
     }
 
     @Override
-    public void onBindViewHolder(final EventViewHolder holder, final int position)
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position)
     {
-        final ViewPager viewPager = holder.viewPager;
+        switch (getItemViewType(position))
+        {
+            case EVENT_VIEW_TYPE:
+                EventViewHolder eventViewHolder = (EventViewHolder) holder;
+                handleEventViewType(eventViewHolder, position-1);
+                break;
+            case CREATE_VIEW_TYPE:
+                CreateViewHolder createViewHolder = (CreateViewHolder) holder;
+                break;
+        }
+    }
+
+    private void handleEventViewType(EventViewHolder eventViewHolder, final int position)
+    {
+        final ViewPager viewPager = eventViewHolder.viewPager;
         viewPager.setCurrentItem(state.get(position).getPosition());
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
         {
@@ -196,13 +242,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         });
 
         Event event = events.get(position);
-        holder.render(event);
-    }
-
-    @Override
-    public int getItemCount()
-    {
-        return events.size();
+        eventViewHolder.render(event);
     }
 
     private enum SwipedState
@@ -227,7 +267,8 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
     {
         private ViewPager viewPager;
         private CardView cardView;
-        private ImageView eventIcon, rsvpIcon, chatIcon, updatesIcon;
+        private ImageView eventIcon, rsvpIcon;
+        private TextView alreadyStartedMessage;
         private TextView title, timeLocation, attendees, date;
         private ImageButton going, mayBe, notGoing;
 
@@ -241,8 +282,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             cardView = (CardView) itemView.findViewById(R.id.cv_list_item_event);
             eventIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_event_icon);
             rsvpIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_event_rsvp);
-            chatIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_event_chat);
-            updatesIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_event_updates);
+            alreadyStartedMessage = (TextView) itemView.findViewById(R.id.tv_list_item_event_started);
             title = (TextView) itemView.findViewById(R.id.tv_list_item_event_title);
             timeLocation = (TextView) itemView.findViewById(R.id.tv_list_item_event_time_location);
             attendees = (TextView) itemView.findViewById(R.id.tv_list_item_event_attendees);
@@ -256,7 +296,8 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 @Override
                 public void onClick(View view)
                 {
-                    bus.post(new EventClickTrigger(events.get(getAdapterPosition())));
+                    bus.post(new EventClickTrigger(events.get(getAdapterPosition() - 1
+                    )));
                 }
             });
 
@@ -265,19 +306,19 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 @Override
                 public void onClick(View view)
                 {
-                    if (events.get(getAdapterPosition()).getOrganizerId().equals(userService.getActiveUserId()))
+                    if (events.get(getAdapterPosition()-1).getOrganizerId().equals(userService.getActiveUserId()))
                     {
                         Toast.makeText(context, R.string.cannot_change_rsvp, Toast.LENGTH_LONG).show();
                     } else
                     {
-                        state.set(getAdapterPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
-                        viewPager.setCurrentItem(state.get(getAdapterPosition()).getPosition());
+                        state.set(getAdapterPosition()-1, SwipedState.SHOWING_PRIMARY_CONTENT);
+                        viewPager.setCurrentItem(state.get(getAdapterPosition()-1).getPosition());
 
-                        Event.RSVP oldRsvp = events.get(getAdapterPosition()).getRsvp();
-                        events.get(getAdapterPosition()).setRsvp(Event.RSVP.YES);
-                        render(events.get(getAdapterPosition()));
+                        Event.RSVP oldRsvp = events.get(getAdapterPosition()-1).getRsvp();
+                        events.get(getAdapterPosition()-1).setRsvp(Event.RSVP.YES);
+                        render(events.get(getAdapterPosition()-1));
 
-                        bus.post(new RsvpChangeTrigger(events.get(getAdapterPosition()), oldRsvp));
+                        bus.post(new RsvpChangeTrigger(events.get(getAdapterPosition()-1), oldRsvp));
                     }
                 }
             });
@@ -287,19 +328,19 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 @Override
                 public void onClick(View view)
                 {
-                    if (events.get(getAdapterPosition()).getOrganizerId().equals(userService.getActiveUserId()))
+                    if (events.get(getAdapterPosition()-1).getOrganizerId().equals(userService.getActiveUserId()))
                     {
                         Toast.makeText(context, R.string.cannot_change_rsvp, Toast.LENGTH_LONG).show();
                     } else
                     {
-                        state.set(getAdapterPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
-                        viewPager.setCurrentItem(state.get(getAdapterPosition()).getPosition());
+                        state.set(getAdapterPosition()-1, SwipedState.SHOWING_PRIMARY_CONTENT);
+                        viewPager.setCurrentItem(state.get(getAdapterPosition()-1).getPosition());
 
-                        Event.RSVP oldRsvp = events.get(getAdapterPosition()).getRsvp();
-                        events.get(getAdapterPosition()).setRsvp(Event.RSVP.MAYBE);
-                        render(events.get(getAdapterPosition()));
+                        Event.RSVP oldRsvp = events.get(getAdapterPosition()-1).getRsvp();
+                        events.get(getAdapterPosition()-1).setRsvp(Event.RSVP.MAYBE);
+                        render(events.get(getAdapterPosition()-1));
 
-                        bus.post(new RsvpChangeTrigger(events.get(getAdapterPosition()), oldRsvp));
+                        bus.post(new RsvpChangeTrigger(events.get(getAdapterPosition()-1), oldRsvp));
                     }
                 }
             });
@@ -309,19 +350,19 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 @Override
                 public void onClick(View view)
                 {
-                    if (events.get(getAdapterPosition()).getOrganizerId().equals(userService.getActiveUserId()))
+                    if (events.get(getAdapterPosition()-1).getOrganizerId().equals(userService.getActiveUserId()))
                     {
                         Toast.makeText(context, R.string.cannot_change_rsvp, Toast.LENGTH_LONG).show();
                     } else
                     {
-                        state.set(getAdapterPosition(), SwipedState.SHOWING_PRIMARY_CONTENT);
-                        viewPager.setCurrentItem(state.get(getAdapterPosition()).getPosition());
+                        state.set(getAdapterPosition()-1, SwipedState.SHOWING_PRIMARY_CONTENT);
+                        viewPager.setCurrentItem(state.get(getAdapterPosition()-1).getPosition());
 
-                        Event.RSVP oldRsvp = events.get(getAdapterPosition()).getRsvp();
-                        events.get(getAdapterPosition()).setRsvp(Event.RSVP.NO);
-                        render(events.get(getAdapterPosition()));
+                        Event.RSVP oldRsvp = events.get(getAdapterPosition()-1).getRsvp();
+                        events.get(getAdapterPosition()-1).setRsvp(Event.RSVP.NO);
+                        render(events.get(getAdapterPosition()-1));
 
-                        bus.post(new RsvpChangeTrigger(events.get(getAdapterPosition()), oldRsvp));
+                        bus.post(new RsvpChangeTrigger(events.get(getAdapterPosition()-1), oldRsvp));
                     }
                 }
             });
@@ -329,8 +370,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
 
         public void render(Event event)
         {
-            boolean isChatUpdated = false;
-
             // Title
             if (event.getTitle().length() <= 20)
             {
@@ -421,30 +460,29 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 rsvpIcon.setVisibility(View.INVISIBLE);
             }
 
-            if (event.getRsvp() == Event.RSVP.YES || event.getRsvp() == Event.RSVP.MAYBE)
+            // already started
+            if (DateTime.now().isAfter(event.getStartTime()))
             {
-                // Chat Updates
-                if (isChatUpdated)
-                {
-                    chatIcon.setVisibility(View.VISIBLE);
-                } else
-                {
-                    chatIcon.setVisibility(View.INVISIBLE);
-                }
-
-                // Event Updates
-                if (event.isUpdated())
-                {
-                    updatesIcon.setVisibility(View.VISIBLE);
-                } else
-                {
-                    updatesIcon.setVisibility(View.INVISIBLE);
-                }
+                alreadyStartedMessage.setVisibility(View.VISIBLE);
+                alreadyStartedMessage.setText("Alreay Started");
+                alreadyStartedMessage.setTextColor(Color.RED);
             } else
             {
-                chatIcon.setVisibility(View.INVISIBLE);
-                updatesIcon.setVisibility(View.INVISIBLE);
+                alreadyStartedMessage.setVisibility(View.GONE);
             }
         }
     }
+
+    public class CreateViewHolder extends RecyclerView.ViewHolder
+    {
+        private ViewPager viewPager;
+
+        public CreateViewHolder(View itemView)
+        {
+            super(itemView);
+
+            viewPager = (ViewPager) itemView.findViewById(R.id.vp_list_item_create);
+        }
+    }
+
 }

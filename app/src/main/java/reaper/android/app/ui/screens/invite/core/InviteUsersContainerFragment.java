@@ -43,6 +43,7 @@ import reaper.android.app.trigger.user.ManageAppFriendsTrigger;
 import reaper.android.app.trigger.user.ManagePhoneContactsTrigger;
 import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
+import reaper.android.app.ui.screens.details.ZoomOutPageTransformer;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
@@ -131,6 +132,7 @@ public class InviteUsersContainerFragment extends Fragment implements TabLayout.
 
         InviteUsersPagerAdapter inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), new ArrayList<EventDetails.Invitee>(), event);
         viewPager.setAdapter(inviteUsersPagerAdapter);
+        viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
         tabLayout.post(new Runnable()
         {

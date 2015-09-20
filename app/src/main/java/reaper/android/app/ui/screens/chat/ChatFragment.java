@@ -385,11 +385,11 @@ public class ChatFragment extends Fragment implements View.OnClickListener
 
                             String[] fromUser = message.getFrom().split("/");
 
-                            if (fromUser[1].equals("reap3r"))
+                            if (fromUser[1].equals("@reap3r"))
                             {
                                 newMessage.setMessage(message.getBody());
-                                newMessage.setSenderName("reap3r");
-                                newMessage.setSenderId("reap3r");
+                                newMessage.setSenderName("@reap3r");
+                                newMessage.setSenderId("@reap3r");
                                 newMessage.setMe(false);
 
                             } else

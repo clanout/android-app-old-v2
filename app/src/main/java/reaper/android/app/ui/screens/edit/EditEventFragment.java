@@ -158,7 +158,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             throw new IllegalStateException("Event/EventDetails cannot be null while creating EditEventFragment instance");
         }
 
-        ((MainActivity)getActivity()).setSupportActionBar(toolbar);
+        ((MainActivity) getActivity()).setSupportActionBar(toolbar);
 
         editedEvent = new Event();
         editedEvent.setId(event.getId());
@@ -271,13 +271,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("dd MMM");
         DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("HH:mm");
 
-        if (event.getStartTime().toString(dateFormatter).equals(event.getEndTime().toString(dateFormatter)))
-        {
-            schedule.setText(event.getStartTime().toString(timeFormatter) + " - " + event.getEndTime().toString(timeFormatter) + " (" + event.getStartTime().toString(dateFormatter) + ")");
-        } else
-        {
-            schedule.setText(event.getStartTime().toString(timeFormatter) + " (" + event.getStartTime().toString(dateFormatter) + ") - " + event.getEndTime().toString(timeFormatter) + " (" + event.getEndTime().toString(dateFormatter) + ")");
-        }
+        schedule.setText(event.getStartTime().toString(timeFormatter) + " (" + event.getStartTime().toString(dateFormatter) + ")");
 
         if (event.getType() == Event.Type.PUBLIC)
         {
@@ -304,7 +298,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EDIT_EVENT_FRAGMENT);
-        ((MainActivity)getActivity()).getSupportActionBar().setTitle("Edit");
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle("Edit");
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EDIT);
 
@@ -609,11 +603,9 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             builder.setView(selectTimingsDialogView);
 
             final TimePicker startTimePicker = (TimePicker) selectTimingsDialogView.findViewById(R.id.tp_select_time_start);
-            final TimePicker endTimePicker = (TimePicker) selectTimingsDialogView.findViewById(R.id.tp_select_time_end);
             final DatePicker startDatePicker = (DatePicker) selectTimingsDialogView.findViewById(R.id.dp_select_date_start);
-            final DatePicker endDatePicker = (DatePicker) selectTimingsDialogView.findViewById(R.id.dp_select_date_end);
 
-            renderDateAndTimePickers(startDatePicker, endDatePicker, startTimePicker, endTimePicker);
+            renderDateAndTimePickers(startDatePicker, startTimePicker);
 
             builder.setPositiveButton("Done", new DialogInterface.OnClickListener()
             {
@@ -621,7 +613,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
                 public void onClick(DialogInterface dialog, int which)
                 {
                     DateTime startDateTime = getTime(startDatePicker, startTimePicker);
-                    DateTime endDateTime = getTime(endDatePicker, endTimePicker);
+                    DateTime endDateTime = startDateTime.plusDays(1).withTimeAtStartOfDay();
 
                     renderEventTimings(startDateTime, endDateTime);
                 }
@@ -652,13 +644,9 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
             editedEvent.setStartTime(_startDateTime);
             editedEvent.setEndTime(_endDateTime);
 
-            if (_startDateTime.toString(dateFormatter).equals(_endDateTime.toString(dateFormatter)))
-            {
-                schedule.setText(_startDateTime.toString(timeFormatter) + " - " + _endDateTime.toString(timeFormatter) + " (" + _startDateTime.toString(dateFormatter) + ")");
-            } else
-            {
-                schedule.setText(_startDateTime.toString(timeFormatter) + " (" + _startDateTime.toString(dateFormatter) + ") - " + _endDateTime.toString(timeFormatter) + " (" + _endDateTime.toString(dateFormatter) + ")");
-            }
+
+            schedule.setText(_startDateTime.toString(timeFormatter) + " (" + _startDateTime.toString(dateFormatter) + ")");
+
         }
     }
 
@@ -688,30 +676,22 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         return dateTime;
     }
 
-    private void renderDateAndTimePickers(DatePicker startDatePicker, DatePicker endDatePicker, TimePicker startTimePicker, TimePicker endTimePicker)
+    private void renderDateAndTimePickers(DatePicker startDatePicker, TimePicker startTimePicker)
     {
         startTimePicker.setIs24HourView(true);
-        endTimePicker.setIs24HourView(true);
 
         hideYearinDatePicker(startDatePicker);
-        hideYearinDatePicker(endDatePicker);
         startDatePicker.setMinDate(System.currentTimeMillis() - 1000);
-        endDatePicker.setMinDate(System.currentTimeMillis() - 1000);
 
         if (editedEvent.getStartTime() == null || editedEvent.getEndTime() == null)
         {
             startTimePicker.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-            endTimePicker.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
         } else
         {
             startTimePicker.setCurrentHour(editedEvent.getStartTime().getHourOfDay());
             startTimePicker.setCurrentMinute(editedEvent.getStartTime().getMinuteOfHour());
 
-            endTimePicker.setCurrentHour(editedEvent.getEndTime().getHourOfDay());
-            endTimePicker.setCurrentMinute(editedEvent.getEndTime().getMinuteOfHour());
-
             startDatePicker.updateDate(editedEvent.getStartTime().getYear(), editedEvent.getStartTime().getMonthOfYear() - 1, editedEvent.getStartTime().getDayOfMonth());
-            endDatePicker.updateDate(editedEvent.getEndTime().getYear(), editedEvent.getEndTime().getMonthOfYear() - 1, editedEvent.getEndTime().getDayOfMonth());
         }
     }
 

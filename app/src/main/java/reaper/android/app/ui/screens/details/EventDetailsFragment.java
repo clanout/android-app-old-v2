@@ -33,6 +33,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
@@ -69,7 +70,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
     // Services
     private UserService userService;
     private EventService eventService;
-    private NotificationService notificationService;
     private EventCache eventCache;
 
     // Data
@@ -131,7 +131,6 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         fragmentManager = getActivity().getSupportFragmentManager();
         userService = new UserService(bus);
         eventService = new EventService(bus);
-        notificationService = new NotificationService(bus);
 
         location.setOnClickListener(this);
         description.setOnClickListener(this);
@@ -200,6 +199,20 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
 
             refreshDetailsProgressBar.setVisibility(View.GONE);
             refreshDetailsTextView.setVisibility(View.GONE);
+
+            int numberOfFriendsGoing = 0;
+            List<EventDetails.Attendee> attendeeList = trigger.getEventDetails().getAttendees();
+            for (EventDetails.Attendee attendee : attendeeList)
+            {
+                if (attendee.isFriend())
+                {
+                    numberOfFriendsGoing++;
+                }
+            }
+
+            event.setFriendCount(numberOfFriendsGoing);
+            eventCache.save(event);
+
         }
     }
 
@@ -332,17 +345,10 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         }
 
         DateTime start = event.getStartTime();
-        DateTime end = event.getEndTime();
         DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("dd MMM");
         DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("HH:mm");
 
-        if (start.toString(dateFormatter).equals(end.toString(dateFormatter)))
-        {
-            dateTime.setText(start.toString(timeFormatter) + " - " + end.toString(timeFormatter) + " (" + start.toString(dateFormatter) + ")");
-        } else
-        {
-            dateTime.setText(start.toString(timeFormatter) + " (" + start.toString(dateFormatter) + ") - " + end.toString(timeFormatter) + " (" + end.toString(dateFormatter) + ")");
-        }
+        dateTime.setText(start.toString(timeFormatter) + " (" + start.toString(dateFormatter) + ")");
 
         if (event.getType() == Event.Type.PUBLIC)
         {

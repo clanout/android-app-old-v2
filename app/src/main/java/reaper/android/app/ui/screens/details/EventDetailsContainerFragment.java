@@ -137,6 +137,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
 
         pagerAdapter = new EventDetailsPagerAdapter(getChildFragmentManager(), events);
         viewPager.setAdapter(pagerAdapter);
+        viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
         viewPager.setCurrentItem(activePosition);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
         {
