@@ -6,8 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,13 +19,10 @@ import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -56,7 +51,6 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.Suggestion;
-import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.GoogleService;
 import reaper.android.app.service.LocationService;
@@ -64,6 +58,7 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventCreatedTrigger;
 import reaper.android.app.trigger.event.EventLocationFetchedTrigger;
 import reaper.android.app.trigger.event.EventSuggestionsTrigger;
+import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
@@ -73,7 +68,7 @@ import reaper.android.common.communicator.Communicator;
 /**
  * Created by aditya on 04/07/15.
  */
-public class CreateEventFragment extends Fragment implements View.OnClickListener, EventSuggestionsAdapter.EventSuggestionsClickListener, AdapterView.OnItemClickListener
+public class CreateEventFragment extends BaseFragment implements View.OnClickListener, EventSuggestionsAdapter.EventSuggestionsClickListener, AdapterView.OnItemClickListener
 {
     private TextView eventTitle, eventType, timing, noSuggestionsMessage;
     private EditText description;
@@ -89,7 +84,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
     private Location placeLocation;
     private DateTime startDateTime, endDateTime;
 
-    private FragmentManager manager;
+    private android.app.FragmentManager manager;
     private Bus bus;
 
     private EventService eventService;
@@ -143,7 +138,7 @@ public class CreateEventFragment extends Fragment implements View.OnClickListene
 
         }
 
-        manager = getActivity().getSupportFragmentManager();
+        manager = getActivity().getFragmentManager();
         bus = Communicator.getInstance().getBus();
         eventService = new EventService(bus);
         locationService = new LocationService(bus);

@@ -1,14 +1,9 @@
 package reaper.android.app.ui.screens.details;
 
-import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
@@ -16,13 +11,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -37,29 +29,24 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
-import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
-import reaper.android.app.model.EventDetails;
-import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
-import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
-import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.ChangeAttendeeListTrigger;
-import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventRsvpNotChangedTrigger;
 import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.chat.ChatFragment;
+import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.event.EventUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class EventDetailsContainerFragment extends Fragment implements View.OnClickListener
+public class EventDetailsContainerFragment extends BaseFragment implements View.OnClickListener
 {
-    private FragmentManager fragmentManager;
+    private android.app.FragmentManager fragmentManager;
     private Bus bus;
 
     // Services
@@ -125,7 +112,7 @@ public class EventDetailsContainerFragment extends Fragment implements View.OnCl
         ((MainActivity)getActivity()).setSupportActionBar(toolbar);
 
         bus = Communicator.getInstance().getBus();
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getActivity().getFragmentManager();
         eventService = new EventService(bus);
         userService = new UserService(bus);
         genericCache = CacheManager.getGenericCache();

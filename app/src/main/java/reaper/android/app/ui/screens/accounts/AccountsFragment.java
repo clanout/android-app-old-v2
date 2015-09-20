@@ -1,6 +1,6 @@
 package reaper.android.app.ui.screens.accounts;
 
-import android.content.ComponentName;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,13 +8,10 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,8 +25,6 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.picasso.Picasso;
 
@@ -42,18 +37,18 @@ import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
-import reaper.android.app.root.Reaper;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
+import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class AccountsFragment extends Fragment implements AccountsAdapter.AccountsItemClickListener
+public class AccountsFragment extends BaseFragment implements AccountsAdapter.AccountsItemClickListener
 {
     private TextView userName;
     private RecyclerView recyclerView;
@@ -95,7 +90,7 @@ public class AccountsFragment extends Fragment implements AccountsAdapter.Accoun
 
         ((MainActivity)getActivity()).setSupportActionBar(toolbar);
 
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getActivity().getFragmentManager();
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
 

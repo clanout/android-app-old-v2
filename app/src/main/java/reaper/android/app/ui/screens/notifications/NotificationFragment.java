@@ -45,6 +45,7 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.notifications.NotificationsFetchedTrigger;
 import reaper.android.app.ui.activity.MainActivity;
+import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
@@ -55,7 +56,7 @@ import reaper.android.common.notification.Notification;
 /**
  * Created by Aditya on 08-09-2015.
  */
-public class NotificationFragment extends Fragment implements NotificationClickCommunicator, View.OnClickListener
+public class NotificationFragment extends BaseFragment implements NotificationClickCommunicator, View.OnClickListener
 {
     private RecyclerView notificationRecyclerView;
     private TextView noNotificationsMessage, clearAll;
@@ -180,7 +181,7 @@ public class NotificationFragment extends Fragment implements NotificationClickC
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
-                FragmentUtils.changeFragment(getActivity().getSupportFragmentManager(), new HomeFragment());
+                FragmentUtils.changeFragment(getActivity().getFragmentManager(), new HomeFragment());
                 return true;
             }
         });
@@ -293,7 +294,7 @@ public class NotificationFragment extends Fragment implements NotificationClickC
         bundle.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, (ArrayList<Event>) events);
         bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
         eventDetailsContainerFragment.setArguments(bundle);
-        FragmentUtils.changeFragment(getActivity().getSupportFragmentManager(), eventDetailsContainerFragment);
+        FragmentUtils.changeFragment(getActivity().getFragmentManager(), eventDetailsContainerFragment);
     }
 
     @Override

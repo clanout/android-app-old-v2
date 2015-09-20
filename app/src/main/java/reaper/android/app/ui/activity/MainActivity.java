@@ -50,7 +50,7 @@ import reaper.android.common.communicator.Communicator;
 
 public class MainActivity extends AppCompatActivity
 {
-    private FragmentManager fragmentManager;
+    private android.app.FragmentManager fragmentManager;
     private Bus bus;
     private GCMService gcmService;
     private EventService eventService;
@@ -73,10 +73,9 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
 
+
         DateTime start = DateTime.now();
         DateTime end = start.plusDays(1).withTimeAtStartOfDay();
-
-        Log.d("APP", "start ------- " + start + "          end ------- " + end);
 
         setContentView(R.layout.activity_main);
 
@@ -88,7 +87,7 @@ public class MainActivity extends AppCompatActivity
         eventService = new EventService(bus);
         locationService = new LocationService(bus);
         facebookService = new FacebookService(bus);
-        fragmentManager = getSupportFragmentManager();
+        fragmentManager = getFragmentManager();
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         genericCache = CacheManager.getGenericCache();

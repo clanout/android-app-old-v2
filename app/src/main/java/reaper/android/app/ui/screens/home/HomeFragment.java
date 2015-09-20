@@ -1,5 +1,7 @@
 package reaper.android.app.ui.screens.home;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
@@ -7,9 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -75,6 +74,7 @@ import reaper.android.app.trigger.notifications.NewNotificationsAvailableTrigger
 import reaper.android.app.trigger.notifications.NewNotificationsNotAvailableTrigger;
 import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
+import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.create.CreateEventFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.notifications.NotificationFragment;
@@ -85,7 +85,7 @@ import reaper.android.common.communicator.Communicator;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
 
-public class HomeFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener
+public class HomeFragment extends BaseFragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener
 {
     private FragmentManager fragmentManager;
     private Bus bus;
@@ -176,7 +176,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         dispayBasicView();
 
         bus = Communicator.getInstance().getBus();
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getActivity().getFragmentManager();
         userService = new UserService(bus);
         eventService = new EventService(bus);
         locationService = new LocationService(bus);

@@ -7,8 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,8 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -47,19 +43,19 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
 import reaper.android.app.model.FriendsComparator;
-import reaper.android.app.root.Reaper;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.PhoneAddedTrigger;
 import reaper.android.app.trigger.user.PhoneContactsFetchedTrigger;
+import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.invite.core.InviteFriendsAdapter;
 import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class InvitePhoneContactsFragment extends Fragment implements View.OnClickListener
+public class InvitePhoneContactsFragment extends BaseFragment implements View.OnClickListener
 {
     private RecyclerView recyclerView;
     private TextView noContactsMessage, invitesLockedMessage;
@@ -77,7 +73,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
     private Bus bus;
     private UserService userService;
     private LocationService locationService;
-    private FragmentManager fragmentManager;
+    private android.app.FragmentManager fragmentManager;
     private GenericCache genericCache;
     private Drawable phoneDrawable;
 
@@ -116,7 +112,7 @@ public class InvitePhoneContactsFragment extends Fragment implements View.OnClic
         isPhoneAdded = false;
         inviteWhatsapp.setOnClickListener(this);
         addPhone.setOnClickListener(this);
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getActivity().getFragmentManager();
         genericCache = CacheManager.getGenericCache();
 
         generateDrawables();

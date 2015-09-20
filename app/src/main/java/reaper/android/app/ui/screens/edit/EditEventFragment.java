@@ -1,13 +1,12 @@
 package reaper.android.app.ui.screens.edit;
 
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,8 +26,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -59,7 +56,6 @@ import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.Suggestion;
-import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.GoogleService;
 import reaper.android.app.service.LocationService;
@@ -71,17 +67,18 @@ import reaper.android.app.trigger.event.EventLocationFetchedTrigger;
 import reaper.android.app.trigger.event.EventSuggestionsTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.ui.activity.MainActivity;
+import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.create.EventSuggestionsAdapter;
 import reaper.android.app.ui.screens.create.GooglePlacesAutocompleteAdapter;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
-import reaper.android.app.ui.util.event.EventUtils;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.app.ui.util.event.EventUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 
-public class EditEventFragment extends Fragment implements AdapterView.OnItemClickListener, EventSuggestionsAdapter.EventSuggestionsClickListener, View.OnClickListener
+public class EditEventFragment extends BaseFragment implements AdapterView.OnItemClickListener, EventSuggestionsAdapter.EventSuggestionsClickListener, View.OnClickListener
 {
     private FragmentManager fragmentManager;
     private Bus bus;
@@ -168,7 +165,7 @@ public class EditEventFragment extends Fragment implements AdapterView.OnItemCli
         editedEvent.setLocation(event.getLocation());
 
         bus = Communicator.getInstance().getBus();
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getActivity().getFragmentManager();
         eventService = new EventService(bus);
         locationService = new LocationService(bus);
         userService = new UserService(bus);

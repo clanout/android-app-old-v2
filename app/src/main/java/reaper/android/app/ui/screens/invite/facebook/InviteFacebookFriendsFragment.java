@@ -1,16 +1,12 @@
 package reaper.android.app.ui.screens.invite.facebook;
 
-import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,8 +16,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -44,7 +38,6 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
 import reaper.android.app.model.FriendsComparator;
-import reaper.android.app.root.Reaper;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.LocationService;
@@ -54,11 +47,12 @@ import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.user.AppFriendsFetchedFromNetworkTrigger;
 import reaper.android.app.trigger.user.AppFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
+import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.invite.core.InviteFriendsAdapter;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class InviteFacebookFriendsFragment extends Fragment implements View.OnClickListener
+public class InviteFacebookFriendsFragment extends BaseFragment implements View.OnClickListener
 {
     private RecyclerView recyclerView;
     private TextView noFriendsMessage;
@@ -71,7 +65,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
     private LocationService locationService;
     private FacebookService facebookService;
     private Bus bus;
-    private FragmentManager fragmentManager;
+    private android.app.FragmentManager fragmentManager;
 
     private GenericCache genericCache;
 
@@ -134,7 +128,7 @@ public class InviteFacebookFriendsFragment extends Fragment implements View.OnCl
         genericCache = CacheManager.getGenericCache();
 
         inviteWhatsapp.setOnClickListener(this);
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getActivity().getFragmentManager();
 
         generateDrawables();
 

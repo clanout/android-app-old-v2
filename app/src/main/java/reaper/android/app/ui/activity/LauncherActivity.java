@@ -1,13 +1,16 @@
 package reaper.android.app.ui.activity;
 
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Slide;
 import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
@@ -61,6 +64,8 @@ public class LauncherActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
 
+        setUpWindowAnimations();
+
         setContentView(R.layout.activity_launcher);
         ShimmerFrameLayout container =
                 (ShimmerFrameLayout) findViewById(R.id.shimmer_view_container);
@@ -75,6 +80,22 @@ public class LauncherActivity extends AppCompatActivity
         cache = CacheManager.getGenericCache();
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void setUpWindowAnimations()
+    {
+        int currentApiVersion = android.os.Build.VERSION.SDK_INT;
+        if (currentApiVersion >= android.os.Build.VERSION_CODES.LOLLIPOP)
+        {
+            Slide slide = new Slide();
+            slide.setDuration(1000);
+            getWindow().setExitTransition(slide);
+
+        } else
+        {
+            // do something for phones running an SDK before lollipop
+        }
     }
 
     @Override

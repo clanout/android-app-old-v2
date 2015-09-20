@@ -1,17 +1,15 @@
 package reaper.android.app.ui.screens.details;
 
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,25 +42,20 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.service.EventService;
-import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.event.ChangeAttendeeListTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchedFromNetworkTrigger;
 import reaper.android.app.trigger.event.EventRsvpNotChangedTrigger;
-import reaper.android.app.trigger.notifications.NewNotificationsAvailableTrigger;
-import reaper.android.app.trigger.notifications.NewNotificationsNotAvailableTrigger;
-import reaper.android.app.ui.activity.MainActivity;
+import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.edit.EditEventFragment;
-import reaper.android.app.ui.screens.notifications.NotificationFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.event.EventUtils;
 import reaper.android.app.ui.util.event.EventUtilsConstants;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
-import timber.log.Timber;
 
-public class EventDetailsFragment extends Fragment implements View.OnClickListener, AttendeeClickCommunicator
+public class EventDetailsFragment extends BaseFragment implements View.OnClickListener, AttendeeClickCommunicator
 {
     private FragmentManager fragmentManager;
     private Bus bus;
@@ -128,7 +121,7 @@ public class EventDetailsFragment extends Fragment implements View.OnClickListen
         }
 
         bus = Communicator.getInstance().getBus();
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getActivity().getFragmentManager();
         userService = new UserService(bus);
         eventService = new EventService(bus);
 

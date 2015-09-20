@@ -1,17 +1,14 @@
 package reaper.android.app.ui.screens.accounts.friends;
 
-import android.content.ComponentName;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,8 +19,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -42,7 +37,6 @@ import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Friend;
-import reaper.android.app.root.Reaper;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.UserService;
@@ -52,11 +46,12 @@ import reaper.android.app.trigger.user.AllAppFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
+import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class ManageFriendsFragment extends Fragment implements BlockListCommunicator, View.OnClickListener
+public class ManageFriendsFragment extends BaseFragment implements BlockListCommunicator, View.OnClickListener
 {
     private RecyclerView recyclerView;
     private TextView noFriendsMessage;
@@ -118,7 +113,7 @@ public class ManageFriendsFragment extends Fragment implements BlockListCommunic
         userService = new UserService(bus);
         facebookService = new FacebookService(bus);
         genericCache = CacheManager.getGenericCache();
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getActivity().getFragmentManager();
 
         done.setOnClickListener(this);
         inviteWhatsapp.setOnClickListener(this);

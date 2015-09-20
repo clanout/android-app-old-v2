@@ -1,15 +1,12 @@
 package reaper.android.app.ui.screens.chat;
 
+import android.app.FragmentManager;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,8 +21,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -33,12 +28,9 @@ import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.MessageListener;
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +44,6 @@ import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.ChatMessage;
 import reaper.android.app.model.Event;
-import reaper.android.app.root.Reaper;
 import reaper.android.app.service.ChatService;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
@@ -63,6 +54,7 @@ import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.ui.activity.MainActivity;
+import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
@@ -73,7 +65,7 @@ import reaper.android.common.communicator.Communicator;
 /**
  * Created by harsh on 21-05-2015.
  */
-public class ChatFragment extends Fragment implements View.OnClickListener
+public class ChatFragment extends BaseFragment implements View.OnClickListener
 {
 
     private EditText typeMessage;
@@ -158,7 +150,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener
         eventService =
                 new EventService(bus);
         locationService = new LocationService(bus);
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getActivity().getFragmentManager();
 
         genericCache = CacheManager.getGenericCache();
     }
