@@ -9,7 +9,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -18,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
@@ -27,15 +30,26 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.concurrent.TimeUnit;
 
 import reaper.android.R;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
+import reaper.android.app.model.EventSuggestion;
+import reaper.android.app.model.factory.EventSuggestionFactory;
 import reaper.android.app.service.UserService;
+import reaper.android.app.trigger.common.ViewPagerClickedTrigger;
 import reaper.android.app.trigger.common.ViewPagerStateChangedTrigger;
 import reaper.android.app.trigger.event.EventClickTrigger;
 import reaper.android.app.trigger.event.RsvpChangeTrigger;
+import reaper.android.common.communicator.Communicator;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Bus bus;
@@ -424,12 +438,19 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public class CreateViewHolder extends RecyclerView.ViewHolder {
         private ViewPager viewPager;
+        private Bus bus;
+        private Subscriber<Integer> subscriber;
+        private List<EventSuggestion> eventSuggestionList;
 
         public CreateViewHolder(View itemView) {
             super(itemView);
 
+            bus = Communicator.getInstance().getBus();
+            bus.register(this);
+            eventSuggestionList = EventSuggestionFactory.getEventSuggestions();
+
             viewPager = (ViewPager) itemView.findViewById(R.id.vp_list_item_create);
-            viewPager.setAdapter(new CreateEventPagerAdapter(fragmentManager));
+            viewPager.setAdapter(new CreateEventPagerAdapter(fragmentManager, eventSuggestionList));
             viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -446,6 +467,38 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     bus.post(new ViewPagerStateChangedTrigger(state));
                 }
             });
+
+            subscriber = new Subscriber<Integer>() {
+                @Override
+                public void onCompleted() {
+
+                }
+
+                @Override
+                public void onError(Throwable e) {
+
+                }
+
+                @Override
+                public void onNext(Integer integer) {
+
+                }
+            };
+
+            rx.Observable.interval(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).map(new Func1<Long, Integer>() {
+                @Override
+                public Integer call(Long aLong) {
+                    int index = (int) (aLong % 4);
+                    viewPager.setCurrentItem(index);
+                    return null;
+
+                }
+            }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(subscriber);
+        }
+
+        @Subscribe
+        public void clickOnViewPagerDetected(ViewPagerClickedTrigger trigger) {
+            subscriber.unsubscribe();
         }
     }
 

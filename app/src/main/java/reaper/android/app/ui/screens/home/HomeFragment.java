@@ -278,6 +278,11 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         }
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
     @Subscribe
     public void onEventsFetchTrigger(EventsFetchTrigger eventsFetchTrigger)
     {

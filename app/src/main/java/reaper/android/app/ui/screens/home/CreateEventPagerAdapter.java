@@ -8,21 +8,20 @@ import android.support.v13.app.FragmentStatePagerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import reaper.android.app.config.BundleKeys;
+import reaper.android.app.model.EventSuggestion;
+
 /**
  * Created by harsh on 21/09/15.
  */
 public class CreateEventPagerAdapter extends FragmentStatePagerAdapter {
 
-    private List<String> categories;
+    private List<EventSuggestion> eventSuggestionList;
 
-    public CreateEventPagerAdapter(FragmentManager fm) {
+    public CreateEventPagerAdapter(FragmentManager fm, List<EventSuggestion> eventSuggestionList) {
         super(fm);
 
-        categories = new ArrayList<>();
-        categories.add("Movie");
-        categories.add("Eat Out");
-        categories.add("Drinks");
-        categories.add("Sports");
+        this.eventSuggestionList = eventSuggestionList;
     }
 
     @Override
@@ -30,13 +29,13 @@ public class CreateEventPagerAdapter extends FragmentStatePagerAdapter {
 
         CreateEventListItemFragment createEventListItemFragment = new CreateEventListItemFragment();
         Bundle bundle = new Bundle();
-        bundle.putString("category", categories.get(position));
+        bundle.putSerializable(BundleKeys.EVENT_SUGGESTION, eventSuggestionList.get(position));
         createEventListItemFragment.setArguments(bundle);
         return createEventListItemFragment;
     }
 
     @Override
     public int getCount() {
-        return categories.size();
+        return eventSuggestionList.size();
     }
 }

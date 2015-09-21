@@ -24,4 +24,6 @@ public class BundleKeys
     public static final String EVENT = "event";
 
     public static final String SHOULD_GO_TO_DETAILS_FRAGMENT = "should_go_to_details_fragment";
+
+    public static final String EVENT_SUGGESTION = "event_suggestion";
 }
