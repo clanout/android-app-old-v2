@@ -1,9 +1,9 @@
 package reaper.android.app.ui.screens.details;
 
+import android.app.FragmentTransaction;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
@@ -275,6 +275,7 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
                 bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_ID, events.get(activePosition).getId());
                 chatFragment.setArguments(bundle);
                 FragmentUtils.changeFragment(fragmentManager, chatFragment);
+
             } else
             {
                 Toast.makeText(getActivity(), R.string.cannot_chat, Toast.LENGTH_LONG).show();

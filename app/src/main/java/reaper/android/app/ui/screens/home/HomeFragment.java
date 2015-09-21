@@ -29,7 +29,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.desarrollodroide.libraryfragmenttransactionextended.FragmentTransactionExtended;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -411,7 +410,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     private void initRecyclerView()
     {
         eventList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        eventsAdapter = new EventsAdapter(bus, new ArrayList<Event>(), getActivity());
+        eventsAdapter = new EventsAdapter(bus, new ArrayList<Event>(), getActivity(), fragmentManager);
         eventList.setAdapter(eventsAdapter);
 
         eventList.addOnScrollListener(new RecyclerView.OnScrollListener()
@@ -494,7 +493,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 //            }
 //        }
 
-        eventsAdapter = new EventsAdapter(bus, events, getActivity());
+        eventsAdapter = new EventsAdapter(bus, events, getActivity(), fragmentManager);
         eventList.setAdapter(eventsAdapter);
     }
 
