@@ -64,8 +64,6 @@ public class LauncherActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
 
-        setUpWindowAnimations();
-
         setContentView(R.layout.activity_launcher);
         ShimmerFrameLayout container =
                 (ShimmerFrameLayout) findViewById(R.id.shimmer_view_container);
@@ -80,22 +78,6 @@ public class LauncherActivity extends AppCompatActivity
         cache = CacheManager.getGenericCache();
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void setUpWindowAnimations()
-    {
-        int currentApiVersion = android.os.Build.VERSION.SDK_INT;
-        if (currentApiVersion >= android.os.Build.VERSION_CODES.LOLLIPOP)
-        {
-            Slide slide = new Slide();
-            slide.setDuration(1000);
-            getWindow().setExitTransition(slide);
-
-        } else
-        {
-            // do something for phones running an SDK before lollipop
-        }
     }
 
     @Override
@@ -168,7 +150,7 @@ public class LauncherActivity extends AppCompatActivity
         cache.put(CacheKeys.SESSION_ID, trigger.getSessionCookie());
         if (!locationService.locationExists())
         {
-            progressDialog = ProgressDialog.show(this, "Welcome", "Fetching your current location...");
+            progressDialog = ProgressDialog.show(this, "Welcome", "Fetching your location...");
             isBlocking = true;
             bus.post(new UserLocationRefreshRequestTrigger());
         } else

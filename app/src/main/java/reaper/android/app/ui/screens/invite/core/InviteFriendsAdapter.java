@@ -102,6 +102,8 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
 
         if (event.getOrganizerId().equals(current.getId()))
         {
+            // TODO -- already going use case
+
             holder.checkBox.setVisibility(View.GONE);
             holder.alreadyInvited.setText("Created Event");
             holder.alreadyInvited.setVisibility(View.VISIBLE);

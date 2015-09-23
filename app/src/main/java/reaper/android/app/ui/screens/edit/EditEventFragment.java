@@ -422,7 +422,7 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
                     {
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setCancelable(true);
-                        builder.setMessage("Are you sure you wan't to unfinalise this event? Other people will now be able to edit the event.");
+                        builder.setMessage(R.string.unfinalise_event);
 
                         builder.setPositiveButton(R.string.event_unlock_positive_button, new DialogInterface.OnClickListener()
                         {
@@ -456,7 +456,7 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
                     {
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setCancelable(true);
-                        builder.setMessage("Are you sure you wan't to finalise this event? Other people will not be able to edit the event.");
+                        builder.setMessage(R.string.finalise_event);
 
                         builder.setPositiveButton(R.string.event_lock_positive_button, new DialogInterface.OnClickListener()
                         {

@@ -23,7 +23,6 @@ public class GCMService
 
     public void register()
     {
-        Log.d("APP", "in gcm service");
         bus.post(new GcmregistrationIntentTrigger());
     }
 

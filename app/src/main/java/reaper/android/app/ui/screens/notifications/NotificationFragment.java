@@ -206,7 +206,7 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
         notificationRecyclerView.setVisibility(View.GONE);
         noNotificationsMessage.setVisibility(View.VISIBLE);
         clearAll.setVisibility(View.GONE);
-        noNotificationsMessage.setText("Could not load notifications");
+        noNotificationsMessage.setText(R.string.no_notifications);
     }
 
     private void displayNoNotificationsView()
@@ -214,7 +214,7 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
         notificationRecyclerView.setVisibility(View.GONE);
         noNotificationsMessage.setVisibility(View.VISIBLE);
         clearAll.setVisibility(View.GONE);
-        noNotificationsMessage.setText("No notifications to show");
+        noNotificationsMessage.setText(R.string.notifications_fetch_failure);
     }
 
     private void initRecyclerView()
@@ -285,7 +285,7 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
             activePosition = events.indexOf(activeEvent);
         } else
         {
-            Toast.makeText(getActivity(), "Could not find this event in the list", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.event_not_found, Toast.LENGTH_LONG).show();
             return;
         }
 

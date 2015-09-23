@@ -21,6 +21,9 @@
     <string name="event_unlock_positive_button">Allow changes</string>
     <string name="event_unlock_negative_button">Undecided</string>
 
+    <string name="fetching_location">Fetching your location...</string>
+    <string name="refreshing_attendee_list">Refreshing attendee list</string>
+
     <!-- RSVP -->
     <string name="rsvp_yes">Going</string>
     <string name="rsvp_maybe">Maybe</string>
@@ -61,6 +64,9 @@
     <string name="cannot_chat">People who are not going to the event cannot enter the chat room.</string>
     <string name="cannot_change_rsvp">You cannot change the RSVP of an event created by you.</string>
 
+    <string name="unfinalise_event">Are you sure you wan't to unfinalise this event? Other people will now be able to edit the event.</string>
+    <string name="finalise_event">Are you sure you wan't to finalise this event? Other people will not be able to edit the event.</string>
+
     <!-- Toast and Blank Screen Messages -->
     <string name="location_not_found">Could not find the location. Please try again.</string>
     <string name="location_not_available_on_map">This location is not available on map.</string>
@@ -96,6 +102,11 @@
     <string name="event_edit_failed_locked">The event could not be edited as the organiser has already finalised it.</string>
     <string name="event_finalisation_failed">The event could not be finalised. Please try again</string>
     <string name="event_unfinalisation_failed">The event could not be unfinalised. Please try again</string>
+
+    <string name="no_notifications">No notifications to show</string>
+    <string name="notifications_fetch_failure">Could not load notifications</string>
+
+    <string name="event_not_found">Could not find this event in the list</string>
 
     <!-- Facebook -->
     <string name="facebook_app_id">711701748936592</string>

@@ -428,7 +428,6 @@ public class EventService
                             {
                                 if (eventDetails == null)
                                 {
-                                    Timber.d("EventDetails null for " + eventId);
                                     EventDetailsApiRequest request = new EventDetailsApiRequest(eventId);
                                     return eventApi.getEventDetails(request)
                                             .map(new Func1<EventDetailsApiResponse, EventDetails>()
@@ -451,7 +450,6 @@ public class EventService
                                             .observeOn(Schedulers.newThread());
                                 } else
                                 {
-                                    Timber.d("EventDetails in cache for " + eventId);
                                     return Observable.just(eventDetails);
                                 }
                             }

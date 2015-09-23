@@ -10,7 +10,6 @@ public class GoogleAnalyticsConstants
     public static final String FACEBOOK_ACTIVITY = "FacebookActivity";
     public static final String LAUNCHER_ACTIVITY = "LauncherActivity";
     public static final String HOME_FRAGMENT = "HomeFragment";
-    public static final String CREATE_EVENT_FRAGMENT = "CreateEventFragment";
     public static final String ACCOUNTS_FRAGMENT = "AccountsFragment";
     public static final String EVENT_DETAILS_CONTAINER_FRAGMENT = "EventDetailsContainerFragment";
     public static final String EVENT_DETAILS_FRAGMENT = "EventDetailsFragment";

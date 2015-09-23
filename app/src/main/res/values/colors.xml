@@ -21,4 +21,10 @@
     <!-- Fonts -->
     <color name="text_title">#AA000000</color>
     <color name="text_subtitle_light">#AA777777</color>
+
+    <!-- Event Suggestion Background -->
+    <color name="pink">#F8BBD0</color>
+    <color name="lime">#F0F4C3</color>
+    <color name="orange">#FFE0B2</color>
+    <color name="purple">#E1BEE7</color>
 </resources>

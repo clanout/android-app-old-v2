@@ -23,12 +23,10 @@ public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
     {
         super(fm);
 
-        Log.d("APP", "inside pager adapter constructor");
         Bundle bundle = new Bundle();
         bundle.putSerializable(BundleKeys.INVITEE_LIST, inviteeList);
 
         this.inviteeList = inviteeList;
-        Log.d("APP", "invitee list size in pager adapter ----- " + inviteeList.size());
         this.event = event;
     }
 
@@ -42,12 +40,10 @@ public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
         switch (position)
         {
             case 0:
-                Log.d("APP", "case 0 ---- fb");
                 InviteFacebookFriendsFragment fragment = new InviteFacebookFriendsFragment();
                 fragment.setArguments(bundle);
                 return fragment;
             case 1:
-                Log.d("APP", "case 1 ------ phone");
                 InvitePhoneContactsFragment contactsFragment = new InvitePhoneContactsFragment();
                 contactsFragment.setArguments(bundle);
                 return contactsFragment;
@@ -66,6 +62,8 @@ public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
     {
         switch (position)
         {
+            // TODO -- Chnge Tab names
+
             case 0:
                 return "Facebook Friends";
             case 1:

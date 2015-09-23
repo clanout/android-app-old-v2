@@ -45,8 +45,6 @@ public class FacebookActivity extends AppCompatActivity
 
     private static final String PERMISSION_REQUIRED = "This app requires your basic information, email and friends information to function properly. Don\\'t worry, we will not misuse this in any way.";
     private static final String PERMISSION_REQUIRED_TITLE = "Permission Required";
-    private static final String PROBLEM_CONTACTING_FACEBOOK_TITLE = "Problem contacting Facebook";
-    private static final String PROBLEM_CONTACTING_FACEBOOK = "There was some problem while connecting to Facebook. Please try again.";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)

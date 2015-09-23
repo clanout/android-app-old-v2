@@ -161,7 +161,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
         eventService.fetchEventDetailsFromNetwork(event.getId());
         refreshDetailsProgressBar.setVisibility(View.VISIBLE);
         refreshDetailsTextView.setVisibility(View.VISIBLE);
-        refreshDetailsTextView.setText("Refreshing Attendee List");
+        refreshDetailsTextView.setText(R.string.refreshing_attendee_list);
     }
 
     @Override
@@ -517,6 +517,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
     @Override
     public void onAttendeeClicked(String name)
     {
+        // TODO --- Invitation Message
         Toast.makeText(getActivity(), name + " has invited you to this event", Toast.LENGTH_LONG).show();
     }
 }

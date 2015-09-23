@@ -1,13 +1,11 @@
 package reaper.android.app.ui.screens.home;
 
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -15,7 +13,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,9 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,7 +39,6 @@ import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
-import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
@@ -65,7 +59,6 @@ import reaper.android.app.trigger.common.ViewPagerStateChangedTrigger;
 import reaper.android.app.trigger.event.EventClickTrigger;
 import reaper.android.app.trigger.event.EventIdsFetchedTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
-import reaper.android.app.trigger.event.NewEventAddedTrigger;
 import reaper.android.app.trigger.event.NewEventsAndUpdatesFetchedTrigger;
 import reaper.android.app.trigger.event.RsvpChangeTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationReceivedTrigger;
@@ -74,15 +67,12 @@ import reaper.android.app.trigger.notifications.NewNotificationsNotAvailableTrig
 import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
-import reaper.android.app.ui.screens.create.CreateEventFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.notifications.NotificationFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
-import rx.Subscriber;
-import rx.schedulers.Schedulers;
 
 public class HomeFragment extends BaseFragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener
 {
@@ -111,11 +101,10 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     private RecyclerView eventList;
     //    private LinearLayout buttonBar;
 //    private Button filterButton, sortButton;
-    private FloatingActionButton createEvent;
     private SwipeRefreshLayout swipeRefreshLayout;
     private Snackbar snackbar;
     private MaterialIconView generalIcon, eatOutIcon, drinksIcon, cafeIcon, movieIcon, outdoorsIcon, partyIcon, eventsIcon, shoppingIcon;
-    private Drawable phoneDrawable, plusDrawable, accountsDrawable;
+    private Drawable phoneDrawable, accountsDrawable;
     private Toolbar toolbar;
 
     private EventsAdapter eventsAdapter;
@@ -157,7 +146,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 //        buttonBar = (LinearLayout) view.findViewById(R.id.ll_home_btn_bar);
 //        filterButton = (Button) view.findViewById(R.id.btn_home_filter);
 //        sortButton = (Button) view.findViewById(R.id.btn_home_sort);
-        createEvent = (FloatingActionButton) view.findViewById(R.id.fib_home_create);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.srl_home);
         toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_home);
 
@@ -189,9 +177,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 //        sortButton.setOnClickListener(this);
 //        filterButton.setOnClickListener(this);
 
-        createEvent.setOnClickListener(this);
-        createEvent.setImageDrawable(plusDrawable);
-
         swipeRefreshLayout.setOnRefreshListener(this);
 
         events = new ArrayList<>();
@@ -214,12 +199,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     {
         phoneDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE_ANDROID)
-                .setColor(getResources().getColor(R.color.white))
-                .setSizeDp(36)
-                .build();
-
-        plusDrawable = MaterialDrawableBuilder.with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.PLUS)
                 .setColor(getResources().getColor(R.color.white))
                 .setSizeDp(36)
                 .build();
@@ -345,27 +324,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         {
             swipeRefreshLayout.setEnabled(true);
         }
-    }
-
-    @Subscribe
-    public void onNewEventAdded(NewEventAddedTrigger trigger)
-    {
-        snackbar = Snackbar.make(getView(), "New Event Added", Snackbar.LENGTH_INDEFINITE);
-
-        snackbar.setAction("Update Feed", new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                eventService.fetchEvents(locationService.getUserLocation().getZone());
-//                sort = Sort.RELEVANCE;
-//                filter = Filter.ALL;
-//                filterButton.setText("ALL EVENTS");
-//                sortButton.setText("RELEVANCE");
-                snackbar.dismiss();
-            }
-        });
-        snackbar.show();
     }
 
     @Subscribe
@@ -505,7 +463,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     private void dispayBasicView()
     {
         noEventsMessage.setVisibility(View.GONE);
-        createEvent.setVisibility(View.VISIBLE);
         eventList.setVisibility(View.VISIBLE);
 //        buttonBar.setVisibility(View.VISIBLE);
     }
@@ -514,7 +471,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     {
         noEventsMessage.setText(R.string.home_no_events);
         noEventsMessage.setVisibility(View.VISIBLE);
-        createEvent.setVisibility(View.VISIBLE);
         eventList.setVisibility(View.GONE);
 //        buttonBar.setVisibility(View.VISIBLE);
     }
@@ -523,7 +479,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     {
         noEventsMessage.setVisibility(View.VISIBLE);
         noEventsMessage.setText(R.string.home_events_fetch_error);
-        createEvent.setVisibility(View.VISIBLE);
         eventList.setVisibility(View.GONE);
 //        buttonBar.setVisibility(View.GONE);
     }
@@ -641,223 +596,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         });
     }
 
-    public void displayCreateEventDialog()
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setCancelable(true);
-
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        final View createEventDialogView = inflater.inflate(R.layout.alert_dialog_create_event, null);
-        builder.setView(createEventDialogView);
-
-        final EditText eventTitle = (EditText) createEventDialogView.findViewById(R.id.et_dialog_fragment_create_event_title);
-        LinearLayout general = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_general);
-        LinearLayout eat_out = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_eat_out);
-        LinearLayout drinks = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_drinks);
-        LinearLayout cafe = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_cafe);
-        LinearLayout movie = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_movie);
-        LinearLayout outdoors = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_outdoors);
-        LinearLayout party = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_party);
-        LinearLayout localEvents = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_local_events);
-        LinearLayout shopping = (LinearLayout) createEventDialogView.findViewById(R.id.ll_dialog_fragment_create_event_shopping);
-        final CheckBox checkBox = (CheckBox) createEventDialogView.findViewById(R.id.cb_dialog_fragment_create_event);
-
-        generalIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_general);
-        eatOutIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_eat_out);
-        drinksIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_drinks);
-        cafeIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_cafe);
-        movieIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_movie);
-        outdoorsIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_outdoors);
-        partyIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_party);
-        eventsIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_local_events);
-        shoppingIcon = (MaterialIconView) createEventDialogView.findViewById(R.id.miv_shopping);
-
-        general.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                eventCategory = EventCategory.GENERAL;
-                changeIconColor(generalIcon);
-            }
-        });
-
-        eat_out.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                eventCategory = EventCategory.EAT_OUT;
-                changeIconColor(eatOutIcon);
-            }
-        });
-
-        drinks.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                eventCategory = EventCategory.DRINKS;
-                changeIconColor(drinksIcon);
-            }
-        });
-
-        cafe.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                eventCategory = EventCategory.CAFE;
-                changeIconColor(cafeIcon);
-            }
-        });
-
-        movie.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                eventCategory = EventCategory.MOVIES;
-                changeIconColor(movieIcon);
-            }
-        });
-
-        outdoors.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                eventCategory = EventCategory.OUTDOORS;
-                changeIconColor(outdoorsIcon);
-            }
-        });
-
-        party.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                eventCategory = EventCategory.PARTY;
-                changeIconColor(partyIcon);
-            }
-        });
-
-        localEvents.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                eventCategory = EventCategory.LOCAL_EVENTS;
-                changeIconColor(eventsIcon);
-            }
-        });
-
-        shopping.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                eventCategory = EventCategory.SHOPPING;
-                changeIconColor(shoppingIcon);
-            }
-        });
-
-        builder.setPositiveButton("Next", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-
-            }
-        });
-
-        final AlertDialog dialog = builder.create();
-        dialog.show();
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Boolean wantToCloseDialog = false;
-
-                String title = eventTitle.getText().toString();
-                boolean isInviteOnly = checkBox.isChecked();
-
-                if (title == null || title.isEmpty())
-                {
-                    Toast.makeText(getActivity(), "Please enter a title", Toast.LENGTH_LONG).show();
-                    wantToCloseDialog = false;
-                } else if (eventCategory == null)
-                {
-                    Toast.makeText(getActivity(), "Please choose a category", Toast.LENGTH_LONG).show();
-                    wantToCloseDialog = false;
-                } else
-                {
-                    wantToCloseDialog = true;
-                    CreateEventFragment createEventFragment = new CreateEventFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putString(BundleKeys.CREATE_EVENT_FRAGMENT_TITLE, title);
-                    bundle.putBoolean(BundleKeys.CREATE_EVENT_FRAGMENT_IS_INVITE_ONLY, isInviteOnly);
-                    bundle.putSerializable(BundleKeys.CREATE_EVENT_CATEGORY, eventCategory);
-                    createEventFragment.setArguments(bundle);
-                    FragmentUtils.changeFragment(fragmentManager, createEventFragment);
-                }
-
-
-                if (wantToCloseDialog)
-                {
-                    dialog.dismiss();
-                }
-
-            }
-        });
-    }
-
-    private void changeIconColor(MaterialIconView icon)
-    {
-        // TODO : Change colors according to our needs
-
-        icon.setColor(R.color.accent);
-
-        if (icon != generalIcon)
-        {
-            generalIcon.setColor(R.color.primary);
-        }
-        if (icon != eatOutIcon)
-        {
-            eatOutIcon.setColor(R.color.primary);
-        }
-        if (icon != drinksIcon)
-        {
-            drinksIcon.setColor(R.color.primary);
-        }
-        if (icon != cafeIcon)
-        {
-            cafeIcon.setColor(R.color.primary);
-        }
-        if (icon != movieIcon)
-        {
-            movieIcon.setColor(R.color.primary);
-        }
-        if (icon != outdoorsIcon)
-        {
-            outdoorsIcon.setColor(R.color.primary);
-        }
-        if (icon != partyIcon)
-        {
-            partyIcon.setColor(R.color.primary);
-        }
-        if (icon != eventsIcon)
-        {
-            eventsIcon.setColor(R.color.primary);
-        }
-        if (icon != shoppingIcon)
-        {
-            shoppingIcon.setColor(R.color.primary);
-        }
-    }
-
     @Override
     public void onClick(View view)
     {
@@ -918,10 +656,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 //            });
 //
 //            sortMenu.show();
-        if (view.getId() == R.id.fib_home_create)
-        {
-            displayCreateEventDialog();
-        }
     }
 
     @Subscribe
