@@ -64,8 +64,8 @@
     <string name="cannot_chat">People who are not going to the event cannot enter the chat room.</string>
     <string name="cannot_change_rsvp">You cannot change the RSVP of an event created by you.</string>
 
-    <string name="unfinalise_event">Are you sure you wan't to unfinalise this event? Other people will now be able to edit the event.</string>
-    <string name="finalise_event">Are you sure you wan't to finalise this event? Other people will not be able to edit the event.</string>
+    <string name="unfinalise_event">Are you sure you wan\'t to unfinalise this event? Other people will now be able to edit the event.</string>
+    <string name="finalise_event">Are you sure you wan\'t to finalise this event? Other people will not be able to edit the event.</string>
 
     <!-- Toast and Blank Screen Messages -->
     <string name="location_not_found">Could not find the location. Please try again.</string>
