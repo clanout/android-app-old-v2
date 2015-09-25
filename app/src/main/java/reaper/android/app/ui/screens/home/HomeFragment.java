@@ -74,8 +74,7 @@ import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class HomeFragment extends BaseFragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener
-{
+public class HomeFragment extends BaseFragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
     private FragmentManager fragmentManager;
     private Bus bus;
 
@@ -113,32 +112,27 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     private Drawable greenNotificationdrawable;
 
     @Override
-    public void onRefresh()
-    {
+    public void onRefresh() {
         eventService.getAllEventIds();
     }
 
-    private enum Sort implements Serializable
-    {
+    private enum Sort implements Serializable {
         RELEVANCE, DATE_TIME, DISTANCE
     }
 
-    private enum Filter implements Serializable
-    {
+    private enum Filter implements Serializable {
         TODAY, ALL
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         eventList = (RecyclerView) view.findViewById(R.id.rv_home_events);
@@ -153,8 +147,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState)
-    {
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         ((MainActivity) getActivity()).setSupportActionBar(toolbar);
@@ -195,8 +188,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         initRecyclerView();
     }
 
-    private void generateDrawables()
-    {
+    private void generateDrawables() {
         phoneDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE_ANDROID)
                 .setColor(getResources().getColor(R.color.white))
@@ -231,8 +223,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 //    }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.HOME_FRAGMENT);
@@ -240,19 +231,23 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.HOME);
 
         bus.register(this);
-        eventService.fetchEvents(userLocation.getZone());
-
         ((MainActivity) getActivity()).getSupportActionBar().setTitle("clanOut");
+
+        if (genericCache.get(CacheKeys.HAS_FETCHED_PENDING_INVITES) == null) {
+
+            displayUpdatePhoneDialog();
+
+        } else {
+            eventService.fetchEvents(userLocation.getZone());
+        }
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
         bus.unregister(this);
 
-        if (snackbar != null)
-        {
+        if (snackbar != null) {
             snackbar.dismiss();
         }
     }
@@ -263,24 +258,20 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     @Subscribe
-    public void onEventsFetchTrigger(EventsFetchTrigger eventsFetchTrigger)
-    {
+    public void onEventsFetchTrigger(EventsFetchTrigger eventsFetchTrigger) {
         events = eventsFetchTrigger.getEvents();
         refreshRecyclerView();
     }
 
     @Subscribe
-    public void onEventsNotFetchedTrigger(GenericErrorTrigger trigger)
-    {
-        if (trigger.getErrorCode() == ErrorCode.EVENTS_FETCH_FAILURE)
-        {
+    public void onEventsNotFetchedTrigger(GenericErrorTrigger trigger) {
+        if (trigger.getErrorCode() == ErrorCode.EVENTS_FETCH_FAILURE) {
             displayErrorView();
         }
     }
 
     @Subscribe
-    public void onEventClickTrigger(EventClickTrigger eventClickTrigger)
-    {
+    public void onEventClickTrigger(EventClickTrigger eventClickTrigger) {
         Event event = eventClickTrigger.getEvent();
         int activePosition = events.indexOf(event);
 
@@ -294,8 +285,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     @Subscribe
-    public void onRsvpChanged(RsvpChangeTrigger rsvpChangeTrigger)
-    {
+    public void onRsvpChanged(RsvpChangeTrigger rsvpChangeTrigger) {
         Event updatedEvent = rsvpChangeTrigger.getUpdatedEvent();
         Event.RSVP oldRsvp = rsvpChangeTrigger.getOldRsvp();
 
@@ -303,53 +293,42 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     @Subscribe
-    public void onGenericErrorTrigger(GenericErrorTrigger trigger)
-    {
+    public void onGenericErrorTrigger(GenericErrorTrigger trigger) {
         ErrorCode code = trigger.getErrorCode();
 
-        if (code == ErrorCode.RSVP_UPDATE_FAILURE)
-        {
+        if (code == ErrorCode.RSVP_UPDATE_FAILURE) {
             Toast.makeText(getActivity(), R.string.message_rsvp_update_failure, Toast.LENGTH_LONG).show();
             eventService.fetchEvents(locationService.getUserLocation().getZone());
         }
     }
 
     @Subscribe
-    public void onViewPagerStateChanged(ViewPagerStateChangedTrigger trigger)
-    {
-        if (trigger.getState() == ViewPager.SCROLL_STATE_DRAGGING)
-        {
+    public void onViewPagerStateChanged(ViewPagerStateChangedTrigger trigger) {
+        if (trigger.getState() == ViewPager.SCROLL_STATE_DRAGGING) {
             swipeRefreshLayout.setEnabled(false);
-        } else
-        {
+        } else {
             swipeRefreshLayout.setEnabled(true);
         }
     }
 
     @Subscribe
-    public void onEventIdsFetched(EventIdsFetchedTrigger trigger)
-    {
-        if (genericCache.get(CacheKeys.LAST_UPDATE_TIMESTAMP) != null)
-        {
+    public void onEventIdsFetched(EventIdsFetchedTrigger trigger) {
+        if (genericCache.get(CacheKeys.LAST_UPDATE_TIMESTAMP) != null) {
             eventService.fetchNewEventsAndUpdatesFromNetwork(locationService.getUserLocation().getZone(), trigger.getEventIdList(), genericCache.get(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.class));
-        } else
-        {
+        } else {
             genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now());
         }
     }
 
     @Subscribe
-    public void OnEventIdsNotFetched(GenericErrorTrigger trigger)
-    {
-        if (trigger.getErrorCode() == ErrorCode.EVENT_IDS_FETCH_FAILURE)
-        {
+    public void OnEventIdsNotFetched(GenericErrorTrigger trigger) {
+        if (trigger.getErrorCode() == ErrorCode.EVENT_IDS_FETCH_FAILURE) {
             displayErrorView();
         }
     }
 
     @Subscribe
-    public void onNewEventsAndUpdatesFetched(NewEventsAndUpdatesFetchedTrigger trigger)
-    {
+    public void onNewEventsAndUpdatesFetched(NewEventsAndUpdatesFetchedTrigger trigger) {
         events = trigger.getEventList();
 
 //        sort = Sort.RELEVANCE;
@@ -362,35 +341,28 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     @Subscribe
-    public void onNewEventsAndUpdatesNotFetched(GenericErrorTrigger trigger)
-    {
-        if (trigger.getErrorCode() == ErrorCode.NEW_EVENTS_AND_UPDATES_FETCH_FAILURE)
-        {
+    public void onNewEventsAndUpdatesNotFetched(GenericErrorTrigger trigger) {
+        if (trigger.getErrorCode() == ErrorCode.NEW_EVENTS_AND_UPDATES_FETCH_FAILURE) {
             displayErrorView();
         }
     }
 
-    private void initRecyclerView()
-    {
+    private void initRecyclerView() {
         eventList.setLayoutManager(new LinearLayoutManager(getActivity()));
         eventsAdapter = new EventsAdapter(bus, new ArrayList<Event>(), getActivity(), fragmentManager);
         eventList.setAdapter(eventsAdapter);
 
-        eventList.addOnScrollListener(new RecyclerView.OnScrollListener()
-        {
+        eventList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
-            {
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
 
             }
 
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
-            {
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 
                 boolean enabled = false;
-                if (eventList != null && eventList.getChildCount() > 0)
-                {
+                if (eventList != null && eventList.getChildCount() > 0) {
                     LinearLayoutManager linearLayoutManager = (LinearLayoutManager) eventList.getLayoutManager();
                     boolean isFirstItemVisible = linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0;
 
@@ -402,13 +374,10 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         });
     }
 
-    private void refreshRecyclerView()
-    {
-        if (events.size() == 0)
-        {
+    private void refreshRecyclerView() {
+        if (events.size() == 0) {
             displayNoEventsView();
-        } else
-        {
+        } else {
             dispayBasicView();
         }
 
@@ -460,23 +429,20 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         eventList.setAdapter(eventsAdapter);
     }
 
-    private void dispayBasicView()
-    {
+    private void dispayBasicView() {
         noEventsMessage.setVisibility(View.GONE);
         eventList.setVisibility(View.VISIBLE);
 //        buttonBar.setVisibility(View.VISIBLE);
     }
 
-    private void displayNoEventsView()
-    {
+    private void displayNoEventsView() {
         noEventsMessage.setText(R.string.home_no_events);
         noEventsMessage.setVisibility(View.VISIBLE);
         eventList.setVisibility(View.GONE);
 //        buttonBar.setVisibility(View.VISIBLE);
     }
 
-    private void displayErrorView()
-    {
+    private void displayErrorView() {
         noEventsMessage.setVisibility(View.VISIBLE);
         noEventsMessage.setText(R.string.home_events_fetch_error);
         eventList.setVisibility(View.GONE);
@@ -484,8 +450,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     @Override
-    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater)
-    {
+    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
         menu.clear();
@@ -504,26 +469,21 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 
         menu.findItem(R.id.action_account).setIcon(accountsDrawable);
 
-        menu.findItem(R.id.action_notifications).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
+        menu.findItem(R.id.action_notifications).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item)
-            {
+            public boolean onMenuItemClick(MenuItem item) {
                 FragmentUtils.changeFragment(fragmentManager, new NotificationFragment());
                 return true;
             }
         });
 
-        if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null)
-        {
+        if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null) {
             menu.findItem(R.id.action_add_phone).setVisible(true);
             menu.findItem(R.id.action_add_phone).setIcon(phoneDrawable);
 
-            menu.findItem(R.id.action_add_phone).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-            {
+            menu.findItem(R.id.action_add_phone).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
-                public boolean onMenuItemClick(MenuItem item)
-                {
+                public boolean onMenuItemClick(MenuItem item) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setCancelable(true);
 
@@ -533,11 +493,9 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 
                     final EditText phoneNumber = (EditText) dialogView.findViewById(R.id.et_alert_dialog_add_phone);
 
-                    builder.setPositiveButton("Done", new DialogInterface.OnClickListener()
-                    {
+                    builder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which)
-                        {
+                        public void onClick(DialogInterface dialog, int which) {
 
                         }
                     });
@@ -545,19 +503,15 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                     final AlertDialog alertDialog = builder.create();
                     alertDialog.show();
 
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
-                    {
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(View v)
-                        {
+                        public void onClick(View v) {
                             Boolean wantToCloseDialog = false;
                             String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
-                            if (parsedPhone == null)
-                            {
+                            if (parsedPhone == null) {
                                 Toast.makeText(getActivity(), R.string.phone_invalid, Toast.LENGTH_LONG).show();
                                 wantToCloseDialog = false;
-                            } else
-                            {
+                            } else {
                                 userService.updatePhoneNumber(parsedPhone);
 
                                 menu.findItem(R.id.action_add_phone).setVisible(false);
@@ -569,8 +523,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 
                             }
 
-                            if (wantToCloseDialog)
-                            {
+                            if (wantToCloseDialog) {
                                 alertDialog.dismiss();
                             }
                         }
@@ -580,16 +533,13 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 }
 
             });
-        } else
-        {
+        } else {
             menu.findItem(R.id.action_add_phone).setVisible(false);
         }
 
-        menu.findItem(R.id.action_account).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
+        menu.findItem(R.id.action_account).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem menuItem)
-            {
+            public boolean onMenuItemClick(MenuItem menuItem) {
                 FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
                 return true;
             }
@@ -597,8 +547,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     @Override
-    public void onClick(View view)
-    {
+    public void onClick(View view) {
 //        if (view.getId() == R.id.btn_home_filter)
 //        {
 //            PopupMenu filterMenu = new PopupMenu(getActivity(), filterButton);
@@ -659,27 +608,78 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     @Subscribe
-    public void newNotificationsAvailable(NewNotificationsAvailableTrigger trigger)
-    {
+    public void newNotificationsAvailable(NewNotificationsAvailableTrigger trigger) {
         menu.findItem(R.id.action_notifications).setIcon(greenNotificationdrawable);
     }
 
     @Subscribe
-    public void newNotificationsNotAvailable(NewNotificationsNotAvailableTrigger trigger)
-    {
+    public void newNotificationsNotAvailable(NewNotificationsNotAvailableTrigger trigger) {
         menu.findItem(R.id.action_notifications).setIcon(whiteNotificationdrawable);
     }
 
     @Subscribe
-    public void newNotificationReceived(NewNotificationReceivedTrigger trigger)
-    {
-        getActivity().runOnUiThread(new Runnable()
-        {
+    public void newNotificationReceived(NewNotificationReceivedTrigger trigger) {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 menu.findItem(R.id.action_notifications).setIcon(greenNotificationdrawable);
             }
         });
+    }
+
+    private void displayUpdatePhoneDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
+
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.alert_dialog_add_phone, null);
+        builder.setView(dialogView);
+
+        final EditText phoneNumber = (EditText) dialogView.findViewById(R.id.et_alert_dialog_add_phone);
+
+        builder.setPositiveButton(R.string.fetch_pending_invites_positive_button, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        builder.setNegativeButton(R.string.fetch_pending_invites_negative_button, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                genericCache.put(CacheKeys.HAS_FETCHED_PENDING_INVITES, true);
+
+                eventService.fetchEvents(locationService.getUserLocation().getZone());
+            }
+        });
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Boolean wantToCloseDialog = false;
+                String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
+                if (parsedPhone == null) {
+                    Toast.makeText(getActivity(), R.string.phone_invalid, Toast.LENGTH_LONG).show();
+                    wantToCloseDialog = false;
+                } else {
+                    userService.updatePhoneNumber(parsedPhone);
+
+                    userService.fetchPendingInvites(parsedPhone, locationService.getUserLocation().getZone());
+
+                    InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputManager.hideSoftInputFromWindow(dialogView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
+                    wantToCloseDialog = true;
+                }
+
+                if (wantToCloseDialog) {
+                    alertDialog.dismiss();
+                }
+            }
+        });
+
     }
 }

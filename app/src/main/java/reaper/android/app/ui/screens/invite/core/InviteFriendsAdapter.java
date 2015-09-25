@@ -18,6 +18,7 @@ import com.squareup.picasso.Picasso;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
@@ -42,8 +43,9 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
     private Bus bus;
     private Event event;
     private Drawable personDrawable;
+    private ArrayList<EventDetails.Attendee> attendeeList;
 
-    public InviteFriendsAdapter(Context context, List<EventDetails.Invitee> invitees, List<Friend> friends, boolean isFacebookAdapter, Bus bus, Event event)
+    public InviteFriendsAdapter(Context context, List<EventDetails.Invitee> invitees, List<Friend> friends, boolean isFacebookAdapter, Bus bus, Event event, ArrayList<EventDetails.Attendee> attendeeList)
     {
         inflater = LayoutInflater.from(context);
         this.invitees = invitees;
@@ -52,6 +54,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
         this.isFacebookAdapter = isFacebookAdapter;
         this.bus = bus;
         this.event = event;
+        this.attendeeList = attendeeList;
 
         generateDrawables();
     }
@@ -105,7 +108,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
             // TODO -- already going use case
 
             holder.checkBox.setVisibility(View.GONE);
-            holder.alreadyInvited.setText("Created Event");
+            holder.alreadyInvited.setText("Already Going");
             holder.alreadyInvited.setVisibility(View.VISIBLE);
         } else
         {
@@ -117,15 +120,24 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
                 holder.alreadyInvited.setVisibility(View.VISIBLE);
             } else
             {
-                if (invitees.contains(invitee))
+                EventDetails.Attendee attendee = new EventDetails.Attendee();
+                attendee.setId(current.getId());
+
+                if(attendeeList.contains(attendee))
                 {
                     holder.checkBox.setVisibility(View.GONE);
-                    holder.alreadyInvited.setText("Already Invited");
+                    holder.alreadyInvited.setText("Already Going");
                     holder.alreadyInvited.setVisibility(View.VISIBLE);
-                } else
-                {
-                    holder.alreadyInvited.setVisibility(View.GONE);
-                    holder.checkBox.setVisibility(View.VISIBLE);
+                }else {
+
+                    if (invitees.contains(invitee)) {
+                        holder.checkBox.setVisibility(View.GONE);
+                        holder.alreadyInvited.setText("Already Invited");
+                        holder.alreadyInvited.setVisibility(View.VISIBLE);
+                    } else {
+                        holder.alreadyInvited.setVisibility(View.GONE);
+                        holder.checkBox.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         }

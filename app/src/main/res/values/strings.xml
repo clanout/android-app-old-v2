@@ -8,6 +8,9 @@
     <string name="location_permission_negative_button">No, exit</string>
     <string name="location_denied">Wary? Once inside, make a private clan with your friends. Later!</string>
 
+    <string name="fetch_pending_invites_positive_button">Fetch</string>
+    <string name="fetch_pending_invites_negative_button">No</string>
+
     <!-- First Time Popups -->
     <string name="invite_only_description">Pick friends and make a private clan</string>
     <string name="public_description">Let everyone know about your clan. You can still send personal invites</string>

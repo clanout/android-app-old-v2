@@ -127,7 +127,6 @@ public class FacebookActivity extends AppCompatActivity
                         genericCache.delete(CacheKeys.GCM_TOKEN);
                         genericCache.delete(CacheKeys.GCM_TOKEN_SENT_TO_SERVER);
                         genericCache.delete(CacheKeys.LAST_UPDATE_TIMESTAMP);
-                        genericCache.delete(CacheKeys.MY_PHONE_NUMBER);
                         genericCache.delete(CacheKeys.SESSION_ID);
                         genericCache.delete(CacheKeys.USER_ID);
                         genericCache.delete(CacheKeys.USER_LOCATION);

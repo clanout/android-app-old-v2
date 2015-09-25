@@ -36,6 +36,9 @@ public class NotificationHelper
         }else if(name.equals(NotificationConstants.NEW_FRIEND_JOINED))
         {
             return Notification.NEW_FRIEND_ADDED;
+        }else if(name.equals(NotificationConstants.CHAT))
+        {
+            return Notification.CHAT;
         }
         else
         {
@@ -65,9 +68,15 @@ public class NotificationHelper
                 return getFriendRelocatedMessage(args);
             case Notification.NEW_FRIEND_ADDED:
                 return newFriendJoinedAppMessage(args);
+            case Notification.CHAT:
+                return newChatMessageReceivedMessage(args);
             default:
                 return "";
         }
+    }
+
+    private static String newChatMessageReceivedMessage(Map<String, String> args) {
+        return "New Chat Message in the clan ---- " + args.get("event_name");
     }
 
     private static String newFriendJoinedAppMessage(Map<String, String> args)

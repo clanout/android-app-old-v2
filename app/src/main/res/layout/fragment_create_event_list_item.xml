@@ -30,8 +30,7 @@
                     android:maxLength="22"
                     android:maxLines="1"
                     android:textColor="@color/abc_primary_text_material_light"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textSize="20sp" />
 
             </LinearLayout>
 

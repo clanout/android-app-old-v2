@@ -11,6 +11,7 @@ import reaper.android.app.api.event.request.FetchNewEventsAndUpdatesApiRequest;
 import reaper.android.app.api.event.request.FinaliseEventApiRequest;
 import reaper.android.app.api.event.request.InviteUsersApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
+import reaper.android.app.api.event.request.SendChatNotificationApiRequest;
 import reaper.android.app.api.event.response.CreateEventApiResponse;
 import reaper.android.app.api.event.response.EventDetailsApiResponse;
 import reaper.android.app.api.event.response.EventSuggestionsApiResponse;
@@ -56,4 +57,7 @@ public interface EventApi
 
     @POST("/event/finalize")
     Observable<Response> finaliseEvent(@Body FinaliseEventApiRequest request);
+
+    @POST("/event/chat")
+    Observable<Response> sendChatNotification(@Body SendChatNotificationApiRequest request);
 }

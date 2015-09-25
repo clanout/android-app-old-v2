@@ -10,20 +10,23 @@ import org.jivesoftware.smackx.muc.MUCNotJoinedException;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import reaper.android.app.model.ChatMessage;
+import reaper.android.app.api.core.ApiManager;
+import reaper.android.app.api.event.EventApi;
+import reaper.android.app.api.event.request.SendChatNotificationApiRequest;
+import retrofit.client.Response;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
 public class ChatService
 {
     private Bus bus;
-    private UserService userService;
     private static final String XMPP_CHATROOM_PREFIX = "@conference.52.1.78.109";
+    private EventApi eventApi;
 
     public ChatService(Bus bus)
     {
         this.bus = bus;
+        this.eventApi = ApiManager.getInstance().getApi(EventApi.class);
     }
 
     public void fetchHistory(MultiUserChat chat, String nickName, String userId, long timeout, int maxStanzas) throws SmackException.NotConnectedException, XMPPException.XMPPErrorException, SmackException.NoResponseException, MUCNotJoinedException
@@ -48,6 +51,26 @@ public class ChatService
         MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
         MultiUserChat chat = manager.getMultiUserChat(eventId + XMPP_CHATROOM_PREFIX);
         return chat;
+    }
+
+    public void sendChatNotification(String eventId, String eventName)
+    {
+        eventApi.sendChatNotification(new SendChatNotificationApiRequest(eventId, eventName)).subscribeOn(Schedulers.newThread()).observeOn(Schedulers.newThread()).subscribe(new Subscriber<Response>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Response response) {
+
+            }
+        });
     }
 
 }

@@ -98,7 +98,38 @@ public class NotificationService
             case Notification.NEW_FRIEND_ADDED:
                 handleNewFriendJoinedAppNotification(notification);
                 break;
+            case Notification.CHAT:
+                handleNewChatMessageNotification(notification);
+                break;
         }
+    }
+
+    private void handleNewChatMessageNotification(final Notification notification) {
+
+        notificationCache.put(notification).observeOn(Schedulers.newThread()).subscribe(new Subscriber<Object>() {
+            @Override
+            public void onCompleted() {
+
+                if (ifAppRunningInForeground())
+                {
+                    bus.post(new NewNotificationReceivedTrigger());
+
+                } else
+                {
+                    buildNotification(notification, true);
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Object o) {
+
+            }
+        });
     }
 
     private void handleNewFriendJoinedAppNotification(final Notification notification)

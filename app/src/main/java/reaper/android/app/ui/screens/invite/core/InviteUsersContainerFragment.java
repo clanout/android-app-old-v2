@@ -60,6 +60,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements TabLay
     private GenericCache genericCache;
 
     private ArrayList<EventDetails.Invitee> inviteeList;
+    private ArrayList<EventDetails.Attendee> attendeeList;
     private Event event;
     private Boolean fromCreateFragment;
 
@@ -126,7 +127,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements TabLay
 
         genericCache = CacheManager.getGenericCache();
 
-        InviteUsersPagerAdapter inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), new ArrayList<EventDetails.Invitee>(), event);
+        InviteUsersPagerAdapter inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), new ArrayList<EventDetails.Invitee>(), new ArrayList<EventDetails.Attendee>(), event);
         viewPager.setAdapter(inviteUsersPagerAdapter);
         viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
@@ -243,8 +244,9 @@ public class InviteUsersContainerFragment extends BaseFragment implements TabLay
         if (!fromCreateFragment)
         {
             inviteeList = (ArrayList<EventDetails.Invitee>) trigger.getEventDetails().getInvitee();
+            attendeeList = (ArrayList<EventDetails.Attendee>) trigger.getEventDetails().getAttendees();
 
-            InviteUsersPagerAdapter inviteUsersPagerAdapterA = new InviteUsersPagerAdapter(getChildFragmentManager(), inviteeList, event);
+            InviteUsersPagerAdapter inviteUsersPagerAdapterA = new InviteUsersPagerAdapter(getChildFragmentManager(), inviteeList, attendeeList, event);
             viewPager.setAdapter(inviteUsersPagerAdapterA);
         }
     }

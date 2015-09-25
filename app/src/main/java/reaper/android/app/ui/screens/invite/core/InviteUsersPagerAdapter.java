@@ -17,17 +17,20 @@ import reaper.android.app.ui.screens.invite.phone.InvitePhoneContactsFragment;
 public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
 {
     private ArrayList<EventDetails.Invitee> inviteeList;
+    private ArrayList<EventDetails.Attendee> attendeeList;
     private Event event;
 
-    public InviteUsersPagerAdapter(FragmentManager fm, ArrayList<EventDetails.Invitee> inviteeList, Event event)
+    public InviteUsersPagerAdapter(FragmentManager fm, ArrayList<EventDetails.Invitee> inviteeList, ArrayList<EventDetails.Attendee> attendeeList, Event event)
     {
         super(fm);
 
+        this.inviteeList = inviteeList;
+        this.attendeeList = attendeeList;
+        this.event = event;
+
         Bundle bundle = new Bundle();
         bundle.putSerializable(BundleKeys.INVITEE_LIST, inviteeList);
-
-        this.inviteeList = inviteeList;
-        this.event = event;
+        bundle.putSerializable(BundleKeys.ATTENDEE_LIST, attendeeList);
     }
 
     @Override
@@ -35,6 +38,7 @@ public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
     {
         Bundle bundle = new Bundle();
         bundle.putSerializable(BundleKeys.INVITEE_LIST, inviteeList);
+        bundle.putSerializable(BundleKeys.ATTENDEE_LIST, attendeeList);
         bundle.putSerializable(BundleKeys.EVENT, event);
 
         switch (position)

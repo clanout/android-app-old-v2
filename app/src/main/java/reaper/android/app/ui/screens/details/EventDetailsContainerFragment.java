@@ -273,6 +273,7 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
                 ChatFragment chatFragment = new ChatFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_ID, events.get(activePosition).getId());
+                bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_NAME, events.get(activePosition).getTitle());
                 chatFragment.setArguments(bundle);
                 FragmentUtils.changeFragment(fragmentManager, chatFragment);
 

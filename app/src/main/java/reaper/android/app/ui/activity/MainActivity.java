@@ -71,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         DateTime start = DateTime.now();
         DateTime end = start.plusDays(1).withTimeAtStartOfDay();
 

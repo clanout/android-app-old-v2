@@ -12,4 +12,7 @@ public class NotificationConstants
     public static final String BLOCKED = "BLOCKED";
     public static final String UNBLOCKED = "UNBLOCKED";
     public static final String NEW_FRIEND_JOINED = "NEW_FRIEND";
+    public static final String CHAT = "CHAT";
+
+
 }

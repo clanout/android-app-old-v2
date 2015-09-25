@@ -22,4 +22,6 @@ public class CacheKeys
     public static final String LAST_UPDATE_TIMESTAMP = "last_update_timestamp";
 
     public static final String IS_APP_IN_FOREGROUND = "is_app_in_foreground";
+
+    public static final String HAS_FETCHED_PENDING_INVITES = "has_fetched_pending_invites";
 }

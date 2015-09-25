@@ -65,6 +65,7 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
     private Drawable refreshDrawable, whatsappDrawable;
 
     private ArrayList<EventDetails.Invitee> inviteeList;
+    private ArrayList<EventDetails.Attendee> attendeeList;
     private List<Friend> friendList;
     private Event event;
     private InviteFriendsAdapter inviteFriendsAdapter;
@@ -135,14 +136,21 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
         if (bundle == null)
         {
             inviteeList = new ArrayList<>();
+            attendeeList = new ArrayList<>();
         } else
         {
             inviteeList = (ArrayList<EventDetails.Invitee>) bundle.get(BundleKeys.INVITEE_LIST);
+            attendeeList = (ArrayList<EventDetails.Attendee>) bundle.get(BundleKeys.ATTENDEE_LIST);
             event = (Event) bundle.get(BundleKeys.EVENT);
 
             if (inviteeList == null)
             {
                 inviteeList = new ArrayList<>();
+            }
+
+            if(attendeeList == null)
+            {
+                attendeeList = new ArrayList<>();
             }
         }
 
@@ -282,7 +290,7 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
 
     private void initRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, false, bus, event);
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, false, bus, event, attendeeList);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -290,7 +298,7 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
 
     private void refreshRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, false, bus, event);
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, false, bus, event, attendeeList);
         recyclerView.setAdapter(inviteFriendsAdapter);
 
         if (friendList.size() == 0)
