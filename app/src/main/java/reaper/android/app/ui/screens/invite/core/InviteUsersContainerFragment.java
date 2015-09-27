@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,7 @@ import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.user.ManageAppFriendsTrigger;
 import reaper.android.app.trigger.user.ManagePhoneContactsTrigger;
+import reaper.android.app.trigger.user.ManageSMSInviteeTrigger;
 import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
@@ -44,15 +46,14 @@ import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class InviteUsersContainerFragment extends BaseFragment implements TabLayout.OnTabSelectedListener, View.OnClickListener
-{
+public class InviteUsersContainerFragment extends BaseFragment implements TabLayout.OnTabSelectedListener, View.OnClickListener {
     private ViewPager viewPager;
     private ImageButton done;
     private TabLayout tabLayout;
     private Drawable checkDrawable;
     private Toolbar toolbar;
 
-//    private InviteUsersPagerAdapter inviteUsersPagerAdapter;
+    //    private InviteUsersPagerAdapter inviteUsersPagerAdapter;
     private FragmentManager fragmentManager;
     private EventService eventService;
     private LocationService locationService;
@@ -67,18 +68,17 @@ public class InviteUsersContainerFragment extends BaseFragment implements TabLay
     private List<String> invitedFacebookFriends;
     private List<String> invitedPhoneContacts;
     private List<String> invitedUsers;
+    private List<String> smsInviteePhoneList;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_invite_friends_container, container, false);
 
         viewPager = (ViewPager) view.findViewById(R.id.vp_invite_friends_container);
@@ -90,33 +90,30 @@ public class InviteUsersContainerFragment extends BaseFragment implements TabLay
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState)
-    {
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         Bundle bundle = getArguments();
-        if (bundle == null)
-        {
+        if (bundle == null) {
             throw new IllegalStateException("Bundle is null");
         }
 
         event = (Event) bundle.get(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT);
-        if (event == null)
-        {
+        if (event == null) {
             throw new IllegalStateException("Event Id is null");
         }
 
         fromCreateFragment = (Boolean) bundle.get(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT);
-        if (fromCreateFragment == null)
-        {
+        if (fromCreateFragment == null) {
             throw new IllegalStateException("fromCreateFragment can't be null");
         }
 
-        ((MainActivity)getActivity()).setSupportActionBar(toolbar);
+        ((MainActivity) getActivity()).setSupportActionBar(toolbar);
 
         invitedFacebookFriends = new ArrayList<>();
         invitedPhoneContacts = new ArrayList<>();
         invitedUsers = new ArrayList<>();
+        smsInviteePhoneList = new ArrayList<>();
 
         generateDrawables();
 
@@ -129,13 +126,12 @@ public class InviteUsersContainerFragment extends BaseFragment implements TabLay
 
         InviteUsersPagerAdapter inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), new ArrayList<EventDetails.Invitee>(), new ArrayList<EventDetails.Attendee>(), event);
         viewPager.setAdapter(inviteUsersPagerAdapter);
+        viewPager.setOffscreenPageLimit(2);
         viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
-        tabLayout.post(new Runnable()
-        {
+        tabLayout.post(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 tabLayout.setupWithViewPager(viewPager);
             }
         });
@@ -145,8 +141,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements TabLay
         done.setImageDrawable(checkDrawable);
     }
 
-    private void generateDrawables()
-    {
+    private void generateDrawables() {
         checkDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
                 .setColor(getResources().getColor(R.color.white))
@@ -155,94 +150,92 @@ public class InviteUsersContainerFragment extends BaseFragment implements TabLay
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_USERS_CONTAINER_FRAGMENT);
-        ((MainActivity)getActivity()).getSupportActionBar().setTitle("Invite Friends");
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle("Invite Friends");
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.INVITE_USERS_CONTAINER);
         bus.register(this);
-        if (!fromCreateFragment)
-        {
+        if (!fromCreateFragment) {
             eventService.fetchEventDetails(event.getId());
         }
     }
 
     @Override
-    public void onTabSelected(TabLayout.Tab tab)
-    {
+    public void onTabSelected(TabLayout.Tab tab) {
         viewPager.setCurrentItem(tab.getPosition());
     }
 
     @Override
-    public void onTabUnselected(TabLayout.Tab tab)
-    {
+    public void onTabUnselected(TabLayout.Tab tab) {
 
     }
 
     @Override
-    public void onTabReselected(TabLayout.Tab tab)
-    {
+    public void onTabReselected(TabLayout.Tab tab) {
 
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
         bus.unregister(this);
     }
 
     @Subscribe
-    public void onManageFacebookFriendsTriggerReceived(ManageAppFriendsTrigger trigger)
-    {
-        if (invitedFacebookFriends.contains(trigger.getId()))
-        {
-            invitedFacebookFriends.remove(trigger.getId());
-        }
-        else
-        {
-            invitedFacebookFriends.add(trigger.getId());
+    public void onManageFacebookFriendsTriggerReceived(ManageAppFriendsTrigger trigger) {
+
+        if (trigger.isSelected()) {
+            if (!(invitedFacebookFriends.contains(trigger.getId()))) {
+                invitedFacebookFriends.add(trigger.getId());
+            }
+        } else {
+
+            if (invitedPhoneContacts.contains(trigger.getId())) {
+                invitedFacebookFriends.remove(trigger.getId());
+            }
         }
     }
 
     @Subscribe
-    public void onManagePhoneContactsTriggerReceived(ManagePhoneContactsTrigger trigger)
-    {
-        if (invitedPhoneContacts.contains(trigger.getId()))
-        {
-            invitedPhoneContacts.remove(trigger.getId());
-        }
-        else
-        {
-            invitedPhoneContacts.add(trigger.getId());
+    public void onManagePhoneContactsTriggerReceived(ManagePhoneContactsTrigger trigger) {
+        if (trigger.isSelected()) {
+            if (!(invitedPhoneContacts.contains(trigger.getId()))) {
+                invitedPhoneContacts.add(trigger.getId());
+            }
+        } else {
+
+            if (invitedPhoneContacts.contains(trigger.getId())) {
+                invitedPhoneContacts.remove(trigger.getId());
+            }
         }
     }
 
     @Override
-    public void onClick(View view)
-    {
-        if (view.getId() == R.id.ib_invite_friends_container_done)
-        {
+    public void onClick(View view) {
+        if (view.getId() == R.id.ib_invite_friends_container_done) {
             invitedUsers = new ArrayList<>();
             invitedUsers.addAll(invitedFacebookFriends);
             invitedUsers.addAll(invitedPhoneContacts);
 
-            if (invitedUsers.size() != 0)
-            {
+            if (invitedUsers.size() != 0) {
                 eventService.inviteUsers(event.getId(), invitedUsers);
             }
+
+            if(smsInviteePhoneList.size() != 0)
+            {
+                eventService.inviteThroughSMS(event.getId(), smsInviteePhoneList);
+            }
+
             eventService.fetchEvents(locationService.getUserLocation().getZone());
         }
     }
 
     @Subscribe
-    public void onEventDetailsFetched(EventDetailsFetchTrigger trigger)
-    {
-        if (!fromCreateFragment)
-        {
+    public void onEventDetailsFetched(EventDetailsFetchTrigger trigger) {
+        if (!fromCreateFragment) {
             inviteeList = (ArrayList<EventDetails.Invitee>) trigger.getEventDetails().getInvitee();
             attendeeList = (ArrayList<EventDetails.Attendee>) trigger.getEventDetails().getAttendees();
 
@@ -252,8 +245,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements TabLay
     }
 
     @Subscribe
-    public void onEventsFetched(EventsFetchTrigger trigger)
-    {
+    public void onEventsFetched(EventsFetchTrigger trigger) {
         List<Event> events = trigger.getEvents();
 
         Event activeEvent = new Event();
@@ -270,11 +262,24 @@ public class InviteUsersContainerFragment extends BaseFragment implements TabLay
     }
 
     @Subscribe
-    public void backPressed(BackPressedTrigger trigger)
-    {
-        if (trigger.getActiveFragment().equals(BackstackTags.INVITE_USERS_CONTAINER))
-        {
+    public void backPressed(BackPressedTrigger trigger) {
+        if (trigger.getActiveFragment().equals(BackstackTags.INVITE_USERS_CONTAINER)) {
             eventService.fetchEvents(locationService.getUserLocation().getZone());
+        }
+    }
+
+    @Subscribe
+    public void onSMSInviteTriggerReceived(ManageSMSInviteeTrigger trigger) {
+
+        if (trigger.isSelected()) {
+            if (!(smsInviteePhoneList.contains(trigger.getPhone()))) {
+                smsInviteePhoneList.add(trigger.getPhone());
+            }
+        } else {
+
+            if (smsInviteePhoneList.contains(trigger.getPhone())) {
+                smsInviteePhoneList.remove(trigger.getPhone());
+            }
         }
     }
 }

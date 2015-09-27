@@ -9,6 +9,7 @@ import reaper.android.app.api.event.request.EventsApiRequest;
 import reaper.android.app.api.event.request.FetchEventApiRequest;
 import reaper.android.app.api.event.request.FetchNewEventsAndUpdatesApiRequest;
 import reaper.android.app.api.event.request.FinaliseEventApiRequest;
+import reaper.android.app.api.event.request.InviteThroughSMSApiRequest;
 import reaper.android.app.api.event.request.InviteUsersApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
 import reaper.android.app.api.event.request.SendChatNotificationApiRequest;
@@ -60,4 +61,7 @@ public interface EventApi
 
     @POST("/event/chat")
     Observable<Response> sendChatNotification(@Body SendChatNotificationApiRequest request);
+
+    @POST("/event/phone_invitation")
+    Observable<Response> inviteThroughSMS(@Body InviteThroughSMSApiRequest request);
 }

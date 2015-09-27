@@ -13,6 +13,7 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.ui.screens.invite.facebook.InviteFacebookFriendsFragment;
 import reaper.android.app.ui.screens.invite.phone.InvitePhoneContactsFragment;
+import reaper.android.app.ui.screens.invite.sms.InviteThroughSMSFragment;
 
 public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
 {
@@ -51,6 +52,9 @@ public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
                 InvitePhoneContactsFragment contactsFragment = new InvitePhoneContactsFragment();
                 contactsFragment.setArguments(bundle);
                 return contactsFragment;
+            case 2:
+                InviteThroughSMSFragment inviteThroughSMSFragment = new InviteThroughSMSFragment();
+                return inviteThroughSMSFragment;
         }
         return null;
     }
@@ -58,7 +62,7 @@ public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
     @Override
     public int getCount()
     {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -72,6 +76,8 @@ public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
                 return "Facebook Friends";
             case 1:
                 return "Phone Contacts";
+            case 2:
+                return "SMS";
         }
         return null;
     }

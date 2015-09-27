@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,7 +21,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -266,18 +266,14 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
 
         menu.findItem(R.id.action_refresh).setIcon(refreshDrawable);
 
-        menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
+        menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem menuItem)
-            {
+            public boolean onMenuItemClick(MenuItem menuItem) {
 
-                if (!isPhoneAdded)
-                {
-                    Toast.makeText(getActivity(), R.string.add_phone_number, Toast.LENGTH_LONG).show();
+                if (!isPhoneAdded) {
+                    Snackbar.make(getView(), R.string.add_phone_number, Snackbar.LENGTH_LONG).show();
                     return true;
-                } else
-                {
+                } else {
 
                     menuItem.setActionView(R.layout.action_button_refreshing);
                     userService.refreshPhoneContacts(getActivity()
@@ -391,7 +387,7 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
                     String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
                     if (parsedPhone == null)
                     {
-                        Toast.makeText(getActivity(), R.string.phone_invalid, Toast.LENGTH_LONG).show();
+                        Snackbar.make(getView(), R.string.phone_invalid, Snackbar.LENGTH_LONG).show();
                         wantToCloseDialog = false;
                     } else
                     {
@@ -426,7 +422,7 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
                 startActivity(sendIntent);
             } else
             {
-                Toast.makeText(getActivity(), R.string.whatsapp_not_installed, Toast.LENGTH_LONG).show();
+                Snackbar.make(getView(), R.string.whatsapp_not_installed, Snackbar.LENGTH_LONG).show();
             }
         }
     }

@@ -3,6 +3,7 @@ package reaper.android.app.ui.screens.notifications;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -285,7 +285,7 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
             activePosition = events.indexOf(activeEvent);
         } else
         {
-            Toast.makeText(getActivity(), R.string.event_not_found, Toast.LENGTH_LONG).show();
+            Snackbar.make(getView(), R.string.event_not_found, Snackbar.LENGTH_LONG).show();
             return;
         }
 

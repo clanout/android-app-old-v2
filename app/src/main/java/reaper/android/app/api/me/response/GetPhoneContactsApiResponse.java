@@ -4,9 +4,10 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+import reaper.android.app.api.core.ApiResponse;
 import reaper.android.app.model.Friend;
 
-public class GetPhoneContactsApiResponse
+public class GetPhoneContactsApiResponse extends ApiResponse
 {
     @SerializedName("registered_contacts")
     private List<Friend> phoneContacts;

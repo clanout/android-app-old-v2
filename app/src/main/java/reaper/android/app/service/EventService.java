@@ -26,6 +26,7 @@ import reaper.android.app.api.event.request.EventsApiRequest;
 import reaper.android.app.api.event.request.FetchEventApiRequest;
 import reaper.android.app.api.event.request.FetchNewEventsAndUpdatesApiRequest;
 import reaper.android.app.api.event.request.FinaliseEventApiRequest;
+import reaper.android.app.api.event.request.InviteThroughSMSApiRequest;
 import reaper.android.app.api.event.request.InviteUsersApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
 import reaper.android.app.api.event.response.CreateEventApiResponse;
@@ -715,21 +716,17 @@ public class EventService
                 .getLongitude(), description, endTime, eventId, placeLocation.getLatitude(), placeLocation.getName(), placeLocation
                 .getZone(), startTime);
 
-        Observable.create(new Observable.OnSubscribe<Event>()
-        {
+        Observable.create(new Observable.OnSubscribe<Event>() {
             @Override
-            public void call(Subscriber<? super Event> subscriber)
-            {
-                try
-                {
+            public void call(Subscriber<? super Event> subscriber) {
+                try {
                     Response response = eventApi.editEvent(request);
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.getBody().in()));
 
                     String line;
                     StringBuilder jsonBuilder = new StringBuilder();
 
-                    while ((line = bufferedReader.readLine()) != null)
-                    {
+                    while ((line = bufferedReader.readLine()) != null) {
                         jsonBuilder.append(line).append("\n");
                     }
 
@@ -739,18 +736,14 @@ public class EventService
 
                     subscriber.onNext(event);
 
-                } catch (RetrofitError e)
-                {
-                    if (e.getResponse().getStatus() == 400)
-                    {
+                } catch (RetrofitError e) {
+                    if (e.getResponse().getStatus() == 400) {
                         subscriber.onError(new Throwable(ExceptionMessages.EVENT_LOCKED));
-                    } else
-                    {
+                    } else {
                         subscriber.onError(new Throwable(ExceptionMessages.BAD_REQUEST));
                     }
 
-                } catch (IOException e)
-                {
+                } catch (IOException e) {
                     subscriber.onError(new Throwable(ExceptionMessages.BAD_REQUEST));
                 }
                 subscriber.onCompleted();
@@ -829,29 +822,51 @@ public class EventService
 
         eventApi.inviteFriends(request)
                 .subscribeOn(Schedulers.newThread())
-                .subscribe(new Subscriber<Response>()
-                {
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Response>() {
                     @Override
-                    public void onCompleted()
-                    {
+                    public void onCompleted() {
 
                     }
 
                     @Override
-                    public void onError(Throwable e)
-                    {
+                    public void onError(Throwable e) {
 
                     }
 
                     @Override
-                    public void onNext(Response response)
-                    {
-                        if (response.getStatus() == 200)
-                        {
+                    public void onNext(Response response) {
+                        if (response.getStatus() == 200) {
                             // TODO: Delete event details or add a new invitee
                         }
                     }
                 });
     }
+
+    public void inviteThroughSMS(String eventId, List<String> phoneNumberList)
+    {
+        InviteThroughSMSApiRequest request = new InviteThroughSMSApiRequest(eventId, phoneNumberList);
+
+        eventApi.inviteThroughSMS(request)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Response>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Response response) {
+
+                    }
+                });
+    }
+
 
 }

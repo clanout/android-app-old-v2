@@ -128,4 +128,6 @@ public class NotificationHelper
     {
         return args.get("user_name") + " is starting a new clan --- " + args.get("event_name");
     }
+
+    //TODO -- notification messages
 }

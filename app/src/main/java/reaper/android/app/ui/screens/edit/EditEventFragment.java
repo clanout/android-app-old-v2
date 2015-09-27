@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -375,7 +376,7 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
                         public void onClick(DialogInterface dialog, int which)
                         {
                             eventService.deleteEvent(event.getId());
-                            Toast.makeText(getActivity(), R.string.event_delete_confirmation, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), R.string.event_delete_confirmation, Toast.LENGTH_LONG).show();
                             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
                         }
                     });
@@ -436,7 +437,6 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
                                 eventService.finaliseEvent(event, false);
 
                                 eventService.fetchEvents(locationService.getUserLocation().getZone());
-                                Toast.makeText(getActivity(), R.string.event_not_finalised, Toast.LENGTH_SHORT).show();
                             }
                         });
 
@@ -470,7 +470,6 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
                                 eventService.finaliseEvent(event, true);
 
                                 eventService.fetchEvents(locationService.getUserLocation().getZone());
-                                Toast.makeText(getActivity(), R.string.event_finalised, Toast.LENGTH_SHORT).show();
                             }
                         });
 
@@ -554,7 +553,7 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
     {
         if (trigger.getErrorCode() == ErrorCode.EVENT_LOCATION_FETCH_FAILURE)
         {
-            Toast.makeText(getActivity(), R.string.location_not_found, Toast.LENGTH_LONG).show();
+            Snackbar.make(getView(), R.string.location_not_found, Snackbar.LENGTH_LONG).show();
             eventLocation.setText("");
 
             Location editedEventLocation = new Location();
@@ -634,8 +633,7 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
 
             editedEvent.setEndTime(null);
             editedEvent.setStartTime(null);
-
-            Toast.makeText(getActivity(), R.string.event_end_before_start, Toast.LENGTH_LONG).show();
+            editedEvent.setStartTime(null);
         } else
         {
             editedEvent.setStartTime(_startDateTime);
@@ -862,7 +860,7 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
     {
         if (trigger.getErrorCode() == ErrorCode.EVENT_EDIT_FAILURE)
         {
-            Toast.makeText(getActivity(), R.string.messed_up, Toast.LENGTH_LONG).show();
+            Snackbar.make(getView(), R.string.messed_up, Snackbar.LENGTH_LONG).show();
         }
     }
 

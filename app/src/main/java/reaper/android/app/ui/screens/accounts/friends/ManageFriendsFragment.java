@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -17,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -51,8 +51,7 @@ import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class ManageFriendsFragment extends BaseFragment implements BlockListCommunicator, View.OnClickListener
-{
+public class ManageFriendsFragment extends BaseFragment implements BlockListCommunicator, View.OnClickListener {
     private RecyclerView recyclerView;
     private TextView noFriendsMessage;
     private ImageButton done;
@@ -74,16 +73,14 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     private GenericCache genericCache;
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_manage_friends, container, false);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_manage_friends);
@@ -97,11 +94,10 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState)
-    {
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        ((MainActivity)getActivity()).setSupportActionBar(toolbar);
+        ((MainActivity) getActivity()).setSupportActionBar(toolbar);
 
         displayBasicView();
 
@@ -125,8 +121,7 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         initRecyclerView();
     }
 
-    private void generateDrawable()
-    {
+    private void generateDrawable() {
         refreshDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
                 .setColor(getResources().getColor(R.color.white))
@@ -141,18 +136,16 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     }
 
     @Override
-    public void onStop()
-    {
+    public void onStop() {
         super.onStop();
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.MANAGE_FRIENDS_FRAGMENT);
-        ((MainActivity)getActivity()).getSupportActionBar().setTitle("Friends");
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle("Friends");
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.MANAGE_FRIENDS);
         bus.register(this);
@@ -160,22 +153,19 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
         bus.unregister(this);
     }
 
-    private void displayBasicView()
-    {
+    private void displayBasicView() {
         recyclerView.setVisibility(View.VISIBLE);
         noFriendsMessage.setVisibility(View.GONE);
         shareFacebook.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
     }
 
-    private void displayErrorView()
-    {
+    private void displayErrorView() {
         recyclerView.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.VISIBLE);
         shareFacebook.setVisibility(View.GONE);
@@ -184,8 +174,7 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         noFriendsMessage.setText(R.string.facebook_friends_not_fetched);
     }
 
-    private void displayNoFriendsView()
-    {
+    private void displayNoFriendsView() {
         recyclerView.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.VISIBLE);
@@ -195,8 +184,7 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
         menu.clear();
@@ -215,11 +203,9 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
 
         menu.findItem(R.id.action_refresh).setIcon(refreshDrawable);
 
-        menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
+        menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item)
-            {
+            public boolean onMenuItemClick(MenuItem item) {
                 item.setActionView(R.layout.action_button_refreshing);
                 facebookService.getFacebookFriends(false);
                 return true;
@@ -227,47 +213,38 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         });
     }
 
-    private void initRecyclerView()
-    {
+    private void initRecyclerView() {
         manageFriendsAdapter = new ManageFriendsAdapter(getActivity(), friendList, this);
 
         recyclerView.setAdapter(manageFriendsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    private void refreshRecyclerView()
-    {
+    private void refreshRecyclerView() {
         manageFriendsAdapter = new ManageFriendsAdapter(getActivity(), friendList, this);
 
         recyclerView.setAdapter(manageFriendsAdapter);
 
-        if (friendList.size() == 0)
-        {
+        if (friendList.size() == 0) {
             displayNoFriendsView();
 
-        } else
-        {
+        } else {
             displayBasicView();
         }
     }
 
     @Subscribe
-    public void onFacebookFriendsUpdatedOnServer(FacebookFriendsUpdatedOnServerTrigger trigger)
-    {
-        if (!trigger.isPolling())
-        {
+    public void onFacebookFriendsUpdatedOnServer(FacebookFriendsUpdatedOnServerTrigger trigger) {
+        if (!trigger.isPolling()) {
             userService.getAllAppFriends();
             genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now().toString());
         }
     }
 
     @Subscribe
-    public void onFacebookFriendsNotUpdatedOnServer(GenericErrorTrigger trigger)
-    {
-        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE)
-        {
-            if (menu != null)
-            {
+    public void onFacebookFriendsNotUpdatedOnServer(GenericErrorTrigger trigger) {
+        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE) {
+            if (menu != null) {
                 menu.findItem(R.id.action_refresh).setActionView(null);
             }
             displayErrorView();
@@ -275,21 +252,16 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     }
 
     @Subscribe
-    public void onFacebookFriendsIdFetched(FacebookFriendsIdFetchedTrigger trigger)
-    {
-        if (!trigger.isPolling())
-        {
+    public void onFacebookFriendsIdFetched(FacebookFriendsIdFetchedTrigger trigger) {
+        if (!trigger.isPolling()) {
             userService.updateFacebookFriends(trigger.getFriendsIdList(), trigger.isPolling());
         }
     }
 
     @Subscribe
-    public void onFacebookFriendsIdNotFetched(GenericErrorTrigger trigger)
-    {
-        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE)
-        {
-            if (menu != null)
-            {
+    public void onFacebookFriendsIdNotFetched(GenericErrorTrigger trigger) {
+        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE) {
+            if (menu != null) {
                 menu.findItem(R.id.action_refresh).setActionView(null);
             }
             displayErrorView();
@@ -297,10 +269,8 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     }
 
     @Subscribe
-    public void onAllAppFriendsFetched(AllAppFriendsFetchedTrigger trigger)
-    {
-        if (menu != null)
-        {
+    public void onAllAppFriendsFetched(AllAppFriendsFetchedTrigger trigger) {
+        if (menu != null) {
             menu.findItem(R.id.action_refresh).setActionView(null);
         }
 
@@ -309,12 +279,9 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     }
 
     @Subscribe
-    public void onAllAppFriendsNotFetched(GenericErrorTrigger trigger)
-    {
-        if (trigger.getErrorCode() == ErrorCode.USER_ALL_APP_FRIENDS_FETCH_FAILURE)
-        {
-            if (menu != null)
-            {
+    public void onAllAppFriendsNotFetched(GenericErrorTrigger trigger) {
+        if (trigger.getErrorCode() == ErrorCode.USER_ALL_APP_FRIENDS_FETCH_FAILURE) {
+            if (menu != null) {
                 menu.findItem(R.id.action_refresh).setActionView(null);
             }
 
@@ -324,17 +291,13 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
 
 
     @Override
-    public void onClick(View view)
-    {
-        if (view.getId() == R.id.ib_manage_friends_done)
-        {
+    public void onClick(View view) {
+        if (view.getId() == R.id.ib_manage_friends_done) {
             userService.sendBlockRequests(blockList, unblockList);
             FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
-        } else if (view.getId() == R.id.fib_fragment_manage_friends_invite_people_whatsapp)
-        {
+        } else if (view.getId() == R.id.fib_fragment_manage_friends_invite_people_whatsapp) {
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
-            if (isWhatsappInstalled)
-            {
+            if (isWhatsappInstalled) {
                 // TODO - Whatsapp invitation message
 
                 Intent sendIntent = new Intent();
@@ -343,47 +306,35 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
                 sendIntent.setType("text/plain");
                 sendIntent.setPackage("com.whatsapp");
                 startActivity(sendIntent);
-            } else
-            {
-                Toast.makeText(getActivity(), R.string.whatsapp_not_installed, Toast.LENGTH_LONG).show();
+            } else {
+                Snackbar.make(getView(), R.string.whatsapp_not_installed, Snackbar.LENGTH_LONG).show();
             }
-        } else if (view.getId() == R.id.fib_fragment_manage_friends_share_facebook)
-        {
-            Toast.makeText(getActivity(), "Facebook", Toast.LENGTH_LONG).show();
         }
     }
 
     @Override
-    public void toggleBlock(String id)
-    {
+    public void toggleBlock(String id) {
         Friend friend = new Friend();
         friend.setId(id);
 
         int position = friendList.indexOf(friend);
 
-        if (friendList.get(position).isBlocked())
-        {
-            if (unblockList.contains(id))
-            {
+        if (friendList.get(position).isBlocked()) {
+            if (unblockList.contains(id)) {
                 unblockList.remove(id);
                 blockList.add(id);
-            } else
-            {
+            } else {
                 unblockList.add(id);
 
-                if (blockList.contains(id))
-                {
+                if (blockList.contains(id)) {
                     blockList.remove(id);
                 }
             }
-        } else
-        {
-            if (blockList.contains(id))
-            {
+        } else {
+            if (blockList.contains(id)) {
                 blockList.remove(id);
                 unblockList.add(id);
-            } else
-            {
+            } else {
                 unblockList.remove(id);
                 blockList.add(id);
             }

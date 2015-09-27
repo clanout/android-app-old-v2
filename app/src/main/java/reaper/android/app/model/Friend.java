@@ -8,6 +8,15 @@ public class Friend implements Model
     private String name;
     private boolean isFavourite;
     private boolean isBlocked;
+    private boolean isChecked;
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setIsChecked(boolean isChecked) {
+        this.isChecked = isChecked;
+    }
 
     public String getId()
     {

@@ -32,9 +32,7 @@ import reaper.android.app.trigger.user.ManagePhoneContactsTrigger;
 /**
  * Created by harsh on 13-05-2015.
  */
-public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdapter.InviteFriendsViewHolder>
-{
-
+public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdapter.InviteFriendsViewHolder> {
     private LayoutInflater inflater;
     private Context context;
     private List<EventDetails.Invitee> invitees;
@@ -45,8 +43,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
     private Drawable personDrawable;
     private ArrayList<EventDetails.Attendee> attendeeList;
 
-    public InviteFriendsAdapter(Context context, List<EventDetails.Invitee> invitees, List<Friend> friends, boolean isFacebookAdapter, Bus bus, Event event, ArrayList<EventDetails.Attendee> attendeeList)
-    {
+    public InviteFriendsAdapter(Context context, List<EventDetails.Invitee> invitees, List<Friend> friends, boolean isFacebookAdapter, Bus bus, Event event, ArrayList<EventDetails.Attendee> attendeeList) {
         inflater = LayoutInflater.from(context);
         this.invitees = invitees;
         this.friends = friends;
@@ -59,8 +56,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
         generateDrawables();
     }
 
-    private void generateDrawables()
-    {
+    private void generateDrawables() {
         personDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.HOME)
                 .setColor(Color.BLACK)
@@ -69,20 +65,17 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
     }
 
     @Override
-    public InviteFriendsViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
-    {
+    public InviteFriendsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.list_item_invite_friends, parent, false);
         InviteFriendsViewHolder holder = new InviteFriendsViewHolder(view);
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(InviteFriendsViewHolder holder, int position)
-    {
-        Friend current = friends.get(position);
+    public void onBindViewHolder(InviteFriendsViewHolder holder, final int position) {
+        final Friend current = friends.get(position);
 
-        if (isFacebookAdapter)
-        {
+        if (isFacebookAdapter) {
             holder.userPic.setVisibility(View.VISIBLE);
 
             Picasso.with(context)
@@ -93,8 +86,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
                     .into(holder.userPic);
 
 
-        } else
-        {
+        } else {
             holder.userPic.setVisibility(View.GONE);
         }
 
@@ -103,32 +95,26 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
         EventDetails.Invitee invitee = new EventDetails.Invitee();
         invitee.setId(current.getId());
 
-        if (event.getOrganizerId().equals(current.getId()))
-        {
-            // TODO -- already going use case
+        if (event.getOrganizerId().equals(current.getId())) {
 
             holder.checkBox.setVisibility(View.GONE);
             holder.alreadyInvited.setText("Already Going");
             holder.alreadyInvited.setVisibility(View.VISIBLE);
-        } else
-        {
+        } else {
 
-            if (current.isBlocked())
-            {
+            if (current.isBlocked()) {
                 holder.checkBox.setVisibility(View.GONE);
                 holder.alreadyInvited.setText("Blocked");
                 holder.alreadyInvited.setVisibility(View.VISIBLE);
-            } else
-            {
+            } else {
                 EventDetails.Attendee attendee = new EventDetails.Attendee();
                 attendee.setId(current.getId());
 
-                if(attendeeList.contains(attendee))
-                {
+                if (attendeeList.contains(attendee)) {
                     holder.checkBox.setVisibility(View.GONE);
                     holder.alreadyInvited.setText("Already Going");
                     holder.alreadyInvited.setVisibility(View.VISIBLE);
-                }else {
+                } else {
 
                     if (invitees.contains(invitee)) {
                         holder.checkBox.setVisibility(View.GONE);
@@ -137,6 +123,8 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
                     } else {
                         holder.alreadyInvited.setVisibility(View.GONE);
                         holder.checkBox.setVisibility(View.VISIBLE);
+
+                       holder.checkBox.setChecked(current.isChecked());
                     }
                 }
             }
@@ -144,20 +132,17 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
     }
 
     @Override
-    public int getItemCount()
-    {
+    public int getItemCount() {
         return friends.size();
     }
 
-    class InviteFriendsViewHolder extends RecyclerView.ViewHolder implements CompoundButton.OnCheckedChangeListener
-    {
+    class InviteFriendsViewHolder extends RecyclerView.ViewHolder {
 
         ImageView userPic;
         TextView username, alreadyInvited;
         CheckBox checkBox;
 
-        public InviteFriendsViewHolder(View itemView)
-        {
+        public InviteFriendsViewHolder(View itemView) {
             super(itemView);
 
             username = (TextView) itemView.findViewById(R.id.tv_list_item_invite_friends_user_name);
@@ -165,19 +150,19 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
             alreadyInvited = (TextView) itemView.findViewById(R.id.tv_list_item_invite_friends_already_invited);
             checkBox = (CheckBox) itemView.findViewById(R.id.cb_list_item_invite_friends);
 
-            checkBox.setOnCheckedChangeListener(this);
-        }
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-        @Override
-        public void onCheckedChanged(CompoundButton compoundButton, boolean b)
-        {
-            if (isFacebookAdapter)
-            {
-                bus.post(new ManageAppFriendsTrigger(friends.get(getAdapterPosition()).getId()));
-            } else
-            {
-                bus.post(new ManagePhoneContactsTrigger(friends.get(getAdapterPosition()).getId()));
-            }
+                    friends.get(getAdapterPosition()).setIsChecked(isChecked);
+
+                    if (isFacebookAdapter) {
+                        bus.post(new ManageAppFriendsTrigger(friends.get(getAdapterPosition()).getId(), isChecked));
+                    } else {
+                        bus.post(new ManagePhoneContactsTrigger(friends.get(getAdapterPosition()).getId(), isChecked));
+                    }
+                }
+            });
         }
     }
 }

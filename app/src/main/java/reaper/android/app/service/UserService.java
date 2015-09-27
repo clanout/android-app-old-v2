@@ -3,9 +3,11 @@ package reaper.android.app.service;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import com.squareup.otto.Bus;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,9 +34,11 @@ import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Friend;
+import reaper.android.app.model.PhoneContact;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.user.AllAppFriendsFetchedTrigger;
+import reaper.android.app.trigger.user.AllPhoneContactsForSMSFetchedTrigger;
 import reaper.android.app.trigger.user.AppFriendsFetchedFromNetworkTrigger;
 import reaper.android.app.trigger.user.AppFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
@@ -359,6 +363,77 @@ public class UserService {
         cur.close();
         return allContacts;
     }
+
+    public void fetchAllPhoneContacts(final ContentResolver contentResolver) {
+
+        Observable.create(new Observable.OnSubscribe<List<PhoneContact>>() {
+            @Override
+            public void call(Subscriber<? super List<PhoneContact>> subscriber) {
+
+                Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+
+                String id = null;
+                String name = null;
+                String phone = null;
+                String sanitizedPhone = null;
+                List<PhoneContact> phoneContactList = new ArrayList<>();
+
+                if (cursor.getCount() > 0) {
+                    while (cursor.moveToNext()) {
+                        id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                        name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                        if (Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+
+                            Cursor smallCursor = contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                                    new String[]{id}, null);
+
+
+                            while (smallCursor.moveToNext()) {
+                                phone = smallCursor.getString(smallCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                                sanitizedPhone = PhoneUtils.sanitize(phone, AppConstants.DEFAULT_COUNTRY_CODE);
+
+                                PhoneContact phoneContact = new PhoneContact();
+                                phoneContact.setName(name);
+                                phoneContact.setPhone(sanitizedPhone);
+                                phoneContact.setIsSelected(false);
+
+                                if(!phoneContactList.contains(phoneContact))
+                                {
+                                    phoneContactList.add(phoneContact);
+                                }
+
+                            }
+                            smallCursor.close();
+                        }
+                    }
+                    cursor.close();
+                }
+
+                subscriber.onNext(phoneContactList);
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<List<PhoneContact>>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+                bus.post(new GenericErrorTrigger(ErrorCode.PHONE_CONTACTS_FOR_SMS_FETCH_FAILURE, (Exception) e));
+            }
+
+            @Override
+            public void onNext(List<PhoneContact> phoneContacts) {
+
+                bus.post(new AllPhoneContactsForSMSFetchedTrigger(phoneContacts));
+            }
+        });
+
+    }
+
 
     public void fetchPendingInvites(String phoneNumber, String zone) {
 

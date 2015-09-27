@@ -22,7 +22,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -297,7 +296,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         ErrorCode code = trigger.getErrorCode();
 
         if (code == ErrorCode.RSVP_UPDATE_FAILURE) {
-            Toast.makeText(getActivity(), R.string.message_rsvp_update_failure, Toast.LENGTH_LONG).show();
+            Snackbar.make(getView(), R.string.message_rsvp_update_failure, Snackbar.LENGTH_LONG).show();
             eventService.fetchEvents(locationService.getUserLocation().getZone());
         }
     }
@@ -509,7 +508,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                             Boolean wantToCloseDialog = false;
                             String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
                             if (parsedPhone == null) {
-                                Toast.makeText(getActivity(), R.string.phone_invalid, Toast.LENGTH_LONG).show();
+                                Snackbar.make(getView(), R.string.phone_invalid, Snackbar.LENGTH_LONG).show();
                                 wantToCloseDialog = false;
                             } else {
                                 userService.updatePhoneNumber(parsedPhone);
@@ -662,7 +661,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 Boolean wantToCloseDialog = false;
                 String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
                 if (parsedPhone == null) {
-                    Toast.makeText(getActivity(), R.string.phone_invalid, Toast.LENGTH_LONG).show();
+                    Snackbar.make(getView(), R.string.phone_invalid, Snackbar.LENGTH_LONG).show();
                     wantToCloseDialog = false;
                 } else {
                     userService.updatePhoneNumber(parsedPhone);

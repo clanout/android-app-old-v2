@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -19,7 +20,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -280,7 +280,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
                 chatService.postMessage(multiUserChat, message, userService.getActiveUserName() + "_" + userService.getActiveUserId(), connection.getPacketReplyTimeout());
             } catch (Exception e) {
                 typeMessage.setText(message);
-                Toast.makeText(getActivity(), R.string.chat_message_not_sent, Toast.LENGTH_LONG).show();
+                Snackbar.make(getView(), R.string.chat_message_not_sent, Snackbar.LENGTH_LONG).show();
                 return;
             }
 

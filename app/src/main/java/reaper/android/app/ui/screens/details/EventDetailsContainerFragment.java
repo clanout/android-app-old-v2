@@ -4,6 +4,7 @@ import android.app.FragmentTransaction;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
@@ -13,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
-import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -216,7 +216,7 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
         {
             if(events.get(activePosition).getOrganizerId().equals(userService.getActiveUserId())){
 
-                Toast.makeText(getActivity(), R.string.cannot_change_rsvp, Toast.LENGTH_LONG).show();
+                Snackbar.make(getView(), R.string.cannot_change_rsvp, Snackbar.LENGTH_LONG).show();
 
             }else
             {
@@ -264,7 +264,7 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
                 FragmentUtils.changeFragment(fragmentManager, inviteUsersContainerFragment);
             } else
             {
-                Toast.makeText(getActivity(), R.string.cannot_invite, Toast.LENGTH_LONG).show();
+                Snackbar.make(getView(), R.string.cannot_invite, Snackbar.LENGTH_LONG).show();
             }
         } else if (view.getId() == R.id.ibtn_event_details_chat)
         {
@@ -279,7 +279,7 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
 
             } else
             {
-                Toast.makeText(getActivity(), R.string.cannot_chat, Toast.LENGTH_LONG).show();
+                Snackbar.make(getView(), R.string.cannot_chat, Snackbar.LENGTH_LONG).show();
             }
         }
     }
@@ -319,7 +319,7 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
         if (trigger.getEventId().equals(events.get(activePosition).getId()))
         {
             events.get(activePosition).setRsvp(trigger.getOldRsvp());
-            Toast.makeText(getActivity(), R.string.message_rsvp_update_failure, Toast.LENGTH_LONG).show();
+            Snackbar.make(getView(), R.string.message_rsvp_update_failure, Snackbar.LENGTH_LONG).show();
         }
     }
 }

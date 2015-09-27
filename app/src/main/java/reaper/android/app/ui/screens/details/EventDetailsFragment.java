@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -389,11 +390,11 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
                     }
                 } else if (EventUtils.canEdit(event, userService.getActiveUserId()) == EventUtilsConstants.CANNOT_EDIT_LOCKED)
                 {
-                    Toast.makeText(getActivity(), R.string.cannot_edit_event_locked, Toast.LENGTH_LONG).show();
+                    Snackbar.make(getView(), R.string.cannot_edit_event_locked, Snackbar.LENGTH_LONG).show();
 
                 } else if (EventUtils.canEdit(event, userService.getActiveUserId()) == EventUtilsConstants.CANNOT_EDIT_NOT_GOING)
                 {
-                    Toast.makeText(getActivity(), R.string.cannot_edit_event_not_going, Toast.LENGTH_LONG).show();
+                    Snackbar.make(getView(), R.string.cannot_edit_event_not_going, Snackbar.LENGTH_LONG).show();
                 }
                 return true;
             }
@@ -412,7 +413,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
                 startActivity(intent);
             } else
             {
-                Toast.makeText(getActivity(), R.string.location_not_available_on_map, Toast.LENGTH_LONG).show();
+                Snackbar.make(getView(), R.string.location_not_available_on_map, Snackbar.LENGTH_LONG).show();
             }
         } else if (view.getId() == R.id.tv_event_details_description)
         {
