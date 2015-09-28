@@ -4,7 +4,7 @@
     <color name="primary">#0097A7</color>
     <color name="primary_dark">#006064</color>
     <color name="primary_light">#B2EBF2</color>
-    <color name="accent">#4C9689</color>
+    <color name="accent">#448AFF</color>
     <color name="accent_secondary">#EF9A9A</color>
 
     <!-- Background -->
@@ -26,5 +26,7 @@
     <color name="pink">#F8BBD0</color>
     <color name="lime">#F0F4C3</color>
     <color name="orange">#FFE0B2</color>
-    <color name="purple">#E1BEE7</color>
+    <color name="purple">#9C27B0</color>
+
+    <color name="abc">#3949AB</color>
 </resources>
