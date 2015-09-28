@@ -45,10 +45,6 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
         this.context = context;
         this.blockListCommunicator = blockListCommunicator;
 
-        Friend friend1 = new Friend();
-        friend1.setBlocked(false);
-        friend1.setName("Friend 1");
-
         generateDrawables();
     }
 
@@ -143,23 +139,15 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
                 AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.PERSON_UNBLOCKED, null);
                 blockIcon.setImageDrawable(unblockedDrawable);
                 friends.get(getAdapterPosition()).setBlocked(false);
+                blockListCommunicator.toggleBlock(friends.get(getAdapterPosition()).getId(), false);
             }
             else
             {
                 AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.PERSON_BLOCKED, null);
                 blockIcon.setImageDrawable(blockedDrawable);
                 friends.get(getAdapterPosition()).setBlocked(true);
+                blockListCommunicator.toggleBlock(friends.get(getAdapterPosition()).getId(), true);
             }
-
-            if(blockListCommunicator!=null)
-            {
-                if(friends.get(getAdapterPosition()).isBlocked()) {
-                    blockListCommunicator.toggleBlock(friends.get(getAdapterPosition()).getId(), false);
-                }else{
-                    blockListCommunicator.toggleBlock(friends.get(getAdapterPosition()).getId(), true);
-                }
-            }
-
         }
     }
 }
