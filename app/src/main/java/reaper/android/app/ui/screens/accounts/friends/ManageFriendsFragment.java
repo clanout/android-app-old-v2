@@ -314,29 +314,23 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
 
     @Override
     public void toggleBlock(String id, boolean isNowBlocked) {
-        Friend friend = new Friend();
-        friend.setId(id);
 
-        int position = friendList.indexOf(friend);
+        if (isNowBlocked) {
+            if (!(blockList.contains(id))) {
+                blockList.add(id);
+            }
 
-        if (friendList.get(position).isBlocked()) {
             if (unblockList.contains(id)) {
                 unblockList.remove(id);
-                blockList.add(id);
-            } else {
-                unblockList.add(id);
-
-                if (blockList.contains(id)) {
-                    blockList.remove(id);
-                }
             }
         } else {
+
+            if (!(unblockList.contains(id))) {
+                unblockList.add(id);
+            }
+
             if (blockList.contains(id)) {
                 blockList.remove(id);
-                unblockList.add(id);
-            } else {
-                unblockList.remove(id);
-                blockList.add(id);
             }
         }
     }
