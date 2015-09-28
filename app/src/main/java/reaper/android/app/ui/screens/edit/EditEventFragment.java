@@ -369,6 +369,7 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setCancelable(true);
+                    builder.setTitle(R.string.event_delete_heading);
 
                     builder.setPositiveButton(R.string.even_delete_positive_button, new DialogInterface.OnClickListener()
                     {
@@ -423,6 +424,7 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
                     {
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setCancelable(true);
+                        builder.setTitle(R.string.event_unlock_heading);
                         builder.setMessage(R.string.unfinalise_event);
 
                         builder.setPositiveButton(R.string.event_unlock_positive_button, new DialogInterface.OnClickListener()
@@ -456,6 +458,7 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
                     {
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setCancelable(true);
+                        builder.setTitle(R.string.event_lock_heading);
                         builder.setMessage(R.string.finalise_event);
 
                         builder.setPositiveButton(R.string.event_lock_positive_button, new DialogInterface.OnClickListener()

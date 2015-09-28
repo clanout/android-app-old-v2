@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -64,6 +65,7 @@ public class FacebookActivity extends AppCompatActivity
         userCache = CacheManager.getUserCache();
 
         facebookLoginButton.setVisibility(View.GONE);
+
         if (AccessToken.getCurrentAccessToken() == null)
         {
             AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FB_ACCESS_TOKEN_NULL, null);

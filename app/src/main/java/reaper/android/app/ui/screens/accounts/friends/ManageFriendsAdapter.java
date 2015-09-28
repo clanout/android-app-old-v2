@@ -36,9 +36,7 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
     private List<Friend> friends;
     private BlockListCommunicator blockListCommunicator;
     private Context context;
-    private List<Boolean> blockStatusList;
-    private Drawable blockedDrawable, unblockedDrawable;
-    private Drawable personDrawable;
+    private Drawable blockedDrawable, unblockedDrawable, personDrawable;
 
     public ManageFriendsAdapter(Context context, List<Friend> friends, BlockListCommunicator blockListCommunicator)
     {
@@ -46,7 +44,10 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
         this.friends = friends;
         this.context = context;
         this.blockListCommunicator = blockListCommunicator;
-        blockStatusList = new ArrayList<>();
+
+        Friend friend1 = new Friend();
+        friend1.setBlocked(false);
+        friend1.setName("Friend 1");
 
         generateDrawables();
     }
@@ -96,13 +97,13 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
 
         if (current.isBlocked())
         {
+            Log.d("APP", "Item at postion ---- " + position + " is blocked");
             holder.blockIcon.setImageDrawable(blockedDrawable);
-            blockStatusList.add(position, true);
         }
         else
         {
+            Log.d("APP", "Item at postion ---- " + position + " is  not blocked");
             holder.blockIcon.setImageDrawable(unblockedDrawable);
-            blockStatusList.add(position, false);
         }
 
     }
@@ -135,22 +136,28 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
         @Override
         public void onClick(View view)
         {
-            if (blockStatusList.get(getAdapterPosition()))
+            Log.d("APP", "on Click triggered for position ----- " + getAdapterPosition());
+
+            if (friends.get(getAdapterPosition()).isBlocked())
             {
                 AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.PERSON_UNBLOCKED, null);
-                blockStatusList.set(getAdapterPosition(), false);
                 blockIcon.setImageDrawable(unblockedDrawable);
+                friends.get(getAdapterPosition()).setBlocked(false);
             }
             else
             {
                 AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.PERSON_BLOCKED, null);
-                blockStatusList.set(getAdapterPosition(), true);
                 blockIcon.setImageDrawable(blockedDrawable);
+                friends.get(getAdapterPosition()).setBlocked(true);
             }
 
             if(blockListCommunicator!=null)
             {
-                blockListCommunicator.toggleBlock(friends.get(getAdapterPosition()).getId());
+                if(friends.get(getAdapterPosition()).isBlocked()) {
+                    blockListCommunicator.toggleBlock(friends.get(getAdapterPosition()).getId(), false);
+                }else{
+                    blockListCommunicator.toggleBlock(friends.get(getAdapterPosition()).getId(), true);
+                }
             }
 
         }

@@ -24,4 +24,5 @@ public class CacheKeys
     public static final String IS_APP_IN_FOREGROUND = "is_app_in_foreground";
 
     public static final String HAS_FETCHED_PENDING_INVITES = "has_fetched_pending_invites";
+    public static final String IS_FIRST_TIME_USER = "is_first_time_user";
 }

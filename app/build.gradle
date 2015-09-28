@@ -86,7 +86,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-gcm:7.8.0'
 
     // Facebook Sdk
-    compile 'com.facebook.android:facebook-android-sdk:4.1.0'
+    compile 'com.facebook.android:facebook-android-sdk:4.6.0'
 
     // Logging
     compile 'com.jakewharton.timber:timber:3.1.0'
@@ -102,5 +102,8 @@ dependencies {
 
     // Google Analytics
     compile 'com.google.android.gms:play-services-analytics:7.8.0'
+
+    // App Intro
+    compile 'com.github.paolorotolo:appintro:3.2.0'
 
 }

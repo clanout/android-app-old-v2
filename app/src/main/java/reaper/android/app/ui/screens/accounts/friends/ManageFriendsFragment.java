@@ -313,7 +313,7 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     }
 
     @Override
-    public void toggleBlock(String id) {
+    public void toggleBlock(String id, boolean isNowBlocked) {
         Friend friend = new Friend();
         friend.setId(id);
 

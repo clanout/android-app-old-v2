@@ -628,6 +628,8 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 
     private void displayUpdatePhoneDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.fetch_pending_invites_title);
+        builder.setMessage(R.string.fetch_pending_invites_message);
         builder.setCancelable(false);
 
         LayoutInflater inflater = getActivity().getLayoutInflater();

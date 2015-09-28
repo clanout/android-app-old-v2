@@ -14,19 +14,24 @@
     <string name="fetch_pending_invites_negative_button">No</string>
 
     <!-- First Time Popups -->
+    <!-- TODO use these 2 strings somewhere ! -->
+
     <string name="invite_only_description"> Make a private clan with selected friends</string>
     <string name="public_description">Let everyone know about your clan. You can still send personal invites</string>
 
     <!-- Dialog messages -->
-    <string name="even_delete_positive_button">Dismiss clan</string>
+    <string name="event_delete_heading">Dismiss Clan</string>
+    <string name="even_delete_positive_button">Yes</string>
     <string name="even_delete_negative_button">Let me think</string>
 
+    <string name="event_lock_heading">Finalize Details?</string>
     <string name="event_lock_negative_button">Not yet</string>
-    <string name="event_lock_positive_button">Finalize details</string>
-    <string name="event_unlock_positive_button">Allow changes</string>
-    <string name="event_unlock_negative_button"> No modifications </string>
+    <string name="event_lock_positive_button">Yes</string>
 
-    <string name="fetching_location">Fetching your location...</string>
+    <string name="event_unlock_heading">Allow Modifications?</string>
+    <string name="event_unlock_positive_button">Yes</string>
+    <string name="event_unlock_negative_button"> No </string>
+
     <string name="refreshing_attendee_list">Refreshing attendee list</string>
 
     <!-- RSVP -->
@@ -83,7 +88,6 @@
     <string name="phone_contacts_not_fetched"> Unable to display your phonebook friends. Swipe to refresh</string>
     <string name="no_local_phone_contacts"> Clanout is exciting with your friends around. Invite them by Whatsapp </string>
 
-    <string name="whatsapp_message">Test Message</string>
     <string name="whatsapp_not_installed"> Whatsapp service not installed on this device </string>
 
     <string name="empty_rating"> Show some love </string>

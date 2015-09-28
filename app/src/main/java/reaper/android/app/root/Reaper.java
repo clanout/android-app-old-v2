@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 
+import com.facebook.FacebookSdk;
 import com.facebook.stetho.Stetho;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
@@ -67,6 +68,8 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     protected void init()
     {
         instance = this;
+
+        FacebookSdk.sdkInitialize(this);
 
         if (BuildConfig.DEBUG)
         {
@@ -141,7 +144,6 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult)
     {
-        Log.d("reap3r", "Unable to connect to Google API client");
         Timber.v("Has resolution : " + connectionResult.hasResolution());
     }
 

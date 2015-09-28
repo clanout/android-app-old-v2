@@ -190,6 +190,8 @@ public class NotificationService
                     boolean isLocationUpdated = Boolean.parseBoolean(notification.getArgs().get("is_location_updated"));
                     boolean isTimeUpdated = Boolean.parseBoolean(notification.getArgs().get("is_time_updated"));
 
+                    // TODO change messages
+
                     if (isLocationUpdated)
                     {
                         if (isTimeUpdated)

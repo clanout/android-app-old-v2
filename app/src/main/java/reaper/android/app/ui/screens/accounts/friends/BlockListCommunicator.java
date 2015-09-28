@@ -4,5 +4,5 @@ import java.io.Serializable;
 
 public interface BlockListCommunicator extends Serializable
 {
-    public void toggleBlock(String id);
+    public void toggleBlock(String id, boolean isNowBlocked);
 }
