@@ -9,23 +9,15 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
-import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
-
 import org.joda.time.DateTime;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.config.BundleKeys;
@@ -46,7 +38,8 @@ import reaper.android.common.communicator.Communicator;
 /**
  * Created by harsh on 21/09/15.
  */
-public class CreateEventListItemFragment extends BaseFragment implements View.OnClickListener, View.OnTouchListener {
+public class CreateEventListItemFragment extends BaseFragment implements View.OnClickListener, View.OnTouchListener
+{
 
     private EditText title;
     private ImageView icon;
@@ -70,7 +63,8 @@ public class CreateEventListItemFragment extends BaseFragment implements View.On
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
         View view = inflater.inflate(R.layout.fragment_create_event_list_item, container, false);
         linearLayout = (LinearLayout) view.findViewById(R.id.ll_fragment_create_event_list_item);
         title = (EditText) view.findViewById(R.id.et_fragment_create_event_list_item_title);
@@ -78,9 +72,12 @@ public class CreateEventListItemFragment extends BaseFragment implements View.On
         cardView = (CardView) view.findViewById(R.id.cv_fragment_create_event_list_item);
         time = (TextView) view.findViewById(R.id.tv_fragment_create_event_list_item_time);
         createEvent = (TextView) view.findViewById(R.id.tv_fragment_create_event_list_item_create);
-        decreaseTimeButton = (ImageView) view.findViewById(R.id.iv_fragment_create_event_list_item_decrease_time);
-        increaseDayButton = (ImageView) view.findViewById(R.id.iv_fragment_create_event_list_item_increase_day);
-        increaseTimeButton = (ImageView) view.findViewById(R.id.iv_fragment_create_event_list_item_increase_time);
+        decreaseTimeButton = (ImageView) view
+                .findViewById(R.id.iv_fragment_create_event_list_item_decrease_time);
+        increaseDayButton = (ImageView) view
+                .findViewById(R.id.iv_fragment_create_event_list_item_increase_day);
+        increaseTimeButton = (ImageView) view
+                .findViewById(R.id.iv_fragment_create_event_list_item_increase_time);
         expand = (ImageView) view.findViewById(R.id.iv_fragment_create_event_list_item_expand);
         day = (TextView) view.findViewById(R.id.tv_fragment_create_event_list_item_day);
 
@@ -88,13 +85,15 @@ public class CreateEventListItemFragment extends BaseFragment implements View.On
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
         super.onActivityCreated(savedInstanceState);
 
         Bundle bundle = getArguments();
         eventSuggestion = (EventSuggestion) bundle.getSerializable(BundleKeys.EVENT_SUGGESTION);
 
-        if (eventSuggestion == null) {
+        if (eventSuggestion == null)
+        {
             throw new IllegalStateException("Event Suggestion is null");
         }
 
@@ -118,28 +117,32 @@ public class CreateEventListItemFragment extends BaseFragment implements View.On
         render();
     }
 
-    private void generateDrawables() {
+    private void generateDrawables()
+    {
 
-        generalDrawable = DrawableFactory.getGeneralDrawable();
-        eatOutDrawable = DrawableFactory.getEatOutDrawable();
-        drinksDrawable = DrawableFactory.getDrinksDrawable();
-        cafeDrawable = DrawableFactory.getCafeDrawable();
-        moviesDrawable = DrawableFactory.getMoviesDrawable();
-        outdorsDrawable = DrawableFactory.getOutdorsDrawable();
-        partyDrawable = DrawableFactory.getPartyDrawable();
-        localEventsDrawable = DrawableFactory.getLocalEventsDrawable();
-        shoppingDrawable = DrawableFactory.getShoppingDrawable();
+        generalDrawable = DrawableFactory.get(EventCategory.GENERAL, 48, R.color.accent);
+        eatOutDrawable = DrawableFactory.get(EventCategory.EAT_OUT, 48, R.color.accent);
+        drinksDrawable = DrawableFactory.get(EventCategory.DRINKS, 48, R.color.accent);
+        cafeDrawable = DrawableFactory.get(EventCategory.CAFE, 48, R.color.accent);
+        moviesDrawable = DrawableFactory.get(EventCategory.MOVIES, 48, R.color.accent);
+        outdorsDrawable = DrawableFactory.get(EventCategory.OUTDOORS, 48, R.color.accent);
+        partyDrawable = DrawableFactory.get(EventCategory.PARTY, 48, R.color.accent);
+        localEventsDrawable = DrawableFactory.get(EventCategory.LOCAL_EVENTS, 48, R.color.accent);
+        shoppingDrawable = DrawableFactory.get(EventCategory.SHOPPING, 48, R.color.accent);
+
         increaseTimeDrawable = DrawableFactory.getIncreaseTimeDrawable();
         decreaseTimeDrawable = DrawableFactory.getDecreaseTimeDrawable();
         expandDrawable = DrawableFactory.getExpandDrawable();
 
     }
 
-    private void initialiseEventSuggestion() {
+    private void initialiseEventSuggestion()
+    {
 
         eventType = Event.Type.INVITE_ONLY;
 
-        switch (EventCategory.valueOf(eventSuggestion.getCategory())) {
+        switch (EventCategory.valueOf(eventSuggestion.getCategory()))
+        {
             case GENERAL:
                 eventCategory = EventCategory.GENERAL;
                 break;
@@ -177,11 +180,13 @@ public class CreateEventListItemFragment extends BaseFragment implements View.On
         placeLocation.setZone(locationService.getUserLocation().getZone());
     }
 
-    private void render() {
+    private void render()
+    {
 
         title.setHint(eventSuggestion.getTitle());
 
-        switch (eventCategory) {
+        switch (eventCategory)
+        {
             case GENERAL:
                 icon.setImageDrawable(generalDrawable);
                 break;
@@ -218,14 +223,19 @@ public class CreateEventListItemFragment extends BaseFragment implements View.On
 
         int hour = startDateTime.getHourOfDay();
 
-        if (hour < 12) {
+        if (hour < 12)
+        {
             time.setText(hour + " AM");
-        } else if(hour > 12 && hour < 24){
-            time.setText((hour-12) + " PM");
-        }else if(hour == 12)
+        }
+        else if (hour > 12 && hour < 24)
+        {
+            time.setText((hour - 12) + " PM");
+        }
+        else if (hour == 12)
         {
             time.setText(hour + " noon");
-        }else if(hour == 24)
+        }
+        else if (hour == 24)
         {
             time.setText(hour + " midnight");
         }
@@ -234,40 +244,49 @@ public class CreateEventListItemFragment extends BaseFragment implements View.On
     }
 
     @Override
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
         bus.register(this);
     }
 
     @Override
-    public void onPause() {
+    public void onPause()
+    {
         super.onPause();
         bus.unregister(this);
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(View v)
+    {
 
         bus.post(new ViewPagerClickedTrigger());
 
-        if (v.getId() == R.id.tv_fragment_create_event_list_item_create) {
-            eventService.createEvent(title.getText().toString(), eventType, eventCategory, eventDescription, placeLocation, startDateTime, startDateTime.plusDays(1).withTimeAtStartOfDay());
+        if (v.getId() == R.id.tv_fragment_create_event_list_item_create)
+        {
+            eventService.createEvent(title.getText()
+                                          .toString(), eventType, eventCategory, eventDescription, placeLocation, startDateTime, startDateTime
+                    .plusDays(1).withTimeAtStartOfDay());
         }
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
+    public boolean onTouch(View v, MotionEvent event)
+    {
 
         bus.post(new ViewPagerClickedTrigger());
         return false;
     }
 
     @Subscribe
-    public void onEventCreated(EventCreatedTrigger trigger) {
+    public void onEventCreated(EventCreatedTrigger trigger)
+    {
 
         InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
         Bundle bundle = new Bundle();
-        bundle.putSerializable(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT, trigger.getEvent());
+        bundle.putSerializable(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT, trigger
+                .getEvent());
         bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, true);
         inviteUsersContainerFragment.setArguments(bundle);
 

@@ -4,7 +4,11 @@ import android.graphics.drawable.Drawable;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import reaper.android.R;
+import reaper.android.app.model.EventCategory;
 import reaper.android.app.root.Reaper;
 
 /**
@@ -12,196 +16,35 @@ import reaper.android.app.root.Reaper;
  */
 public class DrawableFactory
 {
-
     private static Drawable generalDrawable, eatOutDrawable, drinksDrawable, cafeDrawable, moviesDrawable, outdorsDrawable, partyDrawable, localEventsDrawable, shoppingDrawable, increaseTimeDrawable, decreaseTimeDrawable, expandDrawable;
 
-    public static Drawable getGeneralDrawable()
+    private static Map<EventCategory, MaterialDrawableBuilder.IconValue> iconMapping;
+
+    static
     {
-
-        if (generalDrawable == null)
-        {
-
-            generalDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                                                     .setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD)
-                                                     .setColor(Reaper.getReaperContext()
-                                                                     .getResources()
-                                                                     .getColor(R.color.accent))
-                                                     .setSizeDp(48)
-                                                     .build();
-
-            return generalDrawable;
-        }
-        else
-        {
-            return generalDrawable;
-        }
+        iconMapping = new HashMap<>();
+        iconMapping.put(EventCategory.GENERAL, MaterialDrawableBuilder.IconValue.BULLETIN_BOARD);
+        iconMapping.put(EventCategory.EAT_OUT, MaterialDrawableBuilder.IconValue.FOOD);
+        iconMapping.put(EventCategory.DRINKS, MaterialDrawableBuilder.IconValue.MARTINI);
+        iconMapping.put(EventCategory.CAFE, MaterialDrawableBuilder.IconValue.COFFEE);
+        iconMapping.put(EventCategory.MOVIES, MaterialDrawableBuilder.IconValue.MOVIE);
+        iconMapping.put(EventCategory.OUTDOORS, MaterialDrawableBuilder.IconValue.TENNIS);
+        iconMapping.put(EventCategory.PARTY, MaterialDrawableBuilder.IconValue.GIFT);
+        iconMapping
+                .put(EventCategory.LOCAL_EVENTS, MaterialDrawableBuilder.IconValue.BULLETIN_BOARD);
+        iconMapping.put(EventCategory.SHOPPING, MaterialDrawableBuilder.IconValue.SHOPPING);
     }
 
-    public static Drawable getEatOutDrawable()
+
+    public static Drawable get(EventCategory eventCategory, int size, int color)
     {
-        if (eatOutDrawable == null)
-        {
-
-            eatOutDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                                                    .setIcon(MaterialDrawableBuilder.IconValue.FOOD)
-                                                    .setColor(Reaper.getReaperContext()
-                                                                    .getResources()
-                                                                    .getColor(R.color.accent))
-                                                    .setSizeDp(48)
-                                                    .build();
-
-            return eatOutDrawable;
-        }
-        else
-        {
-            return eatOutDrawable;
-        }
-    }
-
-    public static Drawable getDrinksDrawable()
-    {
-        if (drinksDrawable == null)
-        {
-
-            drinksDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                                                    .setIcon(MaterialDrawableBuilder.IconValue.MARTINI)
-                                                    .setColor(Reaper.getReaperContext()
-                                                                    .getResources()
-                                                                    .getColor(R.color.accent))
-                                                    .setSizeDp(48)
-                                                    .build();
-
-            return drinksDrawable;
-        }
-        else
-        {
-            return drinksDrawable;
-        }
-    }
-
-    public static Drawable getCafeDrawable()
-    {
-        if (cafeDrawable == null)
-        {
-
-            cafeDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                                                  .setIcon(MaterialDrawableBuilder.IconValue.COFFEE)
-                                                  .setColor(Reaper.getReaperContext().getResources()
-                                                                  .getColor(R.color.accent))
-                                                  .setSizeDp(48)
-                                                  .build();
-
-            return cafeDrawable;
-        }
-        else
-        {
-            return cafeDrawable;
-        }
-    }
-
-    public static Drawable getMoviesDrawable()
-    {
-        if (moviesDrawable == null)
-        {
-
-            moviesDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                                                    .setIcon(MaterialDrawableBuilder.IconValue.MOVIE)
-                                                    .setColor(Reaper.getReaperContext()
-                                                                    .getResources()
-                                                                    .getColor(R.color.accent))
-                                                    .setSizeDp(48)
-                                                    .build();
-
-            return moviesDrawable;
-        }
-        else
-        {
-            return moviesDrawable;
-        }
-    }
-
-    public static Drawable getOutdorsDrawable()
-    {
-        if (outdorsDrawable == null)
-        {
-
-            outdorsDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                                                     .setIcon(MaterialDrawableBuilder.IconValue.TENNIS)
-                                                     .setColor(Reaper.getReaperContext()
-                                                                     .getResources()
-                                                                     .getColor(R.color.accent))
-                                                     .setSizeDp(48)
-                                                     .build();
-
-            return outdorsDrawable;
-        }
-        else
-        {
-            return outdorsDrawable;
-        }
-    }
-
-    public static Drawable getPartyDrawable()
-    {
-        if (partyDrawable == null)
-        {
-
-            partyDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                                                   .setIcon(MaterialDrawableBuilder.IconValue.GIFT)
-                                                   .setColor(Reaper.getReaperContext()
-                                                                   .getResources()
-                                                                   .getColor(R.color.accent))
-                                                   .setSizeDp(48)
-                                                   .build();
-
-            return partyDrawable;
-        }
-        else
-        {
-            return partyDrawable;
-        }
-    }
-
-    public static Drawable getLocalEventsDrawable()
-    {
-        if (localEventsDrawable == null)
-        {
-
-            localEventsDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                                                         .setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD)
-                                                         .setColor(Reaper.getReaperContext()
-                                                                         .getResources()
-                                                                         .getColor(R.color.accent))
-                                                         .setSizeDp(48)
-                                                         .build();
-
-            return localEventsDrawable;
-        }
-        else
-        {
-            return localEventsDrawable;
-        }
-    }
-
-    public static Drawable getShoppingDrawable()
-    {
-        if (shoppingDrawable == null)
-        {
-
-            shoppingDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                                                      .setIcon(MaterialDrawableBuilder.IconValue.SHOPPING)
-                                                      .setColor(Reaper.getReaperContext()
-                                                                      .getResources()
-                                                                      .getColor(R.color.accent))
-                                                      .setSizeDp(48)
-                                                      .build();
-
-            return shoppingDrawable;
-        }
-        else
-        {
-            return shoppingDrawable;
-        }
+        return MaterialDrawableBuilder.with(Reaper.getReaperContext())
+                                      .setIcon(iconMapping.get(eventCategory))
+                                      .setColor(Reaper.getReaperContext()
+                                                      .getResources()
+                                                      .getColor(color))
+                                      .setSizeDp(size)
+                                      .build();
     }
 
     public static Drawable getIncreaseTimeDrawable()
