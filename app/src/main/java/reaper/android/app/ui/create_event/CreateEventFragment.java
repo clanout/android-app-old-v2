@@ -22,8 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.model.Event;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
+import timber.log.Timber;
 
 public class CreateEventFragment extends BaseFragment
 {
@@ -50,6 +52,17 @@ public class CreateEventFragment extends BaseFragment
     TabLayout timeSelector;
     boolean isTimeSelectorVisible;
 
+    View bottomBar;
+    boolean isBottomBarVisible;
+
+    TextView eventType;
+    View typeSelectorContainer;
+    TabLayout typeSelector;
+    boolean isTypeSelectorVisible;
+
+    TextView moreDetails;
+    TextView create;
+
     ClickListener clickListener;
 
     /* Data */
@@ -61,6 +74,8 @@ public class CreateEventFragment extends BaseFragment
 
     List<DateTime> times;
     int selectedTimeIndex;
+
+    Event.Type selectedType;
 
     /* Static Factory */
 
@@ -94,6 +109,12 @@ public class CreateEventFragment extends BaseFragment
         daySelectorContainer = view.findViewById(R.id.ll_createEvent_daySelectorContainer);
         timeSelector = (TabLayout) view.findViewById(R.id.tl_createEvent_timeSelector);
         timeSelectorContainer = view.findViewById(R.id.ll_createEvent_timeSelectorContainer);
+        bottomBar = view.findViewById(R.id.ll_createEvent_bottomBar);
+        eventType = (TextView) view.findViewById(R.id.tv_createEvent_eventType);
+        typeSelector = (TabLayout) view.findViewById(R.id.tl_createEvent_eventType);
+        typeSelectorContainer = view.findViewById(R.id.ll_createEvent_eventTypeContainer);
+        moreDetails = (TextView) view.findViewById(R.id.tv_createEvent_moreDetails);
+        create = (TextView) view.findViewById(R.id.tv_createEvent_create);
 
         return view;
     }
@@ -129,6 +150,9 @@ public class CreateEventFragment extends BaseFragment
         title.setOnClickListener(clickListener);
         day.setOnClickListener(clickListener);
         time.setOnClickListener(clickListener);
+        eventType.setOnClickListener(clickListener);
+        moreDetails.setOnClickListener(clickListener);
+        create.setOnClickListener(clickListener);
     }
 
     @Override
@@ -137,8 +161,34 @@ public class CreateEventFragment extends BaseFragment
         super.onResume();
 
         initView();
+        initTypeSelector();
         initDaySelector();
         initTimeSelector();
+        initDayTime();
+    }
+
+    private void onMoreDetailsClicked()
+    {
+        Timber.v("More Details");
+        // TODO : Fragment transaction to more details fragment
+    }
+
+    private void onCreateClicked()
+    {
+        String eventTitle = title.getText().toString();
+        if(eventTitle == null || eventTitle.isEmpty())
+        {
+            eventTitle = createEventModel.getTitle();
+        }
+
+        DateTime startTime = days.get(selectedDayIndex)
+                                 .withTime(times.get(selectedTimeIndex).toLocalTime());
+        DateTime endTime = startTime.plusDays(1).withTimeAtStartOfDay();
+
+        Timber.v("Title = " + eventTitle + "; Start Time = " + startTime + "; End Time = " + endTime);
+
+        // TODO : Create event
+        // TODO : Fragment transaction to invite screen
     }
 
     private void initView()
@@ -156,9 +206,9 @@ public class CreateEventFragment extends BaseFragment
             titleContainer.setHint(createEventModel.getTitle());
 
             dayTimeContainer.setVisibility(View.GONE);
-        }
 
-        initDayTime();
+            bottomBar.setVisibility(View.GONE);
+        }
     }
 
     private void enableEditMode()
@@ -172,12 +222,70 @@ public class CreateEventFragment extends BaseFragment
         imm.showSoftInput(title, InputMethodManager.SHOW_IMPLICIT);
 
         dayTimeContainer.setVisibility(View.VISIBLE);
+
+        if (!isBottomBarVisible)
+        {
+            VisibilityAnimationUtil.expand(bottomBar, 200);
+            isBottomBarVisible = true;
+        }
     }
 
     private void initDayTime()
     {
-        day.setText(DayTimeUtil.getInitialDay());
-        time.setText(DayTimeUtil.getInitialTime());
+        day.setText(DayTimeUtil.TODAY);
+        time.setText(times.get(selectedTimeIndex).toString(DayTimeUtil.timeFormatter)
+                          .toUpperCase());
+    }
+
+    private void initTypeSelector()
+    {
+        typeSelectorContainer.setVisibility(View.GONE);
+
+        selectedType = Event.Type.INVITE_ONLY;
+
+        typeSelector.setTabMode(TabLayout.MODE_FIXED);
+        typeSelector.setTabGravity(TabLayout.GRAVITY_CENTER);
+        typeSelector.removeAllTabs();
+
+        typeSelector.addTab(typeSelector.newTab().setText("INVITE ONLY"));
+        typeSelector.addTab(typeSelector.newTab().setText("PUBLIC"));
+
+        typeSelector.getTabAt(0).select();
+
+        typeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
+        {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab)
+            {
+                String selected = tab.getText().toString();
+                eventType.setText(selected);
+
+                if (selected.equalsIgnoreCase("PUBLIC"))
+                {
+                    selectedType = Event.Type.PUBLIC;
+                }
+                else
+                {
+                    selectedType = Event.Type.INVITE_ONLY;
+                }
+
+                VisibilityAnimationUtil.collapse(typeSelectorContainer, 200);
+                isTypeSelectorVisible = false;
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab)
+            {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab)
+            {
+                VisibilityAnimationUtil.collapse(typeSelectorContainer, 200);
+                isTypeSelectorVisible = false;
+            }
+        });
     }
 
     private void initDaySelector()
@@ -343,6 +451,27 @@ public class CreateEventFragment extends BaseFragment
                 {
                     hideTimeSelector();
                 }
+            }
+            else if (v == eventType)
+            {
+                if (isTypeSelectorVisible)
+                {
+                    VisibilityAnimationUtil.collapse(typeSelectorContainer, 200);
+                    isTypeSelectorVisible = false;
+                }
+                else
+                {
+                    VisibilityAnimationUtil.expand(typeSelectorContainer, 200);
+                    isTypeSelectorVisible = true;
+                }
+            }
+            else if (v == moreDetails)
+            {
+                onMoreDetailsClicked();
+            }
+            else if (v == create)
+            {
+                onCreateClicked();
             }
         }
     }
