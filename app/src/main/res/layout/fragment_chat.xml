@@ -61,7 +61,7 @@
                 android:id="@+id/et_chat_fragment_type_message_chat"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:background="@drawable/rounded_edittext"
                 android:autoText="true"
                 android:hint="Type a Message"

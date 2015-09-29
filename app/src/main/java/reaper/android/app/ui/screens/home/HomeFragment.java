@@ -259,6 +259,31 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     @Subscribe
     public void onEventsFetchTrigger(EventsFetchTrigger eventsFetchTrigger) {
         events = eventsFetchTrigger.getEvents();
+
+        Event event = new Event();
+        event.setId("1");
+        event.setCategory("MOVIES");
+        event.setChatId("1");
+        event.setEndTime(DateTime.now().plusDays(2));
+        event.setFriendCount(3);
+        event.setInviterCount(2);
+        event.setIsChatUpdated(true);
+        event.setIsFinalized(false);
+        event.setIsUpdated(true);
+        event.setLastUpdated(DateTime.now());
+        event.setOrganizerId("2");
+        event.setRsvp(Event.RSVP.YES);
+        event.setStartTime(DateTime.now());
+        event.setTitle("Test");
+        event.setType(Event.Type.PUBLIC);
+
+        Location location = new Location();
+        location.setZone("Bengaluru");
+
+        event.setLocation(location);
+
+        events.add(event);
+
         refreshRecyclerView();
     }
 
