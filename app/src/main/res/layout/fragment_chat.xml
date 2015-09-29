@@ -2,6 +2,7 @@
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:background="#E3F2FD"
               android:orientation="vertical">
 
     <android.support.design.widget.AppBarLayout
@@ -61,13 +62,14 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:background="@drawable/rounded_edittext"
                 android:autoText="true"
                 android:hint="Type a Message"
                 />
 
             <ImageButton
                 android:id="@+id/ib_fragment_chat_send"
-                android:layout_width="wrap_content"
+                android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/custom_button_background"
                 android:textSize="14sp"
