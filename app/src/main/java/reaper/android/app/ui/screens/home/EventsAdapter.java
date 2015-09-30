@@ -9,9 +9,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -30,15 +28,14 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 import java.util.concurrent.TimeUnit;
 
 import reaper.android.R;
 import reaper.android.app.config.Dimensions;
+import reaper.android.app.model.CreateEventModel;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
-import reaper.android.app.model.EventSuggestion;
-import reaper.android.app.model.factory.EventSuggestionFactory;
+import reaper.android.app.model.factory.CreateEventSuggestionFactory;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.ViewPagerClickedTrigger;
 import reaper.android.app.trigger.common.ViewPagerStateChangedTrigger;
@@ -46,7 +43,6 @@ import reaper.android.app.trigger.event.EventClickTrigger;
 import reaper.android.app.trigger.event.RsvpChangeTrigger;
 import reaper.android.common.communicator.Communicator;
 import rx.Subscriber;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -78,8 +74,6 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         generateDrawables();
-
-        Log.d("APP", "event list size ------- " + events.size());
     }
 
     private void generateDrawables() {
@@ -428,7 +422,7 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             // already started
             if (DateTime.now().isAfter(event.getStartTime())) {
                 alreadyStartedMessage.setVisibility(View.VISIBLE);
-                alreadyStartedMessage.setText("Alreay Started");
+                alreadyStartedMessage.setText("Already Started");
                 alreadyStartedMessage.setTextColor(Color.RED);
             } else {
                 alreadyStartedMessage.setVisibility(View.GONE);
@@ -440,14 +434,14 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         private ViewPager viewPager;
         private Bus bus;
         private Subscriber<Integer> subscriber;
-        private List<EventSuggestion> eventSuggestionList;
+        private List<CreateEventModel> eventSuggestionList;
 
         public CreateViewHolder(View itemView) {
             super(itemView);
 
             bus = Communicator.getInstance().getBus();
             bus.register(this);
-            eventSuggestionList = EventSuggestionFactory.getEventSuggestions();
+            eventSuggestionList = CreateEventSuggestionFactory.getEventSuggestions();
 
             viewPager = (ViewPager) itemView.findViewById(R.id.vp_list_item_create);
             viewPager.setAdapter(new CreateEventPagerAdapter(fragmentManager, eventSuggestionList));
@@ -498,6 +492,7 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         @Subscribe
         public void clickOnViewPagerDetected(ViewPagerClickedTrigger trigger) {
+
             subscriber.unsubscribe();
         }
     }

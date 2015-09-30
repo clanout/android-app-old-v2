@@ -1,4 +1,4 @@
-package reaper.android.app.ui.create_event;
+package reaper.android.app.model;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

@@ -10,8 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        cardView:cardElevation="4dp"
         cardView:cardPreventCornerOverlap="true"
+        cardView:cardElevation="4dp"
         cardView:cardUseCompatPadding="true">
 
         <LinearLayout

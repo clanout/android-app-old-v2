@@ -1,4 +1,4 @@
-package reaper.android.app.ui.create_event;
+package reaper.android.app.ui.screens.home;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -6,13 +6,17 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.otto.Bus;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -22,15 +26,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.config.BundleKeys;
 import reaper.android.app.model.Event;
+import reaper.android.app.model.CreateEventModel;
+import reaper.android.app.trigger.common.ViewPagerClickedTrigger;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
+import reaper.android.common.communicator.Communicator;
 import timber.log.Timber;
 
-public class CreateEventFragment extends BaseFragment
-{
-    private static final String ARG_MODEL = "arg_model";
-
+public class CreateEventFragment extends BaseFragment implements View.OnTouchListener {
     /* UI Elements */
     CardView cardView;
 
@@ -64,6 +69,7 @@ public class CreateEventFragment extends BaseFragment
     TextView create;
 
     ClickListener clickListener;
+    private Bus bus;
 
     /* Data */
     CreateEventModel createEventModel;
@@ -77,18 +83,6 @@ public class CreateEventFragment extends BaseFragment
 
     Event.Type selectedType;
 
-    /* Static Factory */
-
-    public static CreateEventFragment newInstance(CreateEventModel model)
-    {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(ARG_MODEL, model);
-
-        CreateEventFragment fragment = new CreateEventFragment();
-        fragment.setArguments(bundle);
-
-        return fragment;
-    }
 
     @Nullable
     @Override
@@ -124,9 +118,10 @@ public class CreateEventFragment extends BaseFragment
     {
         super.onActivityCreated(savedInstanceState);
 
-        createEventModel = (CreateEventModel) getArguments().getSerializable(ARG_MODEL);
+        createEventModel = (CreateEventModel) getArguments().getSerializable(BundleKeys.EVENT_SUGGESTION);
 
         clickListener = new ClickListener();
+        bus = Communicator.getInstance().getBus();
 
         title.setOnFocusChangeListener(new View.OnFocusChangeListener()
         {
@@ -147,7 +142,7 @@ public class CreateEventFragment extends BaseFragment
 
         // Detect Edit Mode if any UI element is clicked
         cardView.setOnClickListener(clickListener);
-        title.setOnClickListener(clickListener);
+        title.setOnTouchListener(this);
         day.setOnClickListener(clickListener);
         time.setOnClickListener(clickListener);
         eventType.setOnClickListener(clickListener);
@@ -413,11 +408,18 @@ public class CreateEventFragment extends BaseFragment
         isTimeSelectorVisible = false;
     }
 
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        bus.post(new ViewPagerClickedTrigger());
+        return false;
+    }
+
     private class ClickListener implements View.OnClickListener
     {
         @Override
         public void onClick(View v)
         {
+            bus.post(new ViewPagerClickedTrigger());
             enableEditMode();
 
             if (v == day)

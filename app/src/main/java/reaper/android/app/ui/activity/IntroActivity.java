@@ -33,6 +33,7 @@ public class IntroActivity extends AppIntro {
         } else {
             Intent intent = new Intent(this, FacebookActivity.class);
             startActivity(intent);
+            finish();
         }
 
     }
@@ -43,6 +44,7 @@ public class IntroActivity extends AppIntro {
         genericCache.put(CacheKeys.IS_FIRST_TIME_USER, false);
         Intent intent = new Intent(this, FacebookActivity.class);
         startActivity(intent);
+        finish();
     }
 
     @Override
@@ -51,5 +53,6 @@ public class IntroActivity extends AppIntro {
         genericCache.put(CacheKeys.IS_FIRST_TIME_USER, false);
         Intent intent = new Intent(this, FacebookActivity.class);
         startActivity(intent);
+        finish();
     }
 }
