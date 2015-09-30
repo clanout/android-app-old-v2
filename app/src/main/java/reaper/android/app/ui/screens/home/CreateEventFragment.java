@@ -171,7 +171,7 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
     private void onCreateClicked()
     {
         String eventTitle = title.getText().toString();
-        if(eventTitle == null || eventTitle.isEmpty())
+        if (eventTitle == null || eventTitle.isEmpty())
         {
             eventTitle = createEventModel.getTitle();
         }
@@ -319,13 +319,19 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
             @Override
             public void onTabSelected(TabLayout.Tab tab)
             {
-                selectedDayIndex = tab.getPosition();
+                int originalPosition = selectedDayIndex;
+                int selectedPosition = tab.getPosition();
+
+                selectedDayIndex = selectedPosition;
                 day.setText(tab.getText());
                 hideDaySelector();
 
-                initTimeSelector();
-                time.setText(times.get(selectedTimeIndex).toString(DayTimeUtil.timeFormatter)
-                                  .toUpperCase());
+                if ((originalPosition == 0 && selectedPosition != 0) || (originalPosition != 0 && selectedPosition == 0))
+                {
+                    initTimeSelector();
+                    time.setText(times.get(selectedTimeIndex).toString(DayTimeUtil.timeFormatter)
+                                      .toUpperCase());
+                }
             }
 
             @Override
@@ -348,15 +354,16 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
 
         timeSelector.setTabMode(TabLayout.MODE_SCROLLABLE);
         timeSelector.setTabGravity(TabLayout.GRAVITY_FILL);
-        timeSelector.removeAllTabs();
 
+        timeSelector.removeAllTabs();
         times = DayTimeUtil.getTimeList(selectedDayIndex);
         selectedTimeIndex = 0;
 
         for (DateTime d : times)
         {
-            timeSelector.addTab(timeSelector.newTab().setText(d.toString(DayTimeUtil.timeFormatter)
-                                                               .toUpperCase()));
+            timeSelector
+                    .addTab(timeSelector.newTab().setText(d.toString(DayTimeUtil.timeFormatter)
+                                                           .toUpperCase()));
         }
 
         timeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
@@ -484,16 +491,6 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
 
         public static DateTimeFormatter dayFormatter = DateTimeFormat.forPattern("EEEE");
         public static DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("hh:mm a");
-
-        public static String getInitialDay()
-        {
-            return TODAY;
-        }
-
-        public static String getInitialTime()
-        {
-            return DateTime.now().toString(timeFormatter).toUpperCase();
-        }
 
         public static List<DateTime> getDayList()
         {
