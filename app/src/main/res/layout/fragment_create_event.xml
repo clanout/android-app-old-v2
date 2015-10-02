@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout android:id="@+id/ll_createEvent_parent"
+              xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:cardView="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
+              android:layout_height="wrap_content"
               android:orientation="vertical">
 
     <android.support.v7.widget.CardView
@@ -10,8 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        cardView:cardPreventCornerOverlap="true"
         cardView:cardElevation="4dp"
+        cardView:cardPreventCornerOverlap="true"
         cardView:cardUseCompatPadding="true">
 
         <LinearLayout
@@ -76,14 +77,13 @@
                     <LinearLayout
                         android:id="@+id/ll_createEvent_dayTimeContainer"
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
                         android:orientation="horizontal">
 
                         <TextView
                             android:id="@+id/tv_createEvent_day"
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:padding="16dp"
                             android:text="TODAY"/>
@@ -91,7 +91,7 @@
                         <TextView
                             android:id="@+id/tv_createEvent_time"
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:padding="16dp"
                             android:text="07:30 PM"/>
@@ -155,8 +155,7 @@
                 android:layout_height="36dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:orientation="horizontal"
-                android:visibility="gone">
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tv_createEvent_moreDetails"

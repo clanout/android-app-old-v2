@@ -6,9 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -26,17 +24,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
-import reaper.android.app.config.BundleKeys;
-import reaper.android.app.model.Event;
 import reaper.android.app.model.CreateEventModel;
+import reaper.android.app.model.Event;
 import reaper.android.app.trigger.common.ViewPagerClickedTrigger;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.communicator.Communicator;
 import timber.log.Timber;
 
-public class CreateEventFragment extends BaseFragment implements View.OnTouchListener {
+public class CreateEventFragment extends BaseFragment
+{
+    private static final String ARG_MODEL = "arg_model";
+
     /* UI Elements */
+    View parentContainer;
     CardView cardView;
 
     EditText title;
@@ -83,6 +84,23 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
 
     Event.Type selectedType;
 
+    /* Static Factory */
+    public static CreateEventFragment newInstance(CreateEventModel createEventModel)
+    {
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_MODEL, createEventModel);
+
+        CreateEventFragment createEventFragment = new CreateEventFragment();
+        createEventFragment.setArguments(args);
+
+        return createEventFragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+    }
 
     @Nullable
     @Override
@@ -90,6 +108,7 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
     {
         View view = inflater.inflate(R.layout.fragment_create_event, container, false);
 
+        parentContainer = view.findViewById(R.id.ll_createEvent_parent);
         cardView = (CardView) view.findViewById(R.id.cv_createEvent);
         title = (EditText) view.findViewById(R.id.et_createEvent_title);
         titleContainer = (TextInputLayout) view.findViewById(R.id.til_createEvent_titleContainer);
@@ -118,7 +137,7 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
     {
         super.onActivityCreated(savedInstanceState);
 
-        createEventModel = (CreateEventModel) getArguments().getSerializable(BundleKeys.EVENT_SUGGESTION);
+        createEventModel = (CreateEventModel) getArguments().getSerializable(ARG_MODEL);
 
         clickListener = new ClickListener();
         bus = Communicator.getInstance().getBus();
@@ -142,7 +161,6 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
 
         // Detect Edit Mode if any UI element is clicked
         cardView.setOnClickListener(clickListener);
-        title.setOnTouchListener(this);
         day.setOnClickListener(clickListener);
         time.setOnClickListener(clickListener);
         eventType.setOnClickListener(clickListener);
@@ -188,6 +206,8 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
 
     private void initView()
     {
+        Timber.v("isEdit : " + isEditMode);
+
         icon.setImageDrawable(createEventModel.getIcon());
         iconContainer.setBackground(createEventModel.getIconBackground(getActivity()));
 
@@ -200,14 +220,14 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
             title.clearFocus();
             titleContainer.setHint(createEventModel.getTitle());
 
-            dayTimeContainer.setVisibility(View.GONE);
-            bottomBar.setVisibility(View.GONE);
+//            dayTimeContainer.setVisibility(View.GONE);
         }
     }
 
     private void enableEditMode()
     {
         isEditMode = true;
+        parentContainer.requestLayout();
 
         title.requestFocus();
         titleContainer.setHint("Title");
@@ -215,13 +235,15 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(title, InputMethodManager.SHOW_IMPLICIT);
 
-        dayTimeContainer.setVisibility(View.VISIBLE);
+//        dayTimeContainer.setVisibility(View.VISIBLE);
 
-        if (!isBottomBarVisible)
-        {
-            VisibilityAnimationUtil.expand(bottomBar, 200);
-            isBottomBarVisible = true;
-        }
+//        if (!isBottomBarVisible)
+//        {
+//            VisibilityAnimationUtil.expand(bottomBar, 200);
+//            isBottomBarVisible = true;
+//        }
+
+        bus.post(new ViewPagerClickedTrigger());
     }
 
     private void initDayTime()
@@ -319,19 +341,13 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
             @Override
             public void onTabSelected(TabLayout.Tab tab)
             {
-                int originalPosition = selectedDayIndex;
-                int selectedPosition = tab.getPosition();
-
-                selectedDayIndex = selectedPosition;
+                selectedDayIndex = tab.getPosition();
                 day.setText(tab.getText());
                 hideDaySelector();
 
-                if ((originalPosition == 0 && selectedPosition != 0) || (originalPosition != 0 && selectedPosition == 0))
-                {
-                    initTimeSelector();
-                    time.setText(times.get(selectedTimeIndex).toString(DayTimeUtil.timeFormatter)
-                                      .toUpperCase());
-                }
+                initTimeSelector();
+                time.setText(times.get(selectedTimeIndex).toString(DayTimeUtil.timeFormatter)
+                                  .toUpperCase());
             }
 
             @Override
@@ -354,16 +370,15 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
 
         timeSelector.setTabMode(TabLayout.MODE_SCROLLABLE);
         timeSelector.setTabGravity(TabLayout.GRAVITY_FILL);
-
         timeSelector.removeAllTabs();
+
         times = DayTimeUtil.getTimeList(selectedDayIndex);
         selectedTimeIndex = 0;
 
         for (DateTime d : times)
         {
-            timeSelector
-                    .addTab(timeSelector.newTab().setText(d.toString(DayTimeUtil.timeFormatter)
-                                                           .toUpperCase()));
+            timeSelector.addTab(timeSelector.newTab().setText(d.toString(DayTimeUtil.timeFormatter)
+                                                               .toUpperCase()));
         }
 
         timeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
@@ -412,12 +427,6 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
     {
         VisibilityAnimationUtil.collapse(timeSelectorContainer, 200);
         isTimeSelectorVisible = false;
-    }
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        bus.post(new ViewPagerClickedTrigger());
-        return false;
     }
 
     private class ClickListener implements View.OnClickListener
@@ -491,6 +500,16 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
 
         public static DateTimeFormatter dayFormatter = DateTimeFormat.forPattern("EEEE");
         public static DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("hh:mm a");
+
+        public static String getInitialDay()
+        {
+            return TODAY;
+        }
+
+        public static String getInitialTime()
+        {
+            return DateTime.now().toString(timeFormatter).toUpperCase();
+        }
 
         public static List<DateTime> getDayList()
         {
