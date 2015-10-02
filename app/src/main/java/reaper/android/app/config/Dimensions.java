@@ -5,5 +5,5 @@ package reaper.android.app.config;
  */
 public class Dimensions
 {
-    public static final int EVENT_FEED_ICON_SIZE = 48;
+    public static final int EVENT_FEED_ICON_SIZE = 36;
 }

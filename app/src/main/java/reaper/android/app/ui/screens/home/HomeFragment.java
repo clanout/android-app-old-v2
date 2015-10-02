@@ -295,7 +295,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         event2.setIsUpdated(true);
         event2.setLastUpdated(DateTime.now());
         event2.setOrganizerId("2");
-        event2.setRsvp(Event.RSVP.YES);
+        event2.setRsvp(Event.RSVP.NO);
         event2.setStartTime(DateTime.now());
         event2.setTitle("Dinner");
         event2.setType(Event.Type.PUBLIC);
@@ -317,7 +317,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         event3.setIsUpdated(true);
         event3.setLastUpdated(DateTime.now());
         event3.setOrganizerId("2");
-        event3.setRsvp(Event.RSVP.YES);
+        event3.setRsvp(Event.RSVP.MAYBE);
         event3.setStartTime(DateTime.now().plusDays(1));
         event3.setTitle("Beer Party");
         event3.setType(Event.Type.PUBLIC);
@@ -385,7 +385,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         event6.setIsUpdated(true);
         event6.setLastUpdated(DateTime.now());
         event6.setOrganizerId("2");
-        event6.setRsvp(Event.RSVP.YES);
+        event6.setRsvp(Event.RSVP.MAYBE);
         event6.setStartTime(DateTime.now().plusDays(2));
         event6.setTitle("Long Drive");
         event6.setType(Event.Type.PUBLIC);
@@ -408,7 +408,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         event7.setIsUpdated(true);
         event7.setLastUpdated(DateTime.now());
         event7.setOrganizerId("2");
-        event7.setRsvp(Event.RSVP.YES);
+        event7.setRsvp(Event.RSVP.MAYBE);
         event7.setStartTime(DateTime.now().plusDays(3));
         event7.setTitle("House Party");
         event7.setType(Event.Type.PUBLIC);
@@ -432,7 +432,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         event8.setIsUpdated(true);
         event8.setLastUpdated(DateTime.now());
         event8.setOrganizerId("2");
-        event8.setRsvp(Event.RSVP.YES);
+        event8.setRsvp(Event.RSVP.NO);
         event8.setStartTime(DateTime.now().plusMinutes(5));
         event8.setTitle("Concert");
         event8.setType(Event.Type.PUBLIC);
@@ -457,7 +457,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         event9.setOrganizerId("2");
         event9.setRsvp(Event.RSVP.YES);
         event9.setStartTime(DateTime.now().plusDays(4));
-        event9.setTitle("Window Shopping");
+        event9.setTitle("Window Shopping with me at Lifestyle Mall in Sony Signal");
         event9.setType(Event.Type.PUBLIC);
 
         Location location9 = new Location();

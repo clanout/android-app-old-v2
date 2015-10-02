@@ -3,6 +3,7 @@ package reaper.android.app.model;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 
 import java.io.Serializable;
@@ -49,8 +50,7 @@ public class CreateEventModel implements Serializable
         drawable.setCornerRadius(TypedValue
                 .applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornerRadius, context.getResources()
                                                                                   .getDisplayMetrics()));
-        drawable.setColor(Reaper.getReaperContext().getResources()
-                                .getColor(colorResource));
+        drawable.setColor(ContextCompat.getColor(context, colorResource));
         return drawable;
     }
 }

@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -214,10 +215,10 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public class EventViewHolder extends RecyclerView.ViewHolder {
         private ViewPager viewPager;
         private CardView cardView;
-        private ImageView eventIcon, rsvpIcon;
-        private TextView alreadyStartedMessage;
-        private TextView title, timeLocation, attendees, date;
+        private ImageView eventIcon;
+        private TextView title, timeLocation, attendees, date, rsvp;
         private ImageButton going, mayBe, notGoing;
+        private LinearLayout iconContainer;
 
         public EventViewHolder(View itemView) {
             super(itemView);
@@ -227,8 +228,6 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             cardView = (CardView) itemView.findViewById(R.id.cv_list_item_event);
             eventIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_event_icon);
-            rsvpIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_event_rsvp);
-            alreadyStartedMessage = (TextView) itemView.findViewById(R.id.tv_list_item_event_started);
             title = (TextView) itemView.findViewById(R.id.tv_list_item_event_title);
             timeLocation = (TextView) itemView.findViewById(R.id.tv_list_item_event_time_location);
             attendees = (TextView) itemView.findViewById(R.id.tv_list_item_event_attendees);
@@ -236,6 +235,8 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             going = (ImageButton) itemView.findViewById(R.id.btn_list_item_event_going);
             mayBe = (ImageButton) itemView.findViewById(R.id.btn_list_item_event_maybe);
             notGoing = (ImageButton) itemView.findViewById(R.id.btn_list_item_event_not_going);
+            iconContainer = (LinearLayout) itemView.findViewById(R.id.ll_list_item_event_icon_container);
+            rsvp = (TextView) itemView.findViewById(R.id.tv_list_item_event_rsvp);
 
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -314,35 +315,44 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             switch (category) {
                 case GENERAL:
                     eventIcon.setImageDrawable(generalEventDrawable);
+                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.general, 4));
                     break;
                 case EAT_OUT:
                     eventIcon.setImageDrawable(eatoutDrawable);
+                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.eat_out, 4));
                     break;
                 case DRINKS:
                     eventIcon.setImageDrawable(drinksDrawable);
+                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.drinks, 4));
                     break;
                 case CAFE:
                     eventIcon.setImageDrawable(cafeDrawable);
+                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.cafe, 4));
                     break;
                 case MOVIES:
                     eventIcon.setImageDrawable(movieDrawable);
+                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.movies, 4));
                     break;
                 case OUTDOORS:
                     eventIcon.setImageDrawable(outdoorsDrawable);
+                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.outdoors, 4));
                     break;
                 case PARTY:
                     eventIcon.setImageDrawable(partyDrawable);
+                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.party, 4));
                     break;
                 case LOCAL_EVENTS:
                     eventIcon.setImageDrawable(eventsDrawable);
+                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.local_events, 4));
                     break;
                 case SHOPPING:
                     eventIcon.setImageDrawable(shoppingDrawable);
+                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.shopping, 4));
                     break;
                 default:
                     eventIcon.setImageDrawable(generalEventDrawable);
+                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.general, 4));
             }
-
 
             // Date, Time and Location
             DateTime dateTime = event.getStartTime();
@@ -352,30 +362,39 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             if(dateTime.getDayOfWeek() == dayToday)
             {
+                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
                 date.setText("Today");
             }else if(dateTime.getDayOfWeek() == (dayToday + 1))
             {
-                date.setText("Tommorrow");
+                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
+                date.setText("Tomorrow");
             }else if(dateTime.getDayOfWeek() == 1)
             {
+                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
                 date.setText("Monday");
             }else if(dateTime.getDayOfWeek() == 2)
             {
+                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
                 date.setText("Tuesday");
             }else if(dateTime.getDayOfWeek() == 3)
             {
+                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
                 date.setText("Wednesday");
             }else if(dateTime.getDayOfWeek() == 4)
             {
+                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
                 date.setText("Thursday");
             }else if(dateTime.getDayOfWeek() == 5)
             {
+                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
                 date.setText("Friday");
             }else if(dateTime.getDayOfWeek() == 6)
             {
+                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
                 date.setText("Saturday");
             }else if(dateTime.getDayOfWeek() == 7)
             {
+                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
                 date.setText("Sunday");
             }
 
@@ -400,21 +419,21 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             // RSVP
             if (event.getRsvp() == Event.RSVP.YES) {
-                rsvpIcon.setVisibility(View.VISIBLE);
-                rsvpIcon.setImageDrawable(goingDrawable);
+                rsvp.setVisibility(View.VISIBLE);
+                rsvp.setTextColor(ContextCompat.getColor(context, R.color.going));
+                rsvp.setText("Going");
             } else if (event.getRsvp() == Event.RSVP.MAYBE) {
-                rsvpIcon.setVisibility(View.VISIBLE);
-                rsvpIcon.setImageDrawable(maybeDrawable);
+                rsvp.setVisibility(View.VISIBLE);
+                rsvp.setTextColor(ContextCompat.getColor(context, R.color.may_be));
+                rsvp.setText("Maybe");
             } else {
-                rsvpIcon.setVisibility(View.INVISIBLE);
+                rsvp.setVisibility(View.INVISIBLE);
             }
 
             // already started
             if (DateTime.now().isAfter(event.getStartTime())) {
-                alreadyStartedMessage.setVisibility(View.VISIBLE);
-                alreadyStartedMessage.setText("Started");
-            } else {
-                alreadyStartedMessage.setVisibility(View.GONE);
+                date.setText("Started");
+                date.setTextColor(Color.RED);
             }
         }
     }

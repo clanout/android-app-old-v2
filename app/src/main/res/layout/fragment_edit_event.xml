@@ -59,7 +59,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:text="Public"
-                    android:textColor="@color/text_subtitle_light"
+                    android:textColor="@color/text_subtitle"
                     android:textSize="12sp"
                     />
             </LinearLayout>

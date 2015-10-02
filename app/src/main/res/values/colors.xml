@@ -25,8 +25,8 @@
     <color name="red_app_inro">#F44336</color>
 
     <!-- Fonts -->
-    <color name="text_title">#AA000000</color>
-    <color name="text_subtitle_light">#AA777777</color>
+    <color name="text_title">#212121</color>
+    <color name="text_subtitle">#616161</color>
 
     <!-- Category Icons -->
     <color name="general">#FF7043</color>
@@ -39,5 +39,8 @@
     <color name="local_events">#D4E157</color>
     <color name="party">#42A5F5</color>
 
+    <!-- RSVP colors -->
+    <color name="going">#4CAF50</color>
+    <color name="may_be">#FFD54F</color>
 
 </resources>
