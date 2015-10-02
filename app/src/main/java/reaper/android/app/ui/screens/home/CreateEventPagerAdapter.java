@@ -2,36 +2,31 @@ package reaper.android.app.ui.screens.home;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.support.v13.app.FragmentStatePagerAdapter;
+import android.support.v13.app.FragmentPagerAdapter;
 
 import java.util.List;
 
 import reaper.android.app.model.CreateEventModel;
 
-/**
- * Created by harsh on 21/09/15.
- */
-public class CreateEventPagerAdapter extends FragmentStatePagerAdapter
+public class CreateEventPagerAdapter extends FragmentPagerAdapter
 {
+    List<CreateEventModel> models;
 
-    private List<CreateEventModel> eventSuggestionList;
-
-    public CreateEventPagerAdapter(FragmentManager fm, List<CreateEventModel> eventSuggestionList)
+    public CreateEventPagerAdapter(FragmentManager fm, List<CreateEventModel> models)
     {
         super(fm);
-
-        this.eventSuggestionList = eventSuggestionList;
+        this.models = models;
     }
 
     @Override
     public Fragment getItem(int position)
     {
-        return CreateEventFragment.newInstance(eventSuggestionList.get(position));
+        return CreateEventFragment.newInstance(models.get(position));
     }
 
     @Override
     public int getCount()
     {
-        return eventSuggestionList.size();
+        return models.size();
     }
 }

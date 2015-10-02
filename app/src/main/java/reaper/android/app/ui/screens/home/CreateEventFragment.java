@@ -7,6 +7,7 @@ import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -37,7 +38,6 @@ public class CreateEventFragment extends BaseFragment
     private static final String ARG_MODEL = "arg_model";
 
     /* UI Elements */
-    View parentContainer;
     CardView cardView;
 
     EditText title;
@@ -46,7 +46,6 @@ public class CreateEventFragment extends BaseFragment
     ImageView icon;
     View iconContainer;
 
-    View dayTimeContainer;
     TextView day;
     TextView time;
 
@@ -58,9 +57,6 @@ public class CreateEventFragment extends BaseFragment
     TabLayout timeSelector;
     boolean isTimeSelectorVisible;
 
-    View bottomBar;
-    boolean isBottomBarVisible;
-
     TextView eventType;
     View typeSelectorContainer;
     TabLayout typeSelector;
@@ -70,7 +66,6 @@ public class CreateEventFragment extends BaseFragment
     TextView create;
 
     ClickListener clickListener;
-    private Bus bus;
 
     /* Data */
     CreateEventModel createEventModel;
@@ -84,6 +79,8 @@ public class CreateEventFragment extends BaseFragment
 
     Event.Type selectedType;
 
+    private Bus bus;
+
     /* Static Factory */
     public static CreateEventFragment newInstance(CreateEventModel createEventModel)
     {
@@ -96,33 +93,23 @@ public class CreateEventFragment extends BaseFragment
         return createEventFragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_create_event, container, false);
 
-        parentContainer = view.findViewById(R.id.ll_createEvent_parent);
         cardView = (CardView) view.findViewById(R.id.cv_createEvent);
         title = (EditText) view.findViewById(R.id.et_createEvent_title);
         titleContainer = (TextInputLayout) view.findViewById(R.id.til_createEvent_titleContainer);
         icon = (ImageView) view.findViewById(R.id.iv_createEvent_icon);
         iconContainer = view.findViewById(R.id.ll_create_event_iconContainer);
-        dayTimeContainer = view.findViewById(R.id.ll_createEvent_dayTimeContainer);
         day = (TextView) view.findViewById(R.id.tv_createEvent_day);
         time = (TextView) view.findViewById(R.id.tv_createEvent_time);
-        dayTimeContainer = view.findViewById(R.id.ll_createEvent_dayTimeContainer);
         daySelector = (TabLayout) view.findViewById(R.id.tl_createEvent_daySelector);
         daySelectorContainer = view.findViewById(R.id.ll_createEvent_daySelectorContainer);
         timeSelector = (TabLayout) view.findViewById(R.id.tl_createEvent_timeSelector);
         timeSelectorContainer = view.findViewById(R.id.ll_createEvent_timeSelectorContainer);
-        bottomBar = view.findViewById(R.id.ll_createEvent_bottomBar);
         eventType = (TextView) view.findViewById(R.id.tv_createEvent_eventType);
         typeSelector = (TabLayout) view.findViewById(R.id.tl_createEvent_eventType);
         typeSelectorContainer = view.findViewById(R.id.ll_createEvent_eventTypeContainer);
@@ -147,15 +134,25 @@ public class CreateEventFragment extends BaseFragment
             @Override
             public void onFocusChange(View v, boolean hasFocus)
             {
-                if (hasFocus)
-                {
-                    enableEditMode();
-                }
-                else
+                if (!isEditMode && hasFocus)
                 {
                     title.clearFocus();
                     titleContainer.setHint(createEventModel.getTitle());
                 }
+                else if (hasFocus)
+                {
+                    enableEditMode();
+                }
+            }
+        });
+
+        title.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                enableEditMode();
+                return true;
             }
         });
 
@@ -206,8 +203,6 @@ public class CreateEventFragment extends BaseFragment
 
     private void initView()
     {
-        Timber.v("isEdit : " + isEditMode);
-
         icon.setImageDrawable(createEventModel.getIcon());
         iconContainer.setBackground(createEventModel.getIconBackground(getActivity()));
 
@@ -219,15 +214,12 @@ public class CreateEventFragment extends BaseFragment
         {
             title.clearFocus();
             titleContainer.setHint(createEventModel.getTitle());
-
-//            dayTimeContainer.setVisibility(View.GONE);
         }
     }
 
     private void enableEditMode()
     {
         isEditMode = true;
-        parentContainer.requestLayout();
 
         title.requestFocus();
         titleContainer.setHint("Title");
@@ -235,22 +227,13 @@ public class CreateEventFragment extends BaseFragment
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(title, InputMethodManager.SHOW_IMPLICIT);
 
-//        dayTimeContainer.setVisibility(View.VISIBLE);
-
-//        if (!isBottomBarVisible)
-//        {
-//            VisibilityAnimationUtil.expand(bottomBar, 200);
-//            isBottomBarVisible = true;
-//        }
-
         bus.post(new ViewPagerClickedTrigger());
     }
 
     private void initDayTime()
     {
-        day.setText(DayTimeUtil.TODAY);
-        time.setText(times.get(selectedTimeIndex).toString(DayTimeUtil.timeFormatter)
-                          .toUpperCase());
+        day.setText(DayTimeUtil.getDayName(days.get(selectedDayIndex)));
+        time.setText(DayTimeUtil.getTime(times.get(selectedTimeIndex)));
     }
 
     private void initTypeSelector()
@@ -315,25 +298,9 @@ public class CreateEventFragment extends BaseFragment
         days = DayTimeUtil.getDayList();
         selectedDayIndex = 0;
 
-        int i = 0;
         for (DateTime d : days)
         {
-            if (i == 0)
-            {
-                daySelector.addTab(daySelector.newTab().setText(DayTimeUtil.TODAY));
-            }
-            else if (i == 1)
-            {
-                daySelector.addTab(daySelector.newTab().setText(DayTimeUtil.TOMORROW));
-            }
-            else
-            {
-                daySelector
-                        .addTab(daySelector.newTab().setText(d.toString(DayTimeUtil.dayFormatter)
-                                                              .toUpperCase()));
-            }
-
-            i++;
+            daySelector.addTab(daySelector.newTab().setText(DayTimeUtil.getDayName(d)));
         }
 
         daySelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
@@ -346,8 +313,7 @@ public class CreateEventFragment extends BaseFragment
                 hideDaySelector();
 
                 initTimeSelector();
-                time.setText(times.get(selectedTimeIndex).toString(DayTimeUtil.timeFormatter)
-                                  .toUpperCase());
+                time.setText(DayTimeUtil.getTime(times.get(selectedTimeIndex)));
             }
 
             @Override
@@ -377,8 +343,7 @@ public class CreateEventFragment extends BaseFragment
 
         for (DateTime d : times)
         {
-            timeSelector.addTab(timeSelector.newTab().setText(d.toString(DayTimeUtil.timeFormatter)
-                                                               .toUpperCase()));
+            timeSelector.addTab(timeSelector.newTab().setText(DayTimeUtil.getTime(d)));
         }
 
         timeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
@@ -387,7 +352,7 @@ public class CreateEventFragment extends BaseFragment
             public void onTabSelected(TabLayout.Tab tab)
             {
                 selectedTimeIndex = tab.getPosition();
-                time.setText(tab.getText().toString().toUpperCase());
+                time.setText(tab.getText().toString());
                 hideTimeSelector();
             }
 
@@ -495,26 +460,26 @@ public class CreateEventFragment extends BaseFragment
 
     private static class DayTimeUtil
     {
-        public static final String TODAY = "TODAY";
-        public static final String TOMORROW = "TOMORROW";
+        private static final String TODAY = "TODAY";
+        private static final String TOMORROW = "TOMORROW";
 
-        public static DateTimeFormatter dayFormatter = DateTimeFormat.forPattern("EEEE");
-        public static DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("hh:mm a");
+        private static DateTimeFormatter dayFormatter = DateTimeFormat.forPattern("EEEE");
+        private static DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("hh:mm a");
 
-        public static String getInitialDay()
-        {
-            return TODAY;
-        }
-
-        public static String getInitialTime()
-        {
-            return DateTime.now().toString(timeFormatter).toUpperCase();
-        }
+        private static DateTime today = DateTime.now().withTimeAtStartOfDay();
+        private static DateTime tomorrow = today.plusDays(1);
 
         public static List<DateTime> getDayList()
         {
             List<DateTime> days = new ArrayList<>();
             DateTime today = DateTime.now();
+
+            DateTime lastSlot = today.withTime(23, 29, 0, 0);
+
+            if (today.isAfter(lastSlot))
+            {
+                today = today.plusDays(1).withTimeAtStartOfDay();
+            }
 
             if (today.dayOfWeek().get() == 7)
             {
@@ -541,7 +506,13 @@ public class CreateEventFragment extends BaseFragment
             List<DateTime> times = new ArrayList<>();
 
             DateTime now = DateTime.now();
-            DateTime dateTime = DateTime.now().withTimeAtStartOfDay();
+            DateTime lastSlot = now.withTime(23, 29, 0, 0);
+            if (now.isAfter(lastSlot))
+            {
+                isToday = false;
+            }
+
+            DateTime dateTime = now.withTimeAtStartOfDay();
             for (int i = 0; i < 48; i++)
             {
                 if (isToday)
@@ -560,6 +531,29 @@ public class CreateEventFragment extends BaseFragment
             }
 
             return times;
+        }
+
+        public static String getDayName(DateTime dateTime)
+        {
+            DateTime input = dateTime.withTimeAtStartOfDay();
+
+            if (today.equals(input))
+            {
+                return TODAY;
+            }
+            else if (tomorrow.equals(input))
+            {
+                return TOMORROW;
+            }
+            else
+            {
+                return dateTime.toString(dayFormatter).toUpperCase();
+            }
+        }
+
+        public static String getTime(DateTime dateTime)
+        {
+            return dateTime.toString(timeFormatter).toUpperCase();
         }
     }
 }
