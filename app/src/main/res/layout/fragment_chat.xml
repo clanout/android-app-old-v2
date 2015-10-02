@@ -61,8 +61,7 @@
                 android:id="@+id/et_chat_fragment_type_message_chat"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="40dp"
-                android:background="@drawable/rounded_edittext"
+                android:layout_height="50dp"
                 android:autoText="true"
                 android:hint="Type a Message"
                 />
@@ -70,7 +69,7 @@
             <ImageButton
                 android:id="@+id/ib_fragment_chat_send"
                 android:layout_width="50dp"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:background="@drawable/custom_button_background"
                 android:textSize="14sp"
                 android:layout_gravity="center_vertical"/>

@@ -1,6 +1,8 @@
 package reaper.android.app.ui.screens.chat;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,11 +12,14 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.model.ChatMessage;
+import reaper.android.app.root.Reaper;
 
 
 /**
@@ -25,11 +30,23 @@ public class ChatAdapter extends BaseAdapter
 
     private List<ChatMessage> chatMessageList;
     private Context context;
+    private Drawable outgoingMessageDrawable, incomingMessageDrawable;
 
     public ChatAdapter(List<ChatMessage> chatMessageList, Context context)
     {
         this.chatMessageList = chatMessageList;
         this.context = context;
+
+        generateDrawables();
+    }
+
+    private void generateDrawables() {
+
+        outgoingMessageDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
+                .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE)
+                .setColor(Color.YELLOW)
+                .setSizeDp(24)
+                .build();
     }
 
     @Override
@@ -120,7 +137,7 @@ public class ChatAdapter extends BaseAdapter
     {
         if (!isMe)
         {
-            chatViewHolder.contentWithBackground.setBackgroundResource(R.drawable.out_message_bg);
+            chatViewHolder.contentWithBackground.setBackgroundResource(R.drawable.rounded_rectangle);
 
             LinearLayout.LayoutParams layoutParams =
                     (LinearLayout.LayoutParams) chatViewHolder.contentWithBackground.getLayoutParams();
@@ -144,7 +161,7 @@ public class ChatAdapter extends BaseAdapter
         else
         {
 
-            chatViewHolder.contentWithBackground.setBackgroundResource(R.drawable.in_message_bg);
+            chatViewHolder.contentWithBackground.setBackgroundResource(R.drawable.rounded_rectangle);
 
             LinearLayout.LayoutParams layoutParams =
                     (LinearLayout.LayoutParams) chatViewHolder.contentWithBackground.getLayoutParams();

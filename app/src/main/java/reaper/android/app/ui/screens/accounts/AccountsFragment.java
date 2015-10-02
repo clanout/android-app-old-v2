@@ -51,7 +51,7 @@ import reaper.android.common.communicator.Communicator;
 
 public class AccountsFragment extends BaseFragment implements AccountsAdapter.AccountsItemClickListener
 {
-    private TextView userName;
+//    private TextView userName;
     private RecyclerView recyclerView;
     private ImageView userPic;
     private Drawable homeDrawable, personDrawable;
@@ -77,7 +77,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_accounts, container, false);
-        userName = (TextView) view.findViewById(R.id.tv_account_fragment_user_name);
+//        userName = (TextView) view.findViewById(R.id.tv_account_fragment_user_name);
         userPic = (ImageView) view.findViewById(R.id.iv_account_fragment_user_pic);
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_accounts_fragment);
         toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_accounts);
@@ -128,10 +128,10 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.ACCOUNTS_FRAGMENT);
         ((MainActivity)getActivity()).getSupportActionBar().setTitle("Accounts");
 
-        userName.setText(userService.getActiveUserName());
+//        userName.setText(userService.getActiveUserName());
 
         Picasso.with(getActivity())
-                .load("https://graph.facebook.com/v2.4/" + userService.getActiveUserId() + "/picture")
+                .load("https://graph.facebook.com/v2.4/" + userService.getActiveUserId() + "/picture?height=1000")
                 .placeholder(personDrawable)
                 .fit()
                 .centerInside()

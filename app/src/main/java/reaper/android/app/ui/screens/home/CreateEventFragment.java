@@ -201,7 +201,6 @@ public class CreateEventFragment extends BaseFragment implements View.OnTouchLis
             titleContainer.setHint(createEventModel.getTitle());
 
             dayTimeContainer.setVisibility(View.GONE);
-
             bottomBar.setVisibility(View.GONE);
         }
     }

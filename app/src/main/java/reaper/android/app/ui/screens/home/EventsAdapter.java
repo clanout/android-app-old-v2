@@ -5,10 +5,10 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +41,7 @@ import reaper.android.app.trigger.common.ViewPagerClickedTrigger;
 import reaper.android.app.trigger.common.ViewPagerStateChangedTrigger;
 import reaper.android.app.trigger.event.EventClickTrigger;
 import reaper.android.app.trigger.event.RsvpChangeTrigger;
+import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.common.communicator.Communicator;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -62,6 +63,7 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public static final int EVENT_VIEW_TYPE = 1;
 
     public EventsAdapter(Bus bus, List<Event> events, Context context, FragmentManager fragmentManager) {
+
         this.context = context;
         this.bus = bus;
         this.events = events;
@@ -77,59 +79,16 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     private void generateDrawables() {
-        generalEventDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD)
-                .setColor(context.getResources().getColor(R.color.accent))
-                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
-                .build();
 
-        eatoutDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.FOOD)
-                .setColor(context.getResources().getColor(R.color.accent))
-                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
-                .build();
-
-        drinksDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.MARTINI)
-                .setColor(context.getResources().getColor(R.color.accent))
-                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
-                .build();
-
-        cafeDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.COFFEE)
-                .setColor(context.getResources().getColor(R.color.accent))
-                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
-                .build();
-
-        movieDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.MOVIE)
-                .setColor(context.getResources().getColor(R.color.accent))
-                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
-                .build();
-
-        outdoorsDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.TENNIS)
-                .setColor(context.getResources().getColor(R.color.accent))
-                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
-                .build();
-
-        partyDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.GIFT)
-                .setColor(context.getResources().getColor(R.color.accent))
-                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
-                .build();
-
-        eventsDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.CITY)
-                .setColor(context.getResources().getColor(R.color.accent))
-                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
-                .build();
-
-        shoppingDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.SHOPPING)
-                .setColor(context.getResources().getColor(R.color.accent))
-                .setSizeDp(Dimensions.EVENT_FEED_ICON_SIZE)
-                .build();
+        generalEventDrawable = DrawableFactory.get(EventCategory.GENERAL, Dimensions.EVENT_FEED_ICON_SIZE, R.color.general);
+        eatoutDrawable = DrawableFactory.get(EventCategory.EAT_OUT, Dimensions.EVENT_FEED_ICON_SIZE, R.color.eat_out);
+        drinksDrawable = DrawableFactory.get(EventCategory.DRINKS, Dimensions.EVENT_FEED_ICON_SIZE, R.color.drinks);
+        cafeDrawable = DrawableFactory.get(EventCategory.CAFE, Dimensions.EVENT_FEED_ICON_SIZE, R.color.cafe);
+        movieDrawable = DrawableFactory.get(EventCategory.MOVIES, Dimensions.EVENT_FEED_ICON_SIZE, R.color.movies);
+        outdoorsDrawable = DrawableFactory.get(EventCategory.OUTDOORS, Dimensions.EVENT_FEED_ICON_SIZE, R.color.outdoors);
+        partyDrawable = DrawableFactory.get(EventCategory.PARTY, Dimensions.EVENT_FEED_ICON_SIZE, R.color.party);
+        eventsDrawable = DrawableFactory.get(EventCategory.LOCAL_EVENTS, Dimensions.EVENT_FEED_ICON_SIZE, R.color.local_events);
+        shoppingDrawable = DrawableFactory.get(EventCategory.SHOPPING, Dimensions.EVENT_FEED_ICON_SIZE, R.color.shopping);
 
         goingDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
@@ -342,6 +301,7 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         public void render(Event event) {
+
             // Title
             if (event.getTitle().length() <= 20) {
                 title.setText(event.getTitle());
@@ -383,12 +343,42 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     eventIcon.setImageDrawable(generalEventDrawable);
             }
 
+
             // Date, Time and Location
             DateTime dateTime = event.getStartTime();
-            DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("MMM dd");
             DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("HH:mm");
 
-            date.setText(dateTime.toString(dateFormatter));
+            int dayToday = DateTime.now().getDayOfWeek();
+
+            if(dateTime.getDayOfWeek() == dayToday)
+            {
+                date.setText("Today");
+            }else if(dateTime.getDayOfWeek() == (dayToday + 1))
+            {
+                date.setText("Tommorrow");
+            }else if(dateTime.getDayOfWeek() == 1)
+            {
+                date.setText("Monday");
+            }else if(dateTime.getDayOfWeek() == 2)
+            {
+                date.setText("Tuesday");
+            }else if(dateTime.getDayOfWeek() == 3)
+            {
+                date.setText("Wednesday");
+            }else if(dateTime.getDayOfWeek() == 4)
+            {
+                date.setText("Thursday");
+            }else if(dateTime.getDayOfWeek() == 5)
+            {
+                date.setText("Friday");
+            }else if(dateTime.getDayOfWeek() == 6)
+            {
+                date.setText("Saturday");
+            }else if(dateTime.getDayOfWeek() == 7)
+            {
+                date.setText("Sunday");
+            }
+
             if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty()) {
                 timeLocation.setText(dateTime.toString(timeFormatter) + ", (Location Not Specified)");
             } else {
@@ -422,8 +412,7 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             // already started
             if (DateTime.now().isAfter(event.getStartTime())) {
                 alreadyStartedMessage.setVisibility(View.VISIBLE);
-                alreadyStartedMessage.setText("Already Started");
-                alreadyStartedMessage.setTextColor(Color.RED);
+                alreadyStartedMessage.setText("Started");
             } else {
                 alreadyStartedMessage.setVisibility(View.GONE);
             }
