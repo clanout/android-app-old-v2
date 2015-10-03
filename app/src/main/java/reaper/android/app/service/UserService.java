@@ -320,8 +320,8 @@ public class UserService {
                 });
     }
 
-    public void shareFeedback(String rating, String comment) {
-        ShareFeedbackApiRequest request = new ShareFeedbackApiRequest(comment, rating);
+    public void shareFeedback(int type, String comment) {
+        ShareFeedbackApiRequest request = new ShareFeedbackApiRequest(comment, type);
 
         meApi.shareFeedback(request)
                 .subscribeOn(Schedulers.newThread())

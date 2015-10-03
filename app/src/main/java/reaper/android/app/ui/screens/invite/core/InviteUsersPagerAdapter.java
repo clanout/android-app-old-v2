@@ -74,12 +74,15 @@ public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
             case 0:
                 return "Facebook";
             case 1:
-                return "Contacts";
+                return "On App"; //TODO -- icon
             case 2:
                 return "Phonebook";
         }
 
         // TODO --- show popup for each tab
+        // TODO -- facebook popup --- Facebook friends in "Bengaluru" present on clanOut.
+        // TODO --- phonebook -- All contacts from your phonebook. Send a free SMS to invite them on clanOut.
+        // TODO -- on app ---- Your phonebook contacts present on clanOut.
         return null;
     }
 }

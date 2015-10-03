@@ -326,8 +326,7 @@ public class NotificationService
                             @Override
                             public void onCompleted()
                             {
-                                // TODO -- X friends joined clanname
-                                notification.setMessage("A new clan is growing ------- " + notification.getArgs().get("event_name"));
+                                notification.setMessage("New friends joined " + notification.getArgs().get("event_name"));
                                 notificationCache.put(notification).observeOn(Schedulers.newThread()).subscribe(new Subscriber<Object>()
                                 {
                                     @Override
@@ -372,8 +371,8 @@ public class NotificationService
                     }
                 } else
                 {
-                    // TODO
-                    notification.setMessage("More people are joining the clan ----- " + notification.getArgs().get("event_name"));
+
+                    notification.setMessage("New friends joined " + notification.getArgs().get("event_name"));
                     notificationCache.put(notification).observeOn(Schedulers.newThread()).subscribe(new Subscriber<Object>()
                     {
                         @Override
@@ -680,7 +679,7 @@ public class NotificationService
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(Reaper.getReaperContext())
-                .setSmallIcon(R.drawable.ic_btn_rsvp_going)
+                .setSmallIcon(R.mipmap.logo_dark)
                 .setContentTitle(notification.getTitle())
                 .setContentText(notification.getMessage())
                 .setAutoCancel(true)

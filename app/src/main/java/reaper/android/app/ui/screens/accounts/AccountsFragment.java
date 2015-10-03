@@ -22,6 +22,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -202,7 +204,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         } else if (position == 2) {
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
             if (isWhatsappInstalled) {
-                // TODO -- Whatsapp invitation message
+                // TODO -- Whatsapp invitation message -- X invited you to join clanOut. Check it out (link)
 
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
@@ -223,7 +225,10 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
             builder.setView(dialogView);
 
             final EditText commentMessage = (EditText) dialogView.findViewById(R.id.et_alert_dialog_share_feedback_comment);
-            final RatingBar ratingBar = (RatingBar) dialogView.findViewById(R.id.rb_alert_dialog_share_feedback_rating);
+            RadioButton bug = (RadioButton) dialogView.findViewById(R.id.rb_share_feedback_bug);
+            RadioButton newFeature = (RadioButton) dialogView.findViewById(R.id.rb_share_feedback_new_feature);
+            RadioButton suggestion = (RadioButton) dialogView.findViewById(R.id.rb_share_feedback_other);
+            final RadioGroup radioGroup = (RadioGroup) dialogView.findViewById(R.id.rg_share_feedback);
 
             builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
                 @Override
@@ -238,15 +243,30 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String rating = String.valueOf(ratingBar.getRating());
+
+                    int type = 0;
+
+                    switch (radioGroup.getCheckedRadioButtonId())
+                    {
+                        case R.id.rb_share_feedback_bug:
+                            type = 0;
+                            break;
+                        case R.id.rb_share_feedback_new_feature:
+                            type = 1;
+                            break;
+                        case R.id.rb_share_feedback_other:
+                            type = 2;
+                            break;
+                    }
+
                     String comment = commentMessage.getText().toString();
                     Boolean wantToCloseDialog = false;
 
-                    if (rating == null || rating.isEmpty() || rating.equals("0.0")) {
+                    if (comment == null || comment.isEmpty()) {
                         Toast.makeText(getActivity(), R.string.empty_rating, Toast.LENGTH_LONG).show();
                         wantToCloseDialog = false;
                     } else {
-                        userService.shareFeedback(rating, comment);
+                        userService.shareFeedback(type, comment);
                         Toast.makeText(getActivity(), R.string.feedback_submitted, Toast.LENGTH_LONG).show();
                         wantToCloseDialog = true;
                     }

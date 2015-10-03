@@ -6,15 +6,15 @@ import reaper.android.app.api.core.ApiRequest;
 
 public class ShareFeedbackApiRequest extends ApiRequest
 {
-    @SerializedName("rating")
-    private String rating;
+    @SerializedName("type")
+    private int type;
 
     @SerializedName("comment")
     private String comment;
 
-    public ShareFeedbackApiRequest(String comment, String rating)
+    public ShareFeedbackApiRequest(String comment, int type)
     {
         this.comment = comment;
-        this.rating = rating;
+        this.type = type;
     }
 }

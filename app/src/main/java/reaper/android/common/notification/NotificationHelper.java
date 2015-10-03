@@ -106,13 +106,12 @@ public class NotificationHelper
 
     private static String getEventRemovedMessage(Map<String, String> args)
     {
-        return args.get("event_name") + " dismissed";
+        return args.get("user_name") + " dismissed " + args.get("event_name");
     }
 
-    // TODO --- X friends joined clanname
     private static String getRSVPChangeMessage(Map<String, String> args)
     {
-        return "A new clan is growing ----- " + args.get("event_name");
+        return "New friends joined " + args.get("event_name");
     }
 
     private static String getEventInvitationMessage(Map<String, String> args)

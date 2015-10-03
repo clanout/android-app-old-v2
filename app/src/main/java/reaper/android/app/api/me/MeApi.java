@@ -38,7 +38,7 @@ public interface MeApi
     @POST("/me/block")
     Observable<Response> blockFriends(@Body BlockFriendsApiRequest request);
 
-    @POST("/me/feedback")
+    @POST("/feedback")
     Observable<Response> shareFeedback(@Body ShareFeedbackApiRequest request);
 
     @POST("/me/location")

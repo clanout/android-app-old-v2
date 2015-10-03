@@ -3,7 +3,7 @@
 
     <!-- Location -->
     <string name="location_permission_heading">Turn on GPS</string>
-    <string name="location_permission_message">Your location helps us connect you with your local friends</string>
+    <string name="location_permission_message">Your location helps us connect you with your nearby friends</string>
     <string name="location_permission_positive_button">YES</string>
     <string name="location_permission_negative_button">EXIT</string>
     <string name="location_denied"> Cautious? Once inside, make a secret clan with your friends. Later!</string>
@@ -57,7 +57,7 @@
     <!-- Event Details Fragment -->
     <string name="event_details_no_description">Say something</string>
     <string name="event_details_no_attendees">This clan is no longer available. Refresh to remove dismissed clans from your feed</string>
-    <string name="event_details_no_location">Location to be decided</string>
+    <string name="event_details_no_location">Suggest a location</string>
 
     <string name="event_details_type_public">Open</string>
     <string name="event_details_type_invite_only">Secret</string>
@@ -79,7 +79,7 @@
     <string name="phone_contacts_not_fetched"> Unable to show your phonebook friends. Refresh</string>
     <string name="no_local_phone_contacts"> Clanout is exciting with your friends around. Invite them by Whatsapp </string>
 
-    <string name="whatsapp_not_installed"> Whatsapp service not installed on this device </string>
+    <string name="whatsapp_not_installed"> Whatsapp is not installed on this device </string>
 
     <string name="empty_rating"> Show some love </string>
     <string name="feedback_submitted"> Cheers </string>
@@ -90,7 +90,7 @@
     <string name="messed_up"> Looks like we screwed up. While we fix this issue, go feed your dog </string>
 
     <string name="phone_invalid"> Please enter a valid phone number</string>
-    <string name="add_phone_number"> Clanout is exciting with your friends around. Add your number to instantly connect with your local phonebook friends. ClanOut won\'t share your personal information with anyone</string>
+    <string name="add_phone_number"> Clanout is exciting with your friends around. Add your number to instantly connect with your nearby phonebook friends. ClanOut won\'t share your personal information with anyone</string>
 
     <string name="event_edit_failed_locked"> Organizer finalized the details </string>
     <string name="event_finalisation_failed"> Currently unable to finalize details. Try again</string>
