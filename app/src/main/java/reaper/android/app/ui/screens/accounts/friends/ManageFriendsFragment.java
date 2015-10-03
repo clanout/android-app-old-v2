@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -28,6 +29,8 @@ import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
@@ -38,6 +41,7 @@ import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Friend;
+import reaper.android.app.model.FriendsComparator;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.UserService;
@@ -51,6 +55,7 @@ import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
+import timber.log.Timber;
 
 public class ManageFriendsFragment extends BaseFragment implements BlockListCommunicator, View.OnClickListener {
     private RecyclerView recyclerView;
@@ -76,7 +81,6 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -98,6 +102,7 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         super.onActivityCreated(savedInstanceState);
 
         ((MainActivity) getActivity()).setSupportActionBar(toolbar);
+        setHasOptionsMenu(true);
 
         displayBasicView();
 
@@ -186,7 +191,7 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
         menu.clear();
@@ -209,7 +214,6 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 item.setActionView(R.layout.action_button_refreshing);
-                Log.d("APP", "refresh clicked");
                 facebookService.getFacebookFriends(false);
                 return true;
             }
@@ -224,7 +228,7 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     }
 
     private void refreshRecyclerView() {
-        Log.d("APP", "inside recycler view");
+        Collections.sort(friendList, new FriendsComparator());
         manageFriendsAdapter = new ManageFriendsAdapter(getActivity(), friendList, this);
 
         recyclerView.setAdapter(manageFriendsAdapter);
@@ -240,7 +244,6 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     @Subscribe
     public void onFacebookFriendsUpdatedOnServer(FacebookFriendsUpdatedOnServerTrigger trigger) {
         if (!trigger.isPolling()) {
-            Log.d("APP", "fb friends updated on server");
             userService.getAllAppFriends();
             genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now().toString());
         }
@@ -249,7 +252,6 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     @Subscribe
     public void onFacebookFriendsNotUpdatedOnServer(GenericErrorTrigger trigger) {
         if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE) {
-            Log.d("APP", "fb friends not updated on server");
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -265,7 +267,6 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     @Subscribe
     public void onFacebookFriendsIdFetched(FacebookFriendsIdFetchedTrigger trigger) {
         if (!trigger.isPolling()) {
-            Log.d("APP", "fb friends id fetched");
             userService.updateFacebookFriends(trigger.getFriendsIdList(), trigger.isPolling());
         }
     }
@@ -273,7 +274,6 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     @Subscribe
     public void onFacebookFriendsIdNotFetched(GenericErrorTrigger trigger) {
         if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE) {
-            Log.d("APP", "fb friends id not fetched");
 
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -290,7 +290,6 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     @Subscribe
     public void onAllAppFriendsFetched(final AllAppFriendsFetchedTrigger trigger) {
 
-        Log.d("APP", "app friends fetched");
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -310,7 +309,6 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     public void onAllAppFriendsNotFetched(GenericErrorTrigger trigger) {
         if (trigger.getErrorCode() == ErrorCode.USER_ALL_APP_FRIENDS_FETCH_FAILURE) {
 
-            Log.d("APP", "app friends not fetched");
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

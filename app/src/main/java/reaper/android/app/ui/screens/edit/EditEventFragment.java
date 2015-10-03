@@ -369,6 +369,7 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setCancelable(true);
                     builder.setTitle(R.string.event_delete_heading);
+                    builder.setMessage(R.string.event_delete_message);
 
                     builder.setPositiveButton(R.string.even_delete_positive_button, new DialogInterface.OnClickListener()
                     {
@@ -376,7 +377,7 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
                         public void onClick(DialogInterface dialog, int which)
                         {
                             eventService.deleteEvent(event.getId());
-                            Toast.makeText(getActivity(), R.string.event_delete_confirmation, Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), event.getTitle() + " is dismissed", Toast.LENGTH_LONG).show();
                             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
                         }
                     });

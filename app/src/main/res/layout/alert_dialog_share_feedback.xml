@@ -4,25 +4,49 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <RatingBar
-        android:id="@+id/rb_alert_dialog_share_feedback_rating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
-        android:layout_marginTop="20dp"
-        android:numStars="5"
-        android:rating="0"
-        android:stepSize="1"
-        android:layout_gravity="center_horizontal"/>
+   <RadioGroup
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginLeft="16dp"
+       android:layout_marginRight="16dp"
+       android:layout_marginTop="16dp"
+       android:layout_marginBottom="16dp"
+       android:checkedButton="@+id/rb_share_feedback_bug">
+
+       <RadioButton
+           android:id="@+id/rb_share_feedback_bug"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Report a bug"
+           android:textSize="14sp"
+           android:textColor="@color/text_title"/>
+
+       <RadioButton
+           android:id="@+id/rb_share_feedback_new_feature"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Suggest new feature"
+           android:textSize="14sp"
+           android:textColor="@color/text_title"/>
+
+       <RadioButton
+           android:id="@+id/rb_share_feedback_other"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Other suggestion"
+           android:textSize="14sp"
+           android:textColor="@color/text_title"/>
+
+   </RadioGroup>
 
     <EditText
         android:id="@+id/et_alert_dialog_share_feedback_comment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
-        android:layout_marginTop="20dp"
-        android:hint="Leave us a comment"/>
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:hint="Your feedback"
+        android:textSize="14sp"
+        android:textColor="@color/text_subtitle"/>
 
 </LinearLayout>

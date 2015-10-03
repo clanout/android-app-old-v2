@@ -34,7 +34,7 @@
                 android:id="@+id/rv_home_events"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/primary_light"></android.support.v7.widget.RecyclerView>
+                android:background="@color/background_default"></android.support.v7.widget.RecyclerView>
 
             <TextView
                 android:id="@+id/tv_home_no_events"

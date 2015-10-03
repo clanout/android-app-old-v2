@@ -94,8 +94,26 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
         public void render(Notification notification)
         {
-            notificationIcon.setImageDrawable(eventCreatedDrawable);
             notificationMessage.setText(notification.getMessage());
+
+            switch (notification.getType())
+            {
+                case Notification.CHAT:
+                    notificationIcon.setImageDrawable(eventCreatedDrawable);
+                    break;
+                case Notification.NEW_FRIEND_ADDED:
+                    break;
+                case Notification.EVENT_UPDATED:
+                    break;
+                case Notification.EVENT_REMOVED:
+                    break;
+                case Notification.RSVP:
+                    break;
+                case Notification.EVENT_INVITATION:
+                    break;
+                case Notification.EVENT_CREATED:
+                    break;
+            }
         }
     }
 }

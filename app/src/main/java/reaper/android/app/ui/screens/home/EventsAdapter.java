@@ -452,7 +452,10 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             eventSuggestionList = CreateEventSuggestionFactory.getEventSuggestions();
 
             viewPager = (ViewPager) itemView.findViewById(R.id.vp_list_item_create);
+
             viewPager.setAdapter(new CreateEventPagerAdapter(fragmentManager, eventSuggestionList));
+            viewPager.setOffscreenPageLimit(eventSuggestionList.size());
+
             viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

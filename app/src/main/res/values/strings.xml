@@ -8,13 +8,14 @@
     <string name="location_permission_negative_button">EXIT</string>
     <string name="location_denied"> Cautious? Once inside, make a secret clan with your friends. Later!</string>
 
+
     <string name="fetch_pending_invites_title">Invites</string>
     <string name="fetch_pending_invites_message">To see pending invites, enter your mobile number</string>
     <string name="fetch_pending_invites_positive_button">ENTER</string>
     <string name="fetch_pending_invites_negative_button">CANCEL</string>
 
     <!-- First Time Popups -->
-    <!-- TODO use these 2 strings somewhere ! -->
+    <!-- TODO use these 2 strings somewhere ! and more popups-->
 
     <string name="invite_only_description"> Make a secret clan with selected friends</string>
     <string name="public_description">Let everyone know about your clan. You can still send personal invites</string>
@@ -22,13 +23,11 @@
     <!-- Dialog messages -->
     <string name="event_delete_heading">Dismiss Clan</string>
 
-    <!-- TODO -->
     <string name="event_delete_message">Friends will no longer be able to see it in the feed</string>
     <string name="even_delete_positive_button">REMOVE</string>
     <string name="even_delete_negative_button">CANCEL</string>
 
     <string name="event_lock_heading">Finalize details?</string>
-    <!-- TODO -->
     <string name="event_lock_message">Once confirmed, friends can\'t edit details</string>
     <string name="event_lock_negative_button">NOT YET</string>
     <string name="event_lock_positive_button">FINALIZE</string>
@@ -87,9 +86,6 @@
 
     <string name="chat_messages_not_fetched"> Unable to load conversations. Refresh </string>
     <string name="chat_message_not_sent"> Unable to send message. Resend </string>
-
-    <!-- TODO put clan's name -->
-    <string name="event_delete_confirmation"> -- is dismissed </string>
 
     <string name="messed_up"> Looks like we screwed up. While we fix this issue, go feed your dog </string>
 
