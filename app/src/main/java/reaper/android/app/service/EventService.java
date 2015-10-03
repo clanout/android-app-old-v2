@@ -1,7 +1,5 @@
 package reaper.android.app.service;
 
-import android.util.Log;
-
 import com.squareup.otto.Bus;
 
 import org.joda.time.DateTime;
@@ -96,56 +94,61 @@ public class EventService
         final long startTime = System.currentTimeMillis();
         Observable<List<Event>> eventObservable =
                 eventCache.getEvents()
-                        .flatMap(new Func1<List<Event>, Observable<List<Event>>>()
-                        {
-                            @Override
-                            public Observable<List<Event>> call(List<Event> events)
-                            {
-                                if (events.isEmpty())
-                                {
-                                    EventsApiRequest request = new EventsApiRequest(zone);
-                                    return eventApi.getEvents(request)
-                                            .map(new Func1<EventsApiResponse, List<Event>>()
-                                            {
-                                                @Override
-                                                public List<Event> call(EventsApiResponse eventsApiResponse)
-                                                {
-                                                    List<Event> filteredEvents = new ArrayList<Event>();
-                                                    for (Event event : eventsApiResponse.getEvents())
-                                                    {
-                                                        if (event.getEndTime().isAfterNow())
-                                                        {
-                                                            filteredEvents.add(event);
-                                                        }
-                                                    }
+                          .flatMap(new Func1<List<Event>, Observable<List<Event>>>()
+                          {
+                              @Override
+                              public Observable<List<Event>> call(List<Event> events)
+                              {
+                                  if (events.isEmpty())
+                                  {
+                                      EventsApiRequest request = new EventsApiRequest(zone);
+                                      return eventApi.getEvents(request)
+                                                     .map(new Func1<EventsApiResponse, List<Event>>()
+                                                     {
+                                                         @Override
+                                                         public List<Event> call(EventsApiResponse eventsApiResponse)
+                                                         {
+                                                             List<Event> filteredEvents = new ArrayList<Event>();
+                                                             for (Event event : eventsApiResponse
+                                                                     .getEvents())
+                                                             {
+                                                                 if (event.getEndTime()
+                                                                          .isAfterNow())
+                                                                 {
+                                                                     filteredEvents.add(event);
+                                                                 }
+                                                             }
 
-                                                    return filteredEvents;
-                                                }
-                                            })
-                                            .doOnNext(new Action1<List<Event>>()
-                                            {
-                                                @Override
-                                                public void call(List<Event> events)
-                                                {
-                                                    genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now());
-                                                    eventCache.reset(events);
-                                                }
-                                            })
-                                            .subscribeOn(Schedulers.newThread());
-                                } else
-                                {
-                                    List<Event> filteredEvents = new ArrayList<Event>();
-                                    for (Event event : events)
-                                    {
-                                        if (event.getEndTime().isAfterNow())
-                                        {
-                                            filteredEvents.add(event);
-                                        }
-                                    }
-                                    return Observable.just(filteredEvents);
-                                }
-                            }
-                        });
+                                                             return filteredEvents;
+                                                         }
+                                                     })
+                                                     .doOnNext(new Action1<List<Event>>()
+                                                     {
+                                                         @Override
+                                                         public void call(List<Event> events)
+                                                         {
+                                                             genericCache
+                                                                     .put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime
+                                                                             .now());
+                                                             eventCache.reset(events);
+                                                         }
+                                                     })
+                                                     .subscribeOn(Schedulers.newThread());
+                                  }
+                                  else
+                                  {
+                                      List<Event> filteredEvents = new ArrayList<Event>();
+                                      for (Event event : events)
+                                      {
+                                          if (event.getEndTime().isAfterNow())
+                                          {
+                                              filteredEvents.add(event);
+                                          }
+                                      }
+                                      return Observable.just(filteredEvents);
+                                  }
+                              }
+                          });
 
         eventObservable
                 .observeOn(AndroidSchedulers.mainThread())
@@ -176,58 +179,63 @@ public class EventService
         final long startTime = System.currentTimeMillis();
         Observable<List<Event>> eventObservable =
                 eventCache.getEvents()
-                        .flatMap(new Func1<List<Event>, Observable<List<Event>>>()
-                        {
-                            @Override
-                            public Observable<List<Event>> call(List<Event> events)
-                            {
-                                if (events.isEmpty())
-                                {
-                                    EventsApiRequest request = new EventsApiRequest(zone);
-                                    return eventApi.getEvents(request)
-                                            .map(new Func1<EventsApiResponse, List<Event>>()
-                                            {
-                                                @Override
-                                                public List<Event> call(EventsApiResponse eventsApiResponse)
-                                                {
-                                                    List<Event> filteredEvents = new ArrayList<Event>();
-                                                    for (Event event : eventsApiResponse.getEvents())
-                                                    {
-                                                        if (event.getEndTime().isAfterNow())
-                                                        {
-                                                            filteredEvents.add(event);
-                                                        }
-                                                    }
+                          .flatMap(new Func1<List<Event>, Observable<List<Event>>>()
+                          {
+                              @Override
+                              public Observable<List<Event>> call(List<Event> events)
+                              {
+                                  if (events.isEmpty())
+                                  {
+                                      EventsApiRequest request = new EventsApiRequest(zone);
+                                      return eventApi.getEvents(request)
+                                                     .map(new Func1<EventsApiResponse, List<Event>>()
+                                                     {
+                                                         @Override
+                                                         public List<Event> call(EventsApiResponse eventsApiResponse)
+                                                         {
+                                                             List<Event> filteredEvents = new ArrayList<Event>();
+                                                             for (Event event : eventsApiResponse
+                                                                     .getEvents())
+                                                             {
+                                                                 if (event.getEndTime()
+                                                                          .isAfterNow())
+                                                                 {
+                                                                     filteredEvents.add(event);
+                                                                 }
+                                                             }
 
-                                                    return filteredEvents;
-                                                }
+                                                             return filteredEvents;
+                                                         }
 
-                                            })
-                                            .doOnNext(new Action1<List<Event>>()
-                                            {
-                                                @Override
-                                                public void call(List<Event> events)
-                                                {
-                                                    genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now());
-                                                    eventCache.reset(events);
-                                                }
-                                            })
-                                            .subscribeOn(Schedulers.newThread());
-                                } else
-                                {
-                                    List<Event> filteredEvents = new ArrayList<Event>();
-                                    for (Event event : events)
-                                    {
-                                        if (event.getEndTime().isAfterNow())
-                                        {
-                                            filteredEvents.add(event);
-                                        }
-                                    }
+                                                     })
+                                                     .doOnNext(new Action1<List<Event>>()
+                                                     {
+                                                         @Override
+                                                         public void call(List<Event> events)
+                                                         {
+                                                             genericCache
+                                                                     .put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime
+                                                                             .now());
+                                                             eventCache.reset(events);
+                                                         }
+                                                     })
+                                                     .subscribeOn(Schedulers.newThread());
+                                  }
+                                  else
+                                  {
+                                      List<Event> filteredEvents = new ArrayList<Event>();
+                                      for (Event event : events)
+                                      {
+                                          if (event.getEndTime().isAfterNow())
+                                          {
+                                              filteredEvents.add(event);
+                                          }
+                                      }
 
-                                    return Observable.just(filteredEvents);
-                                }
-                            }
-                        });
+                                      return Observable.just(filteredEvents);
+                                  }
+                              }
+                          });
 
         eventObservable
                 .observeOn(AndroidSchedulers.mainThread())
@@ -297,61 +305,64 @@ public class EventService
 
     public void fetchNewEventsAndUpdatesFromNetwork(String zone, final List<String> eventIdList, DateTime lastUpdateTimestamp)
     {
-        Observable<FetchNewEventsAndUpdatesApiResponse> updatesObservable = eventApi.fetchNewEventsAndUpdates(new FetchNewEventsAndUpdatesApiRequest(zone, eventIdList, lastUpdateTimestamp));
+        Observable<FetchNewEventsAndUpdatesApiResponse> updatesObservable = eventApi
+                .fetchNewEventsAndUpdates(new FetchNewEventsAndUpdatesApiRequest(zone, eventIdList, lastUpdateTimestamp));
         Observable<List<Event>> cachedEventsObservable = eventCache.getEvents();
 
         Observable<List<Event>> updatedObservable =
-                Observable.zip(updatesObservable, cachedEventsObservable, new Func2<FetchNewEventsAndUpdatesApiResponse, List<Event>, List<Event>>()
-                {
-                    @Override
-                    public List<Event> call(FetchNewEventsAndUpdatesApiResponse response, List<Event> events)
-                    {
-                        List<Event> newEventList = response.getNewEventsList();
-                        List<String> deletedEventIdList = response.getDeletedEventIdList();
-                        List<Event> updatedEventList = response.getUpdatedEventList();
-
-                        for (String deletedEventId : deletedEventIdList)
+                Observable
+                        .zip(updatesObservable, cachedEventsObservable, new Func2<FetchNewEventsAndUpdatesApiResponse, List<Event>, List<Event>>()
                         {
-                            Event deletedEvent = new Event();
-                            deletedEvent.setId(deletedEventId);
-
-                            if (events.contains(deletedEvent))
+                            @Override
+                            public List<Event> call(FetchNewEventsAndUpdatesApiResponse response, List<Event> events)
                             {
-                                events.remove(deletedEvent);
-                            }
-                        }
+                                List<Event> newEventList = response.getNewEventsList();
+                                List<String> deletedEventIdList = response.getDeletedEventIdList();
+                                List<Event> updatedEventList = response.getUpdatedEventList();
 
-                        for (Event updatedEvent : updatedEventList)
-                        {
-                            if (events.contains(updatedEvent))
-                            {
-                                int index = events.indexOf(updatedEvent);
-                                if (index >= 0)
+                                for (String deletedEventId : deletedEventIdList)
                                 {
-                                    if (!updatedEvent.isEqualTo(events.get(index)))
+                                    Event deletedEvent = new Event();
+                                    deletedEvent.setId(deletedEventId);
+
+                                    if (events.contains(deletedEvent))
                                     {
-                                        events.set(index, updatedEvent);
-                                    } else
-                                    {
+                                        events.remove(deletedEvent);
                                     }
                                 }
+
+                                for (Event updatedEvent : updatedEventList)
+                                {
+                                    if (events.contains(updatedEvent))
+                                    {
+                                        int index = events.indexOf(updatedEvent);
+                                        if (index >= 0)
+                                        {
+                                            if (!updatedEvent.isEqualTo(events.get(index)))
+                                            {
+                                                events.set(index, updatedEvent);
+                                            }
+                                            else
+                                            {
+                                            }
+                                        }
+                                    }
+                                }
+
+                                events.addAll(newEventList);
+
+                                List<Event> filteredEvents = new ArrayList<Event>();
+                                for (Event event : events)
+                                {
+                                    if (event.getEndTime().isAfterNow())
+                                    {
+                                        filteredEvents.add(event);
+                                    }
+                                }
+
+                                return filteredEvents;
                             }
-                        }
-
-                        events.addAll(newEventList);
-
-                        List<Event> filteredEvents = new ArrayList<Event>();
-                        for (Event event : events)
-                        {
-                            if (event.getEndTime().isAfterNow())
-                            {
-                                filteredEvents.add(event);
-                            }
-                        }
-
-                        return filteredEvents;
-                    }
-                });
+                        });
 
         updatedObservable
                 .observeOn(AndroidSchedulers.mainThread())
@@ -382,39 +393,39 @@ public class EventService
     public void getAllEventIds()
     {
         eventCache.getEvents()
-                .map(new Func1<List<Event>, List<String>>()
-                {
-                    @Override
-                    public List<String> call(List<Event> events)
-                    {
-                        List<String> eventIds = new ArrayList<String>(events.size());
-                        for (Event event : events)
-                        {
-                            eventIds.add(event.getId());
-                        }
-                        return eventIds;
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<String>>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
-                    }
+                  .map(new Func1<List<Event>, List<String>>()
+                  {
+                      @Override
+                      public List<String> call(List<Event> events)
+                      {
+                          List<String> eventIds = new ArrayList<String>(events.size());
+                          for (Event event : events)
+                          {
+                              eventIds.add(event.getId());
+                          }
+                          return eventIds;
+                      }
+                  })
+                  .observeOn(AndroidSchedulers.mainThread())
+                  .subscribe(new Subscriber<List<String>>()
+                  {
+                      @Override
+                      public void onCompleted()
+                      {
+                      }
 
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                        bus.post(new GenericErrorTrigger(ErrorCode.EVENT_IDS_FETCH_FAILURE, (Exception) e));
-                    }
+                      @Override
+                      public void onError(Throwable e)
+                      {
+                          bus.post(new GenericErrorTrigger(ErrorCode.EVENT_IDS_FETCH_FAILURE, (Exception) e));
+                      }
 
-                    @Override
-                    public void onNext(List<String> strings)
-                    {
-                        bus.post(new EventIdsFetchedTrigger(strings));
-                    }
-                });
+                      @Override
+                      public void onNext(List<String> strings)
+                      {
+                          bus.post(new EventIdsFetchedTrigger(strings));
+                      }
+                  });
     }
 
     public void fetchEventDetails(final String eventId)
@@ -422,39 +433,40 @@ public class EventService
         final long startTime = System.currentTimeMillis();
         Observable<EventDetails> eventDetailsObservable =
                 eventCache.getEventDetails(eventId)
-                        .flatMap(new Func1<EventDetails, Observable<EventDetails>>()
-                        {
-                            @Override
-                            public Observable<EventDetails> call(EventDetails eventDetails)
-                            {
-                                if (eventDetails == null)
-                                {
-                                    EventDetailsApiRequest request = new EventDetailsApiRequest(eventId);
-                                    return eventApi.getEventDetails(request)
-                                            .map(new Func1<EventDetailsApiResponse, EventDetails>()
-                                            {
-                                                @Override
-                                                public EventDetails call(EventDetailsApiResponse eventDetailsApiResponse)
-                                                {
-                                                    return eventDetailsApiResponse
-                                                            .getEventDetails();
-                                                }
-                                            })
-                                            .doOnNext(new Action1<EventDetails>()
-                                            {
-                                                @Override
-                                                public void call(EventDetails eventDetails)
-                                                {
-                                                    eventCache.saveDetails(eventDetails);
-                                                }
-                                            })
-                                            .observeOn(Schedulers.newThread());
-                                } else
-                                {
-                                    return Observable.just(eventDetails);
-                                }
-                            }
-                        });
+                          .flatMap(new Func1<EventDetails, Observable<EventDetails>>()
+                          {
+                              @Override
+                              public Observable<EventDetails> call(EventDetails eventDetails)
+                              {
+                                  if (eventDetails == null)
+                                  {
+                                      EventDetailsApiRequest request = new EventDetailsApiRequest(eventId);
+                                      return eventApi.getEventDetails(request)
+                                                     .map(new Func1<EventDetailsApiResponse, EventDetails>()
+                                                     {
+                                                         @Override
+                                                         public EventDetails call(EventDetailsApiResponse eventDetailsApiResponse)
+                                                         {
+                                                             return eventDetailsApiResponse
+                                                                     .getEventDetails();
+                                                         }
+                                                     })
+                                                     .doOnNext(new Action1<EventDetails>()
+                                                     {
+                                                         @Override
+                                                         public void call(EventDetails eventDetails)
+                                                         {
+                                                             eventCache.saveDetails(eventDetails);
+                                                         }
+                                                     })
+                                                     .observeOn(Schedulers.newThread());
+                                  }
+                                  else
+                                  {
+                                      return Observable.just(eventDetails);
+                                  }
+                              }
+                          });
 
         eventDetailsObservable
                 .observeOn(AndroidSchedulers.mainThread())
@@ -508,7 +520,8 @@ public class EventService
                     public void onNext(EventDetailsApiResponse eventDetailsApiResponse)
                     {
                         eventCache.saveDetails(eventDetailsApiResponse.getEventDetails());
-                        bus.post(new EventDetailsFetchedFromNetworkTrigger(eventDetailsApiResponse.getEventDetails()));
+                        bus.post(new EventDetailsFetchedFromNetworkTrigger(eventDetailsApiResponse
+                                .getEventDetails()));
                     }
                 });
     }
@@ -535,7 +548,8 @@ public class EventService
                         if (isFromHomeFragment)
                         {
                             bus.post(new GenericErrorTrigger(ErrorCode.RSVP_UPDATE_FAILURE, (Exception) e));
-                        } else
+                        }
+                        else
                         {
                             bus.post(new EventRsvpNotChangedTrigger(updatedEvent.getId(), oldRsvp));
                         }
@@ -551,19 +565,23 @@ public class EventService
                                 eventCache.deleteCompletely(updatedEvent.getId());
                                 eventCache.save(updatedEvent);
                                 handleTopicSubscription(updatedEvent);
-                            } else
+                            }
+                            else
                             {
                                 eventCache.save(updatedEvent);
                                 handleTopicSubscription(updatedEvent);
                             }
-                        } else
+                        }
+                        else
                         {
                             if (isFromHomeFragment)
                             {
                                 bus.post(new GenericErrorTrigger(ErrorCode.RSVP_UPDATE_FAILURE, new Exception()));
-                            } else
+                            }
+                            else
                             {
-                                bus.post(new EventRsvpNotChangedTrigger(updatedEvent.getId(), oldRsvp));
+                                bus.post(new EventRsvpNotChangedTrigger(updatedEvent
+                                        .getId(), oldRsvp));
                             }
                         }
                     }
@@ -574,8 +592,10 @@ public class EventService
     {
         if (updatedEvent.getRsvp() == Event.RSVP.NO)
         {
-            gcmService.unsubscribeTopic(genericCache.get(CacheKeys.GCM_TOKEN), updatedEvent.getId());
-        } else
+            gcmService
+                    .unsubscribeTopic(genericCache.get(CacheKeys.GCM_TOKEN), updatedEvent.getId());
+        }
+        else
         {
             gcmService.subscribeTopic(genericCache.get(CacheKeys.GCM_TOKEN), updatedEvent.getId());
         }
@@ -620,7 +640,8 @@ public class EventService
     public void createEvent(String title, Event.Type eventType, EventCategory eventCategory, String description, Location placeLocation, DateTime startTime, DateTime endTime)
     {
         CreateEventApiRequest request = new CreateEventApiRequest(title, eventType, eventCategory, description, placeLocation
-                .getName(), placeLocation.getZone(), placeLocation.getLatitude(), placeLocation.getLongitude(), startTime, endTime);
+                .getName(), placeLocation.getZone(), placeLocation.getLatitude(), placeLocation
+                .getLongitude(), startTime, endTime);
 
         eventApi.createEvent(request)
                 .map(new Func1<CreateEventApiResponse, Event>()
@@ -654,7 +675,8 @@ public class EventService
 
                         if (genericCache.get(CacheKeys.GCM_TOKEN) != null)
                         {
-                            gcmService.subscribeTopic(genericCache.get(CacheKeys.GCM_TOKEN), event.getId());
+                            gcmService.subscribeTopic(genericCache.get(CacheKeys.GCM_TOKEN), event
+                                    .getId());
                         }
 
                         bus.post(new EventCreatedTrigger(event));
@@ -678,12 +700,14 @@ public class EventService
                     @Override
                     public void onError(Throwable e)
                     {
-                        if(isFinalised)
+                        if (isFinalised)
                         {
                             event.setIsFinalized(false);
                             eventCache.save(event);
                             bus.post(new GenericErrorTrigger(ErrorCode.EVENT_COULD_NOT_BE_FINALISED, (Exception) e));
-                        }else{
+                        }
+                        else
+                        {
                             event.setIsFinalized(true);
                             eventCache.save(event);
                             bus.post(new GenericErrorTrigger(ErrorCode.EVENT_COULD_NOT_BE_UNFINALISED, (Exception) e));
@@ -693,14 +717,16 @@ public class EventService
                     @Override
                     public void onNext(Response response)
                     {
-                        if(response.getStatus() != 200)
+                        if (response.getStatus() != 200)
                         {
-                            if(isFinalised)
+                            if (isFinalised)
                             {
                                 event.setIsFinalized(false);
                                 eventCache.save(event);
                                 bus.post(new GenericErrorTrigger(ErrorCode.EVENT_COULD_NOT_BE_FINALISED, null));
-                            }else{
+                            }
+                            else
+                            {
                                 event.setIsFinalized(true);
                                 eventCache.save(event);
                                 bus.post(new GenericErrorTrigger(ErrorCode.EVENT_COULD_NOT_BE_UNFINALISED, null));
@@ -713,69 +739,84 @@ public class EventService
     public void editEvent(final String eventId, DateTime startTime, DateTime endTime, Location placeLocation, String description)
     {
         final EditEventApiRequest request = new EditEventApiRequest(placeLocation
-                .getLongitude(), description, endTime, eventId, placeLocation.getLatitude(), placeLocation.getName(), placeLocation
+                .getLongitude(), description, endTime, eventId, placeLocation
+                .getLatitude(), placeLocation.getName(), placeLocation
                 .getZone(), startTime);
 
-        Observable.create(new Observable.OnSubscribe<Event>() {
+        Observable.create(new Observable.OnSubscribe<Event>()
+        {
             @Override
-            public void call(Subscriber<? super Event> subscriber) {
-                try {
+            public void call(Subscriber<? super Event> subscriber)
+            {
+                try
+                {
                     Response response = eventApi.editEvent(request);
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.getBody().in()));
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response
+                            .getBody().in()));
 
                     String line;
                     StringBuilder jsonBuilder = new StringBuilder();
 
-                    while ((line = bufferedReader.readLine()) != null) {
+                    while ((line = bufferedReader.readLine()) != null)
+                    {
                         jsonBuilder.append(line).append("\n");
                     }
 
                     bufferedReader.close();
                     String json = jsonBuilder.toString();
-                    Event event = GsonProvider.getGson().fromJson(json, EditEventApiResponse.class).getEvent();
+                    Event event = GsonProvider.getGson().fromJson(json, EditEventApiResponse.class)
+                                              .getEvent();
 
                     subscriber.onNext(event);
 
-                } catch (RetrofitError e) {
-                    if (e.getResponse().getStatus() == 400) {
+                }
+                catch (RetrofitError e)
+                {
+                    if (e.getResponse().getStatus() == 400)
+                    {
                         subscriber.onError(new Throwable(ExceptionMessages.EVENT_LOCKED));
-                    } else {
+                    }
+                    else
+                    {
                         subscriber.onError(new Throwable(ExceptionMessages.BAD_REQUEST));
                     }
 
-                } catch (IOException e) {
+                }
+                catch (IOException e)
+                {
                     subscriber.onError(new Throwable(ExceptionMessages.BAD_REQUEST));
                 }
                 subscriber.onCompleted();
             }
         }).subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Event>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
+                  .observeOn(AndroidSchedulers.mainThread())
+                  .subscribe(new Subscriber<Event>()
+                  {
+                      @Override
+                      public void onCompleted()
+                      {
 
-                    }
+                      }
 
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                        if (e.getMessage().equals(ExceptionMessages.EVENT_LOCKED))
-                        {
-                            bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE_LOCKED, null));
-                        } else
-                        {
-                            bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE, null));
-                        }
-                    }
+                      @Override
+                      public void onError(Throwable e)
+                      {
+                          if (e.getMessage().equals(ExceptionMessages.EVENT_LOCKED))
+                          {
+                              bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE_LOCKED, null));
+                          }
+                          else
+                          {
+                              bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE, null));
+                          }
+                      }
 
-                    @Override
-                    public void onNext(Event event)
-                    {
-                        bus.post(new EventEditedTrigger(event));
-                    }
-                });
+                      @Override
+                      public void onNext(Event event)
+                      {
+                          bus.post(new EventEditedTrigger(event));
+                      }
+                  });
 
     }
 
@@ -809,7 +850,8 @@ public class EventService
 
                             if (genericCache.get(CacheKeys.GCM_TOKEN) != null)
                             {
-                                gcmService.unsubscribeTopic(genericCache.get(CacheKeys.GCM_TOKEN), eventId);
+                                gcmService.unsubscribeTopic(genericCache
+                                        .get(CacheKeys.GCM_TOKEN), eventId);
                             }
                         }
                     }
@@ -823,20 +865,25 @@ public class EventService
         eventApi.inviteFriends(request)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Response>() {
+                .subscribe(new Subscriber<Response>()
+                {
                     @Override
-                    public void onCompleted() {
+                    public void onCompleted()
+                    {
 
                     }
 
                     @Override
-                    public void onError(Throwable e) {
+                    public void onError(Throwable e)
+                    {
 
                     }
 
                     @Override
-                    public void onNext(Response response) {
-                        if (response.getStatus() == 200) {
+                    public void onNext(Response response)
+                    {
+                        if (response.getStatus() == 200)
+                        {
                             // TODO: Delete event details or add a new invitee
                         }
                     }
@@ -850,23 +897,189 @@ public class EventService
         eventApi.inviteThroughSMS(request)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Response>() {
+                .subscribe(new Subscriber<Response>()
+                {
                     @Override
-                    public void onCompleted() {
+                    public void onCompleted()
+                    {
 
                     }
 
                     @Override
-                    public void onError(Throwable e) {
+                    public void onError(Throwable e)
+                    {
 
                     }
 
                     @Override
-                    public void onNext(Response response) {
+                    public void onNext(Response response)
+                    {
 
                     }
                 });
     }
 
+    public Observable<List<Event>> _fetchEvents(final String zone)
+    {
+        return eventCache
+                .getEvents()
+                .flatMap(new Func1<List<Event>, Observable<List<Event>>>()
+                {
+                    @Override
+                    public Observable<List<Event>> call(List<Event> events)
+                    {
+                        if (events.isEmpty())
+                        {
+                            EventsApiRequest request = new EventsApiRequest(zone);
+                            return eventApi.getEvents(request)
+                                           .map(new Func1<EventsApiResponse, List<Event>>()
+                                           {
+                                               @Override
+                                               public List<Event> call(EventsApiResponse eventsApiResponse)
+                                               {
+                                                   List<Event> filteredEvents = new ArrayList<Event>();
+                                                   for (Event event : eventsApiResponse
+                                                           .getEvents())
+                                                   {
+                                                       if (event.getEndTime()
+                                                                .isAfterNow())
+                                                       {
+                                                           filteredEvents.add(event);
+                                                       }
+                                                   }
 
+                                                   return filteredEvents;
+                                               }
+                                           })
+                                           .doOnNext(new Action1<List<Event>>()
+                                           {
+                                               @Override
+                                               public void call(List<Event> events)
+                                               {
+                                                   genericCache
+                                                           .put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime
+                                                                   .now());
+                                                   eventCache.reset(events);
+                                               }
+                                           })
+                                           .subscribeOn(Schedulers.newThread());
+                        }
+                        else
+                        {
+                            List<Event> filteredEvents = new ArrayList<Event>();
+                            for (Event event : events)
+                            {
+                                if (event.getEndTime().isAfterNow())
+                                {
+                                    filteredEvents.add(event);
+                                }
+                            }
+                            return Observable.just(filteredEvents);
+                        }
+                    }
+                });
+    }
+
+    public Observable<List<Event>> _refreshEvents(String zone, final List<String> eventIdList, DateTime lastUpdateTimestamp)
+    {
+        Timber.v("refreshing");
+
+        Observable<FetchNewEventsAndUpdatesApiResponse> updatesObservable = eventApi
+                .fetchNewEventsAndUpdates(new FetchNewEventsAndUpdatesApiRequest(zone, eventIdList, lastUpdateTimestamp));
+        Observable<List<Event>> cachedEventsObservable = eventCache.getEvents();
+
+        return Observable
+                .zip(updatesObservable, cachedEventsObservable, new Func2<FetchNewEventsAndUpdatesApiResponse, List<Event>, List<Event>>()
+                {
+                    @Override
+                    public List<Event> call(FetchNewEventsAndUpdatesApiResponse response, List<Event> events)
+                    {
+                        List<Event> newEventList = response.getNewEventsList();
+                        List<String> deletedEventIdList = response.getDeletedEventIdList();
+                        List<Event> updatedEventList = response.getUpdatedEventList();
+
+                        for (String deletedEventId : deletedEventIdList)
+                        {
+                            Event deletedEvent = new Event();
+                            deletedEvent.setId(deletedEventId);
+
+                            if (events.contains(deletedEvent))
+                            {
+                                events.remove(deletedEvent);
+                            }
+                        }
+
+                        for (Event updatedEvent : updatedEventList)
+                        {
+                            if (events.contains(updatedEvent))
+                            {
+                                int index = events.indexOf(updatedEvent);
+                                if (index >= 0)
+                                {
+                                    if (!updatedEvent.isEqualTo(events.get(index)))
+                                    {
+                                        events.set(index, updatedEvent);
+                                    }
+                                    else
+                                    {
+                                    }
+                                }
+                            }
+                        }
+
+                        events.addAll(newEventList);
+
+                        List<Event> filteredEvents = new ArrayList<Event>();
+                        for (Event event : events)
+                        {
+                            if (event.getEndTime().isAfterNow())
+                            {
+                                filteredEvents.add(event);
+                            }
+                        }
+
+                        return filteredEvents;
+                    }
+                })
+                .doOnNext(new Action1<List<Event>>()
+                {
+                    @Override
+                    public void call(List<Event> events)
+                    {
+                        genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now());
+                        eventCache.reset(events);
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
+
+    public Observable<Boolean> _updateRsvp(final Event updatedEvent)
+    {
+        RsvpUpdateApiRequest request = new RsvpUpdateApiRequest(updatedEvent.getId(), updatedEvent
+                .getRsvp());
+
+        return eventApi.updateRsvp(request)
+                       .map(new Func1<Response, Boolean>()
+                       {
+                           @Override
+                           public Boolean call(Response response)
+                           {
+                               return (response.getStatus() == 200);
+                           }
+                       })
+                       .doOnNext(new Action1<Boolean>()
+                       {
+                           @Override
+                           public void call(Boolean isSuccess)
+                           {
+                               if (isSuccess)
+                               {
+                                   eventCache.deleteCompletely(updatedEvent.getId());
+                                   eventCache.save(updatedEvent);
+                                   handleTopicSubscription(updatedEvent);
+                               }
+                           }
+                       })
+                       .subscribeOn(Schedulers.newThread());
+    }
 }

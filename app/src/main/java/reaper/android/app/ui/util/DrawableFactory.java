@@ -4,12 +4,13 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import reaper.android.R;
@@ -19,13 +20,17 @@ import reaper.android.app.root.Reaper;
 /**
  * Created by harsh on 24/09/15.
  */
-public class DrawableFactory {
+public class DrawableFactory
+{
     private static Drawable generalDrawable, eatOutDrawable, drinksDrawable, cafeDrawable, moviesDrawable, outdorsDrawable, partyDrawable, localEventsDrawable, shoppingDrawable;
 
     private static Map<EventCategory, MaterialDrawableBuilder.IconValue> iconMapping;
     private static Map<EventCategory, Integer> colorMapping;
+    private static List<Integer> colors = Arrays
+            .asList(R.color.drinks, R.color.party, R.color.general, R.color.outdoors);
 
-    static {
+    static
+    {
         iconMapping = new HashMap<>();
         iconMapping.put(EventCategory.GENERAL, MaterialDrawableBuilder.IconValue.BULLETIN_BOARD);
         iconMapping.put(EventCategory.EAT_OUT, MaterialDrawableBuilder.IconValue.FOOD);
@@ -39,7 +44,8 @@ public class DrawableFactory {
         iconMapping.put(EventCategory.SHOPPING, MaterialDrawableBuilder.IconValue.SHOPPING);
     }
 
-    static {
+    static
+    {
         colorMapping = new HashMap<>();
         colorMapping.put(EventCategory.GENERAL, R.color.general);
         colorMapping.put(EventCategory.EAT_OUT, R.color.eat_out);
@@ -53,12 +59,13 @@ public class DrawableFactory {
     }
 
 
-    public static Drawable get(EventCategory eventCategory, int size, int color) {
+    public static Drawable get(EventCategory eventCategory, int size)
+    {
         return MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                .setIcon(iconMapping.get(eventCategory))
-                .setColor(Color.WHITE)
-                .setSizeDp(size)
-                .build();
+                                      .setIcon(iconMapping.get(eventCategory))
+                                      .setColor(Color.WHITE)
+                                      .setSizeDp(size)
+                                      .build();
     }
 
 
@@ -67,9 +74,23 @@ public class DrawableFactory {
         GradientDrawable drawable = new GradientDrawable();
         drawable.setCornerRadius(TypedValue
                 .applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornerRadius, context.getResources()
-                        .getDisplayMetrics()));
+                                                                                  .getDisplayMetrics()));
         drawable.setColor(Reaper.getReaperContext().getResources()
-                .getColor(colorResource));
+                                .getColor(colorResource));
+        return drawable;
+    }
+
+    public static Drawable randomIconBackground()
+    {
+        int random = (int) (Math.random() * colors.size());
+
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setCornerRadius(TypedValue
+                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, Reaper.getReaperContext()
+                                                                      .getResources()
+                                                                      .getDisplayMetrics()));
+        drawable.setColor(Reaper.getReaperContext().getResources()
+                                .getColor(colors.get(random)));
         return drawable;
     }
 }

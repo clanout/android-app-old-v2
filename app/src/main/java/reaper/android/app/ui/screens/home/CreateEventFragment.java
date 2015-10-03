@@ -1,8 +1,10 @@
 package reaper.android.app.ui.screens.home;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.CardView;
@@ -16,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -25,16 +28,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.config.BundleKeys;
+import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.CreateEventModel;
 import reaper.android.app.model.Event;
+import reaper.android.app.model.Location;
+import reaper.android.app.service.EventService;
+import reaper.android.app.service.LocationService;
+import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.common.ViewPagerClickedTrigger;
+import reaper.android.app.trigger.event.EventCreatedTrigger;
 import reaper.android.app.ui.screens.core.BaseFragment;
+import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
+import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.communicator.Communicator;
+import rx.Subscription;
 import timber.log.Timber;
 
 public class CreateEventFragment extends BaseFragment
 {
+    public interface CreateEventCycleHandler
+    {
+        void addCycle(Subscription subscription);
+    }
+
     private static final String ARG_MODEL = "arg_model";
 
     /* UI Elements */
@@ -65,6 +83,8 @@ public class CreateEventFragment extends BaseFragment
     TextView moreDetails;
     TextView create;
 
+    ProgressDialog progressDialog;
+
     ClickListener clickListener;
 
     /* Data */
@@ -79,7 +99,8 @@ public class CreateEventFragment extends BaseFragment
 
     Event.Type selectedType;
 
-    private Bus bus;
+    boolean isCreateClicked;
+    Bus bus;
 
     /* Static Factory */
     public static CreateEventFragment newInstance(CreateEventModel createEventModel)
@@ -169,12 +190,25 @@ public class CreateEventFragment extends BaseFragment
     public void onResume()
     {
         super.onResume();
+        bus.register(this);
 
         initView();
         initTypeSelector();
         initDaySelector();
         initTimeSelector();
         initDayTime();
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        bus.unregister(this);
+
+        if (progressDialog != null)
+        {
+            progressDialog.dismiss();
+        }
     }
 
     private void onMoreDetailsClicked()
@@ -188,8 +222,15 @@ public class CreateEventFragment extends BaseFragment
         String eventTitle = title.getText().toString();
         if (eventTitle == null || eventTitle.isEmpty())
         {
-            eventTitle = createEventModel.getTitle();
+            Snackbar.make(getView(), "Title cannot be empty", Snackbar.LENGTH_LONG)
+                    .show();
+            return;
         }
+
+        InputMethodManager imm = (InputMethodManager) getActivity()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(title.getWindowToken(), InputMethodManager.SHOW_IMPLICIT);
+        progressDialog = ProgressDialog.show(getActivity(), "Creating your clan", "Please wait ...");
 
         DateTime startTime = days.get(selectedDayIndex)
                                  .withTime(times.get(selectedTimeIndex).toLocalTime());
@@ -197,8 +238,54 @@ public class CreateEventFragment extends BaseFragment
 
         Timber.v("Title = " + eventTitle + "; Start Time = " + startTime + "; End Time = " + endTime);
 
+        EventService eventService = new EventService(bus);
+        LocationService locationService = new LocationService(bus);
+
+        String zone = locationService.getUserLocation().getZone();
+        Location location = new Location();
+        location.setZone(zone);
+
+        isCreateClicked = true;
+        eventService.createEvent(eventTitle, selectedType, createEventModel
+                .getCategory(), "", location, startTime, endTime);
+
         // TODO : Create event
         // TODO : Fragment transaction to invite screen
+    }
+
+    @Subscribe
+    public void onCreateSuccess(EventCreatedTrigger trigger)
+    {
+        if (isCreateClicked)
+        {
+            if (progressDialog != null)
+            {
+                progressDialog.dismiss();
+            }
+
+            InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT, trigger
+                    .getEvent());
+            bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, true);
+            inviteUsersContainerFragment.setArguments(bundle);
+            FragmentUtils.changeFragment(getFragmentManager(), inviteUsersContainerFragment);
+        }
+    }
+
+    @Subscribe
+    public void onCreateFailure(GenericErrorTrigger trigger)
+    {
+        if (isCreateClicked && trigger.getErrorCode() == ErrorCode.EVENT_CREATION_FAILURE)
+        {
+            if (progressDialog != null)
+            {
+                progressDialog.dismiss();
+            }
+
+            Snackbar.make(getView(), "Unable to create event", Snackbar.LENGTH_LONG)
+                    .show();
+        }
     }
 
     private void initView()

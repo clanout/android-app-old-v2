@@ -2,15 +2,10 @@ package reaper.android.app.model;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.support.v4.content.ContextCompat;
-import android.util.TypedValue;
 
 import java.io.Serializable;
 
-import reaper.android.R;
-import reaper.android.app.model.EventCategory;
-import reaper.android.app.root.Reaper;
+import reaper.android.app.config.Dimensions;
 import reaper.android.app.ui.util.DrawableFactory;
 
 public class CreateEventModel implements Serializable
@@ -36,21 +31,11 @@ public class CreateEventModel implements Serializable
 
     public Drawable getIcon()
     {
-        return DrawableFactory.get(category, 48, R.color.white);
+        return DrawableFactory.get(category, Dimensions.CREATE_EVENT_ICON_SIZE);
     }
 
     public Drawable getIconBackground(Context context)
     {
-        return getIconBackground(context, R.color.accent, 4);
-    }
-
-    private Drawable getIconBackground(Context context, int colorResource, int cornerRadius)
-    {
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setCornerRadius(TypedValue
-                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornerRadius, context.getResources()
-                                                                                  .getDisplayMetrics()));
-        drawable.setColor(ContextCompat.getColor(context, colorResource));
-        return drawable;
+        return DrawableFactory.randomIconBackground();
     }
 }

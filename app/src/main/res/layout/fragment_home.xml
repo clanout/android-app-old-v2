@@ -16,6 +16,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/primary"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout
@@ -24,72 +25,63 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/primary_light"
-            android:gravity="center_vertical|center_horizontal">
+            android:orientation="vertical">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_home_events"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/background_default"></android.support.v7.widget.RecyclerView>
+                android:background="@color/background_default"/>
 
-            <TextView
-                android:id="@+id/tv_home_no_events"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+            <android.support.v4.view.ViewPager
+                android:id="@+id/vp_home_create"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="160dp"/>
 
-        </RelativeLayout>
+            <LinearLayout
+                android:id="@+id/ll_home_noEvents"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical|center_horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_no_events"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_home_error"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical|center_horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_events_fetch_error"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_home_loading"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical|center_horizontal">
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+        </LinearLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
-
-    <!--<android.support.design.widget.FloatingActionButton-->
-        <!--android:id="@+id/fib_home_create"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="bottom|right"-->
-        <!--android:layout_margin="16dp"-->
-
-        <!--/>-->
-
-    <!--<LinearLayout-->
-    <!--android:id="@+id/ll_home_btn_bar"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:background="@color/primary_dark"-->
-    <!--android:orientation="horizontal">-->
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_weight="1">-->
-
-    <!--<Button-->
-    <!--android:id="@+id/btn_home_sort"-->
-
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="48dp"-->
-    <!--android:background="@drawable/custom_button_background"-->
-    <!--android:drawableLeft="@drawable/ic_sort_white_24dp"-->
-    <!--android:text="Relevance"-->
-    <!--android:textColor="@color/primary_text_default_material_dark"/>-->
-    <!--</LinearLayout>-->
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_weight="1">-->
-
-    <!--<Button-->
-    <!--android:id="@+id/btn_home_filter"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="48dp"-->
-    <!--android:background="@drawable/custom_button_background"-->
-    <!--android:drawableRight="@drawable/ic_filter_list_white_24dp"-->
-    <!--android:text="All Events"-->
-    <!--android:textColor="@color/primary_text_default_material_dark"/>-->
-    <!--</LinearLayout>-->
-    <!--</LinearLayout>-->
-
 </android.support.design.widget.CoordinatorLayout>

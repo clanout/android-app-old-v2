@@ -3,8 +3,6 @@ package reaper.android.app.ui.screens.home;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
@@ -16,12 +14,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.squareup.otto.Bus;
-import com.squareup.otto.Subscribe;
-
-import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -37,182 +29,186 @@ import reaper.android.app.model.CreateEventModel;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.factory.CreateEventSuggestionFactory;
-import reaper.android.app.service.UserService;
-import reaper.android.app.trigger.common.ViewPagerClickedTrigger;
-import reaper.android.app.trigger.common.ViewPagerStateChangedTrigger;
-import reaper.android.app.trigger.event.EventClickTrigger;
-import reaper.android.app.trigger.event.RsvpChangeTrigger;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.ui.util.DrawableFactory;
-import reaper.android.common.communicator.Communicator;
+import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
-public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private Bus bus;
-    private UserService userService;
-    private Context context;
-    private Drawable generalEventDrawable, eatoutDrawable, drinksDrawable, cafeDrawable, movieDrawable, outdoorsDrawable, partyDrawable, eventsDrawable, shoppingDrawable, goingDrawable, maybeDrawable;
-    private FragmentManager fragmentManager;
-
-    // Data
+public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+{
     private List<Event> events;
     private List<SwipedState> state;
+    private EventActionListener eventActionListener;
+    private PagerSwipeListener pagerSwipeListener;
+    private FragmentManager fragmentManager;
+    private CreateEventFragment.CreateEventCycleHandler createEventCycleHandler;
 
-    public static final int CREATE_VIEW_TYPE = 0;
-    public static final int EVENT_VIEW_TYPE = 1;
+    private static final int CREATE_EVENT_VIEW = 0;
+    private static final int EVENT_LIST_ITEM_VIEW = 1;
 
-    public EventsAdapter(Bus bus, List<Event> events, Context context, FragmentManager fragmentManager) {
-
-        this.context = context;
-        this.bus = bus;
+    public EventsAdapter(List<Event> events,
+                         EventActionListener eventActionListener,
+                         PagerSwipeListener pagerSwipeListener,
+                         FragmentManager fragmentManager,
+                         CreateEventFragment.CreateEventCycleHandler createEventCycleHandler)
+    {
         this.events = events;
-        this.userService = new UserService(bus);
+        this.eventActionListener = eventActionListener;
+        this.pagerSwipeListener = pagerSwipeListener;
         this.fragmentManager = fragmentManager;
+        this.createEventCycleHandler = createEventCycleHandler;
 
         state = new ArrayList<>();
-        for (int i = 0; i < events.size(); i++) {
+        for (int i = 0; i < events.size(); i++)
+        {
             state.add(SwipedState.SHOWING_PRIMARY_CONTENT);
         }
-
-        generateDrawables();
-    }
-
-    private void generateDrawables() {
-
-        generalEventDrawable = DrawableFactory.get(EventCategory.GENERAL, Dimensions.EVENT_FEED_ICON_SIZE, R.color.general);
-        eatoutDrawable = DrawableFactory.get(EventCategory.EAT_OUT, Dimensions.EVENT_FEED_ICON_SIZE, R.color.eat_out);
-        drinksDrawable = DrawableFactory.get(EventCategory.DRINKS, Dimensions.EVENT_FEED_ICON_SIZE, R.color.drinks);
-        cafeDrawable = DrawableFactory.get(EventCategory.CAFE, Dimensions.EVENT_FEED_ICON_SIZE, R.color.cafe);
-        movieDrawable = DrawableFactory.get(EventCategory.MOVIES, Dimensions.EVENT_FEED_ICON_SIZE, R.color.movies);
-        outdoorsDrawable = DrawableFactory.get(EventCategory.OUTDOORS, Dimensions.EVENT_FEED_ICON_SIZE, R.color.outdoors);
-        partyDrawable = DrawableFactory.get(EventCategory.PARTY, Dimensions.EVENT_FEED_ICON_SIZE, R.color.party);
-        eventsDrawable = DrawableFactory.get(EventCategory.LOCAL_EVENTS, Dimensions.EVENT_FEED_ICON_SIZE, R.color.local_events);
-        shoppingDrawable = DrawableFactory.get(EventCategory.SHOPPING, Dimensions.EVENT_FEED_ICON_SIZE, R.color.shopping);
-
-        goingDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
-                .setColor(context.getResources().getColor(R.color.green))
-                .setSizeDp(24)
-                .setStyle(Paint.Style.STROKE)
-                .build();
-
-        maybeDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.HELP)
-                .setColor(context.getResources().getColor(R.color.yellow))
-                .setSizeDp(24)
-                .build();
     }
 
     @Override
-    public int getItemViewType(int position) {
-        if (position == 0) {
-            return CREATE_VIEW_TYPE;
-        } else {
-            return EVENT_VIEW_TYPE;
+    public int getItemViewType(int position)
+    {
+        if (position == 0)
+        {
+            return CREATE_EVENT_VIEW;
+        }
+        else
+        {
+            return EVENT_LIST_ITEM_VIEW;
         }
     }
 
     @Override
-    public int getItemCount() {
-        return events.size() + 1;
-    }
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    {
+        switch (viewType)
+        {
+            case CREATE_EVENT_VIEW:
+                View view = LayoutInflater.from(parent.getContext())
+                                          .inflate(R.layout.list_item_create, parent, false);
+                return new CreateEventViewHolder(view);
 
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        switch (viewType) {
-            case EVENT_VIEW_TYPE:
-                // Create a new view which is basically just a ViewPager in this case
+            case EVENT_LIST_ITEM_VIEW:
                 ViewPager v = (ViewPager) LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.list_item_event, parent, false);
-
-                //Perhaps the first most crucial part. The ViewPager loses its width information when it is put
-                //inside a RecyclerView. It needs to be explicitly resized, in this case to the width of the
-                //screen. The height must be provided as a fixed value.
-//        DisplayMetrics displayMetrics = Resources.getSystem().getDisplayMetrics();
-//        v.getLayoutParams().width = displayMetrics.widthPixels;
-//        v.requestLayout();
-
-                EventViewHolder vh = new EventViewHolder(v);
-                return vh;
-            case CREATE_VIEW_TYPE:
-                View view = LayoutInflater.from(context).inflate(R.layout.list_item_create, parent, false);
-                CreateViewHolder createViewHolder = new CreateViewHolder(view);
-                return createViewHolder;
+                                                        .inflate(R.layout.list_item_event, parent, false);
+                return new EventViewHolder(v);
         }
+
         return null;
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
-        switch (getItemViewType(position)) {
-            case EVENT_VIEW_TYPE:
-                EventViewHolder eventViewHolder = (EventViewHolder) holder;
-                handleEventViewType(eventViewHolder, position - 1);
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position)
+    {
+        switch (getItemViewType(position))
+        {
+            case CREATE_EVENT_VIEW:
+                CreateEventViewHolder createEventViewHolder = (CreateEventViewHolder) holder;
+                onBindCreateEventViewHolder(createEventViewHolder, position);
                 break;
-            case CREATE_VIEW_TYPE:
-                CreateViewHolder createViewHolder = (CreateViewHolder) holder;
+
+            case EVENT_LIST_ITEM_VIEW:
+                EventViewHolder eventViewHolder = (EventViewHolder) holder;
+                onBindEventViewHolder(eventViewHolder, position);
                 break;
         }
     }
 
-    private void handleEventViewType(EventViewHolder eventViewHolder, final int position) {
-        final ViewPager viewPager = eventViewHolder.viewPager;
-        viewPager.setCurrentItem(state.get(position).getPosition());
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+    private int getEventPosition(int position)
+    {
+        return position - 1;
+    }
+
+    private void onBindCreateEventViewHolder(CreateEventViewHolder holder, int position)
+    {
+    }
+
+    private void onBindEventViewHolder(EventViewHolder holder, final int position)
+    {
+        final ViewPager viewPager = holder.viewPager;
+        viewPager.setCurrentItem(state.get(getEventPosition(position)).getPosition());
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
+        {
             int previousPagePosition = 0;
 
             @Override
-            public void onPageScrolled(int pagePosition, float positionOffset, int positionOffsetPixels) {
-                if (pagePosition == previousPagePosition) {
+            public void onPageScrolled(int pagePosition, float positionOffset, int positionOffsetPixels)
+            {
+                if (pagePosition == previousPagePosition)
+                {
                     return;
                 }
 
-                switch (pagePosition) {
+                switch (pagePosition)
+                {
                     case 0:
-                        state.set(position, SwipedState.SHOWING_PRIMARY_CONTENT);
+                        state.set(getEventPosition(position), SwipedState.SHOWING_PRIMARY_CONTENT);
                         break;
                     case 1:
-                        state.set(position, SwipedState.SHOWING_SECONDARY_CONTENT);
+                        state.set(getEventPosition(position), SwipedState.SHOWING_SECONDARY_CONTENT);
                         break;
                 }
                 previousPagePosition = pagePosition;
             }
 
             @Override
-            public void onPageSelected(int pagePosition) {
+            public void onPageSelected(int pagePosition)
+            {
                 //This method keep incorrectly firing as the RecyclerView scrolls.
                 //Use the one above instead
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) {
-
-                bus.post(new ViewPagerStateChangedTrigger(state));
+            public void onPageScrollStateChanged(int state)
+            {
+                // TODO
             }
         });
 
-        Event event = events.get(position);
-        eventViewHolder.render(event);
+        Event event = events.get(getEventPosition(position));
+        holder.render(event);
     }
 
-    private enum SwipedState {
+    @Override
+    public int getItemCount()
+    {
+        return events.size() + 1;
+    }
+
+    public interface EventActionListener
+    {
+        void onEventClicked(Event event);
+
+        void onRsvpChanged(EventsView.EventListItem eventListItem, Event event, Event.RSVP rsvp);
+    }
+
+    public interface PagerSwipeListener
+    {
+        void onPagerSwipe(int state);
+    }
+
+    private enum SwipedState
+    {
         SHOWING_PRIMARY_CONTENT(0),
         SHOWING_SECONDARY_CONTENT(1);
 
         private int position;
 
-        private SwipedState(int position) {
+        SwipedState(int position)
+        {
             this.position = position;
         }
 
-        public int getPosition() {
+        public int getPosition()
+        {
             return position;
         }
     }
 
-    public class EventViewHolder extends RecyclerView.ViewHolder {
+    public class EventViewHolder extends RecyclerView.ViewHolder implements EventsView.EventListItem
+    {
         private ViewPager viewPager;
         private CardView cardView;
         private ImageView eventIcon;
@@ -220,12 +216,11 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         private ImageButton going, mayBe, notGoing;
         private LinearLayout iconContainer;
 
-        public EventViewHolder(View itemView) {
+        public EventViewHolder(View itemView)
+        {
             super(itemView);
 
             viewPager = (ViewPager) itemView;
-            viewPager.setAdapter(new EventViewPagerAdapter());
-
             cardView = (CardView) itemView.findViewById(R.id.cv_list_item_event);
             eventIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_event_icon);
             title = (TextView) itemView.findViewById(R.id.tv_list_item_event_title);
@@ -235,124 +230,106 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             going = (ImageButton) itemView.findViewById(R.id.btn_list_item_event_going);
             mayBe = (ImageButton) itemView.findViewById(R.id.btn_list_item_event_maybe);
             notGoing = (ImageButton) itemView.findViewById(R.id.btn_list_item_event_not_going);
-            iconContainer = (LinearLayout) itemView.findViewById(R.id.ll_list_item_event_icon_container);
+            iconContainer = (LinearLayout) itemView
+                    .findViewById(R.id.ll_list_item_event_icon_container);
             rsvp = (TextView) itemView.findViewById(R.id.tv_list_item_event_rsvp);
 
-            cardView.setOnClickListener(new View.OnClickListener() {
+            viewPager.setAdapter(new EventViewPagerAdapter());
+            cardView.setOnClickListener(new View.OnClickListener()
+            {
                 @Override
-                public void onClick(View view) {
-                    bus.post(new EventClickTrigger(events.get(getAdapterPosition() - 1
-                    )));
+                public void onClick(View view)
+                {
+                    eventActionListener
+                            .onEventClicked(events.get(getEventPosition(getAdapterPosition())));
                 }
             });
 
-            going.setOnClickListener(new View.OnClickListener() {
+            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
+            {
                 @Override
-                public void onClick(View view) {
-                    if (events.get(getAdapterPosition() - 1).getOrganizerId().equals(userService.getActiveUserId())) {
-                        Toast.makeText(context, R.string.cannot_change_rsvp, Toast.LENGTH_LONG).show();
-                    } else {
-                        state.set(getAdapterPosition() - 1, SwipedState.SHOWING_PRIMARY_CONTENT);
-                        viewPager.setCurrentItem(state.get(getAdapterPosition() - 1).getPosition());
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+                {
 
-                        Event.RSVP oldRsvp = events.get(getAdapterPosition() - 1).getRsvp();
-                        events.get(getAdapterPosition() - 1).setRsvp(Event.RSVP.YES);
-                        render(events.get(getAdapterPosition() - 1));
+                }
 
-                        bus.post(new RsvpChangeTrigger(events.get(getAdapterPosition() - 1), oldRsvp));
-                    }
+                @Override
+                public void onPageSelected(int position)
+                {
+
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state)
+                {
+                    pagerSwipeListener.onPagerSwipe(state);
                 }
             });
 
-            mayBe.setOnClickListener(new View.OnClickListener() {
+            going.setOnClickListener(new View.OnClickListener()
+            {
                 @Override
-                public void onClick(View view) {
-                    if (events.get(getAdapterPosition() - 1).getOrganizerId().equals(userService.getActiveUserId())) {
-                        Toast.makeText(context, R.string.cannot_change_rsvp, Toast.LENGTH_LONG).show();
-                    } else {
-                        state.set(getAdapterPosition() - 1, SwipedState.SHOWING_PRIMARY_CONTENT);
-                        viewPager.setCurrentItem(state.get(getAdapterPosition() - 1).getPosition());
+                public void onClick(View v)
+                {
+                    state.set(getEventPosition(getAdapterPosition()), SwipedState.SHOWING_PRIMARY_CONTENT);
+                    viewPager.setCurrentItem(state.get(getEventPosition(getAdapterPosition()))
+                                                  .getPosition());
 
-                        Event.RSVP oldRsvp = events.get(getAdapterPosition() - 1).getRsvp();
-                        events.get(getAdapterPosition() - 1).setRsvp(Event.RSVP.MAYBE);
-                        render(events.get(getAdapterPosition() - 1));
-
-                        bus.post(new RsvpChangeTrigger(events.get(getAdapterPosition() - 1), oldRsvp));
-                    }
+                    eventActionListener
+                            .onRsvpChanged(EventViewHolder.this, events
+                                    .get(getEventPosition(getAdapterPosition())), Event.RSVP.YES);
                 }
             });
 
-            notGoing.setOnClickListener(new View.OnClickListener() {
+            mayBe.setOnClickListener(new View.OnClickListener()
+            {
                 @Override
-                public void onClick(View view) {
-                    if (events.get(getAdapterPosition() - 1).getOrganizerId().equals(userService.getActiveUserId())) {
-                        Toast.makeText(context, R.string.cannot_change_rsvp, Toast.LENGTH_LONG).show();
-                    } else {
-                        state.set(getAdapterPosition() - 1, SwipedState.SHOWING_PRIMARY_CONTENT);
-                        viewPager.setCurrentItem(state.get(getAdapterPosition() - 1).getPosition());
+                public void onClick(View v)
+                {
+                    state.set(getEventPosition(getAdapterPosition()), SwipedState.SHOWING_PRIMARY_CONTENT);
+                    viewPager.setCurrentItem(state.get(getEventPosition(getAdapterPosition()))
+                                                  .getPosition());
 
-                        Event.RSVP oldRsvp = events.get(getAdapterPosition() - 1).getRsvp();
-                        events.get(getAdapterPosition() - 1).setRsvp(Event.RSVP.NO);
-                        render(events.get(getAdapterPosition() - 1));
+                    eventActionListener
+                            .onRsvpChanged(EventViewHolder.this, events
+                                    .get(getEventPosition(getAdapterPosition())), Event.RSVP.MAYBE);
+                }
+            });
 
-                        bus.post(new RsvpChangeTrigger(events.get(getAdapterPosition() - 1), oldRsvp));
-                    }
+            notGoing.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    state.set(getEventPosition(getAdapterPosition()), SwipedState.SHOWING_PRIMARY_CONTENT);
+                    viewPager.setCurrentItem(state.get(getEventPosition(getAdapterPosition()))
+                                                  .getPosition());
+
+                    eventActionListener
+                            .onRsvpChanged(EventViewHolder.this, events
+                                    .get(getEventPosition(getAdapterPosition())), Event.RSVP.NO);
                 }
             });
         }
 
-        public void render(Event event) {
-
+        @Override
+        public void render(Event event)
+        {
             // Title
-            if (event.getTitle().length() <= 20) {
+            if (event.getTitle().length() <= 20)
+            {
                 title.setText(event.getTitle());
-            } else {
+            }
+            else
+            {
                 title.setText(event.getTitle().substring(0, 18) + "...");
             }
 
             // Icon
             EventCategory category = EventCategory.valueOf(event.getCategory());
-            switch (category) {
-                case GENERAL:
-                    eventIcon.setImageDrawable(generalEventDrawable);
-                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.general, 4));
-                    break;
-                case EAT_OUT:
-                    eventIcon.setImageDrawable(eatoutDrawable);
-                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.eat_out, 4));
-                    break;
-                case DRINKS:
-                    eventIcon.setImageDrawable(drinksDrawable);
-                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.drinks, 4));
-                    break;
-                case CAFE:
-                    eventIcon.setImageDrawable(cafeDrawable);
-                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.cafe, 4));
-                    break;
-                case MOVIES:
-                    eventIcon.setImageDrawable(movieDrawable);
-                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.movies, 4));
-                    break;
-                case OUTDOORS:
-                    eventIcon.setImageDrawable(outdoorsDrawable);
-                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.outdoors, 4));
-                    break;
-                case PARTY:
-                    eventIcon.setImageDrawable(partyDrawable);
-                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.party, 4));
-                    break;
-                case LOCAL_EVENTS:
-                    eventIcon.setImageDrawable(eventsDrawable);
-                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.local_events, 4));
-                    break;
-                case SHOPPING:
-                    eventIcon.setImageDrawable(shoppingDrawable);
-                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.shopping, 4));
-                    break;
-                default:
-                    eventIcon.setImageDrawable(generalEventDrawable);
-                    iconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.general, 4));
-            }
+            eventIcon.setImageDrawable(DrawableFactory
+                    .get(category, Dimensions.EVENT_FEED_ICON_SIZE));
+            iconContainer.setBackground(DrawableFactory.randomIconBackground());
 
             // Date, Time and Location
             DateTime dateTime = event.getStartTime();
@@ -360,152 +337,153 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             int dayToday = DateTime.now().getDayOfWeek();
 
-            if(dateTime.getDayOfWeek() == dayToday)
+            Context context = Reaper.getReaperContext();
+            date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
+            if (dateTime.getDayOfWeek() == dayToday)
             {
                 date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
-                date.setText("Today");
-            }else if(dateTime.getDayOfWeek() == (dayToday + 1))
+            }
+            else if (dateTime.getDayOfWeek() == (dayToday + 1))
             {
-                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
                 date.setText("Tomorrow");
-            }else if(dateTime.getDayOfWeek() == 1)
+            }
+            else
             {
-                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
-                date.setText("Monday");
-            }else if(dateTime.getDayOfWeek() == 2)
-            {
-                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
-                date.setText("Tuesday");
-            }else if(dateTime.getDayOfWeek() == 3)
-            {
-                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
-                date.setText("Wednesday");
-            }else if(dateTime.getDayOfWeek() == 4)
-            {
-                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
-                date.setText("Thursday");
-            }else if(dateTime.getDayOfWeek() == 5)
-            {
-                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
-                date.setText("Friday");
-            }else if(dateTime.getDayOfWeek() == 6)
-            {
-                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
-                date.setText("Saturday");
-            }else if(dateTime.getDayOfWeek() == 7)
-            {
-                date.setTextColor(ContextCompat.getColor(context, R.color.text_subtitle));
-                date.setText("Sunday");
+                DateTimeFormatter dayFormatter = DateTimeFormat.forPattern("EEEE");
+                date.setText(dateTime.toString(dayFormatter));
             }
 
-            if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty()) {
-                timeLocation.setText(dateTime.toString(timeFormatter) + ", (Location Not Specified)");
-            } else {
-                if (event.getLocation().getName().length() <= 23) {
-                    timeLocation.setText(dateTime.toString(timeFormatter) + ", " + event.getLocation().getName());
-                } else {
-                    timeLocation.setText(dateTime.toString(timeFormatter) + ", " + event.getLocation().getName().substring(0, 22) + "..");
+            if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty())
+            {
+                timeLocation
+                        .setText(dateTime.toString(timeFormatter) + ", (Location Not Specified)");
+            }
+            else
+            {
+                if (event.getLocation().getName().length() <= 23)
+                {
+                    timeLocation
+                            .setText(dateTime.toString(timeFormatter) + ", " + event.getLocation()
+                                                                                    .getName());
+                }
+                else
+                {
+                    timeLocation
+                            .setText(dateTime.toString(timeFormatter) + ", " + event.getLocation()
+                                                                                    .getName()
+                                                                                    .substring(0, 22) + "..");
                 }
             }
 
             // Friends Attending
-            if (event.getFriendCount() == 0) {
+            if (event.getFriendCount() == 0)
+            {
                 attendees.setText("No friends are going");
-            } else if (event.getFriendCount() == 1) {
+            }
+            else if (event.getFriendCount() == 1)
+            {
                 attendees.setText("1 friend is going");
-            } else {
+            }
+            else
+            {
                 attendees.setText(event.getFriendCount() + " friends are going");
             }
 
             // RSVP
-            if (event.getRsvp() == Event.RSVP.YES) {
+            if (event.getRsvp() == Event.RSVP.YES)
+            {
                 rsvp.setVisibility(View.VISIBLE);
                 rsvp.setTextColor(ContextCompat.getColor(context, R.color.going));
                 rsvp.setText("Going");
-            } else if (event.getRsvp() == Event.RSVP.MAYBE) {
+            }
+            else if (event.getRsvp() == Event.RSVP.MAYBE)
+            {
                 rsvp.setVisibility(View.VISIBLE);
                 rsvp.setTextColor(ContextCompat.getColor(context, R.color.may_be));
                 rsvp.setText("Maybe");
-            } else {
+            }
+            else
+            {
                 rsvp.setVisibility(View.INVISIBLE);
             }
 
             // already started
-            if (DateTime.now().isAfter(event.getStartTime())) {
+            if (DateTime.now().isAfter(event.getStartTime()))
+            {
                 date.setText("Started");
                 date.setTextColor(Color.RED);
             }
         }
     }
 
-    public class CreateViewHolder extends RecyclerView.ViewHolder {
+    public class CreateEventViewHolder extends RecyclerView.ViewHolder
+    {
         private ViewPager viewPager;
-        private Bus bus;
-        private Subscriber<Integer> subscriber;
-        private List<CreateEventModel> eventSuggestionList;
 
-        public CreateViewHolder(View itemView) {
+        public CreateEventViewHolder(View itemView)
+        {
             super(itemView);
 
-            bus = Communicator.getInstance().getBus();
-            bus.register(this);
-            eventSuggestionList = CreateEventSuggestionFactory.getEventSuggestions();
+            final List<CreateEventModel> eventSuggestionList = CreateEventSuggestionFactory
+                    .getEventSuggestions();
 
             viewPager = (ViewPager) itemView.findViewById(R.id.vp_list_item_create);
-
             viewPager.setAdapter(new CreateEventPagerAdapter(fragmentManager, eventSuggestionList));
-            viewPager.setOffscreenPageLimit(eventSuggestionList.size());
 
-            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
+            {
                 @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+                {
 
                 }
 
                 @Override
-                public void onPageSelected(int position) {
+                public void onPageSelected(int position)
+                {
 
                 }
 
                 @Override
-                public void onPageScrollStateChanged(int state) {
-                    bus.post(new ViewPagerStateChangedTrigger(state));
+                public void onPageScrollStateChanged(int state)
+                {
+                    pagerSwipeListener.onPagerSwipe(state);
                 }
             });
 
-            subscriber = new Subscriber<Integer>() {
-                @Override
-                public void onCompleted() {
+            Subscription subscription =
+                    Observable.interval(2, TimeUnit.SECONDS)
+                              .observeOn(AndroidSchedulers.mainThread())
+                              .subscribe(new Subscriber<Long>()
+                              {
+                                  @Override
+                                  public void onCompleted()
+                                  {
 
-                }
+                                  }
 
-                @Override
-                public void onError(Throwable e) {
+                                  @Override
+                                  public void onError(Throwable e)
+                                  {
 
-                }
+                                  }
 
-                @Override
-                public void onNext(Integer integer) {
+                                  @Override
+                                  public void onNext(Long aLong)
+                                  {
+                                      int position = viewPager.getCurrentItem() + 1;
+                                      if (position >= viewPager.getAdapter().getCount())
+                                      {
+                                          viewPager.setCurrentItem(0, false);
+                                      }
+                                      else
+                                      {
+                                          viewPager.setCurrentItem(position);
+                                      }
+                                  }
+                              });
 
-                }
-            };
-
-            rx.Observable.interval(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).map(new Func1<Long, Integer>() {
-                @Override
-                public Integer call(Long aLong) {
-                    int index = (int) (aLong % 4);
-                    viewPager.setCurrentItem(index);
-                    return null;
-
-                }
-            }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(subscriber);
-        }
-
-        @Subscribe
-        public void clickOnViewPagerDetected(ViewPagerClickedTrigger trigger) {
-
-            subscriber.unsubscribe();
+            createEventCycleHandler.addCycle(subscription);
         }
     }
-
 }
