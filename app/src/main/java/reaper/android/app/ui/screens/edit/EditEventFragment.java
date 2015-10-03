@@ -330,7 +330,6 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
 
         if (suggestionList.size() == 0)
         {
-            noSuggestions.setText(R.string.no_suggestions);
             noSuggestions.setVisibility(View.VISIBLE);
             recommendationList.setVisibility(View.GONE);
 
@@ -425,7 +424,7 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setCancelable(true);
                         builder.setTitle(R.string.event_unlock_heading);
-                        builder.setMessage(R.string.unfinalise_event);
+                        builder.setMessage(R.string.event_unlock_message);
 
                         builder.setPositiveButton(R.string.event_unlock_positive_button, new DialogInterface.OnClickListener()
                         {
@@ -459,7 +458,7 @@ public class EditEventFragment extends BaseFragment implements AdapterView.OnIte
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setCancelable(true);
                         builder.setTitle(R.string.event_lock_heading);
-                        builder.setMessage(R.string.finalise_event);
+                        builder.setMessage(R.string.event_lock_message);
 
                         builder.setPositiveButton(R.string.event_lock_positive_button, new DialogInterface.OnClickListener()
                         {

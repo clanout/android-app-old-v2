@@ -29,7 +29,7 @@
 
     <string name="event_lock_heading">Finalize details?</string>
     <!-- TODO -->
-    <string name="event_lock_message">Once confirmed, friends can't edit details</string>
+    <string name="event_lock_message">Once confirmed, friends can\'t edit details</string>
     <string name="event_lock_negative_button">NOT YET</string>
     <string name="event_lock_positive_button">FINALIZE</string>
 
@@ -94,7 +94,7 @@
     <string name="messed_up"> Looks like we screwed up. While we fix this issue, go feed your dog </string>
 
     <string name="phone_invalid"> Please enter a valid phone number</string>
-    <string name="add_phone_number"> Clanout is exciting with your friends around. Add your number to instantly connect with your local phonebook friends. ClanOut won't share your personal information with anyone</string>
+    <string name="add_phone_number"> Clanout is exciting with your friends around. Add your number to instantly connect with your local phonebook friends. ClanOut won\'t share your personal information with anyone</string>
 
     <string name="event_edit_failed_locked"> Organizer finalized the details </string>
     <string name="event_finalisation_failed"> Currently unable to finalize details. Try again</string>
