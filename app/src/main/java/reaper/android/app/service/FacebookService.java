@@ -10,16 +10,22 @@ import com.squareup.otto.Bus;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.app.api.core.FacebookApiManager;
 import reaper.android.app.api.fb.FacebookApi;
+import reaper.android.app.api.fb.response.FacebookCoverPicResponse;
 import reaper.android.app.api.fb.response.FacebookProfileResponse;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
+import reaper.android.app.trigger.facebook.FacebookCoverPicFetchedTrigger;
 import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.facebook.FacebookProfileFetchedTrigger;
+import retrofit.client.Response;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -43,6 +49,28 @@ public class FacebookService
         facebookApi = FacebookApiManager.getInstance().getApi();
         friendsIdList = new ArrayList<>();
     }
+
+    public void getUserCoverPic()
+    {
+        facebookApi.getCoverPic().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<FacebookCoverPicResponse>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(FacebookCoverPicResponse response) {
+
+                bus.post(new FacebookCoverPicFetchedTrigger(response.getCover().getSource()));
+            }
+        });
+    }
+
 
     public void getUserFacebookProfile()
     {

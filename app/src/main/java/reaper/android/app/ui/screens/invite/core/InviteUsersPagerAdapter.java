@@ -70,15 +70,16 @@ public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
     {
         switch (position)
         {
-            // TODO -- Chnge Tab names
 
             case 0:
-                return "Facebook Friends";
+                return "Facebook";
             case 1:
-                return "Phone Contacts";
+                return "Contacts";
             case 2:
-                return "SMS";
+                return "Phonebook";
         }
+
+        // TODO --- show popup for each tab
         return null;
     }
 }

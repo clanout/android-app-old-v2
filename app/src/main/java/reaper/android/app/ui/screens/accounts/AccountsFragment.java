@@ -26,7 +26,9 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.pkmmte.view.CircularImageView;
 import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
@@ -39,7 +41,9 @@ import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.AccountsService;
+import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.trigger.facebook.FacebookCoverPicFetchedTrigger;
 import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
@@ -49,16 +53,18 @@ import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class AccountsFragment extends BaseFragment implements AccountsAdapter.AccountsItemClickListener
-{
-//    private TextView userName;
+public class AccountsFragment extends BaseFragment implements AccountsAdapter.AccountsItemClickListener {
+    //    private TextView userName;
     private RecyclerView recyclerView;
     private ImageView userPic;
+    private CircularImageView userProfilePic;
     private Drawable homeDrawable, personDrawable;
     private Toolbar toolbar;
+    private TextView userName;
 
     private FragmentManager fragmentManager;
     private UserService userService;
+    private FacebookService facebookService;
     private Bus bus;
 
     private GenericCache genericCache;
@@ -66,34 +72,34 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
     private AccountsAdapter accountsAdapter;
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_accounts, container, false);
 //        userName = (TextView) view.findViewById(R.id.tv_account_fragment_user_name);
         userPic = (ImageView) view.findViewById(R.id.iv_account_fragment_user_pic);
+        userProfilePic = (CircularImageView) view.findViewById(R.id.iv_account_fragment_user_profile_pic);
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_accounts_fragment);
         toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_accounts);
+        userName = (TextView) view.findViewById(R.id.tv_account_fragment_user_name);
         return view;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState)
-    {
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        ((MainActivity)getActivity()).setSupportActionBar(toolbar);
+        ((MainActivity) getActivity()).setSupportActionBar(toolbar);
 
         fragmentManager = getActivity().getFragmentManager();
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
+        facebookService = new FacebookService(bus);
 
         genericCache = CacheManager.getGenericCache();
 
@@ -105,8 +111,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    private void generateDrawables()
-    {
+    private void generateDrawables() {
         homeDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.HOME)
                 .setColor(getResources().getColor(R.color.white))
@@ -121,28 +126,48 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.ACCOUNTS_FRAGMENT);
-        ((MainActivity)getActivity()).getSupportActionBar().setTitle("Accounts");
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle("Accounts");
 
-//        userName.setText(userService.getActiveUserName());
+        bus.register(this);
+
+        userName.setText(userService.getActiveUserName());
+
+        if (genericCache.get(CacheKeys.USER_COVER_PIC) != null) {
+
+            Picasso.with(getActivity())
+                    .load(genericCache.get(CacheKeys.USER_COVER_PIC))
+                    .placeholder(personDrawable)
+                    .fit()
+                    .centerCrop()
+                    .into(userPic);
+
+        } else {
+            facebookService.getUserCoverPic();
+        }
 
         Picasso.with(getActivity())
                 .load("https://graph.facebook.com/v2.4/" + userService.getActiveUserId() + "/picture?height=1000")
                 .placeholder(personDrawable)
                 .fit()
-                .centerInside()
-                .into(userPic);
+                .centerCrop()
+                .into(userProfilePic);
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.ACCOUNTS);
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
+    public void onPause() {
+        super.onPause();
+
+        bus.unregister(this);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
         menu.clear();
@@ -159,11 +184,9 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
 
         menu.findItem(R.id.action_home).setIcon(homeDrawable);
 
-        menu.findItem(R.id.action_home).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
+        menu.findItem(R.id.action_home).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem menuItem)
-            {
+            public boolean onMenuItemClick(MenuItem menuItem) {
                 FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
                 return true;
             }
@@ -171,19 +194,14 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
     }
 
     @Override
-    public void onAccountItemClicked(View view, int position)
-    {
-        if (position == 0)
-        {
+    public void onAccountItemClicked(View view, int position) {
+        if (position == 0) {
             FragmentUtils.changeFragment(fragmentManager, new ManageFriendsFragment());
-        } else if (position == 1)
-        {
+        } else if (position == 1) {
             displayUpdatePhoneDialog();
-        } else if (position == 2)
-        {
+        } else if (position == 2) {
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
-            if (isWhatsappInstalled)
-            {
+            if (isWhatsappInstalled) {
                 // TODO -- Whatsapp invitation message
 
                 Intent sendIntent = new Intent();
@@ -193,12 +211,10 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                 sendIntent.setPackage("com.whatsapp");
                 startActivity(sendIntent);
 
-            } else
-            {
+            } else {
                 Snackbar.make(getView(), R.string.whatsapp_not_installed, Snackbar.LENGTH_LONG).show();
             }
-        } else if (position == 3)
-        {
+        } else if (position == 3) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setCancelable(true);
 
@@ -209,11 +225,9 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
             final EditText commentMessage = (EditText) dialogView.findViewById(R.id.et_alert_dialog_share_feedback_comment);
             final RatingBar ratingBar = (RatingBar) dialogView.findViewById(R.id.rb_alert_dialog_share_feedback_rating);
 
-            builder.setPositiveButton("Submit", new DialogInterface.OnClickListener()
-            {
+            builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialogInterface, int i)
-                {
+                public void onClick(DialogInterface dialogInterface, int i) {
 
                 }
             });
@@ -221,40 +235,33 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
             final AlertDialog alertDialog = builder.create();
             alertDialog.show();
 
-            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
-            {
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view)
-                {
+                public void onClick(View view) {
                     String rating = String.valueOf(ratingBar.getRating());
                     String comment = commentMessage.getText().toString();
                     Boolean wantToCloseDialog = false;
 
-                    if (rating == null || rating.isEmpty() || rating.equals("0.0"))
-                    {
+                    if (rating == null || rating.isEmpty() || rating.equals("0.0")) {
                         Toast.makeText(getActivity(), R.string.empty_rating, Toast.LENGTH_LONG).show();
                         wantToCloseDialog = false;
-                    } else
-                    {
+                    } else {
                         userService.shareFeedback(rating, comment);
                         Toast.makeText(getActivity(), R.string.feedback_submitted, Toast.LENGTH_LONG).show();
                         wantToCloseDialog = true;
                     }
 
-                    if (wantToCloseDialog)
-                    {
+                    if (wantToCloseDialog) {
                         alertDialog.dismiss();
                     }
                 }
             });
-        } else if (position == 4)
-        {
+        } else if (position == 4) {
 
         }
     }
 
-    private void displayUpdatePhoneDialog()
-    {
+    private void displayUpdatePhoneDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
 
@@ -264,11 +271,9 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
 
         final EditText phoneNumber = (EditText) dialogView.findViewById(R.id.et_alert_dialog_add_phone);
 
-        builder.setPositiveButton("Done", new DialogInterface.OnClickListener()
-        {
+        builder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
+            public void onClick(DialogInterface dialog, int which) {
 
             }
         });
@@ -276,19 +281,15 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         final AlertDialog alertDialog = builder.create();
         alertDialog.show();
 
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
-        {
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 Boolean wantToCloseDialog = false;
                 String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
-                if (parsedPhone == null)
-                {
+                if (parsedPhone == null) {
                     Toast.makeText(getActivity(), R.string.phone_invalid, Toast.LENGTH_LONG).show();
                     wantToCloseDialog = false;
-                } else
-                {
+                } else {
                     userService.updatePhoneNumber(parsedPhone);
                     InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     inputManager.hideSoftInputFromWindow(dialogView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
@@ -296,12 +297,24 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                     wantToCloseDialog = true;
                 }
 
-                if (wantToCloseDialog)
-                {
+                if (wantToCloseDialog) {
                     alertDialog.dismiss();
                 }
             }
         });
 
+    }
+
+    @Subscribe
+    public void onCoverPicFetched(final FacebookCoverPicFetchedTrigger trigger) {
+
+        genericCache.put(CacheKeys.USER_COVER_PIC, trigger.getSource());
+
+        Picasso.with(getActivity())
+                .load(trigger.getSource())
+                .placeholder(personDrawable)
+                .fit()
+                .centerCrop()
+                .into(userPic);
     }
 }

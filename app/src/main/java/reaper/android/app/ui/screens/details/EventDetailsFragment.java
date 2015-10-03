@@ -518,7 +518,6 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
     @Override
     public void onAttendeeClicked(String name)
     {
-        // TODO --- Invitation Message
-        Toast.makeText(getActivity(), name + " has invited you to this event", Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), name + " invited you", Toast.LENGTH_LONG).show();
     }
 }

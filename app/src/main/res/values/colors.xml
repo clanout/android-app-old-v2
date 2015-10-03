@@ -3,7 +3,7 @@
     <!-- Theme -->
     <color name="primary">#795a76</color>
     <color name="primary_dark">#4d394b</color>
-    <color name="primary_light">#F1EEF1</color>
+    <color name="primary_light">#FFFFFF</color>
     <color name="accent">#29b9a0</color>
     <color name="accent_secondary">#EF9A9A</color>
 

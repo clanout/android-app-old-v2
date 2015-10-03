@@ -3,6 +3,7 @@ package reaper.android.app.service;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
@@ -22,8 +23,8 @@ public class AccountsService
         if (friendsDrawable == null)
         {
             friendsDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                    .setIcon(MaterialDrawableBuilder.IconValue.SNOWMAN)
-                    .setColor(Color.CYAN)
+                    .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_MULTIPLE)
+                    .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.accent))
                     .setSizeDp(24)
                     .build();
         }
@@ -31,8 +32,8 @@ public class AccountsService
         if (phoneDrawable == null)
         {
             phoneDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                    .setIcon(MaterialDrawableBuilder.IconValue.PHONE)
-                    .setColor(Color.CYAN)
+                    .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE_ANDROID)
+                    .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.accent))
                     .setSizeDp(24)
                     .build();
         }
@@ -41,7 +42,7 @@ public class AccountsService
         {
             inviteWhatsappDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
                     .setIcon(MaterialDrawableBuilder.IconValue.WHATSAPP)
-                    .setColor(Color.CYAN)
+                    .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.accent))
                     .setSizeDp(24)
                     .build();
         }
@@ -50,7 +51,7 @@ public class AccountsService
         {
             shareFeedbackDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
                     .setIcon(MaterialDrawableBuilder.IconValue.OWL)
-                    .setColor(Color.CYAN)
+                    .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.accent))
                     .setSizeDp(24)
                     .build();
         }
@@ -59,7 +60,7 @@ public class AccountsService
         {
             faqDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
                     .setIcon(MaterialDrawableBuilder.IconValue.HELP)
-                    .setColor(Color.CYAN)
+                    .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.accent))
                     .setSizeDp(24)
                     .build();
         }
@@ -70,7 +71,7 @@ public class AccountsService
         generateDrawables();
         List<AccountsListItem> menuList = new ArrayList<>();
         Drawable[] drawables = {friendsDrawable, phoneDrawable, inviteWhatsappDrawable, shareFeedbackDrawable, faqDrawable};
-        String[] titles = {"Manage Friends", "Update Phone Number", "Invite People Through Whatsapp", "Share Feedback", "FAQs"};
+        String[] titles = {"Block People", "Update Phone Number", "Invite People Through Whatsapp", "Share Feedback", "FAQs"};
 
         for (int i = 0; i < drawables.length && i < titles.length; i++)
         {

@@ -190,22 +190,20 @@ public class NotificationService
                     boolean isLocationUpdated = Boolean.parseBoolean(notification.getArgs().get("is_location_updated"));
                     boolean isTimeUpdated = Boolean.parseBoolean(notification.getArgs().get("is_time_updated"));
 
-                    // TODO change messages
-
                     if (isLocationUpdated)
                     {
                         if (isTimeUpdated)
                         {
-                            notification.setMessage(notification.getArgs().get("user_name") + "has updated the clan ---- " + notification.getArgs().get("event_name"));
+                            notification.setMessage(notification.getArgs().get("user_name") + "updated " + notification.getArgs().get("event_name"));
                         } else
                         {
-                            notification.setMessage(notification.getArgs().get("user_name") + "has updated the location of the clan ---- " + notification.getArgs().get("event_name"));
+                            notification.setMessage(notification.getArgs().get("user_name") + " updated the location for " + notification.getArgs().get("event_name"));
                         }
                     } else
                     {
                         if (isTimeUpdated)
                         {
-                            notification.setMessage(notification.getArgs().get("user_name") + "has updated the timings of the clan ---- " + notification.getArgs().get("event_name"));
+                            notification.setMessage(notification.getArgs().get("user_name") + " updated the timings for " + notification.getArgs().get("event_name"));
                         }
                     }
 
@@ -328,6 +326,7 @@ public class NotificationService
                             @Override
                             public void onCompleted()
                             {
+                                // TODO -- X friends joined clanname
                                 notification.setMessage("A new clan is growing ------- " + notification.getArgs().get("event_name"));
                                 notificationCache.put(notification).observeOn(Schedulers.newThread()).subscribe(new Subscriber<Object>()
                                 {
@@ -373,6 +372,7 @@ public class NotificationService
                     }
                 } else
                 {
+                    // TODO
                     notification.setMessage("More people are joining the clan ----- " + notification.getArgs().get("event_name"));
                     notificationCache.put(notification).observeOn(Schedulers.newThread()).subscribe(new Subscriber<Object>()
                     {

@@ -11,6 +11,7 @@ public class CacheKeys
     public static final String USER_LAST_NAME = "user_last_name";
     public static final String USER_GENDER = "user_gender";
     public static final String USER_EMAIL = "user_email";
+    public static final String USER_COVER_PIC = "user_cover_pic";
 
     // User Cache
     public static final String MY_PHONE_NUMBER = "my_phone_number";

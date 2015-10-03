@@ -51,14 +51,14 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
     private void generateDrawables()
     {
         blockedDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                .setIcon(MaterialDrawableBuilder.IconValue.STAR)
+                .setIcon(MaterialDrawableBuilder.IconValue.BLOCK_HELPER)
                 .setColor(Color.RED)
                 .setSizeDp(24)
                 .build();
 
         unblockedDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                .setIcon(MaterialDrawableBuilder.IconValue.STAR_OUTLINE)
-                .setColor(Color.BLUE)
+                .setIcon(MaterialDrawableBuilder.IconValue.BLOCK_HELPER)
+                .setColor(Color.LTGRAY)
                 .setSizeDp(24)
                 .build();
 
@@ -83,7 +83,7 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
         Friend current = friends.get(position);
 
         Picasso.with(context)
-                .load(AppConstants.FACEBOOK_END_POINT + current.getId() + "/picture")
+                .load(AppConstants.FACEBOOK_END_POINT + current.getId() + "/picture?width=1000")
                 .placeholder(personDrawable)
                 .fit()
                 .centerInside()
@@ -93,12 +93,10 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
 
         if (current.isBlocked())
         {
-            Log.d("APP", "Item at postion ---- " + position + " is blocked");
             holder.blockIcon.setImageDrawable(blockedDrawable);
         }
         else
         {
-            Log.d("APP", "Item at postion ---- " + position + " is  not blocked");
             holder.blockIcon.setImageDrawable(unblockedDrawable);
         }
 
@@ -115,7 +113,7 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
 
         ImageView userPic;
         TextView username;
-        ImageButton blockIcon;
+        ImageView blockIcon;
 
         public ManageFriendsViewHolder(View itemView)
         {
@@ -123,7 +121,7 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
 
             username = (TextView) itemView.findViewById(R.id.tv_list_item_manage_friends_user_name);
             userPic = (ImageView) itemView.findViewById(R.id.iv_list_item_manage_friends_user_pic);
-            blockIcon = (ImageButton) itemView.findViewById(R.id.ib_list_item_manage_friends_block);
+            blockIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_manage_friends_block);
 
             blockIcon.setOnClickListener(this);
         }
@@ -132,7 +130,6 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
         @Override
         public void onClick(View view)
         {
-            Log.d("APP", "on Click triggered for position ----- " + getAdapterPosition());
 
             if (friends.get(getAdapterPosition()).isBlocked())
             {

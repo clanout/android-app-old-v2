@@ -76,12 +76,12 @@ public class NotificationHelper
     }
 
     private static String newChatMessageReceivedMessage(Map<String, String> args) {
-        return "New Chat Message in the clan ---- " + args.get("event_name");
+        return "New chat in " + args.get("event_name");
     }
 
     private static String newFriendJoinedAppMessage(Map<String, String> args)
     {
-        return args.get("user_name") + "joined clanOut.";
+        return args.get("user_name") + " is now on clanOut";
     }
 
     private static String getFriendRelocatedMessage(Map<String, String> args)
@@ -101,14 +101,15 @@ public class NotificationHelper
 
     private static String getEventUpdatedMessage(Map<String, String> args)
     {
-        return args.get("user_name") + " has updated the clan ---- " + args.get("event_name");
+        return args.get("user_name") + " updated " + args.get("event_name");
     }
 
     private static String getEventRemovedMessage(Map<String, String> args)
     {
-        return " Deleted clan ---- " + args.get("event_name");
+        return args.get("event_name") + " dismissed";
     }
 
+    // TODO --- X friends joined clanname
     private static String getRSVPChangeMessage(Map<String, String> args)
     {
         return "A new clan is growing ----- " + args.get("event_name");
@@ -116,7 +117,7 @@ public class NotificationHelper
 
     private static String getEventInvitationMessage(Map<String, String> args)
     {
-        return args.get("user_name") + "has invited you to the clan ----- " + args.get("event_name");
+        return args.get("user_name") + " calling you for " + args.get("event_name");
     }
 
     public static int getIcon(int type)
@@ -126,8 +127,7 @@ public class NotificationHelper
 
     private static String getEventCreatedMessage(Map<String, String> args)
     {
-        return args.get("user_name") + " is starting a new clan --- " + args.get("event_name");
+        return args.get("user_name") + " suggested " + args.get("event_name");
     }
 
-    //TODO -- notification messages
 }

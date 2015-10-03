@@ -152,7 +152,7 @@ public class LauncherActivity extends AppCompatActivity
         {
             // TODO -- Change messages
 
-            progressDialog = ProgressDialog.show(this, "Welcome", "Fetching your location...");
+            progressDialog = ProgressDialog.show(this, "Welcome", "Getting your location...");
             isBlocking = true;
             bus.post(new UserLocationRefreshRequestTrigger());
         } else
@@ -220,7 +220,7 @@ public class LauncherActivity extends AppCompatActivity
         {
             // TODO
 
-            progressDialog = ProgressDialog.show(this, "Welcome", "Fetching your current location...");
+            progressDialog = ProgressDialog.show(this, "Welcome", "Getting your location...");
             isBlocking = true;
             bus.post(new UserLocationRefreshRequestTrigger());
         } else

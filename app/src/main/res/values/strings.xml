@@ -1,38 +1,44 @@
 <resources>
-    <string name="app_name">reap3r</string>
+    <string name="app_name">clanOut</string>
 
     <!-- Location -->
     <string name="location_permission_heading">Turn on GPS</string>
     <string name="location_permission_message">Your location helps us connect you with your local friends</string>
-    <string name="location_permission_positive_button">Yes</string>
-    <string name="location_permission_negative_button">No, exit</string>
-    <string name="location_denied"> Cautious? Once inside, make a private clan with your friends. Later!</string>
+    <string name="location_permission_positive_button">YES</string>
+    <string name="location_permission_negative_button">EXIT</string>
+    <string name="location_denied"> Cautious? Once inside, make a secret clan with your friends. Later!</string>
 
-    <string name="fetch_pending_invites_title">Fetch Pending Invites</string>
-    <string name="fetch_pending_invites_message">Enter your mobile number to fetch pending invites.</string>
-    <string name="fetch_pending_invites_positive_button">Fetch</string>
-    <string name="fetch_pending_invites_negative_button">No</string>
+    <string name="fetch_pending_invites_title">Invites</string>
+    <string name="fetch_pending_invites_message">To see pending invites, enter your mobile number</string>
+    <string name="fetch_pending_invites_positive_button">ENTER</string>
+    <string name="fetch_pending_invites_negative_button">CANCEL</string>
 
     <!-- First Time Popups -->
     <!-- TODO use these 2 strings somewhere ! -->
 
-    <string name="invite_only_description"> Make a private clan with selected friends</string>
+    <string name="invite_only_description"> Make a secret clan with selected friends</string>
     <string name="public_description">Let everyone know about your clan. You can still send personal invites</string>
 
     <!-- Dialog messages -->
     <string name="event_delete_heading">Dismiss Clan</string>
-    <string name="even_delete_positive_button">Yes</string>
-    <string name="even_delete_negative_button">Let me think</string>
 
-    <string name="event_lock_heading">Finalize Details?</string>
-    <string name="event_lock_negative_button">Not yet</string>
-    <string name="event_lock_positive_button">Yes</string>
+    <!-- TODO -->
+    <string name="event_delete_message">Friends will no longer be able to see it in the feed</string>
+    <string name="even_delete_positive_button">REMOVE</string>
+    <string name="even_delete_negative_button">CANCEL</string>
 
-    <string name="event_unlock_heading">Allow Modifications?</string>
-    <string name="event_unlock_positive_button">Yes</string>
-    <string name="event_unlock_negative_button"> No </string>
+    <string name="event_lock_heading">Finalize details?</string>
+    <!-- TODO -->
+    <string name="event_lock_message">Once confirmed, friends can't edit details</string>
+    <string name="event_lock_negative_button">NOT YET</string>
+    <string name="event_lock_positive_button">FINALIZE</string>
 
-    <string name="refreshing_attendee_list">Refreshing attendee list</string>
+    <string name="event_unlock_heading">Allow modifications?</string>
+    <string name="event_unlock_message">Let your friends edit the details</string>
+    <string name="event_unlock_positive_button">ALLOW</string>
+    <string name="event_unlock_negative_button">CANCEL</string>
+
+    <string name="refreshing_attendee_list">Updating</string>
 
     <!-- RSVP -->
     <string name="rsvp_yes"> Yay </string>
@@ -40,42 +46,28 @@
     <string name="rsvp_no"> Nay </string>
 
     <!-- Action Bar -->
-    <string name="action_refresh_events">Refresh Events</string>
-    <string name="action_create_event">Create Event</string>
     <string name="action_account">Account</string>
-    <string name="action_search">Search Friends</string>
     <string name="action_home">Home</string>
-    <string name="action_edit_event">Edit Event</string>
-    <string name="action_finalize_event">Finalize Event</string>
-    <string name="action_delete_event">Delete Event</string>
-
-    <!-- Home Fragment -->
-    <!--<string name="filter_today">Today</string>-->
-    <!--<string name="filter_all">All Events</string>-->
-
-    <!--<string name="sort_relevance">Relevance</string>-->
-    <!--<string name="sort_time">Start Time</string>-->
-    <!--<string name="sort_distance">Distance</string>-->
+    <string name="action_edit_event">Edit</string>
+    <string name="action_finalize_event">Finalize Details</string>
+    <string name="action_delete_event">Dismiss Clan</string>
 
     <string name="home_no_events"> No active clans at the moment. Start your own </string>
-    <string name="home_events_fetch_error"> Unable to display clans. Swipe to refresh </string>
+    <string name="home_events_fetch_error"> Unable to show clans. Swipe to refresh </string>
 
     <!-- Event Details Fragment -->
-    <string name="event_details_no_description">No description</string>
-    <string name="event_details_no_attendees">This event has been deleted.</string>
-    <string name="event_details_no_location">Location not specified</string>
+    <string name="event_details_no_description">Say something</string>
+    <string name="event_details_no_attendees">This clan is no longer available. Refresh to remove dismissed clans from your feed</string>
+    <string name="event_details_no_location">Location to be decided</string>
 
-    <string name="event_details_type_public">Public</string>
-    <string name="event_details_type_invite_only">Invite Only</string>
+    <string name="event_details_type_public">Open</string>
+    <string name="event_details_type_invite_only">Secret</string>
 
-    <string name="cannot_edit_event_not_going"> Only members can make changes </string>
+    <string name="cannot_edit_event_not_going"> To edit details, join the clan </string>
     <string name="cannot_edit_event_locked"> Organizer finalized the details </string>
-    <string name="cannot_invite"> Join the clan to extend an invitation  </string>
+    <string name="cannot_invite"> To invite new friends, join the clan  </string>
     <string name="cannot_chat"> You can discuss details once you join the clan </string>
     <string name="cannot_change_rsvp"> You are the organizer </string>
-
-    <string name="unfinalise_event">Are you sure you wan\'t to unfinalise this event? Other people will now be able to edit the event.</string>
-    <string name="finalise_event">Are you sure you wan\'t to finalise this event? Other people will not be able to edit the event.</string>
 
     <!-- Toast and Blank Screen Messages -->
     <string name="location_not_found"> Unable to find the desired location. Try a location nearby </string>
@@ -83,9 +75,9 @@
 
     <string name="no_facebook_friends"> Clanout is exciting with your friends around. Invite them by Whatsapp  </string>
     <string name="no_local_facebook_friends"> Clanout is exciting with your friends around. Invite them by Whatsapp </string>
-    <string name="facebook_friends_not_fetched"> Unable to display your facebook friends. Swipe to refresh </string>
+    <string name="facebook_friends_not_fetched"> Unable to show your facebook friends. Refresh </string>
 
-    <string name="phone_contacts_not_fetched"> Unable to display your phonebook friends. Swipe to refresh</string>
+    <string name="phone_contacts_not_fetched"> Unable to show your phonebook friends. Refresh</string>
     <string name="no_local_phone_contacts"> Clanout is exciting with your friends around. Invite them by Whatsapp </string>
 
     <string name="whatsapp_not_installed"> Whatsapp service not installed on this device </string>
@@ -93,30 +85,25 @@
     <string name="empty_rating"> Show some love </string>
     <string name="feedback_submitted"> Cheers </string>
 
-    <string name="chat_messages_not_fetched"> Unable to load conversations. Swipe to refresh </string>
-    <string name="chat_message_not_sent"> Unable to send message. Try to resend </string>
+    <string name="chat_messages_not_fetched"> Unable to load conversations. Refresh </string>
+    <string name="chat_message_not_sent"> Unable to send message. Resend </string>
 
-    <string name="no_suggestions">There are no suggestion to show for this event category.</string>
-    <!--<string name="event_end_before_start">An event can\'t end before it has even started.</string>-->
-    <!--<string name="event_timings_null">Please choose the timings for your event.</string>-->
-    <!--<string name="event_finalised">The event is now finalised. No one can make any changes to it.</string>-->
-    <!--<string name="event_not_finalised">The event is now not finalised. People going to the event can update it.</string>-->
-    <!--<string name="event_delete_confirmation">The event has been deleted</string>-->
-    <string name="event_delete_confirmation"> Clan dismissed </string>
+    <!-- TODO put clan's name -->
+    <string name="event_delete_confirmation"> -- is dismissed </string>
 
     <string name="messed_up"> Looks like we screwed up. While we fix this issue, go feed your dog </string>
 
-    <string name="phone_invalid"> Please enter a valid phone number.</string>
-    <string name="add_phone_number"> Clanout is exciting with your friends around. Add your number to instantly connect with your local phonebook friends. ClanOut will never share your personal information with anyone</string>
+    <string name="phone_invalid"> Please enter a valid phone number</string>
+    <string name="add_phone_number"> Clanout is exciting with your friends around. Add your number to instantly connect with your local phonebook friends. ClanOut won't share your personal information with anyone</string>
 
     <string name="event_edit_failed_locked"> Organizer finalized the details </string>
     <string name="event_finalisation_failed"> Currently unable to finalize details. Try again</string>
     <string name="event_unfinalisation_failed"> Currently unable to allow modifications. Try again</string>
 
-    <string name="no_notifications">No notifications to show</string>
-    <string name="notifications_fetch_failure">Could not load notifications</string>
+    <string name="no_notifications">No notifications</string>
+    <string name="notifications_fetch_failure">Unable to load notifications</string>
 
-    <string name="event_not_found">Could not find this event in the list</string>
+    <string name="event_not_found">Unable to locate this clan</string>
 
     <!-- Facebook -->
     <string name="facebook_app_id">711701748936592</string>

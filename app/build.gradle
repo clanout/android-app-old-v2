@@ -106,4 +106,7 @@ dependencies {
     // App Intro
     compile 'com.github.paolorotolo:appintro:3.2.0'
 
+    // Circular Image View
+    compile 'com.pkmmte.view:circularimageview:1.1'
+
 }

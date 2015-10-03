@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/primary_light">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -16,37 +17,60 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/primary"
             app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
     </android.support.design.widget.AppBarLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical|center_horizontal"
         android:orientation="vertical">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <ImageView
                 android:id="@+id/iv_account_fragment_user_pic"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-        </LinearLayout>
+                android:layout_height="250dp" />
 
-        <!--<TextView-->
-            <!--android:id="@+id/tv_account_fragment_user_name"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:gravity="center_horizontal"-->
-            <!--android:textSize="22sp"/>-->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:background="#55cdcdcd" />
+
+            <com.pkmmte.view.CircularImageView
+                android:id="@+id/iv_account_fragment_user_profile_pic"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="75dp"
+                android:src="@drawable/ic_btn_rsvp_going"
+                app:border="true"
+                app:border_color="@color/white"
+                app:border_width="4dp" />
+
+            <TextView
+                android:id="@+id/tv_account_fragment_user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/iv_account_fragment_user_profile_pic"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_accounts_fragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:paddingTop="8dp"
         android:layout_weight="1"
-        android:background="@color/background_bar"></android.support.v7.widget.RecyclerView>
+        android:background="@color/primary_light"></android.support.v7.widget.RecyclerView>
 </LinearLayout>

@@ -44,8 +44,8 @@ public class FacebookActivity extends AppCompatActivity
     private EventCache eventCache;
     private UserCache userCache;
 
-    private static final String PERMISSION_REQUIRED = "This app requires your basic information, email and friends information to function properly. Don\\'t worry, we will not misuse this in any way.";
-    private static final String PERMISSION_REQUIRED_TITLE = "Permission Required";
+    private static final String PERMISSION_REQUIRED = "Allow access to your basic profile information, email and friend list. This is required to connect you with your facebook friends on clanOut";
+    private static final String PERMISSION_REQUIRED_TITLE = "Request for permission";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -122,7 +122,7 @@ public class FacebookActivity extends AppCompatActivity
                 {
                     if (loginResult.getRecentlyDeniedPermissions().size() > 0)
                     {
-                        setUpAlertDialog(PERMISSION_REQUIRED, PERMISSION_REQUIRED_TITLE, "Grant Permission");
+                        setUpAlertDialog(PERMISSION_REQUIRED, PERMISSION_REQUIRED_TITLE, "ALLOW");
                     } else
                     {
                         genericCache.delete(CacheKeys.ACTIVE_FRAGMENT);
@@ -133,6 +133,11 @@ public class FacebookActivity extends AppCompatActivity
                         genericCache.delete(CacheKeys.USER_ID);
                         genericCache.delete(CacheKeys.USER_LOCATION);
                         genericCache.delete(CacheKeys.USER_NAME);
+                        genericCache.delete(CacheKeys.USER_COVER_PIC);
+                        genericCache.delete(CacheKeys.USER_EMAIL);
+                        genericCache.delete(CacheKeys.USER_FIRST_NAME);
+                        genericCache.delete(CacheKeys.USER_LAST_NAME);
+                        genericCache.delete(CacheKeys.USER_GENDER);
 
                         userCache.deleteFriends();
                         userCache.deleteContacts();
@@ -176,7 +181,7 @@ public class FacebookActivity extends AppCompatActivity
                 LoginManager.getInstance().logInWithReadPermissions(FacebookActivity.this, Arrays.asList("email", "user_friends"));
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialog, int which)
