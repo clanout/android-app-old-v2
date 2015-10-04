@@ -36,11 +36,11 @@ public class DrawableFactory
         iconMapping.put(EventCategory.EAT_OUT, MaterialDrawableBuilder.IconValue.FOOD);
         iconMapping.put(EventCategory.DRINKS, MaterialDrawableBuilder.IconValue.MARTINI);
         iconMapping.put(EventCategory.CAFE, MaterialDrawableBuilder.IconValue.COFFEE);
-        iconMapping.put(EventCategory.MOVIES, MaterialDrawableBuilder.IconValue.MOVIE);
-        iconMapping.put(EventCategory.OUTDOORS, MaterialDrawableBuilder.IconValue.NATURE);
+        iconMapping.put(EventCategory.MOVIES, MaterialDrawableBuilder.IconValue.THEATER);
+        iconMapping.put(EventCategory.OUTDOORS, MaterialDrawableBuilder.IconValue.BIKE);
         iconMapping.put(EventCategory.SPORTS, MaterialDrawableBuilder.IconValue.TENNIS);
         iconMapping
-                .put(EventCategory.ALL_NIGHTER, MaterialDrawableBuilder.IconValue.XBOX_CONTROLLER);
+                .put(EventCategory.INDOORS, MaterialDrawableBuilder.IconValue.XBOX_CONTROLLER);
         iconMapping.put(EventCategory.SHOPPING, MaterialDrawableBuilder.IconValue.SHOPPING);
     }
 
@@ -53,7 +53,7 @@ public class DrawableFactory
         colorMapping.put(EventCategory.CAFE, R.color.cafe);
         colorMapping.put(EventCategory.MOVIES, R.color.movies);
         colorMapping.put(EventCategory.OUTDOORS, R.color.outdoors);
-        colorMapping.put(EventCategory.ALL_NIGHTER, R.color.all_nighter);
+        colorMapping.put(EventCategory.INDOORS, R.color.all_nighter);
         colorMapping.put(EventCategory.SPORTS, R.color.sports);
         colorMapping.put(EventCategory.SHOPPING, R.color.shopping);
     }

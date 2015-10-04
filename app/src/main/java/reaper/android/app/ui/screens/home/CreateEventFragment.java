@@ -181,6 +181,7 @@ public class CreateEventFragment extends BaseFragment {
         eventType.setOnClickListener(clickListener);
         moreDetails.setOnClickListener(clickListener);
         create.setOnClickListener(clickListener);
+        icon.setOnClickListener(clickListener);
     }
 
     @Override
@@ -478,8 +479,31 @@ public class CreateEventFragment extends BaseFragment {
                 onMoreDetailsClicked();
             } else if (v == create) {
                 onCreateClicked();
+            } else if (v == icon) {
+                displayCategoryChangeDialog();
             }
         }
+    }
+
+    private void displayCategoryChangeDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(true);
+
+        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+        View dialogView = layoutInflater.inflate(R.layout.alert_dialog_change_category, null);
+        builder.setView(dialogView);
+
+        builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
     }
 
     private void displayEventTypePopUp() {

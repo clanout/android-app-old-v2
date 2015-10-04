@@ -309,15 +309,15 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
                 icon.setIcon(MaterialDrawableBuilder.IconValue.COFFEE);
                 break;
             case MOVIES:
-                icon.setIcon(MaterialDrawableBuilder.IconValue.MOVIE);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.THEATER);
                 break;
             case OUTDOORS:
-                icon.setIcon(MaterialDrawableBuilder.IconValue.NATURE);
+                icon.setIcon(MaterialDrawableBuilder.IconValue.BIKE);
                 break;
             case SPORTS:
                 icon.setIcon(MaterialDrawableBuilder.IconValue.TENNIS);
                 break;
-            case ALL_NIGHTER:
+            case INDOORS:
                 icon.setIcon(MaterialDrawableBuilder.IconValue.XBOX_CONTROLLER);
                 break;
             case SHOPPING:

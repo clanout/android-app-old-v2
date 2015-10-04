@@ -63,7 +63,7 @@ public class DummyFragment extends BaseFragment
         models.add(new CreateEventModel(EventCategory.EAT_OUT, "dsfsdf"));
         models.add(new CreateEventModel(EventCategory.CAFE, "dfsdf?"));
         models.add(new CreateEventModel(EventCategory.SPORTS, "fsdf football?"));
-        models.add(new CreateEventModel(EventCategory.ALL_NIGHTER, "rgrt football?"));
+        models.add(new CreateEventModel(EventCategory.INDOORS, "rgrt football?"));
         models.add(new CreateEventModel(EventCategory.MOVIES, "vbc football?"));
         models.add(new CreateEventModel(EventCategory.DRINKS, "Want to go out for a beer?"));
 

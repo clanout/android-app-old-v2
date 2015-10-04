@@ -39,15 +39,31 @@ public class NotificationFactory
                                 .title(TITLE)
                                 .eventId("")
                                 .eventName("")
-                                .userId(args.get("user_id"))
-                                .userName(args.get("user_name"))
+                                .userId("")
+                                .userName("")
                                 .timestamp(DateTime.now())
                                 .message(NotificationHelper.getMessage(typeCode, args))
                                 .isNew(true)
                                 .args(args)
                                 .build();
                 return notification;
-            } else
+            } else if(typeCode == Notification.CHAT)
+            {
+                Notification notification =
+                        new Notification.Builder(Integer.parseInt(args.get("notification_id")))
+                                .type(typeCode)
+                                .title(TITLE)
+                                .eventId(args.get("event_id"))
+                                .eventName(args.get("event_name"))
+                                .userId("")
+                                .userName("")
+                                .timestamp(DateTime.now())
+                                .message(NotificationHelper.getMessage(typeCode, args))
+                                .isNew(true)
+                                .args(args)
+                                .build();
+                return notification;
+            }else
             {
                 Notification notification =
                         new Notification.Builder(Integer.parseInt(args.get("notification_id")))

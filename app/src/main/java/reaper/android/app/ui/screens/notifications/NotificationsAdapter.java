@@ -121,12 +121,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                     break;
                 case Notification.NEW_FRIEND_ADDED:
 
-                    Log.d("APP", "NEW friend added");
-                    Log.d("APP", "user id ---- " + notification.getArgs().get("user_id"));
-                    Log.d("APP", "user id ---- " + notification.getArgs().get("user_name"));
-
                     Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getArgs().get("user_id") + "/picture?height=500")
+                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?height=500")
                             .placeholder(personDrawable)
                             .fit()
                             .centerCrop()
@@ -135,12 +131,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                     break;
                 case Notification.EVENT_UPDATED:
 
-                    Log.d("APP", "event updated");
-                    Log.d("APP", "user id ---- " + notification.getArgs().get("user_id"));
-                    Log.d("APP", "user id ---- " + notification.getArgs().get("user_name"));
-
                     Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getArgs().get("user_id") + "/picture?height=500")
+                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?height=500")
                             .placeholder(personDrawable)
                             .fit()
                             .centerCrop()
@@ -149,12 +141,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                     break;
                 case Notification.EVENT_REMOVED:
 
-                    Log.d("APP", "event removed");
-                    Log.d("APP", "user id ---- " + notification.getArgs().get("user_id"));
-                    Log.d("APP", "user id ---- " + notification.getArgs().get("user_name"));
-
                     Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getArgs().get("user_id") + "/picture?height=500")
+                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?height=500")
                             .placeholder(personDrawable)
                             .fit()
                             .centerCrop()
@@ -167,13 +155,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                     break;
                 case Notification.EVENT_INVITATION:
 
-                    Log.d("APP", "event invitation");
-                    Log.d("APP", "user id ---- " + notification.getArgs().get("user_id"));
-                    Log.d("APP", "user id ---- " + notification.getArgs().get("user_name"));
-
-
                     Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getArgs().get("user_id") + "/picture?height=500")
+                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?height=500")
                             .placeholder(personDrawable)
                             .fit()
                             .centerCrop()
@@ -182,13 +165,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                     break;
                 case Notification.EVENT_CREATED:
 
-                    Log.d("APP", "event created");
-                    Log.d("APP", "user id ---- " + notification.getArgs().get("user_id"));
-                    Log.d("APP", "user id ---- " + notification.getArgs().get("user_name"));
-
-
                     Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getArgs().get("user_id") + "/picture?height=500")
+                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?height=500")
                             .placeholder(personDrawable)
                             .fit()
                             .centerCrop()

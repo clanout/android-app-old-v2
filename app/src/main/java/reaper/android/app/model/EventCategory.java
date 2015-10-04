@@ -8,7 +8,7 @@ public enum EventCategory implements Serializable
     MOVIES,
     SHOPPING,
     SPORTS,
-    ALL_NIGHTER,
+    INDOORS,
     EAT_OUT,
     DRINKS,
     OUTDOORS,
