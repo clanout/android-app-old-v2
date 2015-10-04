@@ -19,7 +19,6 @@
             android:id="@+id/iv_list_item_manage_friends_user_pic"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:src="@drawable/ic_btn_rsvp_going"
             app:border = 'false'/>
 
     </LinearLayout>
@@ -43,7 +42,7 @@
             android:id="@+id/iv_list_item_manage_friends_block"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/com_facebook_close" />
+            />
     </LinearLayout>
 
 

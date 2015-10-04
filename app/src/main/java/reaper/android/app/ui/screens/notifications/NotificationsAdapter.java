@@ -1,13 +1,17 @@
 package reaper.android.app.ui.screens.notifications;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
@@ -23,8 +27,10 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 {
     private Context context;
     private List<Notification> notifications;
-    private Drawable eventCreatedDrawable;
+    private Drawable chatDrawable;
     private NotificationClickCommunicator communicator;
+    private Drawable personDrawable;
+    private Drawable rsvpDrawable;
 
     public NotificationsAdapter(Context context, List<Notification> notifications)
     {
@@ -36,9 +42,21 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     private void generateDrawables()
     {
-        eventCreatedDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD)
-                .setColor(context.getResources().getColor(R.color.cyan))
+        chatDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE_TEXT)
+                .setColor(ContextCompat.getColor(context, R.color.accent))
+                .setSizeDp(36)
+                .build();
+
+        personDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
+                .setColor(Color.BLACK)
+                .setSizeDp(36)
+                .build();
+
+        rsvpDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_MULTIPLE_PLUS)
+                .setColor(Color.BLACK)
                 .setSizeDp(36)
                 .build();
     }
@@ -99,19 +117,61 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             switch (notification.getType())
             {
                 case Notification.CHAT:
-                    notificationIcon.setImageDrawable(eventCreatedDrawable);
+                    notificationIcon.setImageDrawable(chatDrawable);
                     break;
                 case Notification.NEW_FRIEND_ADDED:
+
+                    Picasso.with(context)
+                            .load("https://graph.facebook.com/v2.4/" + notification.getArgs().get("user_id") + "/picture?height=500")
+                            .placeholder(personDrawable)
+                            .fit()
+                            .centerCrop()
+                            .into(notificationIcon);
+
                     break;
                 case Notification.EVENT_UPDATED:
+
+                    Picasso.with(context)
+                            .load("https://graph.facebook.com/v2.4/" + notification.getArgs().get("user_id") + "/picture?height=500")
+                            .placeholder(personDrawable)
+                            .fit()
+                            .centerCrop()
+                            .into(notificationIcon);
+
                     break;
                 case Notification.EVENT_REMOVED:
+
+                    Picasso.with(context)
+                            .load("https://graph.facebook.com/v2.4/" + notification.getArgs().get("user_id") + "/picture?height=500")
+                            .placeholder(personDrawable)
+                            .fit()
+                            .centerCrop()
+                            .into(notificationIcon);
+
                     break;
                 case Notification.RSVP:
+
+                    notificationIcon.setImageDrawable(rsvpDrawable);
                     break;
                 case Notification.EVENT_INVITATION:
+
+                    Picasso.with(context)
+                            .load("https://graph.facebook.com/v2.4/" + notification.getArgs().get("user_id") + "/picture?height=500")
+                            .placeholder(personDrawable)
+                            .fit()
+                            .centerCrop()
+                            .into(notificationIcon);
+
                     break;
                 case Notification.EVENT_CREATED:
+
+                    Picasso.with(context)
+                            .load("https://graph.facebook.com/v2.4/" + notification.getArgs().get("user_id") + "/picture?height=500")
+                            .placeholder(personDrawable)
+                            .fit()
+                            .centerCrop()
+                            .into(notificationIcon);
+
                     break;
             }
         }

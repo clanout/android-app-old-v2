@@ -27,23 +27,13 @@
         android:gravity="center_vertical|center_horizontal"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_fragment_notification_clear_all"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginRight="5dp"
-            android:textSize="16sp"
-            android:textColor="@color/accent"
-            android:text="Clear All"
-            android:gravity="right"/>
-
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_fragment_notificatiosn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/primary_light"></android.support.v7.widget.RecyclerView>
+            android:background="@color/primary_light"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"></android.support.v7.widget.RecyclerView>
 
         <TextView
             android:id="@+id/tv_fragemnt_notification_no_notifications"

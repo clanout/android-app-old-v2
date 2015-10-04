@@ -34,7 +34,7 @@
            android:id="@+id/rb_share_feedback_other"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:text="Other suggestion"
+           android:text="Other"
            android:textSize="14sp"
            android:textColor="@color/text_title"/>
 

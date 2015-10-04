@@ -23,7 +23,7 @@ public class AccountsService
         if (friendsDrawable == null)
         {
             friendsDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                    .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_MULTIPLE)
+                    .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_MINUS)
                     .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.accent))
                     .setSizeDp(24)
                     .build();

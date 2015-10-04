@@ -55,7 +55,7 @@ import reaper.android.common.notification.Notification;
 public class NotificationFragment extends BaseFragment implements NotificationClickCommunicator, View.OnClickListener
 {
     private RecyclerView notificationRecyclerView;
-    private TextView noNotificationsMessage, clearAll;
+    private TextView noNotificationsMessage;
     private NotificationsAdapter notificationsAdapter;
     private Menu menu;
     private Drawable homeDrawable;
@@ -83,7 +83,6 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
         View view = inflater.inflate(R.layout.fragment_notification, container, false);
         notificationRecyclerView = (RecyclerView) view.findViewById(R.id.rv_fragment_notificatiosn);
         noNotificationsMessage = (TextView) view.findViewById(R.id.tv_fragemnt_notification_no_notifications);
-        clearAll = (TextView) view.findViewById(R.id.tv_fragment_notification_clear_all);
         toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_notifications);
         return view;
     }
@@ -100,8 +99,6 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
         eventService = new EventService(bus);
         locationService = new LocationService(bus);
         genericCache = CacheManager.getGenericCache();
-
-        clearAll.setOnClickListener(this);
 
         notificationList = new ArrayList<>();
 
@@ -164,7 +161,7 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
         menu.findItem(R.id.action_account).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(true);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
-        menu.findItem(R.id.action_delete_event).setVisible(false);
+        menu.findItem(R.id.action_delete_event).setVisible(true);
         menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
@@ -172,12 +169,20 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
 
         menu.findItem(R.id.action_home).setIcon(homeDrawable);
 
-        menu.findItem(R.id.action_home).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
+        menu.findItem(R.id.action_home).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item)
-            {
+            public boolean onMenuItemClick(MenuItem item) {
                 FragmentUtils.changeFragment(getActivity().getFragmentManager(), new HomeFragment());
+                return true;
+            }
+        });
+
+        menu.findItem(R.id.action_delete_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                notificationService.deleteAllNotificationsFromCache();
+                notificationList = new ArrayList<>();
+                refreshRecyclerView();
                 return true;
             }
         });
@@ -201,7 +206,6 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
     {
         notificationRecyclerView.setVisibility(View.GONE);
         noNotificationsMessage.setVisibility(View.VISIBLE);
-        clearAll.setVisibility(View.GONE);
         noNotificationsMessage.setText(R.string.no_notifications);
     }
 
@@ -209,7 +213,6 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
     {
         notificationRecyclerView.setVisibility(View.GONE);
         noNotificationsMessage.setVisibility(View.VISIBLE);
-        clearAll.setVisibility(View.GONE);
         noNotificationsMessage.setText(R.string.notifications_fetch_failure);
     }
 
@@ -254,6 +257,7 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
     public void onNotificationsFetched(NotificationsFetchedTrigger trigger)
     {
         notificationList = trigger.getNotifications();
+
         refreshRecyclerView();
     }
 
@@ -296,11 +300,5 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
     @Override
     public void onClick(View v)
     {
-        if(v.getId() == R.id.tv_fragment_notification_clear_all)
-        {
-            notificationService.deleteAllNotificationsFromCache();
-            notificationList = new ArrayList<>();
-            refreshRecyclerView();
-        }
     }
 }
