@@ -982,7 +982,6 @@ public class EventService
 
     public Observable<List<Event>> _refreshEvents(String zone, final List<String> eventIdList, DateTime lastUpdateTimestamp)
     {
-        Timber.v("refreshing");
 
         Observable<FetchNewEventsAndUpdatesApiResponse> updatesObservable = eventApi
                 .fetchNewEventsAndUpdates(new FetchNewEventsAndUpdatesApiRequest(zone, eventIdList, lastUpdateTimestamp));

@@ -14,12 +14,6 @@
     <string name="fetch_pending_invites_positive_button">ENTER</string>
     <string name="fetch_pending_invites_negative_button">CANCEL</string>
 
-    <!-- First Time Popups -->
-    <!-- TODO use these 2 strings somewhere ! and more popups-->
-
-    <string name="invite_only_description"> Make a secret clan with selected friends</string>
-    <string name="public_description">Let everyone know about your clan. You can still send personal invites</string>
-
     <!-- Dialog messages -->
     <string name="event_delete_heading">Dismiss Clan</string>
 

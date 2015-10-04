@@ -36,8 +36,8 @@
     <color name="outdoors">#66BB6A</color>
     <color name="movies">#78909C</color>
     <color name="shopping">#EC407A</color>
-    <color name="local_events">#D4E157</color>
-    <color name="party">#42A5F5</color>
+    <color name="sports">#D4E157</color>
+    <color name="all_nighter">#42A5F5</color>
 
     <!-- RSVP colors -->
     <color name="going">#4CAF50</color>

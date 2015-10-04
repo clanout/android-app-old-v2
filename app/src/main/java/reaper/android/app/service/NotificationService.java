@@ -194,7 +194,7 @@ public class NotificationService
                     {
                         if (isTimeUpdated)
                         {
-                            notification.setMessage(notification.getArgs().get("user_name") + "updated " + notification.getArgs().get("event_name"));
+                            notification.setMessage(notification.getArgs().get("user_name") + " updated " + notification.getArgs().get("event_name"));
                         } else
                         {
                             notification.setMessage(notification.getArgs().get("user_name") + " updated the location for " + notification.getArgs().get("event_name"));
@@ -679,7 +679,7 @@ public class NotificationService
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(Reaper.getReaperContext())
-                .setSmallIcon(R.mipmap.logo_dark)
+                .setSmallIcon(R.mipmap.logo_ring)
                 .setContentTitle(notification.getTitle())
                 .setContentText(notification.getMessage())
                 .setAutoCancel(true)

@@ -57,6 +57,8 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
 
     private GenericCache genericCache;
 
+    // TODO --- timber test compile and stetho
+
     @Override
     public void onCreate()
     {

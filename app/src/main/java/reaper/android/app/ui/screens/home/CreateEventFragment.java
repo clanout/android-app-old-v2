@@ -2,12 +2,15 @@ package reaper.android.app.ui.screens.home;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,7 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BundleKeys;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.CreateEventModel;
 import reaper.android.app.model.Event;
@@ -46,10 +52,8 @@ import reaper.android.common.communicator.Communicator;
 import rx.Subscription;
 import timber.log.Timber;
 
-public class CreateEventFragment extends BaseFragment
-{
-    public interface CreateEventCycleHandler
-    {
+public class CreateEventFragment extends BaseFragment {
+    public interface CreateEventCycleHandler {
         void addCycle(Subscription subscription);
     }
 
@@ -102,9 +106,10 @@ public class CreateEventFragment extends BaseFragment
     boolean isCreateClicked;
     Bus bus;
 
+    GenericCache genericCache;
+
     /* Static Factory */
-    public static CreateEventFragment newInstance(CreateEventModel createEventModel)
-    {
+    public static CreateEventFragment newInstance(CreateEventModel createEventModel) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_MODEL, createEventModel);
 
@@ -116,8 +121,7 @@ public class CreateEventFragment extends BaseFragment
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_event, container, false);
 
         cardView = (CardView) view.findViewById(R.id.cv_createEvent);
@@ -141,37 +145,30 @@ public class CreateEventFragment extends BaseFragment
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         createEventModel = (CreateEventModel) getArguments().getSerializable(ARG_MODEL);
 
         clickListener = new ClickListener();
         bus = Communicator.getInstance().getBus();
+        genericCache = CacheManager.getGenericCache();
 
-        title.setOnFocusChangeListener(new View.OnFocusChangeListener()
-        {
+        title.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus)
-            {
-                if (!isEditMode && hasFocus)
-                {
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!isEditMode && hasFocus) {
                     title.clearFocus();
                     titleContainer.setHint(createEventModel.getTitle());
-                }
-                else if (hasFocus)
-                {
+                } else if (hasFocus) {
                     enableEditMode();
                 }
             }
         });
 
-        title.setOnTouchListener(new View.OnTouchListener()
-        {
+        title.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event)
-            {
+            public boolean onTouch(View v, MotionEvent event) {
                 enableEditMode();
                 return true;
             }
@@ -187,8 +184,7 @@ public class CreateEventFragment extends BaseFragment
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
         bus.register(this);
 
@@ -200,28 +196,23 @@ public class CreateEventFragment extends BaseFragment
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
         bus.unregister(this);
 
-        if (progressDialog != null)
-        {
+        if (progressDialog != null) {
             progressDialog.dismiss();
         }
     }
 
-    private void onMoreDetailsClicked()
-    {
+    private void onMoreDetailsClicked() {
         Timber.v("More Details");
         // TODO : Fragment transaction to more details fragment
     }
 
-    private void onCreateClicked()
-    {
+    private void onCreateClicked() {
         String eventTitle = title.getText().toString();
-        if (eventTitle == null || eventTitle.isEmpty())
-        {
+        if (eventTitle == null || eventTitle.isEmpty()) {
             Snackbar.make(getView(), "Title cannot be empty", Snackbar.LENGTH_LONG)
                     .show();
             return;
@@ -230,13 +221,13 @@ public class CreateEventFragment extends BaseFragment
         InputMethodManager imm = (InputMethodManager) getActivity()
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(title.getWindowToken(), InputMethodManager.SHOW_IMPLICIT);
+
         progressDialog = ProgressDialog.show(getActivity(), "Creating your clan", "Please wait ...");
 
         DateTime startTime = days.get(selectedDayIndex)
-                                 .withTime(times.get(selectedTimeIndex).toLocalTime());
+                .withTime(times.get(selectedTimeIndex).toLocalTime());
         DateTime endTime = startTime.plusDays(1).withTimeAtStartOfDay();
 
-        Timber.v("Title = " + eventTitle + "; Start Time = " + startTime + "; End Time = " + endTime);
 
         EventService eventService = new EventService(bus);
         LocationService locationService = new LocationService(bus);
@@ -254,12 +245,9 @@ public class CreateEventFragment extends BaseFragment
     }
 
     @Subscribe
-    public void onCreateSuccess(EventCreatedTrigger trigger)
-    {
-        if (isCreateClicked)
-        {
-            if (progressDialog != null)
-            {
+    public void onCreateSuccess(EventCreatedTrigger trigger) {
+        if (isCreateClicked) {
+            if (progressDialog != null) {
                 progressDialog.dismiss();
             }
 
@@ -274,12 +262,9 @@ public class CreateEventFragment extends BaseFragment
     }
 
     @Subscribe
-    public void onCreateFailure(GenericErrorTrigger trigger)
-    {
-        if (isCreateClicked && trigger.getErrorCode() == ErrorCode.EVENT_CREATION_FAILURE)
-        {
-            if (progressDialog != null)
-            {
+    public void onCreateFailure(GenericErrorTrigger trigger) {
+        if (isCreateClicked && trigger.getErrorCode() == ErrorCode.EVENT_CREATION_FAILURE) {
+            if (progressDialog != null) {
                 progressDialog.dismiss();
             }
 
@@ -288,24 +273,19 @@ public class CreateEventFragment extends BaseFragment
         }
     }
 
-    private void initView()
-    {
+    private void initView() {
         icon.setImageDrawable(createEventModel.getIcon());
         iconContainer.setBackground(createEventModel.getIconBackground(getActivity()));
 
-        if (isEditMode)
-        {
+        if (isEditMode) {
             enableEditMode();
-        }
-        else
-        {
+        } else {
             title.clearFocus();
             titleContainer.setHint(createEventModel.getTitle());
         }
     }
 
-    private void enableEditMode()
-    {
+    private void enableEditMode() {
         isEditMode = true;
 
         title.requestFocus();
@@ -317,14 +297,12 @@ public class CreateEventFragment extends BaseFragment
         bus.post(new ViewPagerClickedTrigger());
     }
 
-    private void initDayTime()
-    {
+    private void initDayTime() {
         day.setText(DayTimeUtil.getDayName(days.get(selectedDayIndex)));
         time.setText(DayTimeUtil.getTime(times.get(selectedTimeIndex)));
     }
 
-    private void initTypeSelector()
-    {
+    private void initTypeSelector() {
         typeSelectorContainer.setVisibility(View.GONE);
 
         selectedType = Event.Type.INVITE_ONLY;
@@ -333,25 +311,20 @@ public class CreateEventFragment extends BaseFragment
         typeSelector.setTabGravity(TabLayout.GRAVITY_CENTER);
         typeSelector.removeAllTabs();
 
-        typeSelector.addTab(typeSelector.newTab().setText("INVITE ONLY"));
-        typeSelector.addTab(typeSelector.newTab().setText("PUBLIC"));
+        typeSelector.addTab(typeSelector.newTab().setText(R.string.event_details_type_invite_only));
+        typeSelector.addTab(typeSelector.newTab().setText(R.string.event_details_type_public));
 
         typeSelector.getTabAt(0).select();
 
-        typeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
-        {
+        typeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onTabSelected(TabLayout.Tab tab)
-            {
+            public void onTabSelected(TabLayout.Tab tab) {
                 String selected = tab.getText().toString();
-                eventType.setText(selected);
+                eventType.setText(selected.toUpperCase());
 
-                if (selected.equalsIgnoreCase("PUBLIC"))
-                {
+                if (selected.equalsIgnoreCase("OPEN")) {
                     selectedType = Event.Type.PUBLIC;
-                }
-                else
-                {
+                } else {
                     selectedType = Event.Type.INVITE_ONLY;
                 }
 
@@ -360,22 +333,19 @@ public class CreateEventFragment extends BaseFragment
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab)
-            {
+            public void onTabUnselected(TabLayout.Tab tab) {
 
             }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab)
-            {
+            public void onTabReselected(TabLayout.Tab tab) {
                 VisibilityAnimationUtil.collapse(typeSelectorContainer, 200);
                 isTypeSelectorVisible = false;
             }
         });
     }
 
-    private void initDaySelector()
-    {
+    private void initDaySelector() {
         daySelectorContainer.setVisibility(View.GONE);
 
         daySelector.setTabMode(TabLayout.MODE_SCROLLABLE);
@@ -385,16 +355,13 @@ public class CreateEventFragment extends BaseFragment
         days = DayTimeUtil.getDayList();
         selectedDayIndex = 0;
 
-        for (DateTime d : days)
-        {
+        for (DateTime d : days) {
             daySelector.addTab(daySelector.newTab().setText(DayTimeUtil.getDayName(d)));
         }
 
-        daySelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
-        {
+        daySelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onTabSelected(TabLayout.Tab tab)
-            {
+            public void onTabSelected(TabLayout.Tab tab) {
                 selectedDayIndex = tab.getPosition();
                 day.setText(tab.getText());
                 hideDaySelector();
@@ -404,21 +371,18 @@ public class CreateEventFragment extends BaseFragment
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab)
-            {
+            public void onTabUnselected(TabLayout.Tab tab) {
 
             }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab)
-            {
+            public void onTabReselected(TabLayout.Tab tab) {
                 hideDaySelector();
             }
         });
     }
 
-    private void initTimeSelector()
-    {
+    private void initTimeSelector() {
         timeSelectorContainer.setVisibility(View.GONE);
 
         timeSelector.setTabMode(TabLayout.MODE_SCROLLABLE);
@@ -428,125 +392,118 @@ public class CreateEventFragment extends BaseFragment
         times = DayTimeUtil.getTimeList(selectedDayIndex);
         selectedTimeIndex = 0;
 
-        for (DateTime d : times)
-        {
+        for (DateTime d : times) {
             timeSelector.addTab(timeSelector.newTab().setText(DayTimeUtil.getTime(d)));
         }
 
-        timeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
-        {
+        timeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onTabSelected(TabLayout.Tab tab)
-            {
+            public void onTabSelected(TabLayout.Tab tab) {
                 selectedTimeIndex = tab.getPosition();
                 time.setText(tab.getText().toString());
                 hideTimeSelector();
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab)
-            {
+            public void onTabUnselected(TabLayout.Tab tab) {
 
             }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab)
-            {
+            public void onTabReselected(TabLayout.Tab tab) {
                 hideTimeSelector();
             }
         });
     }
 
-    private void showDaySelector()
-    {
+    private void showDaySelector() {
         VisibilityAnimationUtil.expand(daySelectorContainer, 200);
         isDaySelectorVisible = true;
     }
 
-    private void hideDaySelector()
-    {
+    private void hideDaySelector() {
         VisibilityAnimationUtil.collapse(daySelectorContainer, 200);
         isDaySelectorVisible = false;
     }
 
-    private void showTimeSelector()
-    {
+    private void showTimeSelector() {
         VisibilityAnimationUtil.expand(timeSelectorContainer, 200);
         isTimeSelectorVisible = true;
     }
 
-    private void hideTimeSelector()
-    {
+    private void hideTimeSelector() {
         VisibilityAnimationUtil.collapse(timeSelectorContainer, 200);
         isTimeSelectorVisible = false;
     }
 
-    private class ClickListener implements View.OnClickListener
-    {
+    private class ClickListener implements View.OnClickListener {
         @Override
-        public void onClick(View v)
-        {
+        public void onClick(View v) {
             bus.post(new ViewPagerClickedTrigger());
             enableEditMode();
 
-            if (v == day)
-            {
-                if (isTimeSelectorVisible)
-                {
+            if (v == day) {
+                if (isTimeSelectorVisible) {
                     hideTimeSelector();
                 }
 
-                if (!isDaySelectorVisible)
-                {
+                if (!isDaySelectorVisible) {
                     showDaySelector();
-                }
-                else
-                {
+                } else {
                     hideDaySelector();
                 }
-            }
-            else if (v == time)
-            {
-                if (isDaySelectorVisible)
-                {
+            } else if (v == time) {
+                if (isDaySelectorVisible) {
                     hideDaySelector();
                 }
 
-                if (!isTimeSelectorVisible)
-                {
+                if (!isTimeSelectorVisible) {
                     showTimeSelector();
-                }
-                else
-                {
+                } else {
                     hideTimeSelector();
                 }
-            }
-            else if (v == eventType)
-            {
-                if (isTypeSelectorVisible)
-                {
+            } else if (v == eventType) {
+                if (genericCache.get(CacheKeys.HAS_SEEN_EVENT_TYPE_POP_UP) == null) {
+                    displayEventTypePopUp();
+                }
+
+                if (isTypeSelectorVisible) {
                     VisibilityAnimationUtil.collapse(typeSelectorContainer, 200);
                     isTypeSelectorVisible = false;
-                }
-                else
-                {
+                } else {
                     VisibilityAnimationUtil.expand(typeSelectorContainer, 200);
                     isTypeSelectorVisible = true;
                 }
-            }
-            else if (v == moreDetails)
-            {
+            } else if (v == moreDetails) {
                 onMoreDetailsClicked();
-            }
-            else if (v == create)
-            {
+            } else if (v == create) {
                 onCreateClicked();
             }
         }
     }
 
-    private static class DayTimeUtil
-    {
+    private void displayEventTypePopUp() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
+
+        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+        View dialogView = layoutInflater.inflate(R.layout.alert_dialog_event_type, null);
+        builder.setView(dialogView);
+
+        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                genericCache.put(CacheKeys.HAS_SEEN_EVENT_TYPE_POP_UP, true);
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private static class DayTimeUtil {
         private static final String TODAY = "TODAY";
         private static final String TOMORROW = "TOMORROW";
 
@@ -556,28 +513,24 @@ public class CreateEventFragment extends BaseFragment
         private static DateTime today = DateTime.now().withTimeAtStartOfDay();
         private static DateTime tomorrow = today.plusDays(1);
 
-        public static List<DateTime> getDayList()
-        {
+        public static List<DateTime> getDayList() {
             List<DateTime> days = new ArrayList<>();
             DateTime today = DateTime.now();
 
             DateTime lastSlot = today.withTime(23, 29, 0, 0);
 
-            if (today.isAfter(lastSlot))
-            {
+            if (today.isAfter(lastSlot)) {
                 today = today.plusDays(1).withTimeAtStartOfDay();
             }
 
-            if (today.dayOfWeek().get() == 7)
-            {
+            if (today.dayOfWeek().get() == 7) {
                 days.add(today);
                 return days;
             }
 
             int dayOfWeek = today.dayOfWeek().get();
 
-            while (dayOfWeek <= 7)
-            {
+            while (dayOfWeek <= 7) {
                 days.add(today);
                 today = today.plusDays(1);
 
@@ -587,30 +540,23 @@ public class CreateEventFragment extends BaseFragment
             return days;
         }
 
-        public static List<DateTime> getTimeList(int dayIndex)
-        {
+        public static List<DateTime> getTimeList(int dayIndex) {
             boolean isToday = dayIndex == 0;
             List<DateTime> times = new ArrayList<>();
 
             DateTime now = DateTime.now();
             DateTime lastSlot = now.withTime(23, 29, 0, 0);
-            if (now.isAfter(lastSlot))
-            {
+            if (now.isAfter(lastSlot)) {
                 isToday = false;
             }
 
             DateTime dateTime = now.withTimeAtStartOfDay();
-            for (int i = 0; i < 48; i++)
-            {
-                if (isToday)
-                {
-                    if (dateTime.isAfter(now))
-                    {
+            for (int i = 0; i < 48; i++) {
+                if (isToday) {
+                    if (dateTime.isAfter(now)) {
                         times.add(dateTime);
                     }
-                }
-                else
-                {
+                } else {
                     times.add(dateTime);
                 }
 
@@ -620,26 +566,19 @@ public class CreateEventFragment extends BaseFragment
             return times;
         }
 
-        public static String getDayName(DateTime dateTime)
-        {
+        public static String getDayName(DateTime dateTime) {
             DateTime input = dateTime.withTimeAtStartOfDay();
 
-            if (today.equals(input))
-            {
+            if (today.equals(input)) {
                 return TODAY;
-            }
-            else if (tomorrow.equals(input))
-            {
+            } else if (tomorrow.equals(input)) {
                 return TOMORROW;
-            }
-            else
-            {
+            } else {
                 return dateTime.toString(dayFormatter).toUpperCase();
             }
         }
 
-        public static String getTime(DateTime dateTime)
-        {
+        public static String getTime(DateTime dateTime) {
             return dateTime.toString(timeFormatter).toUpperCase();
         }
     }

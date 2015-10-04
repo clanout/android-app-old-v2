@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -123,11 +124,12 @@ public class HomeFragment extends BaseFragment implements EventsView,
     {
         super.onActivityCreated(savedInstanceState);
 
-        setHasOptionsMenu(true);
         toolbar.setTitle(R.string.app_name);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        setHasOptionsMenu(true);
 
         swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setColorSchemeResources(R.color.eat_out, R.color.accent, R.color.shopping, R.color.outdoors);
 
         initRecyclerView();
     }
@@ -405,6 +407,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
         final EditText phoneNumber = (EditText) dialogView
                 .findViewById(R.id.et_alert_dialog_add_phone);
+        TextView message = (TextView) dialogView.findViewById(R.id.tv_alert_dialog_add_phone_message);
+        message.setVisibility(View.GONE);
 
         builder.setPositiveButton(R.string.fetch_pending_invites_positive_button, new DialogInterface.OnClickListener()
         {

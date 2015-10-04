@@ -356,7 +356,7 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty())
             {
                 timeLocation
-                        .setText(dateTime.toString(timeFormatter) + ", (Location Not Specified)");
+                        .setText(dateTime.toString(timeFormatter) + ", Suggest a location");
             }
             else
             {

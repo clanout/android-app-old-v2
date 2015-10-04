@@ -18,6 +18,7 @@ import reaper.android.app.service.UserService;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 public class EventsPresenterImpl implements EventsPresenter
@@ -55,6 +56,7 @@ public class EventsPresenterImpl implements EventsPresenter
         this.view.showLoading();
         Subscription subscription = eventService
                 ._fetchEvents(userLocation.getZone())
+                .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Event>>()
                 {

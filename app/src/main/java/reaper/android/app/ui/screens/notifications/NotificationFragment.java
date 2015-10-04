@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -68,12 +69,12 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
     private ItemTouchHelper itemTouchHelper;
     private List<Notification> notificationList;
     private GenericCache genericCache;
+    private Drawable deleteDrawable;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -93,6 +94,7 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
         super.onActivityCreated(savedInstanceState);
 
         ((MainActivity)getActivity()).setSupportActionBar(toolbar);
+        setHasOptionsMenu(true);
 
         bus = Communicator.getInstance().getBus();
         notificationService = new NotificationService(bus);
@@ -168,6 +170,7 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
         menu.findItem(R.id.action_notifications).setVisible(false);
 
         menu.findItem(R.id.action_home).setIcon(homeDrawable);
+        menu.findItem(R.id.action_delete_event).setIcon(deleteDrawable);
 
         menu.findItem(R.id.action_home).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -206,14 +209,14 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
     {
         notificationRecyclerView.setVisibility(View.GONE);
         noNotificationsMessage.setVisibility(View.VISIBLE);
-        noNotificationsMessage.setText(R.string.no_notifications);
+        noNotificationsMessage.setText(R.string.notifications_fetch_failure);
     }
 
     private void displayNoNotificationsView()
     {
         notificationRecyclerView.setVisibility(View.GONE);
         noNotificationsMessage.setVisibility(View.VISIBLE);
-        noNotificationsMessage.setText(R.string.notifications_fetch_failure);
+        noNotificationsMessage.setText(R.string.no_notifications);
     }
 
     private void initRecyclerView()
@@ -248,7 +251,13 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
     {
         homeDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.HOME)
-                .setColor(getResources().getColor(R.color.white))
+                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
+                .setSizeDp(36)
+                .build();
+
+        deleteDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.DELETE)
+                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
                 .setSizeDp(36)
                 .build();
     }

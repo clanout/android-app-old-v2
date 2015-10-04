@@ -4,13 +4,13 @@ import java.io.Serializable;
 
 public enum EventCategory implements Serializable
 {
-    GENERAL,
-    EAT_OUT,
-    DRINKS,
     CAFE,
     MOVIES,
+    SHOPPING,
+    SPORTS,
+    ALL_NIGHTER,
+    EAT_OUT,
+    DRINKS,
     OUTDOORS,
-    PARTY,
-    LOCAL_EVENTS,
-    SHOPPING;
+    GENERAL;
 }

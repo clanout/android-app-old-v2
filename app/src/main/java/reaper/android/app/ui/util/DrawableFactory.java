@@ -27,7 +27,7 @@ public class DrawableFactory
     private static Map<EventCategory, MaterialDrawableBuilder.IconValue> iconMapping;
     private static Map<EventCategory, Integer> colorMapping;
     private static List<Integer> colors = Arrays
-            .asList(R.color.drinks, R.color.party, R.color.general, R.color.outdoors);
+            .asList(R.color.drinks, R.color.all_nighter, R.color.general, R.color.outdoors, R.color.eat_out, R.color.cafe, R.color.shopping, R.color.sports);
 
     static
     {
@@ -37,10 +37,10 @@ public class DrawableFactory
         iconMapping.put(EventCategory.DRINKS, MaterialDrawableBuilder.IconValue.MARTINI);
         iconMapping.put(EventCategory.CAFE, MaterialDrawableBuilder.IconValue.COFFEE);
         iconMapping.put(EventCategory.MOVIES, MaterialDrawableBuilder.IconValue.MOVIE);
-        iconMapping.put(EventCategory.OUTDOORS, MaterialDrawableBuilder.IconValue.TENNIS);
-        iconMapping.put(EventCategory.PARTY, MaterialDrawableBuilder.IconValue.GIFT);
+        iconMapping.put(EventCategory.OUTDOORS, MaterialDrawableBuilder.IconValue.NATURE);
+        iconMapping.put(EventCategory.SPORTS, MaterialDrawableBuilder.IconValue.TENNIS);
         iconMapping
-                .put(EventCategory.LOCAL_EVENTS, MaterialDrawableBuilder.IconValue.BULLETIN_BOARD);
+                .put(EventCategory.ALL_NIGHTER, MaterialDrawableBuilder.IconValue.XBOX_CONTROLLER);
         iconMapping.put(EventCategory.SHOPPING, MaterialDrawableBuilder.IconValue.SHOPPING);
     }
 
@@ -53,8 +53,8 @@ public class DrawableFactory
         colorMapping.put(EventCategory.CAFE, R.color.cafe);
         colorMapping.put(EventCategory.MOVIES, R.color.movies);
         colorMapping.put(EventCategory.OUTDOORS, R.color.outdoors);
-        colorMapping.put(EventCategory.PARTY, R.color.party);
-        colorMapping.put(EventCategory.LOCAL_EVENTS, R.color.local_events);
+        colorMapping.put(EventCategory.ALL_NIGHTER, R.color.all_nighter);
+        colorMapping.put(EventCategory.SPORTS, R.color.sports);
         colorMapping.put(EventCategory.SHOPPING, R.color.shopping);
     }
 
