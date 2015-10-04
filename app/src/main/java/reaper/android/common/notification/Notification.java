@@ -26,6 +26,9 @@ public class Notification
     private int type;
     private String title;
     private String eventId;
+    private String eventName;
+    private String userId;
+    private String userName;
     private String message;
     private DateTime timestamp;
     private DateTime timestampReceived;
@@ -52,6 +55,21 @@ public class Notification
     public String getEventId()
     {
         return eventId;
+    }
+
+    public String getEventName()
+    {
+        return eventName;
+    }
+
+    public String getUserId()
+    {
+        return userId;
+    }
+
+    public String getUserName()
+    {
+        return userName;
     }
 
     public String getMessage()
@@ -142,6 +160,24 @@ public class Notification
         public Builder eventId(String eventId)
         {
             notification.eventId = eventId;
+            return this;
+        }
+
+        public Builder eventName(String eventName)
+        {
+            notification.eventName = eventName;
+            return this;
+        }
+
+        public Builder userId(String userId)
+        {
+            notification.userId = userId;
+            return this;
+        }
+
+        public Builder userName(String userName)
+        {
+            notification.userName = userName;
             return this;
         }
 

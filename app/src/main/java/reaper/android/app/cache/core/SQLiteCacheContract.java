@@ -107,6 +107,9 @@ public abstract class SQLiteCacheContract
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_MESSAGE = "message";
         public static final String COLUMN_EVENT_ID = "event_id";
+        public static final String COLUMN_EVENT_NAME = "event_name";
+        public static final String COLUMN_USER_ID = "user_id";
+        public static final String COLUMN_USER_NAME = "user_name";
         public static final String COLUMN_TIMESTAMP = "timestamp";
         public static final String COLUMN_TIMESTAMP_RECEIVED = "timestamp_received";
         public static final String COLUMN_IS_NEW = "is_new";
@@ -117,13 +120,16 @@ public abstract class SQLiteCacheContract
                 COLUMN_TITLE + " TEXT, " +
                 COLUMN_MESSAGE + " TEXT, " +
                 COLUMN_EVENT_ID + " TEXT, " +
+                COLUMN_EVENT_NAME + " TEXT, " +
+                COLUMN_USER_ID + " TEXT, " +
+                COLUMN_USER_NAME + " TEXT, " +
                 COLUMN_TIMESTAMP + " INTEGER, " +
                 COLUMN_TIMESTAMP_RECEIVED + " INTEGER, " +
                 COLUMN_IS_NEW + " TEXT)";
 
         public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
-        public static final String SQL_INSERT = "INSERT INTO " + TABLE_NAME + "  VALUES (?,?,?,?,?,?,?,?)";
+        public static final String SQL_INSERT = "INSERT INTO " + TABLE_NAME + "  VALUES (?,?,?,?,?,?,?,?, ?, ?, ?)";
         public static final String SQL_DELETE = "DELETE FROM " + TABLE_NAME;
         public static final String SQL_MARK_READ = "UPDATE " + TABLE_NAME + " SET " + COLUMN_IS_NEW + " = ?";
         public static final String SQL_DELETE_ONE = "DELETE FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + " = ?";

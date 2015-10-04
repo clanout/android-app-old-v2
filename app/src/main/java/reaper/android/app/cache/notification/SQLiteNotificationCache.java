@@ -69,9 +69,12 @@ public class SQLiteNotificationCache implements NotificationCache
                             statement.bindString(3, notification.getTitle());
                             statement.bindString(4, notification.getMessage());
                             statement.bindString(5, notification.getEventId());
-                            statement.bindLong(6, notification.getTimestamp().getMillis());
-                            statement.bindLong(7, notification.getTimestampReceived().getMillis());
-                            statement.bindString(8, String.valueOf(notification.isNew()));
+                            statement.bindString(6, notification.getEventName());
+                            statement.bindString(7, notification.getUserId());
+                            statement.bindString(8, notification.getUserName());
+                            statement.bindLong(9, notification.getTimestamp().getMillis());
+                            statement.bindLong(10, notification.getTimestampReceived().getMillis());
+                            statement.bindString(11, String.valueOf(notification.isNew()));
 
                             statement.execute();
                             statement.close();
@@ -106,6 +109,9 @@ public class SQLiteNotificationCache implements NotificationCache
                                 SQLiteCacheContract.Notification.COLUMN_TITLE,
                                 SQLiteCacheContract.Notification.COLUMN_MESSAGE,
                                 SQLiteCacheContract.Notification.COLUMN_EVENT_ID,
+                                SQLiteCacheContract.Notification.COLUMN_EVENT_NAME,
+                                SQLiteCacheContract.Notification.COLUMN_USER_ID,
+                                SQLiteCacheContract.Notification.COLUMN_USER_NAME,
                                 SQLiteCacheContract.Notification.COLUMN_TIMESTAMP,
                                 SQLiteCacheContract.Notification.COLUMN_IS_NEW
                         };
@@ -117,14 +123,17 @@ public class SQLiteNotificationCache implements NotificationCache
                         {
                             try
                             {
-                                Notification notification = new Notification.Builder(cursor
-                                        .getInt(0))
+                                Notification notification = new Notification
+                                        .Builder(cursor.getInt(0))
                                         .type(cursor.getInt(1))
                                         .title(cursor.getString(2))
                                         .message(cursor.getString(3))
                                         .eventId(cursor.getString(4))
-                                        .timestamp(new DateTime(cursor.getLong(5)))
-                                        .isNew(Boolean.parseBoolean(cursor.getString(6)))
+                                        .eventName(cursor.getString(5))
+                                        .userId(cursor.getString(6))
+                                        .userName(cursor.getString(7))
+                                        .timestamp(new DateTime(cursor.getLong(8)))
+                                        .isNew(Boolean.parseBoolean(cursor.getString(9)))
                                         .build();
 
                                 notifications.add(notification);
@@ -259,24 +268,27 @@ public class SQLiteNotificationCache implements NotificationCache
 
                             boolean isAvailable = false;
 
-                            SQLiteDatabase db = databaseManager.openConnection();;
+                            SQLiteDatabase db = databaseManager.openConnection();
+                            ;
 
-                            Cursor cursor = db.rawQuery(SQLiteCacheContract.Notification.SQL_COUNT_NEW, null);
-                            if(cursor.moveToFirst())
+                            Cursor cursor = db
+                                    .rawQuery(SQLiteCacheContract.Notification.SQL_COUNT_NEW, null);
+                            if (cursor.moveToFirst())
                             {
                                 do
                                 {
                                     try
                                     {
                                         int count = Integer.parseInt(cursor.getString(0));
-                                        if(count > 0)
+                                        if (count > 0)
                                         {
                                             isAvailable = true;
                                             break;
                                         }
                                     }
                                     catch (Exception e)
-                                    {}
+                                    {
+                                    }
                                 }
                                 while (cursor.moveToNext());
                             }
