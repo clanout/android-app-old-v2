@@ -148,13 +148,13 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     {
         refreshDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
-                .setColor(getResources().getColor(R.color.white))
+                .setColor(getResources().getColor(R.color.whity))
                 .setSizeDp(36)
                 .build();
 
         whatsappDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.WHATSAPP)
-                .setColor(getResources().getColor(R.color.white))
+                .setColor(getResources().getColor(R.color.whity))
                 .setSizeDp(24)
                 .build();
     }

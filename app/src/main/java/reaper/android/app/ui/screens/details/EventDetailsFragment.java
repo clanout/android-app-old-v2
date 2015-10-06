@@ -142,7 +142,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
     {
         pencilDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.PENCIL)
-                .setColor(getResources().getColor(R.color.white))
+                .setColor(getResources().getColor(R.color.whity))
                 .setSizeDp(36)
                 .build();
     }

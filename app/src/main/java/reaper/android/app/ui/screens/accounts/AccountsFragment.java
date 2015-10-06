@@ -115,7 +115,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
     private void generateDrawables() {
         homeDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.HOME)
-                .setColor(getResources().getColor(R.color.white))
+                .setColor(getResources().getColor(R.color.whity))
                 .setSizeDp(36)
                 .build();
 

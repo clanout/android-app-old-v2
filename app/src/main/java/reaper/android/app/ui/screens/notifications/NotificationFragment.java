@@ -251,13 +251,13 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
     {
         homeDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.HOME)
-                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
+                .setColor(ContextCompat.getColor(getActivity(), R.color.whity))
                 .setSizeDp(36)
                 .build();
 
         deleteDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.DELETE)
-                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
+                .setColor(ContextCompat.getColor(getActivity(), R.color.whity))
                 .setSizeDp(36)
                 .build();
     }

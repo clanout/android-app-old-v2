@@ -3,7 +3,7 @@
     <!-- Theme -->
     <color name="primary">#795a76</color>
     <color name="primary_dark">#4d394b</color>
-    <color name="primary_light">#FFFFFF</color>
+    <color name="white">#FFFFFF</color>
     <color name="accent">#29b9a0</color>
     <color name="accent_secondary">#EF9A9A</color>
 
@@ -12,11 +12,12 @@
     <color name="background_bar">#E0E0E0</color>
 
     <!-- Miscellaneous -->
-    <color name="white">#FFFFFF</color>
+    <color name="whity">#FFFFFF</color>
     <color name="divider">#FAFAFA</color>
     <color name="cyan">#0097A7</color>
     <color name="green">#4CAF50</color>
     <color name="yellow">#FFC107</color>
+    <color name="grey">#424242</color>
 
     <!-- App Intro Background -->
     <color name="purple_app_inro">#9C27B0</color>
@@ -29,15 +30,15 @@
     <color name="text_subtitle">#616161</color>
 
     <!-- Category Icons -->
-    <color name="general">#FF7043</color>
-    <color name="eat_out">#EF5350</color>
-    <color name="drinks">#AB47BC</color>
-    <color name="cafe">#8D6E63</color>
-    <color name="outdoors">#66BB6A</color>
-    <color name="movies">#78909C</color>
-    <color name="shopping">#EC407A</color>
-    <color name="sports">#D4E157</color>
-    <color name="all_nighter">#42A5F5</color>
+    <color name="one">#EF5350</color>
+    <color name="two">#FF7043</color>
+    <color name="three">#AB47BC</color>
+    <color name="four">#8D6E63</color>
+    <color name="five">#66BB6A</color>
+    <color name="six">#78909C</color>
+    <color name="seven">#EC407A</color>
+    <color name="eight">#D4E157</color>
+    <color name="nine">#42A5F5</color>
 
     <!-- RSVP colors -->
     <color name="going">#4CAF50</color>

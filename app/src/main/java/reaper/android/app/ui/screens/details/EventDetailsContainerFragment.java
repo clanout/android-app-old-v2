@@ -1,6 +1,5 @@
 package reaper.android.app.ui.screens.details;
 
-import android.app.FragmentTransaction;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -160,31 +159,31 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
     {
         goingDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
-                .setColor(getResources().getColor(R.color.white))
+                .setColor(getResources().getColor(R.color.whity))
                 .setSizeDp(24)
                 .build();
 
         maybeDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.HELP)
-                .setColor(getResources().getColor(R.color.white))
+                .setColor(getResources().getColor(R.color.whity))
                 .setSizeDp(24)
                 .build();
 
         notGoingDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.CLOSE)
-                .setColor(getResources().getColor(R.color.white))
+                .setColor(getResources().getColor(R.color.whity))
                 .setSizeDp(24)
                 .build();
 
         chatDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE)
-                .setColor(getResources().getColor(R.color.white))
+                .setColor(getResources().getColor(R.color.whity))
                 .setSizeDp(24)
                 .build();
 
         inviteDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_MULTIPLE_PLUS)
-                .setColor(getResources().getColor(R.color.white))
+                .setColor(getResources().getColor(R.color.whity))
                 .setSizeDp(24)
                 .build();
     }

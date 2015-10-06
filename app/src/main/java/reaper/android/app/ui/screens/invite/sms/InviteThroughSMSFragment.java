@@ -14,7 +14,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -35,23 +34,17 @@ import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
-import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
-import reaper.android.app.config.GoogleAnalyticsConstants;
-import reaper.android.app.model.Event;
-import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.PhoneContact;
 import reaper.android.app.model.PhoneContactComparator;
 import reaper.android.app.service.AccountsService;
-import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.AllPhoneContactsForSMSFetchedTrigger;
 import reaper.android.app.trigger.user.PhoneAddedTrigger;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.util.PhoneUtils;
-import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 /**
@@ -140,13 +133,13 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
         whatsappDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.WHATSAPP)
-                .setColor(getResources().getColor(R.color.white))
+                .setColor(getResources().getColor(R.color.whity))
                 .setSizeDp(24)
                 .build();
 
         phoneDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE_ANDROID)
-                .setColor(getResources().getColor(R.color.white))
+                .setColor(getResources().getColor(R.color.whity))
                 .setSizeDp(24)
                 .build();
     }

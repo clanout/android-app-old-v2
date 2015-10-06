@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
@@ -27,7 +28,7 @@ public class DrawableFactory
     private static Map<EventCategory, MaterialDrawableBuilder.IconValue> iconMapping;
     private static Map<EventCategory, Integer> colorMapping;
     private static List<Integer> colors = Arrays
-            .asList(R.color.drinks, R.color.all_nighter, R.color.general, R.color.outdoors, R.color.eat_out, R.color.cafe, R.color.shopping, R.color.sports);
+            .asList(R.color.three, R.color.nine, R.color.two, R.color.five, R.color.one, R.color.four, R.color.seven, R.color.eight);
 
     static
     {
@@ -47,15 +48,15 @@ public class DrawableFactory
     static
     {
         colorMapping = new HashMap<>();
-        colorMapping.put(EventCategory.GENERAL, R.color.general);
-        colorMapping.put(EventCategory.EAT_OUT, R.color.eat_out);
-        colorMapping.put(EventCategory.DRINKS, R.color.drinks);
-        colorMapping.put(EventCategory.CAFE, R.color.cafe);
-        colorMapping.put(EventCategory.MOVIES, R.color.movies);
-        colorMapping.put(EventCategory.OUTDOORS, R.color.outdoors);
-        colorMapping.put(EventCategory.INDOORS, R.color.all_nighter);
-        colorMapping.put(EventCategory.SPORTS, R.color.sports);
-        colorMapping.put(EventCategory.SHOPPING, R.color.shopping);
+        colorMapping.put(EventCategory.GENERAL, R.color.two);
+        colorMapping.put(EventCategory.EAT_OUT, R.color.one);
+        colorMapping.put(EventCategory.DRINKS, R.color.three);
+        colorMapping.put(EventCategory.CAFE, R.color.four);
+        colorMapping.put(EventCategory.MOVIES, R.color.six);
+        colorMapping.put(EventCategory.OUTDOORS, R.color.five);
+        colorMapping.put(EventCategory.INDOORS, R.color.nine);
+        colorMapping.put(EventCategory.SPORTS, R.color.eight);
+        colorMapping.put(EventCategory.SHOPPING, R.color.seven);
     }
 
 
@@ -75,8 +76,7 @@ public class DrawableFactory
         drawable.setCornerRadius(TypedValue
                 .applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornerRadius, context.getResources()
                                                                                   .getDisplayMetrics()));
-        drawable.setColor(Reaper.getReaperContext().getResources()
-                                .getColor(colorResource));
+        drawable.setColor(ContextCompat.getColor(Reaper.getReaperContext(), colorResource));
         return drawable;
     }
 
@@ -89,8 +89,7 @@ public class DrawableFactory
                 .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, Reaper.getReaperContext()
                                                                       .getResources()
                                                                       .getDisplayMetrics()));
-        drawable.setColor(Reaper.getReaperContext().getResources()
-                                .getColor(colors.get(random)));
+        drawable.setColor(Reaper.getReaperContext().getResources().getColor(colors.get(random)));
         return drawable;
     }
 }

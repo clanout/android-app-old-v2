@@ -679,7 +679,7 @@ public class NotificationService
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(Reaper.getReaperContext())
-                .setSmallIcon(R.mipmap.logo_ring)
+                .setSmallIcon(R.mipmap.logo1)
                 .setContentTitle(notification.getTitle())
                 .setContentText(notification.getMessage())
                 .setAutoCancel(true)

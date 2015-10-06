@@ -129,7 +129,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
         setHasOptionsMenu(true);
 
         swipeRefreshLayout.setOnRefreshListener(this);
-        swipeRefreshLayout.setColorSchemeResources(R.color.eat_out, R.color.accent, R.color.shopping, R.color.outdoors);
+        swipeRefreshLayout.setColorSchemeResources(R.color.one, R.color.accent, R.color.seven, R.color.five);
 
         initRecyclerView();
     }
@@ -496,7 +496,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
         menu.findItem(R.id.action_account).setIcon(MaterialDrawableBuilder.with(getActivity())
                                                                           .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
                                                                           .setColor(getResources()
-                                                                                  .getColor(R.color.white))
+                                                                                  .getColor(R.color.whity))
                                                                           .setSizeDp(36)
                                                                           .build());
 
@@ -517,7 +517,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
             menu.findItem(R.id.action_add_phone).setIcon(MaterialDrawableBuilder.with(getActivity())
                                                                                 .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE_ANDROID)
                                                                                 .setColor(getResources()
-                                                                                        .getColor(R.color.white))
+                                                                                        .getColor(R.color.whity))
                                                                                 .setSizeDp(36)
                                                                                 .build());
 
@@ -629,7 +629,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
         notification.setIcon(MaterialDrawableBuilder.with(getActivity())
                                                     .setIcon(MaterialDrawableBuilder.IconValue.BELL)
                                                     .setColor(getResources()
-                                                            .getColor(R.color.white))
+                                                            .getColor(R.color.whity))
                                                     .setSizeDp(36)
                                                     .build());
     }

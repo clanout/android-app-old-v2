@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
@@ -35,9 +36,11 @@ import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.CreateEventModel;
 import reaper.android.app.model.Event;
+import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.Location;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
@@ -46,6 +49,7 @@ import reaper.android.app.trigger.common.ViewPagerClickedTrigger;
 import reaper.android.app.trigger.event.EventCreatedTrigger;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
+import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.communicator.Communicator;
@@ -53,6 +57,8 @@ import rx.Subscription;
 import timber.log.Timber;
 
 public class CreateEventFragment extends BaseFragment {
+    private EventCategory eventCategory;
+
     public interface CreateEventCycleHandler {
         void addCycle(Subscription subscription);
     }
@@ -238,11 +244,13 @@ public class CreateEventFragment extends BaseFragment {
         location.setZone(zone);
 
         isCreateClicked = true;
-        eventService.createEvent(eventTitle, selectedType, createEventModel
-                .getCategory(), "", location, startTime, endTime);
 
-        // TODO : Create event
-        // TODO : Fragment transaction to invite screen
+        if(eventCategory == null)
+        {
+            eventCategory = createEventModel.getCategory();
+        }
+
+        eventService.createEvent(eventTitle, selectedType, eventCategory, "", location, startTime, endTime);
     }
 
     @Subscribe
@@ -487,12 +495,201 @@ public class CreateEventFragment extends BaseFragment {
 
     private void displayCategoryChangeDialog() {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
 
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
-        View dialogView = layoutInflater.inflate(R.layout.alert_dialog_change_category, null);
+        final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_change_category, null);
         builder.setView(dialogView);
+
+        final LinearLayout cafe = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_cafe);
+        final LinearLayout movies = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_movie);
+        final LinearLayout eatOut = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_eat_out);
+        final LinearLayout sports = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_sports);
+        final LinearLayout outdoors = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_outdoors);
+        final LinearLayout indoors = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_indoors);
+        final LinearLayout drinks = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_drinks);
+        final LinearLayout shopping = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_shopping);
+        final LinearLayout general = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_general);
+
+        cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+
+        cafe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
+                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+
+                eventCategory = EventCategory.CAFE;
+                icon.setImageDrawable(DrawableFactory.get(EventCategory.CAFE, Dimensions.CREATE_EVENT_ICON_SIZE));
+            }
+        });
+
+        movies.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
+                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+
+                eventCategory = EventCategory.MOVIES;
+                icon.setImageDrawable(DrawableFactory.get(EventCategory.MOVIES, Dimensions.CREATE_EVENT_ICON_SIZE));
+            }
+        });
+
+
+        eatOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
+                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+
+                eventCategory = EventCategory.EAT_OUT;
+                icon.setImageDrawable(DrawableFactory.get(EventCategory.EAT_OUT, Dimensions.CREATE_EVENT_ICON_SIZE));
+            }
+        });
+
+
+        sports.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
+                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+
+                eventCategory = EventCategory.SPORTS;
+                icon.setImageDrawable(DrawableFactory.get(EventCategory.SPORTS, Dimensions.CREATE_EVENT_ICON_SIZE));
+            }
+        });
+
+
+        outdoors.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
+                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+
+                eventCategory = EventCategory.OUTDOORS;
+                icon.setImageDrawable(DrawableFactory.get(EventCategory.OUTDOORS, Dimensions.CREATE_EVENT_ICON_SIZE));
+            }
+        });
+
+
+        indoors.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
+                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+
+                eventCategory = EventCategory.INDOORS;
+                icon.setImageDrawable(DrawableFactory.get(EventCategory.INDOORS, Dimensions.CREATE_EVENT_ICON_SIZE));
+            }
+        });
+
+
+        drinks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
+                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+
+                eventCategory = EventCategory.DRINKS;
+                icon.setImageDrawable(DrawableFactory.get(EventCategory.DRINKS, Dimensions.CREATE_EVENT_ICON_SIZE));
+            }
+        });
+
+
+        shopping.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
+                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+
+                eventCategory = EventCategory.SHOPPING;
+                icon.setImageDrawable(DrawableFactory.get(EventCategory.SHOPPING, Dimensions.CREATE_EVENT_ICON_SIZE));
+            }
+        });
+
+
+        general.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
+
+                eventCategory = EventCategory.GENERAL;
+                icon.setImageDrawable(DrawableFactory.get(EventCategory.GENERAL, Dimensions.CREATE_EVENT_ICON_SIZE));
+            }
+        });
 
         builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
             @Override

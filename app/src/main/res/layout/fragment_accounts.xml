@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/primary_light">
+    android:background="@color/white">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -48,7 +48,7 @@
                 android:layout_marginTop="75dp"
                 android:src="@drawable/ic_btn_rsvp_going"
                 app:border="true"
-                app:border_color="@color/white"
+                app:border_color="@color/whity"
                 app:border_width="4dp" />
 
             <TextView
@@ -58,7 +58,7 @@
                 android:layout_below="@+id/iv_account_fragment_user_profile_pic"
                 android:layout_centerInParent="true"
                 android:layout_marginTop="4dp"
-                android:textColor="@color/white"
+                android:textColor="@color/whity"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
@@ -72,5 +72,5 @@
         android:layout_height="0dp"
         android:paddingTop="8dp"
         android:layout_weight="1"
-        android:background="@color/primary_light"></android.support.v7.widget.RecyclerView>
+        android:background="@color/white"></android.support.v7.widget.RecyclerView>
 </LinearLayout>

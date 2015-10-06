@@ -44,19 +44,19 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     {
         chatDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE_TEXT)
-                .setColor(ContextCompat.getColor(context, R.color.accent))
+                .setColor(ContextCompat.getColor(context, R.color.grey))
                 .setSizeDp(36)
                 .build();
 
         personDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
-                .setColor(Color.BLACK)
+                .setColor(ContextCompat.getColor(context, R.color.grey))
                 .setSizeDp(36)
                 .build();
 
         rsvpDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_MULTIPLE_PLUS)
-                .setColor(Color.BLACK)
+                .setColor(ContextCompat.getColor(context, R.color.grey))
                 .setSizeDp(36)
                 .build();
     }

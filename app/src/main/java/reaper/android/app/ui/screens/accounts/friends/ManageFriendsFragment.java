@@ -7,11 +7,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,7 +28,6 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
@@ -55,7 +52,6 @@ import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
-import timber.log.Timber;
 
 public class ManageFriendsFragment extends BaseFragment implements BlockListCommunicator, View.OnClickListener {
     private RecyclerView recyclerView;
@@ -128,13 +124,13 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     private void generateDrawable() {
         refreshDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
-                .setColor(getResources().getColor(R.color.white))
+                .setColor(getResources().getColor(R.color.whity))
                 .setSizeDp(36)
                 .build();
 
         checkDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
-                .setColor(getResources().getColor(R.color.white))
+                .setColor(getResources().getColor(R.color.whity))
                 .setSizeDp(24)
                 .build();
     }

@@ -7,274 +7,336 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:orientation="vertical">
 
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/ll_dialog_fragment_create_event_cafe"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
                 android:layout_weight="1"
-                android:gravity="center_horizontal"
-                android:orientation="vertical"
-                android:background="@color/accent">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <net.steamcrafted.materialiconlib.MaterialIconView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/miv_cafe"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="center"
-                    app:materialIcon="coffee"
-                    app:materialIconColor="@color/white"
-                    app:materialIconSize="48dp" />
+                <LinearLayout
+                    android:id="@+id/ll_dialog_fragment_create_event_cafe"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:orientation="vertical">
+
+                    <net.steamcrafted.materialiconlib.MaterialIconView xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/miv_cafe"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:scaleType="center"
+                        app:materialIcon="coffee"
+                        app:materialIconColor="@color/whity"
+                        app:materialIconSize="36dp" />
+
+                </LinearLayout>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="Cafe"
                     android:layout_marginTop="4dp"
-                    android:text="Cafe" />
+                    android:gravity="center_vertical|center_horizontal" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/ll_dialog_fragment_create_event_movie"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
                 android:layout_weight="1"
-                android:gravity="center_horizontal"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <net.steamcrafted.materialiconlib.MaterialIconView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/miv_movie"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="center"
-                    app:materialIcon="theater"
-                    app:materialIconColor="@color/white"
-                    app:materialIconSize="48dp" />
+                <LinearLayout
+                    android:id="@+id/ll_dialog_fragment_create_event_movie"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:orientation="vertical">
+
+                    <net.steamcrafted.materialiconlib.MaterialIconView xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/miv_movie"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:scaleType="center"
+                        app:materialIcon="movie"
+                        app:materialIconColor="@color/whity"
+                        app:materialIconSize="36dp" />
+
+                </LinearLayout>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="Movie"
                     android:layout_marginTop="4dp"
-                    android:text="Movie" />
+                    android:gravity="center_vertical|center_horizontal" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/ll_dialog_fragment_create_event_shopping"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
                 android:layout_weight="1"
-                android:gravity="center_horizontal"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <net.steamcrafted.materialiconlib.MaterialIconView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/miv_shopping"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="center"
-                    app:materialIcon="shopping"
-                    app:materialIconColor="@color/white"
-                    app:materialIconSize="48dp" />
+                <LinearLayout
+                    android:id="@+id/ll_dialog_fragment_create_event_shopping"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:orientation="vertical">
+
+                    <net.steamcrafted.materialiconlib.MaterialIconView xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/miv_shopping"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:scaleType="center"
+                        app:materialIcon="shopping"
+                        app:materialIconColor="@color/whity"
+                        app:materialIconSize="36dp" />
+
+                </LinearLayout>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Shopping"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical|center_horizontal" />
             </LinearLayout>
-
-
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
 
-
             <LinearLayout
-                android:id="@+id/ll_dialog_fragment_create_event_sports"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
                 android:layout_weight="1"
-                android:gravity="center_horizontal"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <net.steamcrafted.materialiconlib.MaterialIconView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/miv_sports"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="center"
-                    app:materialIcon="tennis"
-                    app:materialIconColor="@color/white"
-                    app:materialIconSize="48dp" />
+                <LinearLayout
+                    android:id="@+id/ll_dialog_fragment_create_event_sports"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:orientation="vertical">
+
+                    <net.steamcrafted.materialiconlib.MaterialIconView xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/miv_sports"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:scaleType="center"
+                        app:materialIcon="tennis"
+                        app:materialIconColor="@color/whity"
+                        app:materialIconSize="36dp" />
+
+                </LinearLayout>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Sports"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical|center_horizontal" />
             </LinearLayout>
 
-
             <LinearLayout
-                android:id="@+id/ll_dialog_fragment_create_event_eat_out"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
                 android:layout_weight="1"
-                android:gravity="center_horizontal"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <net.steamcrafted.materialiconlib.MaterialIconView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/miv_eat_out"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="center"
-                    app:materialIcon="food"
-                    app:materialIconColor="@color/white"
-                    app:materialIconSize="48dp" />
+                <LinearLayout
+                    android:id="@+id/ll_dialog_fragment_create_event_eat_out"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:orientation="vertical">
+
+                    <net.steamcrafted.materialiconlib.MaterialIconView xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/miv_eat_out"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:scaleType="center"
+                        app:materialIcon="food"
+                        app:materialIconColor="@color/whity"
+                        app:materialIconSize="36dp" />
+
+                </LinearLayout>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Eat Out"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical|center_horizontal" />
             </LinearLayout>
 
-
             <LinearLayout
-                android:id="@+id/ll_dialog_fragment_create_event_indoors"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
                 android:layout_weight="1"
-                android:gravity="center_horizontal"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <net.steamcrafted.materialiconlib.MaterialIconView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/miv_all_nighter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="center"
-                    app:materialIcon="xbox_controller"
-                    app:materialIconColor="@color/white"
-                    app:materialIconSize="48dp" />
+                <LinearLayout
+                    android:id="@+id/ll_dialog_fragment_create_event_indoors"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:orientation="vertical">
+
+                    <net.steamcrafted.materialiconlib.MaterialIconView xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/miv_indoors"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:scaleType="center"
+                        app:materialIcon="xbox_controller"
+                        app:materialIconColor="@color/whity"
+                        app:materialIconSize="36dp" />
+
+                </LinearLayout>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Indoors"
                     android:layout_marginTop="4dp"
-                    />
+                    android:gravity="center_vertical|center_horizontal" />
             </LinearLayout>
         </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:gravity="center_horizontal"
-            android:orientation="horizontal">
-
+            android:orientation="horizontal"
+            >
 
             <LinearLayout
-                android:id="@+id/ll_dialog_fragment_create_event_drinks"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
                 android:layout_weight="1"
-                android:gravity="center_horizontal"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <net.steamcrafted.materialiconlib.MaterialIconView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/miv_drinks"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="center"
-                    app:materialIcon="martini"
-                    app:materialIconColor="@color/white"
-                    app:materialIconSize="48dp" />
+                <LinearLayout
+                    android:id="@+id/ll_dialog_fragment_create_event_drinks"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:orientation="vertical">
+
+                    <net.steamcrafted.materialiconlib.MaterialIconView xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/miv_drinks"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:scaleType="center"
+                        app:materialIcon="martini"
+                        app:materialIconColor="@color/whity"
+                        app:materialIconSize="36dp" />
+
+                </LinearLayout>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Drinks"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical|center_horizontal" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/ll_dialog_fragment_create_event_outdoors"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
                 android:layout_weight="1"
-                android:gravity="center_horizontal"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <net.steamcrafted.materialiconlib.MaterialIconView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/miv_outdoors"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="center"
-                    app:materialIcon="bike"
-                    app:materialIconColor="@color/white"
-                    app:materialIconSize="48dp" />
+                <LinearLayout
+                    android:id="@+id/ll_dialog_fragment_create_event_outdoors"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:orientation="vertical">
+
+                    <net.steamcrafted.materialiconlib.MaterialIconView xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/miv_outdoors"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:scaleType="center"
+                        app:materialIcon="bike"
+                        app:materialIconColor="@color/whity"
+                        app:materialIconSize="36dp" />
+
+                </LinearLayout>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Outdoors"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical|center_horizontal" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/ll_dialog_fragment_create_event_general"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
                 android:layout_weight="1"
-                android:gravity="center_horizontal"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <net.steamcrafted.materialiconlib.MaterialIconView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/miv_general"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="center"
-                    app:materialIcon="calendar"
-                    app:materialIconColor="@color/white"
-                    app:materialIconSize="48dp" />
+                <LinearLayout
+                    android:id="@+id/ll_dialog_fragment_create_event_general"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:orientation="vertical">
+
+                    <net.steamcrafted.materialiconlib.MaterialIconView xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/miv_general"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:scaleType="center"
+                        app:materialIcon="bulletin_board"
+                        app:materialIconColor="@color/whity"
+                        app:materialIconSize="36dp" />
+
+                </LinearLayout>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="General"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical|center_horizontal" />
             </LinearLayout>
-
         </LinearLayout>
+
 
     </LinearLayout>
 

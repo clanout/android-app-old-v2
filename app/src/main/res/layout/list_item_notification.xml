@@ -8,7 +8,7 @@
     android:layout_marginRight="16dp"
     android:layout_marginTop="8dp"
     android:orientation="horizontal"
-    android:background="@color/primary_light">
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -18,8 +18,8 @@
 
         <com.pkmmte.view.CircularImageView
             android:id="@+id/iv_list_item_notifiactions"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             app:border='false' />
 
     </LinearLayout>
