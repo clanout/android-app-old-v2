@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +34,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import reaper.android.R;
@@ -40,6 +43,7 @@ import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
+import reaper.android.app.model.EventAttendeeComparator;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.service.EventService;
@@ -50,6 +54,7 @@ import reaper.android.app.trigger.event.EventDetailsFetchedFromNetworkTrigger;
 import reaper.android.app.trigger.event.EventRsvpNotChangedTrigger;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.edit.EditEventFragment;
+import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.event.EventUtils;
 import reaper.android.app.ui.util.event.EventUtilsConstants;
@@ -72,6 +77,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
     // UI Elements
     private MaterialIconView icon;
+    private LinearLayout iconContainer;
     private TextView title, type, description, location, dateTime;
     private RecyclerView attendeeList;
     private TextView noAttendeeMessage, refreshDetailsTextView;
@@ -81,6 +87,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
     private EventAttendeesAdapter eventAttendeesAdapter;
 
     private boolean areEventDetailsFetched;
+    private List<EventDetails.Attendee> attendees;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -104,6 +111,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
         noAttendeeMessage = (TextView) view.findViewById(R.id.tv_event_details_no_attendees);
         refreshDetailsProgressBar = (ProgressBar) view.findViewById(R.id.pb_event_details_refresh_details);
         refreshDetailsTextView = (TextView) view.findViewById(R.id.tv_event_details_refresh_details);
+        iconContainer = (LinearLayout) view.findViewById(R.id.ll_event_details_icon_container);
 
         return view;
     }
@@ -142,7 +150,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
     {
         pencilDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.PENCIL)
-                .setColor(getResources().getColor(R.color.whity))
+                .setColor(ContextCompat.getColor(getActivity(), R.color.whity))
                 .setSizeDp(36)
                 .build();
     }
@@ -273,6 +281,8 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
             eventDetails.getAttendees().add(attendee);
         }
 
+        attendees = eventDetails.getAttendees();
+        Collections.sort(attendees, new EventAttendeeComparator(userService.getActiveUserId()));
         eventAttendeesAdapter = new EventAttendeesAdapter(eventDetails.getAttendees(), getActivity());
         eventAttendeesAdapter.setAttendeeClickCommunicator(this);
         attendeeList.setAdapter(eventAttendeesAdapter);
@@ -326,6 +336,8 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
             default:
                 icon.setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD);
         }
+
+        iconContainer.setBackground(DrawableFactory.randomIconBackground());
 
         title.setText(event.getTitle());
 

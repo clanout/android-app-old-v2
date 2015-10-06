@@ -43,8 +43,7 @@ import reaper.android.app.ui.util.event.EventUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class EventDetailsContainerFragment extends BaseFragment implements View.OnClickListener
-{
+public class EventDetailsContainerFragment extends BaseFragment implements View.OnClickListener {
     private android.app.FragmentManager fragmentManager;
     private Bus bus;
 
@@ -67,15 +66,13 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
     private PagerAdapter pagerAdapter;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_details_container, container, false);
 
         viewPager = (ViewPager) view.findViewById(R.id.vp_event_details_container);
@@ -88,27 +85,23 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState)
-    {
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (savedInstanceState != null)
-        {
+        if (savedInstanceState != null) {
             events = (List<Event>) savedInstanceState.get(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
             activePosition = savedInstanceState.getInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION);
-        } else
-        {
+        } else {
             Bundle bundle = getArguments();
             events = (List<Event>) bundle.get(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
             activePosition = bundle.getInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION);
         }
 
-        if (events == null)
-        {
+        if (events == null) {
             throw new IllegalStateException("Event cannot be null while creating EventDetailsFragment instance");
         }
 
-        ((MainActivity)getActivity()).setSupportActionBar(toolbar);
+        ((MainActivity) getActivity()).setSupportActionBar(toolbar);
 
         bus = Communicator.getInstance().getBus();
         fragmentManager = getActivity().getFragmentManager();
@@ -123,27 +116,23 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
 
         pagerAdapter = new EventDetailsPagerAdapter(getChildFragmentManager(), events);
         viewPager.setAdapter(pagerAdapter);
-        viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
         viewPager.setCurrentItem(activePosition);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
-        {
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int i, float v, int i2)
-            {
+            public void onPageScrolled(int i, float v, int i2) {
 
             }
 
             @Override
-            public void onPageSelected(int i)
-            {
+            public void onPageSelected(int i) {
                 activePosition = i;
-                ((MainActivity)getActivity()).getSupportActionBar().setTitle(events.get(activePosition).getCategory());
+
+                setActionBarTitle();
                 renderRsvpButton(events.get(activePosition).getRsvp());
             }
 
             @Override
-            public void onPageScrollStateChanged(int i)
-            {
+            public void onPageScrollStateChanged(int i) {
 
             }
         });
@@ -155,8 +144,7 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
         renderRsvpButton(events.get(activePosition).getRsvp());
     }
 
-    private void generateDrawables()
-    {
+    private void generateDrawables() {
         goingDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
                 .setColor(getResources().getColor(R.color.whity))
@@ -189,47 +177,72 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EVENT_DETAILS_CONTAINER_FRAGMENT);
 
-        ((MainActivity)getActivity()).getSupportActionBar().setTitle(events.get(activePosition).getCategory());
-
+        setActionBarTitle();
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EVENT_DETAILS_CONTAINER);
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState)
+    private void setActionBarTitle()
     {
+        switch (events.get(activePosition).getCategory()) {
+            case "CAFE":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Cafe");
+                break;
+            case "MOVIES":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Movie");
+                break;
+            case "SHOPPING":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Shopping");
+                break;
+            case "SPORTS":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Sports");
+                break;
+            case "INDOORS":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Indoors");
+                break;
+            case "EAT_OUT":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Eat Out");
+                break;
+            case "DRINKS":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Drinks");
+                break;
+            case "OUTDOORS":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Outdoors");
+                break;
+            case "GENERAL":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("General");
+                break;
+        }
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, (ArrayList<Event>) events);
         outState.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
     }
 
     @Override
-    public void onClick(View view)
-    {
-        if (view.getId() == R.id.ibtn_event_details_rsvp)
-        {
-            if(events.get(activePosition).getOrganizerId().equals(userService.getActiveUserId())){
+    public void onClick(View view) {
+        if (view.getId() == R.id.ibtn_event_details_rsvp) {
+            if (events.get(activePosition).getOrganizerId().equals(userService.getActiveUserId())) {
 
                 Snackbar.make(getView(), R.string.cannot_change_rsvp, Snackbar.LENGTH_LONG).show();
 
-            }else
-            {
+            } else {
                 PopupMenu rsvpMenu = new PopupMenu(getActivity(), rsvp);
                 rsvpMenu.getMenuInflater().inflate(R.menu.popup_rsvp, rsvpMenu.getMenu());
 
-                rsvpMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
-                {
+                rsvpMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
-                    public boolean onMenuItemClick(MenuItem menuItem)
-                    {
+                    public boolean onMenuItemClick(MenuItem menuItem) {
                         int menuItemId = menuItem.getItemId();
-                        switch (menuItemId)
-                        {
+                        switch (menuItemId) {
                             case R.id.menu_rsvp_yes:
                                 bus.post(new ChangeAttendeeListTrigger(Event.RSVP.YES, events.get(activePosition).getId()));
                                 updateRsvp(Event.RSVP.YES);
@@ -251,24 +264,19 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
 
                 rsvpMenu.show();
             }
-        } else if (view.getId() == R.id.ibtn_event_details_invite)
-        {
-            if (EventUtils.canInviteFriends(events.get(activePosition)))
-            {
+        } else if (view.getId() == R.id.ibtn_event_details_invite) {
+            if (EventUtils.canInviteFriends(events.get(activePosition))) {
                 InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT, events.get(activePosition));
                 bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, false);
                 inviteUsersContainerFragment.setArguments(bundle);
                 FragmentUtils.changeFragment(fragmentManager, inviteUsersContainerFragment);
-            } else
-            {
+            } else {
                 Snackbar.make(getView(), R.string.cannot_invite, Snackbar.LENGTH_LONG).show();
             }
-        } else if (view.getId() == R.id.ibtn_event_details_chat)
-        {
-            if (EventUtils.canViewChat(events.get(activePosition)))
-            {
+        } else if (view.getId() == R.id.ibtn_event_details_chat) {
+            if (EventUtils.canViewChat(events.get(activePosition))) {
                 ChatFragment chatFragment = new ChatFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_ID, events.get(activePosition).getId());
@@ -276,15 +284,13 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
                 chatFragment.setArguments(bundle);
                 FragmentUtils.changeFragment(fragmentManager, chatFragment);
 
-            } else
-            {
+            } else {
                 Snackbar.make(getView(), R.string.cannot_chat, Snackbar.LENGTH_LONG).show();
             }
         }
     }
 
-    private void updateRsvp(Event.RSVP newRsvp)
-    {
+    private void updateRsvp(Event.RSVP newRsvp) {
         renderRsvpButton(newRsvp);
 
         Event.RSVP oldRsvp = events.get(activePosition).getRsvp();
@@ -294,10 +300,8 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
 
     }
 
-    private void renderRsvpButton(Event.RSVP rsvpStatus)
-    {
-        switch (rsvpStatus)
-        {
+    private void renderRsvpButton(Event.RSVP rsvpStatus) {
+        switch (rsvpStatus) {
             case YES:
                 rsvp.setImageDrawable(goingDrawable);
                 break;
@@ -313,10 +317,8 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
     }
 
     @Subscribe
-    public void onRsvpNotChanged(EventRsvpNotChangedTrigger trigger)
-    {
-        if (trigger.getEventId().equals(events.get(activePosition).getId()))
-        {
+    public void onRsvpNotChanged(EventRsvpNotChangedTrigger trigger) {
+        if (trigger.getEventId().equals(events.get(activePosition).getId())) {
             events.get(activePosition).setRsvp(trigger.getOldRsvp());
             Snackbar.make(getView(), R.string.message_rsvp_update_failure, Snackbar.LENGTH_LONG).show();
         }

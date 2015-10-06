@@ -74,6 +74,8 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
 
     private GenericCache genericCache;
 
+    // TODO save selected friends onResume -- invite fragments also
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

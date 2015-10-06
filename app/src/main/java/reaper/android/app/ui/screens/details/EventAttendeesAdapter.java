@@ -3,6 +3,7 @@ package reaper.android.app.ui.screens.details;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.pkmmte.view.CircularImageView;
 import com.squareup.picasso.Picasso;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
@@ -19,6 +21,7 @@ import java.util.List;
 import reaper.android.R;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.model.EventDetails;
+import reaper.android.app.root.Reaper;
 
 public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAdapter.EventDetailsViewHolder>
 {
@@ -40,25 +43,25 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
     {
         goingDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
-                .setColor(context.getResources().getColor(R.color.green))
-                .setSizeDp(18)
+                .setColor(ContextCompat.getColor(context, R.color.going))
+                .setSizeDp(24)
                 .build();
 
         maybeDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.HELP)
-                .setColor(context.getResources().getColor(R.color.yellow))
-                .setSizeDp(18)
+                .setColor(ContextCompat.getColor(context, R.color.may_be))
+                .setSizeDp(24)
                 .build();
 
         invitedDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.EMAIL)
-                .setColor(context.getResources().getColor(R.color.primary))
-                .setSizeDp(18)
+                .setColor(ContextCompat.getColor(context, R.color.primary))
+                .setSizeDp(24)
                 .build();
 
         personDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
-                .setColor(Color.BLACK)
+                .setColor(ContextCompat.getColor(context, R.color.black))
                 .setSizeDp(24)
                 .build();
     }
@@ -92,14 +95,15 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
 
     public class EventDetailsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
-        private ImageView pic, inviter, rsvp;
+        private ImageView inviter, rsvp;
+        private CircularImageView pic;
         private TextView name;
 
         public EventDetailsViewHolder(View itemView)
         {
             super(itemView);
 
-            pic = (ImageView) itemView.findViewById(R.id.iv_event_attendee_pic);
+            pic = (CircularImageView) itemView.findViewById(R.id.iv_event_attendee_pic);
             inviter = (ImageView) itemView.findViewById(R.id.iv_event_attendee_inviter);
             rsvp = (ImageView) itemView.findViewById(R.id.iv_event_attendee_rsvp);
             name = (TextView) itemView.findViewById(R.id.tv_event_attendee_name);

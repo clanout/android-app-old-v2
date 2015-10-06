@@ -48,21 +48,22 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:id="@+id/ll_event_details_icon_container"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:layout_marginRight="16dp"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical|center_horizontal">
 
                 <net.steamcrafted.materialiconlib.MaterialIconView
                     android:id="@+id/miv_event_details_icon"
                     xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:scaleType="center"
                     app:materialIcon="bulletin_board"
-                    app:materialIconColor="@color/cyan"
+                    app:materialIconColor="@color/whity"
                     app:materialIconSize="48dp"
-                    />
+                    android:layout_gravity="center" />
 
             </LinearLayout>
         </LinearLayout>
@@ -70,7 +71,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/divider"/>
+            android:background="@color/divider_light"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -100,14 +101,15 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:maxLines="1"
-                android:textSize="14sp"/>
+                android:textSize="14sp"
+                android:textColor="@color/text_subtitle"/>
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="56dp"
-            android:background="@color/divider"/>
+            android:background="@color/divider_light"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -137,14 +139,15 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:maxLines="1"
-                android:textSize="14sp"/>
+                android:textSize="14sp"
+                android:textColor="@color/text_subtitle"/>
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="56dp"
-            android:background="@color/divider"/>
+            android:background="@color/divider_light"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -175,7 +178,8 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:maxLines="3"
-                android:textSize="14sp"/>
+                android:textSize="14sp"
+                android:textColor="@color/text_subtitle"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -199,6 +203,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textSize="8dp"
+            android:textColor="@color/text_subtitle"
             />
 
     </LinearLayout>
@@ -218,6 +223,7 @@
             android:id="@+id/tv_event_details_no_attendees"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center_vertical|center_horizontal"/>
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="@color/text_title"/>
     </LinearLayout>
 </LinearLayout>

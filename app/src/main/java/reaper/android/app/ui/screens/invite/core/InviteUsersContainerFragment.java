@@ -40,7 +40,6 @@ import reaper.android.app.trigger.user.ManageSMSInviteeTrigger;
 import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
-import reaper.android.app.ui.screens.details.ZoomOutPageTransformer;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
@@ -126,7 +125,6 @@ public class InviteUsersContainerFragment extends BaseFragment implements TabLay
         InviteUsersPagerAdapter inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), new ArrayList<EventDetails.Invitee>(), new ArrayList<EventDetails.Attendee>(), event);
         viewPager.setAdapter(inviteUsersPagerAdapter);
         viewPager.setOffscreenPageLimit(2);
-        viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
         tabLayout.post(new Runnable() {
             @Override
