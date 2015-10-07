@@ -27,13 +27,13 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.pkmmte.view.CircularImageView;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
@@ -58,7 +58,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
     //    private TextView userName;
     private RecyclerView recyclerView;
     private ImageView userPic;
-    private CircularImageView userProfilePic;
+    private CircleImageView userProfilePic;
     private Drawable homeDrawable, personDrawable;
     private Toolbar toolbar;
     private TextView userName;
@@ -84,7 +84,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         View view = inflater.inflate(R.layout.fragment_accounts, container, false);
 //        userName = (TextView) view.findViewById(R.id.tv_account_fragment_user_name);
         userPic = (ImageView) view.findViewById(R.id.iv_account_fragment_user_pic);
-        userProfilePic = (CircularImageView) view.findViewById(R.id.iv_account_fragment_user_profile_pic);
+        userProfilePic = (CircleImageView) view.findViewById(R.id.iv_account_fragment_user_profile_pic);
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_accounts_fragment);
         toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_accounts);
         userName = (TextView) view.findViewById(R.id.tv_account_fragment_user_name);
@@ -144,6 +144,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                     .placeholder(personDrawable)
                     .fit()
                     .centerCrop()
+                    .noFade()
                     .into(userPic);
 
         } else {
@@ -155,6 +156,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                 .placeholder(personDrawable)
                 .fit()
                 .centerCrop()
+                .noFade()
                 .into(userProfilePic);
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.ACCOUNTS);
@@ -334,6 +336,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                 .placeholder(personDrawable)
                 .fit()
                 .centerCrop()
+                .noFade()
                 .into(userPic);
     }
 }

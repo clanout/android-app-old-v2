@@ -1,45 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:layout_margin="12dp">
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:layout_marginBottom="4dp"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginTop="4dp"
+    android:background="@color/white"
+    android:orientation="horizontal">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginRight="12dp"
+        android:layout_marginRight="16dp"
         android:gravity="center_vertical|center_horizontal">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/iv_list_item_invite_friends_user_pic"/>
+        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/iv_list_item_invite_friends_user_pic"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:civ_border_width="0dp" />
 
     </LinearLayout>
 
     <TextView
+        android:id="@+id/tv_list_item_invite_friends_user_name"
         android:layout_width="0dp"
-        android:layout_weight="1"
         android:layout_height="match_parent"
-        android:textStyle="normal"
-        android:textSize="16sp"
+        android:layout_weight="1"
         android:gravity="center_vertical"
-        android:text="Harsh Pokharna"
-        android:id="@+id/tv_list_item_invite_friends_user_name"/>
+        android:textSize="16sp"
+        android:textStyle="normal"
+        android:textColor="@color/text_subtitle"/>
 
     <CheckBox
+        android:id="@+id/cb_list_item_invite_friends"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:id="@+id/cb_list_item_invite_friends"
-        android:gravity="center_vertical|center_horizontal"/>
+        android:gravity="center_vertical|center_horizontal" />
 
     <TextView
+        android:id="@+id/tv_list_item_invite_friends_already_invited"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:id="@+id/tv_list_item_invite_friends_already_invited"
-        android:text="Already Invited"
+        android:gravity="center_vertical|center_horizontal"
         android:textSize="12sp"
-        android:gravity="center_vertical|center_horizontal"/>
+        android:textColor="@color/text_subtitle"/>
 
 </LinearLayout>

@@ -12,7 +12,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.pkmmte.view.CircularImageView;
 import com.squareup.picasso.Picasso;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
@@ -20,6 +19,7 @@ import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import reaper.android.R;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.GoogleAnalyticsConstants;
@@ -83,6 +83,7 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
                 .placeholder(personDrawable)
                 .fit()
                 .centerInside()
+                .noFade()
                 .into(holder.userPic);
 
         holder.username.setText(current.getName());
@@ -102,7 +103,7 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
 
     class ManageFriendsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        CircularImageView userPic;
+        CircleImageView userPic;
         TextView username;
         ImageView blockIcon;
 
@@ -110,7 +111,7 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
             super(itemView);
 
             username = (TextView) itemView.findViewById(R.id.tv_list_item_manage_friends_user_name);
-            userPic = (CircularImageView) itemView.findViewById(R.id.iv_list_item_manage_friends_user_pic);
+            userPic = (CircleImageView) itemView.findViewById(R.id.iv_list_item_manage_friends_user_pic);
             blockIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_manage_friends_block);
 
             blockIcon.setOnClickListener(this);

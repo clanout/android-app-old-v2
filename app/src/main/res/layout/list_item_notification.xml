@@ -7,8 +7,8 @@
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     android:layout_marginTop="4dp"
-    android:orientation="horizontal"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:orientation="horizontal">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -16,11 +16,11 @@
         android:layout_marginRight="16dp"
         android:gravity="center_vertical|center_horizontal">
 
-        <com.pkmmte.view.CircularImageView
+        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/iv_list_item_notifiactions"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            app:border='false' />
+            app:civ_border_width="0dp" />
 
     </LinearLayout>
 
@@ -45,7 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
             android:layout_marginTop="16dp"
-            android:background="@color/divider"/>
+            android:background="@color/divider" />
 
     </LinearLayout>
 </LinearLayout>

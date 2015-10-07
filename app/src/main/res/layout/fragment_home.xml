@@ -53,7 +53,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/home_no_events"/>
+                    android:text="@string/home_no_events"
+                    android:textColor="@color/text_title"
+                    android:textSize="14sp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -66,7 +68,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/home_events_fetch_error"/>
+                    android:text="@string/home_events_fetch_error"
+                    android:textColor="@color/text_title"
+                    android:textSize="14sp"/>
             </LinearLayout>
 
             <LinearLayout

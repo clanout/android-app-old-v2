@@ -6,20 +6,22 @@
     android:layout_margin="12dp">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:textStyle="normal"
         android:textSize="16sp"
+        android:textColor="@color/text_subtitle"
         android:gravity="center_vertical"
         android:layout_marginRight="16dp"
         android:id="@+id/tv_list_item_invite_through_sms_user_name"/>
 
     <TextView
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_weight="1"
         android:id="@+id/tv_list_item_invite_through_sms_phone_number"
-        android:textSize="16sp"
+        android:textSize="12sp"
+        android:textColor="@color/text_subtitle"
         android:gravity="center_vertical|center_horizontal"/>
 
     <CheckBox

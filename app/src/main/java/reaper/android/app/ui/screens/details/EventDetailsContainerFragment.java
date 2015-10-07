@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
@@ -11,7 +12,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 
 import com.squareup.otto.Bus;
@@ -59,7 +62,7 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
 
     // UI Elements
     private ViewPager viewPager;
-    private ImageButton rsvp, invite, chat;
+    private Button rsvp, invite, chat;
     private Drawable goingDrawable, maybeDrawable, notGoingDrawable, inviteDrawable, chatDrawable;
     private Toolbar toolbar;
 
@@ -76,9 +79,9 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
         View view = inflater.inflate(R.layout.fragment_event_details_container, container, false);
 
         viewPager = (ViewPager) view.findViewById(R.id.vp_event_details_container);
-        rsvp = (ImageButton) view.findViewById(R.id.ibtn_event_details_rsvp);
-        invite = (ImageButton) view.findViewById(R.id.ibtn_event_details_invite);
-        chat = (ImageButton) view.findViewById(R.id.ibtn_event_details_chat);
+        rsvp = (Button) view.findViewById(R.id.btn_event_details_rsvp);
+        invite = (Button) view.findViewById(R.id.btn_event_details_invite);
+        chat = (Button) view.findViewById(R.id.btn_event_details_chat);
         toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_event_details_container);
 
         return view;
@@ -111,8 +114,8 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
 
         generateDrawables();
 
-        chat.setImageDrawable(chatDrawable);
-        invite.setImageDrawable(inviteDrawable);
+        chat.setText("Chat");
+        invite.setText("Invite");
 
         pagerAdapter = new EventDetailsPagerAdapter(getChildFragmentManager(), events);
         viewPager.setAdapter(pagerAdapter);
@@ -229,7 +232,7 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.ibtn_event_details_rsvp) {
+        if (view.getId() == R.id.btn_event_details_rsvp) {
             if (events.get(activePosition).getOrganizerId().equals(userService.getActiveUserId())) {
 
                 Snackbar.make(getView(), R.string.cannot_change_rsvp, Snackbar.LENGTH_LONG).show();
@@ -264,7 +267,7 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
 
                 rsvpMenu.show();
             }
-        } else if (view.getId() == R.id.ibtn_event_details_invite) {
+        } else if (view.getId() == R.id.btn_event_details_invite) {
             if (EventUtils.canInviteFriends(events.get(activePosition))) {
                 InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
                 Bundle bundle = new Bundle();
@@ -275,7 +278,7 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
             } else {
                 Snackbar.make(getView(), R.string.cannot_invite, Snackbar.LENGTH_LONG).show();
             }
-        } else if (view.getId() == R.id.ibtn_event_details_chat) {
+        } else if (view.getId() == R.id.btn_event_details_chat) {
             if (EventUtils.canViewChat(events.get(activePosition))) {
                 ChatFragment chatFragment = new ChatFragment();
                 Bundle bundle = new Bundle();
@@ -303,13 +306,13 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
     private void renderRsvpButton(Event.RSVP rsvpStatus) {
         switch (rsvpStatus) {
             case YES:
-                rsvp.setImageDrawable(goingDrawable);
+                rsvp.setText(R.string.rsvp_yes);
                 break;
             case MAYBE:
-                rsvp.setImageDrawable(maybeDrawable);
+                rsvp.setText(R.string.rsvp_maybe);
                 break;
             case NO:
-                rsvp.setImageDrawable(notGoingDrawable);
+                rsvp.setText(R.string.rsvp_no);
                 break;
             default:
                 throw new IllegalStateException();

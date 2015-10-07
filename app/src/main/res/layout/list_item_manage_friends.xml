@@ -15,11 +15,13 @@
         android:layout_marginRight="16dp"
         android:gravity="center_vertical|center_horizontal">
 
-        <com.pkmmte.view.CircularImageView
+        <de.hdodenhof.circleimageview.CircleImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/iv_list_item_manage_friends_user_pic"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            app:border = 'false'/>
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            app:civ_border_width="0dp"
+            />
 
     </LinearLayout>
 

@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:orientation="vertical">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -40,16 +40,14 @@
                 android:layout_height="250dp"
                 android:background="#55cdcdcd" />
 
-            <com.pkmmte.view.CircularImageView
+            <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/iv_account_fragment_user_profile_pic"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="75dp"
-                android:src="@drawable/ic_btn_rsvp_going"
-                app:border="true"
-                app:border_color="@color/whity"
-                app:border_width="4dp" />
+                app:civ_border_color="@color/white"
+                app:civ_border_width="4dp" />
 
             <TextView
                 android:id="@+id/tv_account_fragment_user_name"
@@ -58,7 +56,7 @@
                 android:layout_below="@+id/iv_account_fragment_user_profile_pic"
                 android:layout_centerInParent="true"
                 android:layout_marginTop="4dp"
-                android:textColor="@color/whity"
+                android:textColor="@color/white"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
@@ -70,7 +68,7 @@
         android:id="@+id/rv_accounts_fragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingTop="8dp"
         android:layout_weight="1"
-        android:background="@color/white"></android.support.v7.widget.RecyclerView>
+        android:background="@color/white"
+        android:paddingTop="8dp"></android.support.v7.widget.RecyclerView>
 </LinearLayout>

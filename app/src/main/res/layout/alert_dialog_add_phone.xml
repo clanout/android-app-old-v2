@@ -41,7 +41,8 @@
             android:layout_weight="1"
             android:hint="Your phone number"
             android:textSize="14sp"
-            android:inputType="phone"/>
+            android:inputType="phone"
+            android:textColor="@color/text_subtitle"/>
 
     </LinearLayout>
 

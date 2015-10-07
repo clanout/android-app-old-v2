@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -16,7 +17,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -67,8 +68,11 @@ import reaper.android.common.communicator.Communicator;
  */
 public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
+    // TODO -- disable load history after one click
+    // TODO -- no chat notificatons from myself
+
     private EditText typeMessage;
-    private ImageButton send;
+    private ImageView send;
     private ListView listView;
     private TextView noSessionMessage;
     private LinearLayout mainContent;
@@ -108,7 +112,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
 
         typeMessage = (EditText) view.findViewById(R.id.et_chat_fragment_type_message_chat);
-        send = (ImageButton) view.findViewById(R.id.ib_fragment_chat_send);
+        send = (ImageView) view.findViewById(R.id.ib_fragment_chat_send);
         listView = (ListView) view.findViewById(R.id.lv_chat_fragment);
         noSessionMessage = (TextView) view.findViewById(R.id.tv_fragment_chat_no_session);
         mainContent = (LinearLayout) view.findViewById(R.id.ll_fragment_chat_main_content);
@@ -160,7 +164,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
     private void generateDrawables() {
         sendDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.SEND)
-                .setColor(getResources().getColor(R.color.accent))
+                .setColor(ContextCompat.getColor(getActivity(), R.color.accent))
                 .setSizeDp(24)
                 .build();
     }

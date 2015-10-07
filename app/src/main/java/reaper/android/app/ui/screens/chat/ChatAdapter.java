@@ -30,23 +30,11 @@ public class ChatAdapter extends BaseAdapter
 
     private List<ChatMessage> chatMessageList;
     private Context context;
-    private Drawable outgoingMessageDrawable, incomingMessageDrawable;
 
     public ChatAdapter(List<ChatMessage> chatMessageList, Context context)
     {
         this.chatMessageList = chatMessageList;
         this.context = context;
-
-        generateDrawables();
-    }
-
-    private void generateDrawables() {
-
-        outgoingMessageDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE)
-                .setColor(Color.YELLOW)
-                .setSizeDp(24)
-                .build();
     }
 
     @Override
@@ -110,7 +98,11 @@ public class ChatAdapter extends BaseAdapter
 
         if (chatMessagePrevious == null)
         {
-            chatViewHolder.infoOutside.setVisibility(View.VISIBLE);
+            if(isMe) {
+                chatViewHolder.infoOutside.setVisibility(View.GONE);
+            }else{
+                chatViewHolder.infoOutside.setVisibility(View.VISIBLE);
+            }
             chatViewHolder.messageInside.setText(chatMessageCurrent.getMessage());
             chatViewHolder.infoOutside.setText(chatMessageCurrent.getSenderName());
 
@@ -124,7 +116,11 @@ public class ChatAdapter extends BaseAdapter
             }
             else
             {
-                chatViewHolder.infoOutside.setVisibility(View.VISIBLE);
+                if(isMe) {
+                    chatViewHolder.infoOutside.setVisibility(View.GONE);
+                }else{
+                    chatViewHolder.infoOutside.setVisibility(View.VISIBLE);
+                }
                 chatViewHolder.messageInside.setText(chatMessageCurrent.getMessage());
                 chatViewHolder.infoOutside.setText(chatMessageCurrent.getSenderName());
 
@@ -137,7 +133,7 @@ public class ChatAdapter extends BaseAdapter
     {
         if (!isMe)
         {
-            chatViewHolder.contentWithBackground.setBackgroundResource(R.drawable.rounded_rectangle);
+            chatViewHolder.contentWithBackground.setBackgroundResource(R.drawable.rounded_rectangle_not_me);
 
             LinearLayout.LayoutParams layoutParams =
                     (LinearLayout.LayoutParams) chatViewHolder.contentWithBackground.getLayoutParams();
@@ -161,7 +157,7 @@ public class ChatAdapter extends BaseAdapter
         else
         {
 
-            chatViewHolder.contentWithBackground.setBackgroundResource(R.drawable.rounded_rectangle);
+            chatViewHolder.contentWithBackground.setBackgroundResource(R.drawable.rounded_rectangle_me);
 
             LinearLayout.LayoutParams layoutParams =
                     (LinearLayout.LayoutParams) chatViewHolder.contentWithBackground.getLayoutParams();

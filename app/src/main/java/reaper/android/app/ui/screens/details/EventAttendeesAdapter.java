@@ -11,13 +11,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.pkmmte.view.CircularImageView;
 import com.squareup.picasso.Picasso;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import reaper.android.R;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.model.EventDetails;
@@ -96,14 +96,14 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
     public class EventDetailsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         private ImageView inviter, rsvp;
-        private CircularImageView pic;
+        private CircleImageView pic;
         private TextView name;
 
         public EventDetailsViewHolder(View itemView)
         {
             super(itemView);
 
-            pic = (CircularImageView) itemView.findViewById(R.id.iv_event_attendee_pic);
+            pic = (CircleImageView) itemView.findViewById(R.id.iv_event_attendee_pic);
             inviter = (ImageView) itemView.findViewById(R.id.iv_event_attendee_inviter);
             rsvp = (ImageView) itemView.findViewById(R.id.iv_event_attendee_rsvp);
             name = (TextView) itemView.findViewById(R.id.tv_event_attendee_name);
@@ -118,6 +118,7 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
                     .placeholder(personDrawable)
                     .fit()
                     .centerInside()
+                    .noFade()
                     .into(pic);
 
             name.setText(attendee.getName());

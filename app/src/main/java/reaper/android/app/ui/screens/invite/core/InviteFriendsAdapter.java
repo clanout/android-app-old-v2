@@ -3,6 +3,7 @@ package reaper.android.app.ui.screens.invite.core;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +22,7 @@ import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import reaper.android.R;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.model.Event;
@@ -58,8 +60,8 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
 
     private void generateDrawables() {
         personDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.HOME)
-                .setColor(Color.BLACK)
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
+                .setColor(ContextCompat.getColor(context, R.color.black))
                 .setSizeDp(24)
                 .build();
     }
@@ -83,6 +85,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
                     .placeholder(personDrawable)
                     .fit()
                     .centerInside()
+                    .noFade()
                     .into(holder.userPic);
 
 
@@ -138,7 +141,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
 
     class InviteFriendsViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView userPic;
+        CircleImageView userPic;
         TextView username, alreadyInvited;
         CheckBox checkBox;
 
@@ -146,7 +149,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
             super(itemView);
 
             username = (TextView) itemView.findViewById(R.id.tv_list_item_invite_friends_user_name);
-            userPic = (ImageView) itemView.findViewById(R.id.iv_list_item_invite_friends_user_pic);
+            userPic = (CircleImageView) itemView.findViewById(R.id.iv_list_item_invite_friends_user_pic);
             alreadyInvited = (TextView) itemView.findViewById(R.id.tv_list_item_invite_friends_already_invited);
             checkBox = (CheckBox) itemView.findViewById(R.id.cb_list_item_invite_friends);
 
