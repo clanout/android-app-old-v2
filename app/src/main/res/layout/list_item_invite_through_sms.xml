@@ -2,8 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="12dp">
+    android:layout_height="50dp"
+    android:layout_marginBottom="4dp"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginTop="4dp"
+    android:background="@color/white">
 
     <TextView
         android:layout_width="0dp"
@@ -13,7 +17,7 @@
         android:textSize="16sp"
         android:textColor="@color/text_subtitle"
         android:gravity="center_vertical"
-        android:layout_marginRight="16dp"
+        android:layout_marginLeft="8dp"
         android:id="@+id/tv_list_item_invite_through_sms_user_name"/>
 
     <TextView
@@ -21,6 +25,7 @@
         android:layout_height="match_parent"
         android:id="@+id/tv_list_item_invite_through_sms_phone_number"
         android:textSize="12sp"
+        android:layout_marginRight="8dp"
         android:textColor="@color/text_subtitle"
         android:gravity="center_vertical|center_horizontal"/>
 

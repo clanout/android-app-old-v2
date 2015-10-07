@@ -27,4 +27,7 @@ public class CacheKeys
     public static final String HAS_FETCHED_PENDING_INVITES = "has_fetched_pending_invites";
     public static final String IS_FIRST_TIME_USER = "is_first_time_user";
     public static final String HAS_SEEN_EVENT_TYPE_POP_UP = "has_seen_event_type_pop_up";
+    public static final String HAS_SEEN_FACEBOOK_TAB_POP_UP = "has_seen_facebook_tab_pop_up";
+    public static final String HAS_SEEN_ON_APP_TAB_POP_UP = "has_seen_on_app_tab_pop_up";
+    public static final String HAS_SEEN_PHONEBOOK_TAB_POP_UP = "has_seen_phonebook_tab_pop_up";
 }

@@ -1,12 +1,15 @@
 package reaper.android.app.ui.screens.invite.core;
 
 import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +47,7 @@ import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class InviteUsersContainerFragment extends BaseFragment implements TabLayout.OnTabSelectedListener, View.OnClickListener {
+public class InviteUsersContainerFragment extends BaseFragment implements View.OnClickListener {
     private ViewPager viewPager;
     private ImageButton done;
     private TabLayout tabLayout;
@@ -130,9 +133,37 @@ public class InviteUsersContainerFragment extends BaseFragment implements TabLay
             @Override
             public void run() {
                 tabLayout.setupWithViewPager(viewPager);
+
+                tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
+
+                    @Override
+                    public void onTabSelected(TabLayout.Tab tab) {
+                        super.onTabSelected(tab);
+
+                        viewPager.setCurrentItem(tab.getPosition());
+
+                        switch (tab.getPosition()) {
+                            case 0:
+                                if(genericCache.get(CacheKeys.HAS_SEEN_FACEBOOK_TAB_POP_UP) == null) {
+                                    displayFacebookPopup();
+                                }
+                                break;
+                            case 1:
+                                if(genericCache.get(CacheKeys.HAS_SEEN_ON_APP_TAB_POP_UP) == null) {
+                                    displayOnAppPopup();
+                                }
+                                break;
+                            case 2:
+                                if(genericCache.get(CacheKeys.HAS_SEEN_PHONEBOOK_TAB_POP_UP) == null) {
+                                    displayPhonebookPopup();
+                                }
+                                break;
+                        }
+                    }
+                });
             }
         });
-        tabLayout.setOnTabSelectedListener(this);
+
 
         done.setOnClickListener(this);
         done.setImageDrawable(checkDrawable);
@@ -160,25 +191,65 @@ public class InviteUsersContainerFragment extends BaseFragment implements TabLay
         }
     }
 
-    @Override
-    public void onTabSelected(TabLayout.Tab tab) {
-        viewPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(TabLayout.Tab tab) {
-
-    }
-
-    @Override
-    public void onTabReselected(TabLayout.Tab tab) {
-
-    }
 
     @Override
     public void onPause() {
         super.onPause();
         bus.unregister(this);
+    }
+
+    private void displayFacebookPopup() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
+        builder.setMessage("Find your facebook friends in " + locationService.getUserLocation().getZone() + " present on clanOut");
+
+        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                genericCache.put(CacheKeys.HAS_SEEN_FACEBOOK_TAB_POP_UP, true);
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void displayOnAppPopup() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
+        builder.setMessage("Your phonebook contacts present on clanOut");
+
+        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                genericCache.put(CacheKeys.HAS_SEEN_ON_APP_TAB_POP_UP, true);
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void displayPhonebookPopup() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
+        builder.setMessage("All contacts from your phonebook. Send a free SMS to invite them to your clan");
+
+        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                genericCache.put(CacheKeys.HAS_SEEN_PHONEBOOK_TAB_POP_UP, true);
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     @Subscribe

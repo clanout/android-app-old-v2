@@ -1,11 +1,14 @@
 package reaper.android.app.ui.screens.invite.facebook;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -31,6 +34,7 @@ import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BundleKeys;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
@@ -148,13 +152,13 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     {
         refreshDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
-                .setColor(getResources().getColor(R.color.whity))
+                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
                 .setSizeDp(36)
                 .build();
 
         whatsappDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.WHATSAPP)
-                .setColor(getResources().getColor(R.color.whity))
+                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
                 .setSizeDp(24)
                 .build();
     }

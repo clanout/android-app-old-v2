@@ -29,12 +29,7 @@ public class InviteThroughSMSAdapter extends RecyclerView.Adapter<InviteThroughS
 
     public InviteThroughSMSAdapter(Context context, List<PhoneContact> phoneContactList, Bus bus) {
         this.context = context;
-//        this.phoneContactList = phoneContactList;
-        if (phoneContactList.size() != 0) {
-            this.phoneContactList = phoneContactList.subList(0, 19);
-        } else {
-            this.phoneContactList = phoneContactList;
-        }
+        this.phoneContactList = phoneContactList;
         this.bus = bus;
     }
 

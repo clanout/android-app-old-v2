@@ -2,15 +2,24 @@ package reaper.android.app.ui.screens.invite.core;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
 import android.util.Log;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import java.util.ArrayList;
 
+import reaper.android.R;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.ui.screens.invite.facebook.InviteFacebookFriendsFragment;
 import reaper.android.app.ui.screens.invite.phone.InvitePhoneContactsFragment;
 import reaper.android.app.ui.screens.invite.sms.InviteThroughSMSFragment;
@@ -70,19 +79,13 @@ public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
     {
         switch (position)
         {
-
             case 0:
                 return "Facebook";
             case 1:
-                return "On App"; //TODO -- icon
+                return "On App";
             case 2:
                 return "Phonebook";
         }
-
-        // TODO --- show popup for each tab
-        // TODO -- facebook popup --- Facebook friends in "Bengaluru" present on clanOut.
-        // TODO --- phonebook -- All contacts from your phonebook. Send a free SMS to invite them on clanOut.
-        // TODO -- on app ---- Your phonebook contacts present on clanOut.
         return null;
     }
 }
