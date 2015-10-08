@@ -71,7 +71,6 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
     private GenericCache genericCache;
     private Drawable deleteDrawable;
 
-    // TODO -- stackoverflow error
     // TODO -- Onclick push notification, open correct event
     // TODO --- change order of action bar buttons
 

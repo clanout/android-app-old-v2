@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -174,11 +175,20 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     {
         super.onResume();
 
+        Log.d("APP", "onResume fb");
+
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_FACEBOOK_FRIENDS_FRAGMENT);
 
         bus.register(this);
         userService.getAppFriends(locationService.getUserLocation().getZone());
     }
+
+//    @Override
+//    public void setUserVisibleHint(boolean isVisibleToUser) {
+//        super.setUserVisibleHint(isVisibleToUser);
+//
+//        Log.d("APP", "visibility fb ---- " + isVisibleToUser);
+//    }
 
     @Override
     public void onPause()
@@ -216,6 +226,8 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         super.onCreateOptionsMenu(menu, inflater);
+
+        Log.d("APP", "onCreateOptionsMenu fb");
 
         menu.clear();
         inflater.inflate(R.menu.action_button, menu);
