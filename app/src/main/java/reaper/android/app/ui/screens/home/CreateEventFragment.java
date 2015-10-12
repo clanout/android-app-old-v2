@@ -213,6 +213,10 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
         moreDetails.setOnClickListener(clickListener);
         create.setOnClickListener(clickListener);
         icon.setOnClickListener(clickListener);
+
+        initTypeSelector();
+        initDaySelector();
+        initTimeSelector();
     }
 
     @Override
@@ -222,9 +226,6 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
         bus.register(this);
 
         initView();
-        initTypeSelector();
-        initDaySelector();
-        initTimeSelector();
         initDayTime();
     }
 

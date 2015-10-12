@@ -432,6 +432,10 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                                 presenter.autocomplete(s);
                             }
                         }
+
+                        eventLocation.setName(s);
+                        eventLocation.setLongitude(null);
+                        eventLocation.setLatitude(null);
                     }
                 });
 

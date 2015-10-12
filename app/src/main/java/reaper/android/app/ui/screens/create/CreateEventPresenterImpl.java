@@ -270,6 +270,12 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
             return;
         }
 
+        if (location == null)
+        {
+            location = new Location();
+            location.setZone(userLocation.getZone());
+        }
+
         Subscription subscription = eventService
                 ._create(title, type, eventCategory, description, location, startTime, endTime)
                 .observeOn(AndroidSchedulers.mainThread())

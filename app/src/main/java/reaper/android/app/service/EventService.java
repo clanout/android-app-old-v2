@@ -1129,4 +1129,20 @@ public class EventService
                 })
                 .subscribeOn(Schedulers.newThread());
     }
+
+    public Observable<Response> _finaliseEvent(final Event event, final boolean isFinalised)
+    {
+        return eventApi
+                .finaliseEvent(new FinaliseEventApiRequest(event.getId(), isFinalised))
+                .doOnNext(new Action1<Response>()
+                {
+                    @Override
+                    public void call(Response response)
+                    {
+                        event.setIsFinalized(isFinalised);
+                        eventCache.save(event);
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
 }

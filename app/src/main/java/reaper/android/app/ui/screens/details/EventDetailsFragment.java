@@ -53,7 +53,7 @@ import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchedFromNetworkTrigger;
 import reaper.android.app.trigger.event.EventRsvpNotChangedTrigger;
 import reaper.android.app.ui.screens.core.BaseFragment;
-import reaper.android.app.ui.screens.edit.EditEventFragment;
+import reaper.android.app.ui.screens.edit.old.EditEventFragment;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.event.EventUtils;
