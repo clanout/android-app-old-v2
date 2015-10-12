@@ -642,6 +642,8 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
         final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_change_category, null);
         builder.setView(dialogView);
 
+        final AlertDialog alertDialog = builder.create();
+
         final LinearLayout cafe = (LinearLayout) dialogView
                 .findViewById(R.id.ll_dialog_fragment_create_event_cafe);
         final LinearLayout movies = (LinearLayout) dialogView
@@ -678,28 +680,12 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
             @Override
             public void onClick(View v)
             {
-                cafe.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.accent, 4));
-                movies.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
 
                 eventCategory = EventCategory.CAFE;
                 icon.setImageDrawable(DrawableFactory
                         .get(EventCategory.CAFE, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
             }
         });
 
@@ -708,28 +694,12 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
             @Override
             public void onClick(View v)
             {
-                cafe.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.accent, 4));
-                eatOut.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
 
                 eventCategory = EventCategory.MOVIES;
                 icon.setImageDrawable(DrawableFactory
                         .get(EventCategory.MOVIES, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
             }
         });
 
@@ -739,28 +709,12 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
             @Override
             public void onClick(View v)
             {
-                cafe.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.accent, 4));
-                sports.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
 
                 eventCategory = EventCategory.EAT_OUT;
                 icon.setImageDrawable(DrawableFactory
                         .get(EventCategory.EAT_OUT, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
             }
         });
 
@@ -770,28 +724,12 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
             @Override
             public void onClick(View v)
             {
-                cafe.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.accent, 4));
-                outdoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
 
                 eventCategory = EventCategory.SPORTS;
                 icon.setImageDrawable(DrawableFactory
                         .get(EventCategory.SPORTS, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
             }
         });
 
@@ -801,28 +739,12 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
             @Override
             public void onClick(View v)
             {
-                cafe.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.accent, 4));
-                indoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
 
                 eventCategory = EventCategory.OUTDOORS;
                 icon.setImageDrawable(DrawableFactory
                         .get(EventCategory.OUTDOORS, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
             }
         });
 
@@ -832,28 +754,12 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
             @Override
             public void onClick(View v)
             {
-                cafe.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.accent, 4));
-                drinks.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
 
                 eventCategory = EventCategory.INDOORS;
                 icon.setImageDrawable(DrawableFactory
                         .get(EventCategory.INDOORS, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
             }
         });
 
@@ -863,28 +769,12 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
             @Override
             public void onClick(View v)
             {
-                cafe.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.accent, 4));
-                shopping.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
 
                 eventCategory = EventCategory.DRINKS;
                 icon.setImageDrawable(DrawableFactory
                         .get(EventCategory.DRINKS, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
             }
         });
 
@@ -894,28 +784,11 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
             @Override
             public void onClick(View v)
             {
-                cafe.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.accent, 4));
-                general.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-
                 eventCategory = EventCategory.SHOPPING;
                 icon.setImageDrawable(DrawableFactory
                         .get(EventCategory.SHOPPING, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
             }
         });
 
@@ -925,41 +798,15 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
             @Override
             public void onClick(View v)
             {
-                cafe.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory
-                        .getIconBackground(getActivity(), R.color.accent, 4));
-
                 eventCategory = EventCategory.GENERAL;
                 icon.setImageDrawable(DrawableFactory
                         .get(EventCategory.GENERAL, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
+
             }
         });
 
-        builder.setPositiveButton("DONE", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                dialog.dismiss();
-            }
-        });
-
-        AlertDialog alertDialog = builder.create();
         alertDialog.show();
 
     }
