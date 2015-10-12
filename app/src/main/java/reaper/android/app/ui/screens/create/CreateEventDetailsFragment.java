@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +21,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -606,6 +608,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                             .newInstance(CreateEventDetailsFragment.this, startTime
                                     .getHourOfDay(), startTime
                                     .getMinuteOfHour(), false);
+                    dialog.dismissOnPause(true);
                     dialog.vibrate(false);
                     dialog.show(getFragmentManager(), "TimePicker");
                 }
@@ -634,6 +637,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                             .newInstance(CreateEventDetailsFragment.this, startTime
                                     .getHourOfDay(), startTime
                                     .getMinuteOfHour(), false);
+                    dialog.dismissOnPause(true);
                     dialog.vibrate(false);
                     dialog.show(getFragmentManager(), "TimePicker");
                 }
@@ -670,6 +674,183 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     {
         VisibilityAnimationUtil.collapse(timeSelectorContainer, 200);
         isTimeSelectorVisible = false;
+    }
+
+    private void displayCategoryChangeDialog()
+    {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(true);
+
+        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+        final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_change_category, null);
+        builder.setView(dialogView);
+
+        final AlertDialog alertDialog = builder.create();
+
+        final LinearLayout cafe = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_cafe);
+        final LinearLayout movies = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_movie);
+        final LinearLayout eatOut = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_eat_out);
+        final LinearLayout sports = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_sports);
+        final LinearLayout outdoors = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_outdoors);
+        final LinearLayout indoors = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_indoors);
+        final LinearLayout drinks = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_drinks);
+        final LinearLayout shopping = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_shopping);
+        final LinearLayout general = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_general);
+
+        cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        outdoors.setBackground(DrawableFactory
+                .getIconBackground(getActivity(), R.color.primary, 4));
+        indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        shopping.setBackground(DrawableFactory
+                .getIconBackground(getActivity(), R.color.primary, 4));
+        general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+
+        cafe.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                changeCategory(EventCategory.CAFE);
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.CAFE, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
+            }
+        });
+
+        movies.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                changeCategory(EventCategory.MOVIES);
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.MOVIES, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
+            }
+        });
+
+
+        eatOut.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                changeCategory(EventCategory.EAT_OUT);
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.EAT_OUT, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
+            }
+        });
+
+
+        sports.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                changeCategory(EventCategory.SPORTS);
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.SPORTS, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
+            }
+        });
+
+
+        outdoors.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                changeCategory(EventCategory.OUTDOORS);
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.OUTDOORS, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
+            }
+        });
+
+
+        indoors.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                changeCategory(EventCategory.INDOORS);
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.INDOORS, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
+            }
+        });
+
+
+        drinks.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                changeCategory(EventCategory.DRINKS);
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.DRINKS, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
+            }
+        });
+
+
+        shopping.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                changeCategory(EventCategory.SHOPPING);
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.SHOPPING, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
+            }
+        });
+
+
+        general.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                changeCategory(EventCategory.GENERAL);
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.GENERAL, Dimensions.CREATE_EVENT_ICON_SIZE));
+
+                alertDialog.dismiss();
+
+            }
+        });
+
+        alertDialog.show();
+
+    }
+
+    private void changeCategory(EventCategory category)
+    {
+        this.category = category;
+        presenter.changeCategory(category);
     }
 
     private class ClickListener implements View.OnClickListener

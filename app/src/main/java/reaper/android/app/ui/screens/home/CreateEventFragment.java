@@ -494,6 +494,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
                             .newInstance(CreateEventFragment.this, startTime
                                     .getHourOfDay(), startTime
                                     .getMinuteOfHour(), false);
+                    dialog.dismissOnPause(true);
                     dialog.vibrate(false);
                     dialog.show(getFragmentManager(), "TimePicker");
                 }
@@ -522,6 +523,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
                             .newInstance(CreateEventFragment.this, startTime
                                     .getHourOfDay(), startTime
                                     .getMinuteOfHour(), false);
+                    dialog.dismissOnPause(true);
                     dialog.vibrate(false);
                     dialog.show(getFragmentManager(), "TimePicker");
                 }
