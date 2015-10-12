@@ -11,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -71,7 +72,6 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -134,13 +134,13 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         whatsappDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.WHATSAPP)
                 .setColor(getResources().getColor(R.color.whity))
-                .setSizeDp(24)
+                .setSizeDp(36)
                 .build();
 
         phoneDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE_ANDROID)
                 .setColor(getResources().getColor(R.color.whity))
-                .setSizeDp(24)
+                .setSizeDp(36)
                 .build();
     }
 
@@ -153,6 +153,16 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     public void onPause() {
         super.onPause();
         bus.unregister(this);
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if(isVisibleToUser)
+        {
+            setHasOptionsMenu(true);
+        }
     }
 
     private void displayInvitesLockedView() {
@@ -255,11 +265,9 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         } else if (view.getId() == R.id.fib_fragment_invite_through_sms_invite_people_whatsapp) {
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
             if (isWhatsappInstalled) {
-                // TODO -- Whatsapp invite message
-
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+                sendIntent.putExtra(Intent.EXTRA_TEXT, userService.getActiveUserName() + AppConstants.WHATSAPP_INVITATION_MESSAGE + AppConstants.APP_LINK);
                 sendIntent.setType("text/plain");
                 sendIntent.setPackage("com.whatsapp");
                 startActivity(sendIntent);

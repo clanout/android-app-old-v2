@@ -55,7 +55,7 @@ public class NotificationFactory
                                 .title(TITLE)
                                 .eventId(args.get("event_id"))
                                 .eventName(args.get("event_name"))
-                                .userId("")
+                                .userId(args.get("user_id"))
                                 .userName("")
                                 .timestamp(DateTime.now())
                                 .message(NotificationHelper.getMessage(typeCode, args))

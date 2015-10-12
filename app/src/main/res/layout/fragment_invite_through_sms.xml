@@ -22,8 +22,8 @@
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fib_fragment_invite_through_sms_add_phone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:layout_gravity="center_horizontal"/>
 
 
@@ -58,8 +58,8 @@
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fib_fragment_invite_through_sms_invite_people_whatsapp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:layout_marginBottom="10dp"/>
 
         </LinearLayout>

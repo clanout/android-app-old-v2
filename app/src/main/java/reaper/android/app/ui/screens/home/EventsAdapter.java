@@ -163,7 +163,6 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             @Override
             public void onPageScrollStateChanged(int state)
             {
-                // TODO
             }
         });
 

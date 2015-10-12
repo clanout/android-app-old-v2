@@ -1,6 +1,5 @@
 package reaper.android.app.ui.screens.invite.facebook;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -8,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -34,8 +32,8 @@ import java.util.List;
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BundleKeys;
-import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
@@ -80,11 +78,11 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     private Event event;
     private Drawable whatsappDrawable;
 
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -160,7 +158,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
         whatsappDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.WHATSAPP)
                 .setColor(ContextCompat.getColor(getActivity(), R.color.white))
-                .setSizeDp(24)
+                .setSizeDp(36)
                 .build();
     }
 
@@ -175,20 +173,21 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     {
         super.onResume();
 
-        Log.d("APP", "onResume fb");
-
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_FACEBOOK_FRIENDS_FRAGMENT);
 
         bus.register(this);
         userService.getAppFriends(locationService.getUserLocation().getZone());
     }
 
-//    @Override
-//    public void setUserVisibleHint(boolean isVisibleToUser) {
-//        super.setUserVisibleHint(isVisibleToUser);
-//
-//        Log.d("APP", "visibility fb ---- " + isVisibleToUser);
-//    }
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if(isVisibleToUser)
+        {
+            setHasOptionsMenu(true);
+        }
+    }
 
     @Override
     public void onPause()
@@ -226,8 +225,6 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         super.onCreateOptionsMenu(menu, inflater);
-
-        Log.d("APP", "onCreateOptionsMenu fb");
 
         menu.clear();
         inflater.inflate(R.menu.action_button, menu);
@@ -377,11 +374,9 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
             if (isWhatsappInstalled)
             {
-                // TODO -- Change whatsapp invite message
-
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+                sendIntent.putExtra(Intent.EXTRA_TEXT, userService.getActiveUserName() + AppConstants.WHATSAPP_INVITATION_MESSAGE + AppConstants.APP_LINK);
                 sendIntent.setType("text/plain");
                 startActivity(sendIntent);
             } else

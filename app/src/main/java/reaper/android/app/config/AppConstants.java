@@ -17,4 +17,10 @@ public class AppConstants
 
     // Google Analytics
     public static final String GOOGLE_ANALYTICS_TRACKING_KEY = "UA-67721019-1";
+
+    // Whatsapp Message
+    public static final String WHATSAPP_INVITATION_MESSAGE = " invited you to join clanOut. Check it out ";
+
+    // App Link
+    public static final String APP_LINK = "www.clanout.com"; // TODO -- change link
 }

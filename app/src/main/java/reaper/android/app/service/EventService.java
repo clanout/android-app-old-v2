@@ -884,7 +884,6 @@ public class EventService
                     {
                         if (response.getStatus() == 200)
                         {
-                            // TODO: Delete event details or add a new invitee
                         }
                     }
                 });

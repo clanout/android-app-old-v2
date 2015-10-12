@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -127,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
                 if (checkPlayServices()) {
                     gcmService.register();
                 } else {
-                    // TODO - do something
                 }
             } else {
                 FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
@@ -231,6 +231,8 @@ public class MainActivity extends AppCompatActivity {
     public void onEventsFetched(EventsFetchForActivityTrigger trigger) {
         List<Event> eventList = trigger.getEvents();
 
+        Log.d("APP", "event id ---- " + eventId);
+
         Event activeEvent = new Event();
         activeEvent.setId(eventId);
 
@@ -239,6 +241,8 @@ public class MainActivity extends AppCompatActivity {
         if (eventList.contains(activeEvent)) {
             activePosition = eventList.indexOf(activeEvent);
         }
+
+        Log.d("APP", "active position --- " + activePosition);
 
         EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
         Bundle bundle = new Bundle();

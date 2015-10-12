@@ -24,9 +24,9 @@
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fib_fragment_invite_phone_contacts_add_phone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"/>
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center_horizontal" />
 
 
     </LinearLayout>
@@ -55,13 +55,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:textColor="@color/text_title"
+                android:textColor="@color/text_subtitle"
                 android:textSize="14sp"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fib_fragment_invite_phone_contacts_invite_people_whatsapp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:layout_marginBottom="10dp"/>
 
         </LinearLayout>

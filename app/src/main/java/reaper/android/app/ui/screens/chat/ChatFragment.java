@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -68,9 +69,6 @@ import reaper.android.common.communicator.Communicator;
  */
 public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
-    // TODO -- disable load history after one click
-    // TODO -- no chat notificatons from myself
-
     private EditText typeMessage;
     private ImageView send;
     private ListView listView;
@@ -100,6 +98,8 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
     private MessageListener messageListener;
     private Drawable sendDrawable;
     private Toolbar toolbar;
+
+    private long loadHistoryLastClickedTime = 0;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -296,7 +296,15 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
             inputManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
         } else if (v.getId() == R.id.b_chat_fragment_load_history) {
-            loadHistory.setClickable(false);
+
+            if((SystemClock.elapsedRealtime() - loadHistoryLastClickedTime) < 1000)
+            {
+                return;
+            }
+
+            loadHistoryLastClickedTime = SystemClock.elapsedRealtime();
+            loadHistory.setEnabled(false);
+
             loadHistoryClickCount++;
 
             chatMessageList = new ArrayList<>();
@@ -309,7 +317,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
             } catch (Exception e) {
                 renderNoSessionView();
             }
-            loadHistory.setClickable(true);
+            loadHistory.setEnabled(true);
         }
     }
 

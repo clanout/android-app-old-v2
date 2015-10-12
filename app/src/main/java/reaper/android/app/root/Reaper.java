@@ -57,9 +57,9 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
 
     private GenericCache genericCache;
 
+    // TODO -- Fetch pending invites
     // TODO --- timber test compile and stetho
-    // TODO -- style of snackbar
-    // TODO -- designing no content pages
+    // TODO -- Analytics events
     // TODO -- placeholders in Picasso circle image view
     // TODO -- fitting of fb profile images in circle image view
     // TODO -- if app already open, clicking on push notification launches one more activity

@@ -72,7 +72,6 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
     private Drawable deleteDrawable;
 
     // TODO -- Onclick push notification, open correct event
-    // TODO --- change order of action bar buttons
 
     @Override
     public void onCreate(Bundle savedInstanceState)

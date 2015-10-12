@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -32,6 +33,7 @@ import java.util.Collections;
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
@@ -73,6 +75,7 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     private ArrayList<Friend> friendList;
 
     private GenericCache genericCache;
+    private Drawable whatsappDrawable;
 
     // TODO save selected friends onResume -- invite fragments also
 
@@ -119,6 +122,7 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
 
         generateDrawable();
         done.setImageDrawable(checkDrawable);
+        inviteWhatsapp.setImageDrawable(whatsappDrawable);
 
         initRecyclerView();
     }
@@ -126,15 +130,22 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     private void generateDrawable() {
         refreshDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
-                .setColor(getResources().getColor(R.color.whity))
+                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
                 .setSizeDp(36)
                 .build();
 
         checkDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
-                .setColor(getResources().getColor(R.color.whity))
+                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
                 .setSizeDp(24)
                 .build();
+
+        whatsappDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.WHATSAPP)
+                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
+                .setSizeDp(36)
+                .build();
+
     }
 
     @Override
@@ -329,11 +340,10 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         } else if (view.getId() == R.id.fib_fragment_manage_friends_invite_people_whatsapp) {
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
             if (isWhatsappInstalled) {
-                // TODO - Whatsapp invitation message -- X invited you to join
 
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+                sendIntent.putExtra(Intent.EXTRA_TEXT, userService.getActiveUserName() + AppConstants.WHATSAPP_INVITATION_MESSAGE + AppConstants.APP_LINK);
                 sendIntent.setType("text/plain");
                 sendIntent.setPackage("com.whatsapp");
                 startActivity(sendIntent);

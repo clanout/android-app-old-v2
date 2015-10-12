@@ -150,8 +150,6 @@ public class LauncherActivity extends AppCompatActivity
         cache.put(CacheKeys.SESSION_ID, trigger.getSessionCookie());
         if (!locationService.locationExists())
         {
-            // TODO -- Change messages
-
             progressDialog = ProgressDialog.show(this, "Welcome", "Getting your location...");
             isBlocking = true;
             bus.post(new UserLocationRefreshRequestTrigger());
@@ -218,8 +216,6 @@ public class LauncherActivity extends AppCompatActivity
     {
         if (!locationService.locationExists())
         {
-            // TODO
-
             progressDialog = ProgressDialog.show(this, "Welcome", "Getting your location...");
             isBlocking = true;
             bus.post(new UserLocationRefreshRequestTrigger());
