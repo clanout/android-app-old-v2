@@ -66,7 +66,6 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
-import timber.log.Timber;
 
 public class EventService
 {
@@ -1079,5 +1078,55 @@ public class EventService
                            }
                        })
                        .subscribeOn(Schedulers.newThread());
+    }
+
+    public Observable<List<Suggestion>> _fetchSuggestions(EventCategory eventCategory, double latitude, double longitude)
+    {
+        EventSuggestionsApiRequest request = new EventSuggestionsApiRequest(eventCategory,
+                String.valueOf(latitude),
+                String.valueOf(longitude));
+        return eventApi.getEventSuggestions(request)
+                       .map(new Func1<EventSuggestionsApiResponse, List<Suggestion>>()
+                       {
+                           @Override
+                           public List<Suggestion> call(EventSuggestionsApiResponse eventSuggestionsApiResponse)
+                           {
+                               return eventSuggestionsApiResponse.getEventSuggestions();
+                           }
+                       })
+                       .subscribeOn(Schedulers.newThread());
+    }
+
+    public Observable<Event> _create(String title, Event.Type eventType, EventCategory eventCategory, String description, Location placeLocation, DateTime startTime, DateTime endTime)
+    {
+        CreateEventApiRequest request = new CreateEventApiRequest(title, eventType, eventCategory, description, placeLocation
+                .getName(), placeLocation.getZone(), placeLocation.getLatitude(), placeLocation
+                .getLongitude(), startTime, endTime);
+
+        return eventApi
+                .createEvent(request)
+                .map(new Func1<CreateEventApiResponse, Event>()
+                {
+                    @Override
+                    public Event call(CreateEventApiResponse createEventApiResponse)
+                    {
+                        return createEventApiResponse.getEvent();
+                    }
+                })
+                .doOnNext(new Action1<Event>()
+                {
+                    @Override
+                    public void call(Event event)
+                    {
+                        eventCache.save(event);
+
+                        if (genericCache.get(CacheKeys.GCM_TOKEN) != null)
+                        {
+                            gcmService.subscribeTopic(genericCache.get(CacheKeys.GCM_TOKEN), event
+                                    .getId());
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
     }
 }

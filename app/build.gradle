@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId "reaper.android"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -109,4 +109,6 @@ dependencies {
     // Circular Image View
     compile 'de.hdodenhof:circleimageview:2.0.0'
 
+    // Material Date-Time picker
+    compile 'com.wdullaer:materialdatetimepicker:1.5.3'
 }

@@ -15,6 +15,9 @@ import reaper.android.app.trigger.event.EventLocationFetchedTrigger;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import rx.Observable;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 public class GoogleService
 {
@@ -29,7 +32,8 @@ public class GoogleService
 
     public ArrayList<GooglePlaceAutocompleteApiResponse.Prediction> autocomplete(Double latitude, Double longitude, String input)
     {
-        GooglePlaceAutocompleteApiResponse response = googlePlacesApi.getPlacesAutocomplete(latitude + "," + longitude, input);
+        GooglePlaceAutocompleteApiResponse response = googlePlacesApi
+                .getPlacesAutocomplete(latitude + "," + longitude, input);
         return (ArrayList<GooglePlaceAutocompleteApiResponse.Prediction>) response.getPredictions();
     }
 
@@ -62,5 +66,28 @@ public class GoogleService
                 bus.post(new GenericErrorTrigger(ErrorCode.EVENT_LOCATION_FETCH_FAILURE, error));
             }
         });
+    }
+
+    public Observable<Location> _getPlaceDetails(String placeid)
+    {
+        return googlePlacesApi
+                .getPlaceDetails(placeid)
+                .map(new Func1<GooglePlaceDetailsApiResponse, Location>()
+                {
+                    @Override
+                    public Location call(GooglePlaceDetailsApiResponse googlePlaceDetailsApiResponse)
+                    {
+                        Location placeLocation = new Location();
+                        placeLocation
+                                .setLatitude(googlePlaceDetailsApiResponse.getLatitude());
+                        placeLocation
+                                .setLongitude(googlePlaceDetailsApiResponse.getLongitude());
+                        placeLocation.setName(googlePlaceDetailsApiResponse.getName());
+                        placeLocation.setZone(new LocationService(bus).getUserLocation()
+                                                                      .getZone());
+                        return placeLocation;
+                    }
+                })
+                .observeOn(Schedulers.newThread());
     }
 }

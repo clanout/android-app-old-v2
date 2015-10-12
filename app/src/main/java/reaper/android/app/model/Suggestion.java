@@ -4,13 +4,23 @@ package reaper.android.app.model;
  * Created by harsh on 13-05-2015.
  */
 public class Suggestion {
-
+    private String id;
     private Double latitude;
     private Double longitude;
     private String name;
     private String iconUrl;
     private String description;
     private String rating;
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public void setId(String id)
+    {
+        this.id = id;
+    }
 
     public Double getLatitude() {
         return latitude;
