@@ -298,6 +298,11 @@ public class MainActivity extends AppCompatActivity
     {
         List<Event> eventList = trigger.getEvents();
 
+        for(Event event: eventList)
+        {
+            Log.d("APP", event.getId() + event.getTitle());
+        }
+
         Log.d("APP", "event id ---- " + eventId);
 
         Event activeEvent = new Event();
@@ -310,7 +315,7 @@ public class MainActivity extends AppCompatActivity
             activePosition = eventList.indexOf(activeEvent);
         }
 
-        Log.d("APP", "active position --- " + activePosition);
+        Log.d("APP", "active position ---- " + activePosition);
 
         EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
         Bundle bundle = new Bundle();

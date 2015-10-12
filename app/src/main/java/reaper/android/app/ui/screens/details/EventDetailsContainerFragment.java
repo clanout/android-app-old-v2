@@ -8,6 +8,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -92,13 +93,22 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
         super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null) {
+            Log.d("APP", "saved instance state");
             events = (List<Event>) savedInstanceState.get(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
             activePosition = savedInstanceState.getInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION);
         } else {
+            Log.d("APP", "not saved instance state");
             Bundle bundle = getArguments();
             events = (List<Event>) bundle.get(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
             activePosition = bundle.getInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION);
         }
+
+        for(Event event: events)
+        {
+            Log.d("APP", event.getId());
+        }
+
+        Log.d("APP", "active position -- " + activePosition);
 
         if (events == null) {
             throw new IllegalStateException("Event cannot be null while creating EventDetailsFragment instance");

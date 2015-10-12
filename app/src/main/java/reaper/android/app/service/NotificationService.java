@@ -543,6 +543,8 @@ public class NotificationService {
         Intent intent = new Intent(Reaper.getReaperContext(), LauncherActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
+        int requestCode = ("someString" + System.currentTimeMillis()).hashCode();
+
         if (shouldGoToDetailsFragment) {
             intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "yes");
             intent.putExtra("event_id", notification.getEventId());
@@ -550,8 +552,10 @@ public class NotificationService {
             intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "no");
         }
 
+        intent.putExtra("randomRequestCode", requestCode);
+
         PendingIntent pendingIntent = PendingIntent
-                .getActivity(Reaper.getReaperContext(), 0, intent, PendingIntent.FLAG_ONE_SHOT);
+                .getActivity(Reaper.getReaperContext(), requestCode, intent, PendingIntent.FLAG_ONE_SHOT);
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(Reaper.getReaperContext())

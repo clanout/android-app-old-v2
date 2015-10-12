@@ -71,8 +71,6 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
     private GenericCache genericCache;
     private Drawable deleteDrawable;
 
-    // TODO -- Onclick push notification, open correct event
-
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
