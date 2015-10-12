@@ -8,9 +8,9 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,12 +23,14 @@ import android.widget.TextView;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.DateTimeFieldType;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
@@ -48,18 +50,20 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.common.ViewPagerClickedTrigger;
 import reaper.android.app.trigger.event.EventCreatedTrigger;
 import reaper.android.app.ui.screens.core.BaseFragment;
+import reaper.android.app.ui.screens.create.CreateEventDetailsFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
+import reaper.android.app.ui.util.DateTimeUtils;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.communicator.Communicator;
 import rx.Subscription;
-import timber.log.Timber;
 
-public class CreateEventFragment extends BaseFragment {
-    private EventCategory eventCategory;
 
-    public interface CreateEventCycleHandler {
+public class CreateEventFragment extends BaseFragment implements TimePickerDialog.OnTimeSetListener
+{
+    public interface CreateEventCycleHandler
+    {
         void addCycle(Subscription subscription);
     }
 
@@ -99,23 +103,23 @@ public class CreateEventFragment extends BaseFragment {
 
     /* Data */
     CreateEventModel createEventModel;
+
+    DateTimeUtils dateTimeUtils;
+
+    EventCategory eventCategory;
+    Event.Type type;
+    LocalTime startTime;
+    LocalDate startDate;
+
     boolean isEditMode;
-
-    List<DateTime> days;
-    int selectedDayIndex;
-
-    List<DateTime> times;
-    int selectedTimeIndex;
-
-    Event.Type selectedType;
-
     boolean isCreateClicked;
     Bus bus;
 
     GenericCache genericCache;
 
     /* Static Factory */
-    public static CreateEventFragment newInstance(CreateEventModel createEventModel) {
+    public static CreateEventFragment newInstance(CreateEventModel createEventModel)
+    {
         Bundle args = new Bundle();
         args.putSerializable(ARG_MODEL, createEventModel);
 
@@ -125,9 +129,17 @@ public class CreateEventFragment extends BaseFragment {
         return createEventFragment;
     }
 
+    @Override
+    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute)
+    {
+        startTime = new LocalTime(hourOfDay, minute);
+        time.setText(dateTimeUtils.formatTime(startTime));
+    }
+
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
         View view = inflater.inflate(R.layout.fragment_create_event, container, false);
 
         cardView = (CardView) view.findViewById(R.id.cv_createEvent);
@@ -151,30 +163,43 @@ public class CreateEventFragment extends BaseFragment {
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
         super.onActivityCreated(savedInstanceState);
 
         createEventModel = (CreateEventModel) getArguments().getSerializable(ARG_MODEL);
+        if(createEventModel != null)
+        {
+            eventCategory = createEventModel.getCategory();
+        }
 
         clickListener = new ClickListener();
         bus = Communicator.getInstance().getBus();
         genericCache = CacheManager.getGenericCache();
+        dateTimeUtils = new DateTimeUtils();
 
-        title.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        title.setOnFocusChangeListener(new View.OnFocusChangeListener()
+        {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!isEditMode && hasFocus) {
+            public void onFocusChange(View v, boolean hasFocus)
+            {
+                if (!isEditMode && hasFocus)
+                {
                     title.clearFocus();
                     titleContainer.setHint(createEventModel.getTitle());
-                } else if (hasFocus) {
+                }
+                else if (hasFocus)
+                {
                     enableEditMode();
                 }
             }
         });
 
-        title.setOnTouchListener(new View.OnTouchListener() {
+        title.setOnTouchListener(new View.OnTouchListener()
+        {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
+            public boolean onTouch(View v, MotionEvent event)
+            {
                 enableEditMode();
                 return true;
             }
@@ -191,7 +216,8 @@ public class CreateEventFragment extends BaseFragment {
     }
 
     @Override
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
         bus.register(this);
 
@@ -203,38 +229,56 @@ public class CreateEventFragment extends BaseFragment {
     }
 
     @Override
-    public void onPause() {
+    public void onPause()
+    {
         super.onPause();
         bus.unregister(this);
 
-        if (progressDialog != null) {
+        if (progressDialog != null)
+        {
             progressDialog.dismiss();
         }
     }
 
-    private void onMoreDetailsClicked() {
-        Timber.v("More Details");
-        // TODO : Fragment transaction to more details fragment
+    private void onMoreDetailsClicked()
+    {
+        String eventTitle = title.getText().toString();
+
+        CreateEventDetailsFragment fragment = CreateEventDetailsFragment
+                .newInstance(eventTitle, eventCategory, type, startDate, startTime);
+
+        FragmentUtils.changeFragment(getFragmentManager(), fragment);
     }
 
-    private void onCreateClicked() {
+    private void onCreateClicked()
+    {
+        isCreateClicked = true;
+
         String eventTitle = title.getText().toString();
-        if (eventTitle == null || eventTitle.isEmpty()) {
+        if (eventTitle.isEmpty())
+        {
             Snackbar.make(getView(), "Title cannot be empty", Snackbar.LENGTH_LONG)
                     .show();
             return;
         }
 
+        title.requestFocus();
         InputMethodManager imm = (InputMethodManager) getActivity()
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(title.getWindowToken(), InputMethodManager.SHOW_IMPLICIT);
+        imm.hideSoftInputFromWindow(title.getWindowToken(), 0);
 
-        progressDialog = ProgressDialog.show(getActivity(), "Creating your clan", "Please wait ...");
+        DateTime start = DateTimeUtils.getDateTime(startDate, startTime);
+        if(start.isBefore(DateTime.now()))
+        {
+            Snackbar.make(getView(), "Start time cannot be before the current time", Snackbar.LENGTH_LONG)
+                    .show();
+            return;
+        }
 
-        DateTime startTime = days.get(selectedDayIndex)
-                .withTime(times.get(selectedTimeIndex).toLocalTime());
-        DateTime endTime = startTime.plusDays(1).withTimeAtStartOfDay();
+        progressDialog = ProgressDialog
+                .show(getActivity(), "Creating your clan", "Please wait ...");
 
+        DateTime end = DateTimeUtils.getEndTime(start);
 
         EventService eventService = new EventService(bus);
         LocationService locationService = new LocationService(bus);
@@ -243,20 +287,19 @@ public class CreateEventFragment extends BaseFragment {
         Location location = new Location();
         location.setZone(zone);
 
-        isCreateClicked = true;
-
-        if(eventCategory == null)
-        {
-            eventCategory = createEventModel.getCategory();
-        }
-
-        eventService.createEvent(eventTitle, selectedType, eventCategory, "", location, startTime, endTime);
+        eventService
+                .createEvent(eventTitle, type, eventCategory, "", location, start, end);
     }
 
     @Subscribe
-    public void onCreateSuccess(EventCreatedTrigger trigger) {
-        if (isCreateClicked) {
-            if (progressDialog != null) {
+    public void onCreateSuccess(EventCreatedTrigger trigger)
+    {
+        if (isCreateClicked)
+        {
+            isCreateClicked = false;
+
+            if (progressDialog != null)
+            {
                 progressDialog.dismiss();
             }
 
@@ -271,9 +314,14 @@ public class CreateEventFragment extends BaseFragment {
     }
 
     @Subscribe
-    public void onCreateFailure(GenericErrorTrigger trigger) {
-        if (isCreateClicked && trigger.getErrorCode() == ErrorCode.EVENT_CREATION_FAILURE) {
-            if (progressDialog != null) {
+    public void onCreateFailure(GenericErrorTrigger trigger)
+    {
+        if (isCreateClicked && trigger.getErrorCode() == ErrorCode.EVENT_CREATION_FAILURE)
+        {
+            isCreateClicked = false;
+
+            if (progressDialog != null)
+            {
                 progressDialog.dismiss();
             }
 
@@ -282,19 +330,24 @@ public class CreateEventFragment extends BaseFragment {
         }
     }
 
-    private void initView() {
+    private void initView()
+    {
         icon.setImageDrawable(createEventModel.getIcon());
         iconContainer.setBackground(createEventModel.getIconBackground(getActivity()));
 
-        if (isEditMode) {
+        if (isEditMode)
+        {
             enableEditMode();
-        } else {
+        }
+        else
+        {
             title.clearFocus();
             titleContainer.setHint(createEventModel.getTitle());
         }
     }
 
-    private void enableEditMode() {
+    private void enableEditMode()
+    {
         isEditMode = true;
 
         title.requestFocus();
@@ -306,15 +359,17 @@ public class CreateEventFragment extends BaseFragment {
         bus.post(new ViewPagerClickedTrigger());
     }
 
-    private void initDayTime() {
-        day.setText(DayTimeUtil.getDayName(days.get(selectedDayIndex)));
-        time.setText(DayTimeUtil.getTime(times.get(selectedTimeIndex)));
+    private void initDayTime()
+    {
+        day.setText(dateTimeUtils.formatDate(startDate));
+        time.setText(dateTimeUtils.formatTime(startTime));
     }
 
-    private void initTypeSelector() {
+    private void initTypeSelector()
+    {
         typeSelectorContainer.setVisibility(View.GONE);
 
-        selectedType = Event.Type.INVITE_ONLY;
+        type = Event.Type.INVITE_ONLY;
 
         typeSelector.setTabMode(TabLayout.MODE_FIXED);
         typeSelector.setTabGravity(TabLayout.GRAVITY_CENTER);
@@ -325,16 +380,22 @@ public class CreateEventFragment extends BaseFragment {
 
         typeSelector.getTabAt(0).select();
 
-        typeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        typeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
+        {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
+            public void onTabSelected(TabLayout.Tab tab)
+            {
                 String selected = tab.getText().toString();
                 eventType.setText(selected.toUpperCase());
 
-                if (selected.equalsIgnoreCase("OPEN")) {
-                    selectedType = Event.Type.PUBLIC;
-                } else {
-                    selectedType = Event.Type.INVITE_ONLY;
+                if (selected.equalsIgnoreCase(getResources()
+                        .getString(R.string.event_details_type_public)))
+                {
+                    type = Event.Type.PUBLIC;
+                }
+                else
+                {
+                    type = Event.Type.INVITE_ONLY;
                 }
 
                 VisibilityAnimationUtil.collapse(typeSelectorContainer, 200);
@@ -342,159 +403,238 @@ public class CreateEventFragment extends BaseFragment {
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
+            public void onTabUnselected(TabLayout.Tab tab)
+            {
 
             }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
+            public void onTabReselected(TabLayout.Tab tab)
+            {
                 VisibilityAnimationUtil.collapse(typeSelectorContainer, 200);
                 isTypeSelectorVisible = false;
             }
         });
     }
 
-    private void initDaySelector() {
+    private void initDaySelector()
+    {
         daySelectorContainer.setVisibility(View.GONE);
 
         daySelector.setTabMode(TabLayout.MODE_SCROLLABLE);
         daySelector.setTabGravity(TabLayout.GRAVITY_FILL);
+        daySelector
+                .setSelectedTabIndicatorColor(ContextCompat.getColor(getActivity(), R.color.white));
         daySelector.removeAllTabs();
 
-        days = DayTimeUtil.getDayList();
-        selectedDayIndex = 0;
+        List<String> days = dateTimeUtils.getDayList();
 
-        for (DateTime d : days) {
-            daySelector.addTab(daySelector.newTab().setText(DayTimeUtil.getDayName(d)));
+        startDate = dateTimeUtils.getDate(days.get(0));
+
+        for (String day : days)
+        {
+            daySelector.addTab(daySelector.newTab().setText(day));
         }
 
-        daySelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        daySelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
+        {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                selectedDayIndex = tab.getPosition();
-                day.setText(tab.getText());
+            public void onTabSelected(TabLayout.Tab tab)
+            {
+                String key = tab.getText().toString();
+                day.setText(key);
+                startDate = dateTimeUtils.getDate(key);
                 hideDaySelector();
-
-                initTimeSelector();
-                time.setText(DayTimeUtil.getTime(times.get(selectedTimeIndex)));
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
+            public void onTabUnselected(TabLayout.Tab tab)
+            {
 
             }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
+            public void onTabReselected(TabLayout.Tab tab)
+            {
+                String key = tab.getText().toString();
+                day.setText(key);
+                startDate = dateTimeUtils.getDate(key);
                 hideDaySelector();
             }
         });
     }
 
-    private void initTimeSelector() {
+    private void initTimeSelector()
+    {
         timeSelectorContainer.setVisibility(View.GONE);
 
         timeSelector.setTabMode(TabLayout.MODE_SCROLLABLE);
         timeSelector.setTabGravity(TabLayout.GRAVITY_FILL);
+        timeSelector
+                .setSelectedTabIndicatorColor(ContextCompat.getColor(getActivity(), R.color.white));
         timeSelector.removeAllTabs();
 
-        times = DayTimeUtil.getTimeList(selectedDayIndex);
-        selectedTimeIndex = 0;
+        startTime = LocalTime.now().plusHours(1).withField(DateTimeFieldType.minuteOfHour(), 0);
 
-        for (DateTime d : times) {
-            timeSelector.addTab(timeSelector.newTab().setText(DayTimeUtil.getTime(d)));
+        List<String> times = dateTimeUtils.getTimeList();
+        for (String time : times)
+        {
+            timeSelector.addTab(timeSelector.newTab().setText(time));
         }
 
-        timeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        timeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
+        {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                selectedTimeIndex = tab.getPosition();
-                time.setText(tab.getText().toString());
+            public void onTabSelected(TabLayout.Tab tab)
+            {
+                String key = tab.getText().toString();
+                if (key.equalsIgnoreCase(DateTimeUtils.PICK_YOUR_OWN))
+                {
+                    TimePickerDialog dialog = TimePickerDialog
+                            .newInstance(CreateEventFragment.this, startTime
+                                    .getHourOfDay(), startTime
+                                    .getMinuteOfHour(), false);
+                    dialog.vibrate(false);
+                    dialog.show(getFragmentManager(), "TimePicker");
+                }
+                else
+                {
+                    startTime = dateTimeUtils.getTime(key);
+                    time.setText(dateTimeUtils.formatTime(startTime));
+                }
+
                 hideTimeSelector();
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
+            public void onTabUnselected(TabLayout.Tab tab)
+            {
 
             }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
+            public void onTabReselected(TabLayout.Tab tab)
+            {
+                String key = tab.getText().toString();
+                if (key.equalsIgnoreCase(DateTimeUtils.PICK_YOUR_OWN))
+                {
+                    TimePickerDialog dialog = TimePickerDialog
+                            .newInstance(CreateEventFragment.this, startTime
+                                    .getHourOfDay(), startTime
+                                    .getMinuteOfHour(), false);
+                    dialog.vibrate(false);
+                    dialog.show(getFragmentManager(), "TimePicker");
+                }
+                else
+                {
+                    startTime = dateTimeUtils.getTime(key);
+                    time.setText(dateTimeUtils.formatTime(startTime));
+                }
+
                 hideTimeSelector();
             }
         });
     }
 
-    private void showDaySelector() {
+    private void showDaySelector()
+    {
         VisibilityAnimationUtil.expand(daySelectorContainer, 200);
         isDaySelectorVisible = true;
     }
 
-    private void hideDaySelector() {
+    private void hideDaySelector()
+    {
         VisibilityAnimationUtil.collapse(daySelectorContainer, 200);
         isDaySelectorVisible = false;
     }
 
-    private void showTimeSelector() {
+    private void showTimeSelector()
+    {
         VisibilityAnimationUtil.expand(timeSelectorContainer, 200);
         isTimeSelectorVisible = true;
     }
 
-    private void hideTimeSelector() {
+    private void hideTimeSelector()
+    {
         VisibilityAnimationUtil.collapse(timeSelectorContainer, 200);
         isTimeSelectorVisible = false;
     }
 
-    private class ClickListener implements View.OnClickListener {
+    private class ClickListener implements View.OnClickListener
+    {
         @Override
-        public void onClick(View v) {
+        public void onClick(View v)
+        {
             bus.post(new ViewPagerClickedTrigger());
             enableEditMode();
 
-            if (v == day) {
-                if (isTimeSelectorVisible) {
+            if (v == day)
+            {
+                if (isTimeSelectorVisible)
+                {
                     hideTimeSelector();
                 }
 
-                if (!isDaySelectorVisible) {
+                if (!isDaySelectorVisible)
+                {
                     showDaySelector();
-                } else {
+                }
+                else
+                {
                     hideDaySelector();
                 }
-            } else if (v == time) {
-                if (isDaySelectorVisible) {
+            }
+            else if (v == time)
+            {
+                if (isDaySelectorVisible)
+                {
                     hideDaySelector();
                 }
 
-                if (!isTimeSelectorVisible) {
+                if (!isTimeSelectorVisible)
+                {
                     showTimeSelector();
-                } else {
+                }
+                else
+                {
                     hideTimeSelector();
                 }
-            } else if (v == eventType) {
-                if (genericCache.get(CacheKeys.HAS_SEEN_EVENT_TYPE_POP_UP) == null) {
+            }
+            else if (v == eventType)
+            {
+                if (genericCache.get(CacheKeys.HAS_SEEN_EVENT_TYPE_POP_UP) == null)
+                {
                     displayEventTypePopUp();
                 }
 
-                if (isTypeSelectorVisible) {
+                if (isTypeSelectorVisible)
+                {
                     VisibilityAnimationUtil.collapse(typeSelectorContainer, 200);
                     isTypeSelectorVisible = false;
-                } else {
+                }
+                else
+                {
                     VisibilityAnimationUtil.expand(typeSelectorContainer, 200);
                     isTypeSelectorVisible = true;
                 }
-            } else if (v == moreDetails) {
+            }
+            else if (v == moreDetails)
+            {
                 onMoreDetailsClicked();
-            } else if (v == create) {
+            }
+            else if (v == create)
+            {
                 onCreateClicked();
-            } else if (v == icon) {
+            }
+            else if (v == icon)
+            {
                 displayCategoryChangeDialog();
             }
         }
     }
 
-    private void displayCategoryChangeDialog() {
-
+    private void displayCategoryChangeDialog()
+    {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
 
@@ -502,198 +642,319 @@ public class CreateEventFragment extends BaseFragment {
         final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_change_category, null);
         builder.setView(dialogView);
 
-        final LinearLayout cafe = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_cafe);
-        final LinearLayout movies = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_movie);
-        final LinearLayout eatOut = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_eat_out);
-        final LinearLayout sports = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_sports);
-        final LinearLayout outdoors = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_outdoors);
-        final LinearLayout indoors = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_indoors);
-        final LinearLayout drinks = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_drinks);
-        final LinearLayout shopping = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_shopping);
-        final LinearLayout general = (LinearLayout) dialogView.findViewById(R.id.ll_dialog_fragment_create_event_general);
+        final LinearLayout cafe = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_cafe);
+        final LinearLayout movies = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_movie);
+        final LinearLayout eatOut = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_eat_out);
+        final LinearLayout sports = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_sports);
+        final LinearLayout outdoors = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_outdoors);
+        final LinearLayout indoors = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_indoors);
+        final LinearLayout drinks = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_drinks);
+        final LinearLayout shopping = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_shopping);
+        final LinearLayout general = (LinearLayout) dialogView
+                .findViewById(R.id.ll_dialog_fragment_create_event_general);
 
         cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
         movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
         eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
         sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-        outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        outdoors.setBackground(DrawableFactory
+                .getIconBackground(getActivity(), R.color.primary, 4));
         indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
         drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-        shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+        shopping.setBackground(DrawableFactory
+                .getIconBackground(getActivity(), R.color.primary, 4));
         general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
 
-        cafe.setOnClickListener(new View.OnClickListener() {
+        cafe.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
-                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+            public void onClick(View v)
+            {
+                cafe.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.accent, 4));
+                movies.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
 
                 eventCategory = EventCategory.CAFE;
-                icon.setImageDrawable(DrawableFactory.get(EventCategory.CAFE, Dimensions.CREATE_EVENT_ICON_SIZE));
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.CAFE, Dimensions.CREATE_EVENT_ICON_SIZE));
             }
         });
 
-        movies.setOnClickListener(new View.OnClickListener() {
+        movies.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
-                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+            public void onClick(View v)
+            {
+                cafe.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.accent, 4));
+                eatOut.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
 
                 eventCategory = EventCategory.MOVIES;
-                icon.setImageDrawable(DrawableFactory.get(EventCategory.MOVIES, Dimensions.CREATE_EVENT_ICON_SIZE));
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.MOVIES, Dimensions.CREATE_EVENT_ICON_SIZE));
             }
         });
 
 
-        eatOut.setOnClickListener(new View.OnClickListener() {
+        eatOut.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
-                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+            public void onClick(View v)
+            {
+                cafe.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.accent, 4));
+                sports.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
 
                 eventCategory = EventCategory.EAT_OUT;
-                icon.setImageDrawable(DrawableFactory.get(EventCategory.EAT_OUT, Dimensions.CREATE_EVENT_ICON_SIZE));
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.EAT_OUT, Dimensions.CREATE_EVENT_ICON_SIZE));
             }
         });
 
 
-        sports.setOnClickListener(new View.OnClickListener() {
+        sports.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
-                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+            public void onClick(View v)
+            {
+                cafe.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.accent, 4));
+                outdoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
 
                 eventCategory = EventCategory.SPORTS;
-                icon.setImageDrawable(DrawableFactory.get(EventCategory.SPORTS, Dimensions.CREATE_EVENT_ICON_SIZE));
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.SPORTS, Dimensions.CREATE_EVENT_ICON_SIZE));
             }
         });
 
 
-        outdoors.setOnClickListener(new View.OnClickListener() {
+        outdoors.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
-                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+            public void onClick(View v)
+            {
+                cafe.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.accent, 4));
+                indoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
 
                 eventCategory = EventCategory.OUTDOORS;
-                icon.setImageDrawable(DrawableFactory.get(EventCategory.OUTDOORS, Dimensions.CREATE_EVENT_ICON_SIZE));
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.OUTDOORS, Dimensions.CREATE_EVENT_ICON_SIZE));
             }
         });
 
 
-        indoors.setOnClickListener(new View.OnClickListener() {
+        indoors.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
-                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+            public void onClick(View v)
+            {
+                cafe.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.accent, 4));
+                drinks.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
 
                 eventCategory = EventCategory.INDOORS;
-                icon.setImageDrawable(DrawableFactory.get(EventCategory.INDOORS, Dimensions.CREATE_EVENT_ICON_SIZE));
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.INDOORS, Dimensions.CREATE_EVENT_ICON_SIZE));
             }
         });
 
 
-        drinks.setOnClickListener(new View.OnClickListener() {
+        drinks.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
-                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+            public void onClick(View v)
+            {
+                cafe.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.accent, 4));
+                shopping.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
 
                 eventCategory = EventCategory.DRINKS;
-                icon.setImageDrawable(DrawableFactory.get(EventCategory.DRINKS, Dimensions.CREATE_EVENT_ICON_SIZE));
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.DRINKS, Dimensions.CREATE_EVENT_ICON_SIZE));
             }
         });
 
 
-        shopping.setOnClickListener(new View.OnClickListener() {
+        shopping.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
-                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
+            public void onClick(View v)
+            {
+                cafe.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.accent, 4));
+                general.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
 
                 eventCategory = EventCategory.SHOPPING;
-                icon.setImageDrawable(DrawableFactory.get(EventCategory.SHOPPING, Dimensions.CREATE_EVENT_ICON_SIZE));
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.SHOPPING, Dimensions.CREATE_EVENT_ICON_SIZE));
             }
         });
 
 
-        general.setOnClickListener(new View.OnClickListener() {
+        general.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                cafe.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                movies.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                eatOut.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                sports.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                outdoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                indoors.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                drinks.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                shopping.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
-                general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.accent, 4));
+            public void onClick(View v)
+            {
+                cafe.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                movies.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                eatOut.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                sports.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                outdoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                indoors.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                drinks.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                shopping.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.primary, 4));
+                general.setBackground(DrawableFactory
+                        .getIconBackground(getActivity(), R.color.accent, 4));
 
                 eventCategory = EventCategory.GENERAL;
-                icon.setImageDrawable(DrawableFactory.get(EventCategory.GENERAL, Dimensions.CREATE_EVENT_ICON_SIZE));
+                icon.setImageDrawable(DrawableFactory
+                        .get(EventCategory.GENERAL, Dimensions.CREATE_EVENT_ICON_SIZE));
             }
         });
 
-        builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("DONE", new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
                 dialog.dismiss();
             }
         });
@@ -703,7 +964,8 @@ public class CreateEventFragment extends BaseFragment {
 
     }
 
-    private void displayEventTypePopUp() {
+    private void displayEventTypePopUp()
+    {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(false);
@@ -712,9 +974,11 @@ public class CreateEventFragment extends BaseFragment {
         View dialogView = layoutInflater.inflate(R.layout.alert_dialog_event_type, null);
         builder.setView(dialogView);
 
-        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
                 genericCache.put(CacheKeys.HAS_SEEN_EVENT_TYPE_POP_UP, true);
                 dialog.dismiss();
             }
@@ -722,85 +986,5 @@ public class CreateEventFragment extends BaseFragment {
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
-    }
-
-    private static class DayTimeUtil {
-        private static final String TODAY = "TODAY";
-        private static final String TOMORROW = "TOMORROW";
-
-        private static DateTimeFormatter dayFormatter = DateTimeFormat.forPattern("EEEE");
-        private static DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("hh:mm a");
-
-        private static DateTime today = DateTime.now().withTimeAtStartOfDay();
-        private static DateTime tomorrow = today.plusDays(1);
-
-        public static List<DateTime> getDayList() {
-            List<DateTime> days = new ArrayList<>();
-            DateTime today = DateTime.now();
-
-            DateTime lastSlot = today.withTime(23, 29, 0, 0);
-
-            if (today.isAfter(lastSlot)) {
-                today = today.plusDays(1).withTimeAtStartOfDay();
-            }
-
-            if (today.dayOfWeek().get() == 7) {
-                days.add(today);
-                return days;
-            }
-
-            int dayOfWeek = today.dayOfWeek().get();
-
-            while (dayOfWeek <= 7) {
-                days.add(today);
-                today = today.plusDays(1);
-
-                dayOfWeek++;
-            }
-
-            return days;
-        }
-
-        public static List<DateTime> getTimeList(int dayIndex) {
-            boolean isToday = dayIndex == 0;
-            List<DateTime> times = new ArrayList<>();
-
-            DateTime now = DateTime.now();
-            DateTime lastSlot = now.withTime(23, 29, 0, 0);
-            if (now.isAfter(lastSlot)) {
-                isToday = false;
-            }
-
-            DateTime dateTime = now.withTimeAtStartOfDay();
-            for (int i = 0; i < 48; i++) {
-                if (isToday) {
-                    if (dateTime.isAfter(now)) {
-                        times.add(dateTime);
-                    }
-                } else {
-                    times.add(dateTime);
-                }
-
-                dateTime = dateTime.plusMinutes(30);
-            }
-
-            return times;
-        }
-
-        public static String getDayName(DateTime dateTime) {
-            DateTime input = dateTime.withTimeAtStartOfDay();
-
-            if (today.equals(input)) {
-                return TODAY;
-            } else if (tomorrow.equals(input)) {
-                return TOMORROW;
-            } else {
-                return dateTime.toString(dayFormatter).toUpperCase();
-            }
-        }
-
-        public static String getTime(DateTime dateTime) {
-            return dateTime.toString(timeFormatter).toUpperCase();
-        }
     }
 }

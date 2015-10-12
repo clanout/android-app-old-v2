@@ -37,7 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
@@ -165,7 +168,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
 
         InputMethodManager imm = (InputMethodManager) getActivity()
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(title.getWindowToken(), InputMethodManager.SHOW_IMPLICIT);
+        imm.hideSoftInputFromWindow(title.getWindowToken(), 0);
     }
 
     @Override
@@ -201,7 +204,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
             progressDialog.dismiss();
         }
 
-        Snackbar.make(getView(), "Start Time cannot be after the current time", Snackbar.LENGTH_LONG)
+        Snackbar.make(getView(), "Start time cannot be before the current time", Snackbar.LENGTH_LONG)
                 .show();
     }
 
@@ -296,7 +299,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
         setHasOptionsMenu(true);
 
         String inputTitle = getArguments().getString(ARG_TITLE);
-        if (inputTitle != null)
+        if (inputTitle != null && !inputTitle.isEmpty())
         {
             title.setText(inputTitle);
             title.setSelection(title.getText().length());
@@ -307,8 +310,8 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
         {
             type = Event.Type.INVITE_ONLY;
         }
-        typeSelector.addTab(typeSelector.newTab().setText("OPEN"));
-        typeSelector.addTab(typeSelector.newTab().setText("SECRET"));
+        typeSelector.addTab(typeSelector.newTab().setText(R.string.event_details_type_invite_only));
+        typeSelector.addTab(typeSelector.newTab().setText(R.string.event_details_type_public));
 
         if (type == Event.Type.PUBLIC)
         {
@@ -363,8 +366,15 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     {
         super.onResume();
 
-        presenter.attachView(this);
+        title.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getActivity()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(title.getWindowToken(), 0);
+        title.clearFocus();
 
+        CacheManager.getGenericCache().put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.CREATE);
+
+        presenter.attachView(this);
         initDayTime();
 
         location.setOnFocusChangeListener(new View.OnFocusChangeListener()
@@ -423,11 +433,36 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                     }
                 });
 
-        subscriptions.add(subscription);
+        typeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
+        {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab)
+            {
+                String selected = tab.getText().toString();
+                if (selected.equalsIgnoreCase(getResources()
+                        .getString(R.string.event_details_type_public)))
+                {
+                    type = Event.Type.PUBLIC;
+                }
+                else
+                {
+                    type = Event.Type.INVITE_ONLY;
+                }
+            }
 
-        InputMethodManager imm = (InputMethodManager) getActivity()
-                .getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(title.getWindowToken(), InputMethodManager.SHOW_IMPLICIT);
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab)
+            {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab)
+            {
+            }
+        });
+
+        subscriptions.add(subscription);
     }
 
     @Override
@@ -435,6 +470,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     {
         super.onPause();
         location.setOnFocusChangeListener(null);
+        typeSelector.setOnTabSelectedListener(null);
         subscriptions.clear();
         presenter.detachView();
     }
@@ -452,6 +488,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                 public boolean onMenuItemClick(MenuItem item)
                 {
                     String eventTitle = title.getText().toString();
+                    String eventDescription = description.getText().toString();
                     DateTime start = DateTimeUtils.getDateTime(startDate, startTime);
                     DateTime end = DateTimeUtils.getEndTime(start);
                     Timber.v("Title : " + eventTitle);
@@ -460,6 +497,9 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                     Timber.v("Location : " + location.getText().toString());
                     Timber.v("Type : " + type);
                     Timber.v("Category : " + category);
+
+                    presenter
+                            .create(eventTitle, type, category, eventDescription, start, end, eventLocation);
 
                     return true;
                 }
@@ -562,7 +602,6 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                 String key = tab.getText().toString();
                 if (key.equalsIgnoreCase(DateTimeUtils.PICK_YOUR_OWN))
                 {
-                    Timber.v("qwerty1");
                     TimePickerDialog dialog = TimePickerDialog
                             .newInstance(CreateEventDetailsFragment.this, startTime
                                     .getHourOfDay(), startTime
@@ -591,7 +630,6 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                 String key = tab.getText().toString();
                 if (key.equalsIgnoreCase(DateTimeUtils.PICK_YOUR_OWN))
                 {
-                    Timber.v("qwerty2");
                     TimePickerDialog dialog = TimePickerDialog
                             .newInstance(CreateEventDetailsFragment.this, startTime
                                     .getHourOfDay(), startTime

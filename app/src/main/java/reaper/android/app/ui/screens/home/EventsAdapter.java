@@ -470,8 +470,9 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                   @Override
                                   public void onNext(Long aLong)
                                   {
-                                      int position = viewPager.getCurrentItem() + 1;
-                                      if (position >= viewPager.getAdapter().getCount())
+                                      int size = viewPager.getAdapter().getCount();
+                                      int position = (int) (aLong % size);
+                                      if (position == 0)
                                       {
                                           viewPager.setCurrentItem(0, false);
                                       }

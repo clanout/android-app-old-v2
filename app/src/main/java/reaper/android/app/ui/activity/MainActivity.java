@@ -46,7 +46,8 @@ import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.chat.ChatHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+{
     private android.app.FragmentManager fragmentManager;
     private Bus bus;
     private GCMService gcmService;
@@ -66,7 +67,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         DateTime start = DateTime.now();
@@ -89,63 +91,92 @@ public class MainActivity extends AppCompatActivity {
         eventCache = CacheManager.getEventCache();
         userCache = CacheManager.getUserCache();
 
-        String shouldGoToDetailsFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);
+        String shouldGoToDetailsFragment = getIntent()
+                .getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);
         eventId = getIntent().getStringExtra("event_id");
 
-        if (shouldGoToDetailsFragment.equals("yes") && eventId != null) {
+        if (shouldGoToDetailsFragment.equals("yes") && eventId != null)
+        {
             eventService.fetchEventsForActivity(locationService.getUserLocation().getZone());
-        } else {
-            String lastNotificationReceived = genericCache.get(Timestamps.NOTIFICATION_RECEIVED_TIMESTAMP);
-            String lastFriendRelocatedNotificationReceived = genericCache.get(Timestamps.FRIEND_RELOCATED_NOTIFICATION_TIMESTAMP);
+        }
+        else
+        {
+            String lastNotificationReceived = genericCache
+                    .get(Timestamps.NOTIFICATION_RECEIVED_TIMESTAMP);
+            String lastFriendRelocatedNotificationReceived = genericCache
+                    .get(Timestamps.FRIEND_RELOCATED_NOTIFICATION_TIMESTAMP);
 
-            if (lastNotificationReceived != null && lastFriendRelocatedNotificationReceived != null) {
+            if (lastNotificationReceived != null && lastFriendRelocatedNotificationReceived != null)
+            {
                 DateTime lastNotificationTimestamp = DateTime.parse(lastNotificationReceived);
-                DateTime lastFriendRelocatedNotificationTimestamp = DateTime.parse(lastFriendRelocatedNotificationReceived);
+                DateTime lastFriendRelocatedNotificationTimestamp = DateTime
+                        .parse(lastFriendRelocatedNotificationReceived);
 
-                if (DateTime.now().getMillis() - lastNotificationTimestamp.getMillis() > Timestamps.NOTIFICATION_NOT_RECEIVED_LIMIT) {
-                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.NOTIFICATION_NOT_RECEIVED_LIMIT_CROSSED, null);
+                if (DateTime.now().getMillis() - lastNotificationTimestamp
+                        .getMillis() > Timestamps.NOTIFICATION_NOT_RECEIVED_LIMIT)
+                {
+                    AnalyticsHelper
+                            .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.NOTIFICATION_NOT_RECEIVED_LIMIT_CROSSED, null);
                     eventCache.deleteAll();
                 }
 
-                if (DateTime.now().getMillis() - lastFriendRelocatedNotificationTimestamp.getMillis() > Timestamps.FRIEND_RELOCATED_NOTIFICATION_NOT_RECEIVED_LIMIT) {
-                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FRIEND_RELOCATED_NOTIFICATION_NOT_RECEIVED_LIMIT_CROSSED, null);
+                if (DateTime.now().getMillis() - lastFriendRelocatedNotificationTimestamp
+                        .getMillis() > Timestamps.FRIEND_RELOCATED_NOTIFICATION_NOT_RECEIVED_LIMIT)
+                {
+                    AnalyticsHelper
+                            .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FRIEND_RELOCATED_NOTIFICATION_NOT_RECEIVED_LIMIT_CROSSED, null);
                     userCache.deleteFriends();
                 }
             }
 
-            DateTime lastFacebookFriendsRefreshTimestamp = genericCache.get(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.class);
+            DateTime lastFacebookFriendsRefreshTimestamp = genericCache
+                    .get(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.class);
 
-            if (lastFacebookFriendsRefreshTimestamp != null) {
-                if (DateTime.now().minusDays(2).isAfter(lastFacebookFriendsRefreshTimestamp)) {
-                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FACEBOOK_FRIEND_REFRESHED_LIMIT_CROSSED, null);
+            if (lastFacebookFriendsRefreshTimestamp != null)
+            {
+                if (DateTime.now().minusDays(2).isAfter(lastFacebookFriendsRefreshTimestamp))
+                {
+                    AnalyticsHelper
+                            .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FACEBOOK_FRIEND_REFRESHED_LIMIT_CROSSED, null);
                     facebookService.getFacebookFriends(true);
                 }
-            } else {
+            }
+            else
+            {
                 facebookService.getFacebookFriends(true);
             }
 
-            if (genericCache.get(CacheKeys.GCM_TOKEN) == null) {
-                if (checkPlayServices()) {
+            if (genericCache.get(CacheKeys.GCM_TOKEN) == null)
+            {
+                if (checkPlayServices())
+                {
                     gcmService.register();
-                } else {
                 }
-            } else {
+                else
+                {
+                }
+            }
+            else
+            {
                 FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
             }
         }
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart()
+    {
         super.onStart();
 
-        if (!isBusRegistered) {
+        if (!isBusRegistered)
+        {
             bus.register(this);
         }
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.MAIN_ACTIVITY);
         genericCache.put(CacheKeys.IS_APP_IN_FOREGROUND, true);
@@ -154,62 +185,94 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause()
+    {
         super.onPause();
 
         genericCache.put(CacheKeys.IS_APP_IN_FOREGROUND, false);
     }
 
     @Override
-    protected void onStop() {
+    protected void onStop()
+    {
         super.onStop();
         bus.unregister(this);
         isBusRegistered = false;
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy()
+    {
         super.onDestroy();
         ChatHelper.disconnectConnection();
     }
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressed()
+    {
         String activeFragment = genericCache.get(CacheKeys.ACTIVE_FRAGMENT);
 
-        if (activeFragment == null) {
+        if (activeFragment == null)
+        {
             super.onBackPressed();
         }
 
-        if (activeFragment.equals(BackstackTags.HOME)) {
+        if (activeFragment.equals(BackstackTags.HOME))
+        {
             finish();
-        } else if (activeFragment.equals(BackstackTags.ACCOUNTS)) {
+        }
+        else if (activeFragment.equals(BackstackTags.ACCOUNTS))
+        {
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
-        } else if (activeFragment.equals(BackstackTags.MANAGE_FRIENDS)) {
+        }
+        else if (activeFragment.equals(BackstackTags.MANAGE_FRIENDS))
+        {
             FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
-        } else if (activeFragment.equals(BackstackTags.FAQ)) {
+        }
+        else if (activeFragment.equals(BackstackTags.FAQ))
+        {
             FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
-        } else if (activeFragment.equals(BackstackTags.INVITE_USERS_CONTAINER)) {
+        }
+        else if (activeFragment.equals(BackstackTags.INVITE_USERS_CONTAINER))
+        {
             bus.post(new BackPressedTrigger(BackstackTags.INVITE_USERS_CONTAINER));
-        } else if (activeFragment.equals(BackstackTags.EVENT_DETAILS_CONTAINER)) {
+        }
+        else if (activeFragment.equals(BackstackTags.EVENT_DETAILS_CONTAINER))
+        {
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
-        } else if (activeFragment.equals(BackstackTags.EDIT)) {
+        }
+        else if (activeFragment.equals(BackstackTags.EDIT))
+        {
             bus.post(new BackPressedTrigger(BackstackTags.EDIT));
-        } else if (activeFragment.equals(BackstackTags.CHAT)) {
+        }
+        else if (activeFragment.equals(BackstackTags.CHAT))
+        {
             bus.post(new BackPressedTrigger(BackstackTags.CHAT));
-        } else if (activeFragment.equals(BackstackTags.NOTIFICATIONS)) {
+        }
+        else if (activeFragment.equals(BackstackTags.NOTIFICATIONS))
+        {
+            FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
+        }
+        else if (activeFragment.equals(BackstackTags.CREATE))
+        {
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
         }
     }
 
-    private boolean checkPlayServices() {
+    private boolean checkPlayServices()
+    {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+        if (resultCode != ConnectionResult.SUCCESS)
+        {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode))
+            {
                 GooglePlayServicesUtil.getErrorDialog(resultCode, this,
                         PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Toast.makeText(this, "This device does not support Google Play Services.", Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                Toast.makeText(this, "This device does not support Google Play Services.", Toast.LENGTH_LONG)
+                     .show();
                 finish();
             }
             return false;
@@ -218,17 +281,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Subscribe
-    public void onGcmRegistrationComplete(GcmRegistrationCompleteTrigger trigger) {
-        runOnUiThread(new Runnable() {
+    public void onGcmRegistrationComplete(GcmRegistrationCompleteTrigger trigger)
+    {
+        runOnUiThread(new Runnable()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
                 FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
             }
         });
     }
 
     @Subscribe
-    public void onEventsFetched(EventsFetchForActivityTrigger trigger) {
+    public void onEventsFetched(EventsFetchForActivityTrigger trigger)
+    {
         List<Event> eventList = trigger.getEvents();
 
         Log.d("APP", "event id ---- " + eventId);
@@ -238,7 +305,8 @@ public class MainActivity extends AppCompatActivity {
 
         int activePosition = 0;
 
-        if (eventList.contains(activeEvent)) {
+        if (eventList.contains(activeEvent))
+        {
             activePosition = eventList.indexOf(activeEvent);
         }
 
@@ -253,11 +321,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Subscribe
-    public void onEventsNotFetched(GenericErrorTrigger trigger) {
-        if (trigger.getErrorCode() == ErrorCode.EVENTS_FETCH_FOR_ACTIVITY_FAILURE) {
-            runOnUiThread(new Runnable() {
+    public void onEventsNotFetched(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.EVENTS_FETCH_FOR_ACTIVITY_FAILURE)
+        {
+            runOnUiThread(new Runnable()
+            {
                 @Override
-                public void run() {
+                public void run()
+                {
                     FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
                 }
             });
@@ -265,22 +337,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Subscribe
-    public void onEventEditFailedAsFinalised(GenericErrorTrigger trigger) {
-        if (trigger.getErrorCode() == ErrorCode.EVENT_EDIT_FAILURE_LOCKED) {
+    public void onEventEditFailedAsFinalised(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.EVENT_EDIT_FAILURE_LOCKED)
+        {
             Toast.makeText(this, R.string.event_edit_failed_locked, Toast.LENGTH_LONG).show();
         }
     }
 
     @Subscribe
-    public void onEventFinalisationFailed(GenericErrorTrigger trigger) {
-        if (trigger.getErrorCode() == ErrorCode.EVENT_COULD_NOT_BE_FINALISED) {
+    public void onEventFinalisationFailed(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.EVENT_COULD_NOT_BE_FINALISED)
+        {
             Toast.makeText(this, R.string.event_finalisation_failed, Toast.LENGTH_LONG).show();
         }
     }
 
     @Subscribe
-    public void onEventUnFinalisationFailed(GenericErrorTrigger trigger) {
-        if (trigger.getErrorCode() == ErrorCode.EVENT_COULD_NOT_BE_UNFINALISED) {
+    public void onEventUnFinalisationFailed(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.EVENT_COULD_NOT_BE_UNFINALISED)
+        {
             Toast.makeText(this, R.string.event_unfinalisation_failed, Toast.LENGTH_LONG).show();
         }
     }

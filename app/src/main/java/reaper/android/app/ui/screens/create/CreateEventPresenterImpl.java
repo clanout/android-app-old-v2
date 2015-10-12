@@ -264,7 +264,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
         }
 
         DateTime now = DateTime.now();
-        if (startTime.isAfter(now))
+        if (startTime.isBefore(now))
         {
             view.displayInvalidTimeError();
             return;

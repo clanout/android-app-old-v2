@@ -11,4 +11,5 @@ public class BackstackTags
     public static final String EDIT = "edit";
     public static final String CHAT = "chat";
     public static final String NOTIFICATIONS = "notifications";
+    public static final String CREATE = "create";
 }
