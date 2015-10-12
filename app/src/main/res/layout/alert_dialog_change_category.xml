@@ -73,8 +73,8 @@
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:scaleType="center"
-                        app:materialIcon="movie"
-                        app:materialIconColor="@color/whity"
+                        app:materialIcon="theater"
+                        app:materialIconColor="@color/white"
                         app:materialIconSize="36dp" />
 
                 </LinearLayout>
