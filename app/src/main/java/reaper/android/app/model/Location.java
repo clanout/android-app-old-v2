@@ -1,5 +1,6 @@
 package reaper.android.app.model;
 
+import reaper.android.app.api.core.GsonProvider;
 import reaper.android.app.model.core.Model;
 
 public class Location implements Model
@@ -47,5 +48,11 @@ public class Location implements Model
     public void setZone(String zone)
     {
         this.zone = zone;
+    }
+
+    @Override
+    public String toString()
+    {
+        return GsonProvider.getGson().toJson(this);
     }
 }

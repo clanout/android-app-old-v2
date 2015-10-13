@@ -12,6 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,7 +48,6 @@ import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
-import reaper.android.app.model.Location;
 import reaper.android.app.model.Suggestion;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
@@ -55,13 +56,6 @@ import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.communicator.Communicator;
-import rx.Subscriber;
-import rx.Subscription;
-import rx.android.widget.OnTextChangeEvent;
-import rx.android.widget.WidgetObservable;
-import rx.functions.Func1;
-import rx.subscriptions.CompositeSubscription;
-import timber.log.Timber;
 
 public class CreateEventDetailsFragment extends BaseFragment implements CreateEventView,
         LocationSuggestionAdapter.SuggestionClickListener,
@@ -117,6 +111,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     boolean isTimeSelectorVisible;
 
     EditText location;
+    TextWatcher locationListener;
     ImageView locationIcon;
     boolean isLocationUpdating;
 
@@ -128,14 +123,9 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     /* Data */
     DateTimeUtils dateTimeUtils;
 
-    EventCategory category;
     Event.Type type;
-    Location eventLocation;
     LocalTime startTime;
     LocalDate startDate;
-
-    /* Subscriptions */
-    CompositeSubscription subscriptions;
 
     /* Listeners */
     ClickListener clickListener;
@@ -160,11 +150,10 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     }
 
     @Override
-    public void setLocation(Location loc)
+    public void setLocation(String loc)
     {
-        eventLocation = loc;
         isLocationUpdating = true;
-        location.setText(loc.getName());
+        location.setText(loc);
         location.setSelection(location.length());
         isLocationUpdating = false;
 
@@ -250,7 +239,6 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        subscriptions = new CompositeSubscription();
         dateTimeUtils = new DateTimeUtils();
     }
 
@@ -324,16 +312,6 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
             typeSelector.getTabAt(1).select();
         }
 
-        category = (EventCategory) getArguments().getSerializable(ARG_CATEGORY);
-        if (category == null)
-        {
-            category = EventCategory.GENERAL;
-        }
-
-        icon.setImageDrawable(DrawableFactory
-                .get(category, Dimensions.CREATE_EVENT_ICON_SIZE));
-        iconContainer.setBackground(DrawableFactory.randomIconBackground());
-
         dayIcon.setImageDrawable(MaterialDrawableBuilder.with(getActivity())
                                                         .setIcon(MaterialDrawableBuilder.IconValue.CALENDAR)
                                                         .setColor(ContextCompat
@@ -360,7 +338,47 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
         initTimeSelector();
         initRecyclerView();
 
+        EventCategory category = (EventCategory) getArguments().getSerializable(ARG_CATEGORY);
         presenter = new CreateEventPresenterImpl(Communicator.getInstance().getBus(), category);
+
+        icon.setImageDrawable(DrawableFactory
+                .get(category, Dimensions.CREATE_EVENT_ICON_SIZE));
+        iconContainer.setBackground(DrawableFactory.randomIconBackground());
+
+        locationListener = new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                parent.scrollTo(0, suggestionContainer.getBottom());
+
+                if (!isLocationUpdating)
+                {
+                    if (s.length() == 0)
+                    {
+                        presenter.changeCategory(EventCategory.EAT_OUT);
+                    }
+                    else if (s.length() >= 3)
+                    {
+                        presenter.autocomplete(s.toString());
+                    }
+
+                    presenter.setLocationName(s.toString());
+                }
+            }
+        };
     }
 
     @Override
@@ -391,53 +409,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
             }
         });
 
-        Subscription subscription = WidgetObservable
-                .text(location)
-                .map(new Func1<OnTextChangeEvent, String>()
-                {
-                    @Override
-                    public String call(OnTextChangeEvent onTextChangeEvent)
-                    {
-                        return onTextChangeEvent.text()
-                                                .toString();
-                    }
-                })
-                .subscribe(new Subscriber<String>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e)
-                    {
-
-                    }
-
-                    @Override
-                    public void onNext(String s)
-                    {
-                        parent.scrollTo(0, suggestionContainer.getBottom());
-
-                        if (!isLocationUpdating)
-                        {
-                            if (s.length() == 0)
-                            {
-                                presenter.changeCategory(EventCategory.EAT_OUT);
-                            }
-                            else if (s.length() >= 3)
-                            {
-                                presenter.autocomplete(s);
-                            }
-                        }
-
-                        eventLocation.setName(s);
-                        eventLocation.setLongitude(null);
-                        eventLocation.setLatitude(null);
-                    }
-                });
+        location.addTextChangedListener(locationListener);
 
         typeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
         {
@@ -467,8 +439,6 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
             {
             }
         });
-
-        subscriptions.add(subscription);
     }
 
     @Override
@@ -477,7 +447,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
         super.onPause();
         location.setOnFocusChangeListener(null);
         typeSelector.setOnTabSelectedListener(null);
-        subscriptions.clear();
+        location.removeTextChangedListener(locationListener);
         presenter.detachView();
     }
 
@@ -497,15 +467,9 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                     String eventDescription = description.getText().toString();
                     DateTime start = DateTimeUtils.getDateTime(startDate, startTime);
                     DateTime end = DateTimeUtils.getEndTime(start);
-                    Timber.v("Title : " + eventTitle);
-                    Timber.v("Start Time : " + start);
-                    Timber.v("End Time : " + end);
-                    Timber.v("Location : " + location.getText().toString());
-                    Timber.v("Type : " + type);
-                    Timber.v("Category : " + category);
 
                     presenter
-                            .create(eventTitle, type, category, eventDescription, start, end, eventLocation);
+                            .create(eventTitle, type, eventDescription, start, end);
 
                     return true;
                 }
@@ -530,6 +494,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     {
         daySelectorContainer.setVisibility(View.GONE);
 
+        daySelector.setOnTabSelectedListener(null);
         daySelector.setTabMode(TabLayout.MODE_SCROLLABLE);
         daySelector.setTabGravity(TabLayout.GRAVITY_FILL);
         daySelector
@@ -581,6 +546,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     {
         timeSelectorContainer.setVisibility(View.GONE);
 
+        timeSelector.setOnTabSelectedListener(null);
         timeSelector.setTabMode(TabLayout.MODE_SCROLLABLE);
         timeSelector.setTabGravity(TabLayout.GRAVITY_FILL);
         timeSelector
@@ -853,7 +819,6 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
 
     private void changeCategory(EventCategory category)
     {
-        this.category = category;
         presenter.changeCategory(category);
     }
 

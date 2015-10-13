@@ -10,7 +10,7 @@ public interface CreateEventView
 {
     void displaySuggestions(List<Suggestion> suggestions);
 
-    void setLocation(Location location);
+    void setLocation(String locationName);
 
     void showLoading();
 

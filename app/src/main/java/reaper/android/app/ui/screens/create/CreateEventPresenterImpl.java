@@ -22,6 +22,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
+import timber.log.Timber;
 
 public class CreateEventPresenterImpl implements CreateEventPresenter
 {
@@ -56,6 +57,11 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
         userLocation = new LocationService(bus).getUserLocation();
         subscriptions = new CompositeSubscription();
         this.eventCategory = eventCategory;
+
+        if (this.eventCategory == null)
+        {
+            this.eventCategory = EventCategory.GENERAL;
+        }
     }
 
     @Override
@@ -157,12 +163,12 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     {
         if (suggestion.getLatitude() != null && suggestion.getLongitude() != null)
         {
-            Location location = new Location();
+            location = new Location();
             location.setZone(userLocation.getZone());
             location.setLatitude(suggestion.getLatitude());
             location.setLongitude(suggestion.getLongitude());
             location.setName(suggestion.getName());
-            view.setLocation(location);
+            view.setLocation(location.getName());
 
             isLocationFetchInProgress = false;
         }
@@ -191,10 +197,10 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
                             @Override
                             public void onError(Throwable e)
                             {
-                                Location location = new Location();
+                                location = new Location();
                                 location.setZone(userLocation.getZone());
                                 location.setName(suggestion.getName());
-                                view.setLocation(location);
+                                view.setLocation(location.getName());
 
                                 isLocationFetchInProgress = false;
 
@@ -207,7 +213,8 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
                             @Override
                             public void onNext(Location location)
                             {
-                                view.setLocation(location);
+                                CreateEventPresenterImpl.this.location = location;
+                                view.setLocation(location.getName());
                             }
                         });
 
@@ -217,10 +224,10 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
             {
                 if (view != null)
                 {
-                    Location location = new Location();
+                    location = new Location();
                     location.setZone(userLocation.getZone());
                     location.setName(suggestion.getName());
-                    view.setLocation(location);
+                    view.setLocation(location.getName());
                 }
 
                 isLocationFetchInProgress = false;
@@ -229,8 +236,15 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     }
 
     @Override
-    public void create(String title, Event.Type type, EventCategory category, String description,
-                       DateTime startTime, DateTime endTime, Location location)
+    public void setLocationName(String locationName)
+    {
+        location = new Location();
+        location.setZone(userLocation.getZone());
+        location.setName(locationName);
+    }
+
+    @Override
+    public void create(String title, Event.Type type, String description, DateTime startTime, DateTime endTime)
     {
         view.showLoading();
 
@@ -238,11 +252,9 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
 
         this.title = title;
         this.type = type;
-        this.eventCategory = category;
         this.description = description;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.location = location;
 
         if (!isLocationFetchInProgress)
         {

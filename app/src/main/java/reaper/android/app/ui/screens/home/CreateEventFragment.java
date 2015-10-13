@@ -168,7 +168,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
         super.onActivityCreated(savedInstanceState);
 
         createEventModel = (CreateEventModel) getArguments().getSerializable(ARG_MODEL);
-        if(createEventModel != null)
+        if (createEventModel != null)
         {
             eventCategory = createEventModel.getCategory();
         }
@@ -269,7 +269,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
         imm.hideSoftInputFromWindow(title.getWindowToken(), 0);
 
         DateTime start = DateTimeUtils.getDateTime(startDate, startTime);
-        if(start.isBefore(DateTime.now()))
+        if (start.isBefore(DateTime.now()))
         {
             Snackbar.make(getView(), "Start time cannot be before the current time", Snackbar.LENGTH_LONG)
                     .show();
@@ -372,6 +372,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
 
         type = Event.Type.INVITE_ONLY;
 
+        typeSelector.setOnTabSelectedListener(null);
         typeSelector.setTabMode(TabLayout.MODE_FIXED);
         typeSelector.setTabGravity(TabLayout.GRAVITY_CENTER);
         typeSelector.removeAllTabs();
@@ -422,6 +423,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
     {
         daySelectorContainer.setVisibility(View.GONE);
 
+        daySelector.setOnTabSelectedListener(null);
         daySelector.setTabMode(TabLayout.MODE_SCROLLABLE);
         daySelector.setTabGravity(TabLayout.GRAVITY_FILL);
         daySelector
@@ -469,6 +471,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
     {
         timeSelectorContainer.setVisibility(View.GONE);
 
+        timeSelector.setOnTabSelectedListener(null);
         timeSelector.setTabMode(TabLayout.MODE_SCROLLABLE);
         timeSelector.setTabGravity(TabLayout.GRAVITY_FILL);
         timeSelector
