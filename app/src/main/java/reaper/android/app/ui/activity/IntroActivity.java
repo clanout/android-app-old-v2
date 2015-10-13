@@ -12,6 +12,8 @@ import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GoogleAnalyticsConstants;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 /**
  * Created by harsh on 27/09/15.
@@ -41,6 +43,8 @@ public class IntroActivity extends AppIntro {
     @Override
     public void onSkipPressed() {
 
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.INTRO_ACTIVITY_SKIP_PRESSED, null);
+
         genericCache.put(CacheKeys.IS_FIRST_TIME_USER, false);
         Intent intent = new Intent(this, FacebookActivity.class);
         startActivity(intent);
@@ -49,6 +53,8 @@ public class IntroActivity extends AppIntro {
 
     @Override
     public void onDonePressed() {
+
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.INTRO_ACTIVITY_DONE_PRESSED, null);
 
         genericCache.put(CacheKeys.IS_FIRST_TIME_USER, false);
         Intent intent = new Intent(this, FacebookActivity.class);

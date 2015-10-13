@@ -275,14 +275,22 @@ public class MainActivity extends AppCompatActivity
                      .show();
                 finish();
             }
+
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.PLAY_SERVICES_NOT_PRESENT, null);
+
             return false;
         }
+
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.PLAY_SERVICES_PRESENT, null);
+
         return true;
     }
 
     @Subscribe
     public void onGcmRegistrationComplete(GcmRegistrationCompleteTrigger trigger)
     {
+
+
         runOnUiThread(new Runnable()
         {
             @Override
@@ -298,13 +306,6 @@ public class MainActivity extends AppCompatActivity
     {
         List<Event> eventList = trigger.getEvents();
 
-        for(Event event: eventList)
-        {
-            Log.d("APP", event.getId() + event.getTitle());
-        }
-
-        Log.d("APP", "event id ---- " + eventId);
-
         Event activeEvent = new Event();
         activeEvent.setId(eventId);
 
@@ -314,8 +315,6 @@ public class MainActivity extends AppCompatActivity
         {
             activePosition = eventList.indexOf(activeEvent);
         }
-
-        Log.d("APP", "active position ---- " + activePosition);
 
         EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
         Bundle bundle = new Bundle();

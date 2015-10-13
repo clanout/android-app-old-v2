@@ -40,4 +40,8 @@ public class GoogleAnalyticsConstants
     public static final String FACEBOOK_FRIEND_REFRESHED_LIMIT_CROSSED = "facebook_friends_refresh_limit_crossed";
     public static final String PERSON_BLOCKED = "person_blocked";
     public static final String PERSON_UNBLOCKED = "person_unblocked";
+    public static final String INTRO_ACTIVITY_SKIP_PRESSED = "intro_activity_skip_pressed";
+    public static final String INTRO_ACTIVITY_DONE_PRESSED = "intro_Activity_done_pressed";
+    public static final String PLAY_SERVICES_PRESENT = "play_services_present";
+    public static final String PLAY_SERVICES_NOT_PRESENT = "play_services_not_present";
 }
