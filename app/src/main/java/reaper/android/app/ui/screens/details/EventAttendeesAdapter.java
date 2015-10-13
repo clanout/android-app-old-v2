@@ -22,6 +22,7 @@ import reaper.android.R;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.root.Reaper;
+import reaper.android.app.ui.util.CircleTransform;
 
 public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAdapter.EventDetailsViewHolder>
 {
@@ -96,14 +97,14 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
     public class EventDetailsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         private ImageView inviter, rsvp;
-        private CircleImageView pic;
+        private ImageView pic;
         private TextView name;
 
         public EventDetailsViewHolder(View itemView)
         {
             super(itemView);
 
-            pic = (CircleImageView) itemView.findViewById(R.id.iv_event_attendee_pic);
+            pic = (ImageView) itemView.findViewById(R.id.iv_event_attendee_pic);
             inviter = (ImageView) itemView.findViewById(R.id.iv_event_attendee_inviter);
             rsvp = (ImageView) itemView.findViewById(R.id.iv_event_attendee_rsvp);
             name = (TextView) itemView.findViewById(R.id.tv_event_attendee_name);
@@ -116,9 +117,7 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
             Picasso.with(context)
                     .load(AppConstants.FACEBOOK_END_POINT + attendee.getId() + "/picture")
                     .placeholder(personDrawable)
-                    .fit()
-                    .centerInside()
-                    .noFade()
+                    .transform(new CircleTransform())
                     .into(pic);
 
             name.setText(attendee.getName());

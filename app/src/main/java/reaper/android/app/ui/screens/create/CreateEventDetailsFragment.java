@@ -46,6 +46,7 @@ import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.Dimensions;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.Suggestion;
@@ -55,6 +56,7 @@ import reaper.android.app.ui.util.DateTimeUtils;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 public class CreateEventDetailsFragment extends BaseFragment implements CreateEventView,
@@ -393,6 +395,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
         title.clearFocus();
 
         CacheManager.getGenericCache().put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.CREATE);
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.CREATE_FRAGMENT);
 
         presenter.attachView(this);
         initDayTime();

@@ -49,6 +49,7 @@ import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
+import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.analytics.AnalyticsHelper;

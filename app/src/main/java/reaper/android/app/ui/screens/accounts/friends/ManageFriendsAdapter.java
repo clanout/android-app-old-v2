@@ -25,6 +25,7 @@ import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Friend;
 import reaper.android.app.root.Reaper;
+import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.common.analytics.AnalyticsHelper;
 
 /**
@@ -81,9 +82,7 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
         Picasso.with(context)
                 .load(AppConstants.FACEBOOK_END_POINT + current.getId() + "/picture?width=500")
                 .placeholder(personDrawable)
-                .fit()
-                .centerInside()
-                .noFade()
+                .transform(new CircleTransform())
                 .into(holder.userPic);
 
         holder.username.setText(current.getName());
@@ -103,7 +102,7 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
 
     class ManageFriendsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        CircleImageView userPic;
+        ImageView userPic;
         TextView username;
         ImageView blockIcon;
 
@@ -111,7 +110,7 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
             super(itemView);
 
             username = (TextView) itemView.findViewById(R.id.tv_list_item_manage_friends_user_name);
-            userPic = (CircleImageView) itemView.findViewById(R.id.iv_list_item_manage_friends_user_pic);
+            userPic = (ImageView) itemView.findViewById(R.id.iv_list_item_manage_friends_user_pic);
             blockIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_manage_friends_block);
 
             blockIcon.setOnClickListener(this);

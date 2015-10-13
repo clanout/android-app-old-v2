@@ -20,6 +20,8 @@ public class GoogleAnalyticsConstants
     public static final String INVITE_PHONEBOOK_CONTACTS_FRAGMENT = "InvitePhonebookContactsFragment";
     public static final String EDIT_EVENT_FRAGMENT = "EDIT_EVENT_FRAGMENT";
     public static final String NOTIFICATION_FRAGMENT = "notification_fragment";
+    public static final String CREATE_FRAGMENT = "create_fragment" ;
+    public static final String INVITE_THROUGH_SMS_FRAGMENT = "invite_through_sms_fragment";
 
     // Event CATEGORY
     public static final String BUTTON_CLICK = "button_click";
@@ -38,6 +40,4 @@ public class GoogleAnalyticsConstants
     public static final String FACEBOOK_FRIEND_REFRESHED_LIMIT_CROSSED = "facebook_friends_refresh_limit_crossed";
     public static final String PERSON_BLOCKED = "person_blocked";
     public static final String PERSON_UNBLOCKED = "person_unblocked";
-
-
 }

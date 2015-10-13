@@ -20,6 +20,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import reaper.android.R;
+import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.common.notification.Notification;
 
 /**
@@ -82,15 +83,13 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     }
 
     public class NotificationsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private CircleImageView notificationIcon;
+        private ImageView notificationIcon;
         private TextView notificationMessage;
 
         public NotificationsViewHolder(View itemView) {
             super(itemView);
-            notificationIcon = (CircleImageView) itemView.findViewById(R.id.iv_list_item_notifiactions);
+            notificationIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_notifications);
             notificationMessage = (TextView) itemView.findViewById(R.id.tv_list_item_notifications);
-
-            notificationIcon.setImageDrawable(personDrawable);
             itemView.setOnClickListener(this);
         }
 
@@ -113,9 +112,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                     Picasso.with(context)
                             .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?height=500")
                             .placeholder(personDrawable)
-                            .fit()
-                            .centerCrop()
-                            .noFade()
+                            .transform(new CircleTransform())
                             .into(notificationIcon);
                     break;
                 case Notification.EVENT_UPDATED:
@@ -123,9 +120,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                     Picasso.with(context)
                             .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?height=500")
                             .placeholder(personDrawable)
-                            .fit()
-                            .centerCrop()
-                            .noFade()
+                            .transform(new CircleTransform())
                             .into(notificationIcon);
                     break;
                 case Notification.EVENT_REMOVED:
@@ -133,9 +128,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                     Picasso.with(context)
                             .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?height=500")
                             .placeholder(personDrawable)
-                            .fit()
-                            .centerCrop()
-                            .noFade()
+                            .transform(new CircleTransform())
                             .into(notificationIcon);
                     break;
                 case Notification.RSVP:
@@ -147,9 +140,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                     Picasso.with(context)
                             .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?height=500")
                             .placeholder(personDrawable)
-                            .fit()
-                            .centerCrop()
-                            .noFade()
+                            .transform(new CircleTransform())
                             .into(notificationIcon);
                     break;
                 case Notification.EVENT_CREATED:
@@ -157,9 +148,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                     Picasso.with(context)
                             .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?height=500")
                             .placeholder(personDrawable)
-                            .fit()
-                            .centerCrop()
-                            .noFade()
+                            .transform(new CircleTransform())
                             .into(notificationIcon);
                     break;
             }

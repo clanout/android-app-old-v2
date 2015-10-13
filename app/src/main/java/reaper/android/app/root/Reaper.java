@@ -60,8 +60,6 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     // TODO -- Fetch pending invites
     // TODO --- timber test compile and stetho
     // TODO -- Analytics events
-    // TODO -- placeholders in Picasso circle image view
-    // TODO -- clicking notification opens duplicate activity
 
     @Override
     public void onCreate()

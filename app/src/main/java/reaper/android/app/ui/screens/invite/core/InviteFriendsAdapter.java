@@ -30,6 +30,7 @@ import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
 import reaper.android.app.trigger.user.ManageAppFriendsTrigger;
 import reaper.android.app.trigger.user.ManagePhoneContactsTrigger;
+import reaper.android.app.ui.util.CircleTransform;
 
 /**
  * Created by harsh on 13-05-2015.
@@ -83,9 +84,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
             Picasso.with(context)
                     .load(AppConstants.FACEBOOK_END_POINT + current.getId() + "/picture")
                     .placeholder(personDrawable)
-                    .fit()
-                    .centerInside()
-                    .noFade()
+                    .transform(new CircleTransform())
                     .into(holder.userPic);
 
 
@@ -127,7 +126,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
                         holder.alreadyInvited.setVisibility(View.GONE);
                         holder.checkBox.setVisibility(View.VISIBLE);
 
-                       holder.checkBox.setChecked(current.isChecked());
+                        holder.checkBox.setChecked(current.isChecked());
                     }
                 }
             }
@@ -141,7 +140,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
 
     class InviteFriendsViewHolder extends RecyclerView.ViewHolder {
 
-        CircleImageView userPic;
+        ImageView userPic;
         TextView username, alreadyInvited;
         CheckBox checkBox;
 
@@ -149,7 +148,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
             super(itemView);
 
             username = (TextView) itemView.findViewById(R.id.tv_list_item_invite_friends_user_name);
-            userPic = (CircleImageView) itemView.findViewById(R.id.iv_list_item_invite_friends_user_pic);
+            userPic = (ImageView) itemView.findViewById(R.id.iv_list_item_invite_friends_user_pic);
             alreadyInvited = (TextView) itemView.findViewById(R.id.tv_list_item_invite_friends_already_invited);
             checkBox = (CheckBox) itemView.findViewById(R.id.cb_list_item_invite_friends);
 

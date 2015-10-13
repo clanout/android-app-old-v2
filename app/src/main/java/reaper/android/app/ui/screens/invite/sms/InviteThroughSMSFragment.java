@@ -37,6 +37,7 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.PhoneContact;
 import reaper.android.app.model.PhoneContactComparator;
 import reaper.android.app.service.AccountsService;
@@ -46,6 +47,7 @@ import reaper.android.app.trigger.user.AllPhoneContactsForSMSFetchedTrigger;
 import reaper.android.app.trigger.user.PhoneAddedTrigger;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 /**
@@ -121,6 +123,8 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     @Override
     public void onResume() {
         super.onResume();
+
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_THROUGH_SMS_FRAGMENT);
 
         bus.register(this);
 
