@@ -83,7 +83,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_accounts, container, false);
-//        userName = (TextView) view.findViewById(R.id.tv_account_fragment_user_name);
+
         userPic = (ImageView) view.findViewById(R.id.iv_account_fragment_user_pic);
         userProfilePic = (CircleImageView) view.findViewById(R.id.iv_account_fragment_user_profile_pic);
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_accounts_fragment);
@@ -202,10 +202,15 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         if (position == 0) {
             FragmentUtils.changeFragment(fragmentManager, new ManageFriendsFragment());
         } else if (position == 1) {
+
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.UPDATE_PHONE_CLICKED_ACCOUNTS_FRAGMENT, userService.getActiveUserId());
+
             displayUpdatePhoneDialog();
         } else if (position == 2) {
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
             if (isWhatsappInstalled) {
+
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.WHATSAPP_INVITE_CLICKED_ACCOUNTS_FRAGMENT, userService.getActiveUserId());
 
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
@@ -218,6 +223,9 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                 Snackbar.make(getView(), R.string.whatsapp_not_installed, Snackbar.LENGTH_LONG).show();
             }
         } else if (position == 3) {
+
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.SHARE_FEEDBACK_CLICKED, userService.getActiveUserId());
+
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setCancelable(true);
 
@@ -267,6 +275,9 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                         Toast.makeText(getActivity(), R.string.empty_rating, Toast.LENGTH_LONG).show();
                         wantToCloseDialog = false;
                     } else {
+
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.FEEDBACK_SHARED, userService.getActiveUserId());
+
                         userService.shareFeedback(type, comment);
                         Toast.makeText(getActivity(), R.string.feedback_submitted, Toast.LENGTH_LONG).show();
                         wantToCloseDialog = true;
@@ -279,6 +290,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
             });
         } else if (position == 4) {
 
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.FAQ_CLICKED_ACCOUNTS_FRAGMENT, userService.getActiveUserId());
         }
     }
 
@@ -311,6 +323,9 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                     Toast.makeText(getActivity(), R.string.phone_invalid, Toast.LENGTH_LONG).show();
                     wantToCloseDialog = false;
                 } else {
+
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.PHONE_NUMBER_UPDATED, userService.getActiveUserId());
+
                     userService.updatePhoneNumber(parsedPhone);
                     InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     inputManager.hideSoftInputFromWindow(dialogView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);

@@ -214,6 +214,8 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
 
     private void displayErrorView()
     {
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_LOAD_FACEBOOK_FRIENDS, userService.getActiveUserId());
+
         recyclerView.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.GONE);
@@ -247,6 +249,9 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
+
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.INVITE_FACEBOOK_FRIENDS_REFRESH_CLIKCED, userService.getActiveUserId());
+
                 item.setActionView(R.layout.action_button_refreshing);
                 facebookService.getFacebookFriends(false);
                 return true;
@@ -371,6 +376,8 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     {
         if (view.getId() == R.id.fib_fragment_invite_facebook_friends_invite_people_whatsapp)
         {
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.WHATSAPP_INVITATION_INVITE_FACEBOOK_FRAGMENT, userService.getActiveUserId());
+
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
             if (isWhatsappInstalled)
             {

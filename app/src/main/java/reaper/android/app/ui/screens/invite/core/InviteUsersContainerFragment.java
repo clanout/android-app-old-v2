@@ -33,6 +33,7 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
+import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
@@ -56,6 +57,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
     //    private InviteUsersPagerAdapter inviteUsersPagerAdapter;
     private FragmentManager fragmentManager;
     private EventService eventService;
+    private UserService userService;
     private LocationService locationService;
     private Bus bus;
     private GenericCache genericCache;
@@ -118,6 +120,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
 
         bus = Communicator.getInstance().getBus();
         eventService = new EventService(bus);
+        userService = new UserService(bus);
         locationService = new LocationService(bus);
         fragmentManager = getActivity().getFragmentManager();
 
@@ -142,17 +145,17 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
 
                         switch (tab.getPosition()) {
                             case 0:
-                                if(genericCache.get(CacheKeys.HAS_SEEN_FACEBOOK_TAB_POP_UP) == null) {
+                                if (genericCache.get(CacheKeys.HAS_SEEN_FACEBOOK_TAB_POP_UP) == null) {
                                     displayFacebookPopup();
                                 }
                                 break;
                             case 1:
-                                if(genericCache.get(CacheKeys.HAS_SEEN_ON_APP_TAB_POP_UP) == null) {
+                                if (genericCache.get(CacheKeys.HAS_SEEN_ON_APP_TAB_POP_UP) == null) {
                                     displayOnAppPopup();
                                 }
                                 break;
                             case 2:
-                                if(genericCache.get(CacheKeys.HAS_SEEN_PHONEBOOK_TAB_POP_UP) == null) {
+                                if (genericCache.get(CacheKeys.HAS_SEEN_PHONEBOOK_TAB_POP_UP) == null) {
                                     displayPhonebookPopup();
                                 }
                                 break;
@@ -282,17 +285,22 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.ib_invite_friends_container_done) {
+
             invitedUsers = new ArrayList<>();
             invitedUsers.addAll(invitedFacebookFriends);
             invitedUsers.addAll(invitedPhoneContacts);
 
             if (invitedUsers.size() != 0) {
                 eventService.inviteUsers(event.getId(), invitedUsers);
+
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.FACEBOOK_FRIENDS_INVITED, "user - " + userService.getActiveUserId() + " event - " + event.getId() + " invitee count - " + invitedFacebookFriends.size());
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.PHONE_CONTACTS_INVITED, "user - " + userService.getActiveUserId() + " event - " + event.getId() + " invitee count - " + invitedPhoneContacts.size());
             }
 
-            if(smsInviteePhoneList.size() != 0)
-            {
+            if (smsInviteePhoneList.size() != 0) {
                 eventService.inviteThroughSMS(event.getId(), smsInviteePhoneList);
+
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.PHONE_CONTACTS_INVITED_THROUGH_SMS, "user - " + userService.getActiveUserId() + " event - " + event.getId() + " invitee count - " + smsInviteePhoneList.size());
             }
 
             eventService.fetchEvents(locationService.getUserLocation().getZone());

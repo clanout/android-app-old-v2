@@ -11,7 +11,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -237,6 +236,9 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
 
     private void displayErrorView()
     {
+
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_LOAD_ON_APP_FRIENDS, userService.getActiveUserId());
+
         mainContent.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
@@ -274,6 +276,8 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
                     Snackbar.make(getView(), R.string.add_phone_number, Snackbar.LENGTH_LONG).show();
                     return true;
                 } else {
+
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.INVITE_ON_APP_FRIENDS_REFRESH_CLICKED, userService.getActiveUserId());
 
                     menuItem.setActionView(R.layout.action_button_refreshing);
                     userService.refreshPhoneContacts(getActivity()
@@ -366,6 +370,9 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
     {
         if (view.getId() == R.id.fib_fragment_invite_phone_contacts_add_phone)
         {
+
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.UPDATE_PHONE_CLICKED_ON_APP_FRAGMENT, userService.getActiveUserId());
+
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setCancelable(true);
 
@@ -400,6 +407,9 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
                         wantToCloseDialog = false;
                     } else
                     {
+
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.UPDATED_PHONE_ON_APP_FRAGMENT, userService.getActiveUserId());
+
                         userService.updatePhoneNumber(parsedPhone);
 
                         InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -418,6 +428,9 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
 
         } else if (view.getId() == R.id.fib_fragment_invite_phone_contacts_invite_people_whatsapp)
         {
+
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.WHATSAPP_INVITE_ON_APP_FRAGMENT, userService.getActiveUserId());
+
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
             if (isWhatsappInstalled)
             {

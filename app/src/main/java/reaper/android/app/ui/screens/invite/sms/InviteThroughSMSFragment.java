@@ -194,6 +194,9 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     }
 
     private void displayErrorView() {
+
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_LOAD_PHONEBOOK, userService.getActiveUserId());
+
         mainContent.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
@@ -223,6 +226,9 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.fib_fragment_invite_through_sms_add_phone) {
+
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.UPDATE_PHONE_CLICKED_INVITE_SMS_FRAGMENT, userService.getActiveUserId());
+
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setCancelable(true);
 
@@ -251,6 +257,9 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
                         Snackbar.make(getView(), R.string.phone_invalid, Snackbar.LENGTH_LONG).show();
                         wantToCloseDialog = false;
                     } else {
+
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.UPDATED_PHONE_INVITE_SMS_FRAGMENT, userService.getActiveUserId());
+
                         userService.updatePhoneNumber(parsedPhone);
 
                         InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -267,6 +276,9 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
             });
 
         } else if (view.getId() == R.id.fib_fragment_invite_through_sms_invite_people_whatsapp) {
+
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.WHATSAPP_INVITATION_INVITE_THROUGH_SMS_FRAGMENT, userService.getActiveUserId());
+
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
             if (isWhatsappInstalled) {
                 Intent sendIntent = new Intent();

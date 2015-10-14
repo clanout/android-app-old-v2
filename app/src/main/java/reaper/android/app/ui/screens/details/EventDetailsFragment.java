@@ -389,6 +389,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
+
                 if (EventUtils.canEdit(event, userService.getActiveUserId()) == EventUtilsConstants.CAN_EDIT)
                 {
                     if (areEventDetailsFetched)

@@ -93,22 +93,13 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
         super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null) {
-            Log.d("APP", "saved instance state");
             events = (List<Event>) savedInstanceState.get(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
             activePosition = savedInstanceState.getInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION);
         } else {
-            Log.d("APP", "not saved instance state");
             Bundle bundle = getArguments();
             events = (List<Event>) bundle.get(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
             activePosition = bundle.getInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION);
         }
-
-        for(Event event: events)
-        {
-            Log.d("APP", event.getId());
-        }
-
-        Log.d("APP", "active position -- " + activePosition);
 
         if (events == null) {
             throw new IllegalStateException("Event cannot be null while creating EventDetailsFragment instance");
@@ -304,6 +295,9 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
     }
 
     private void updateRsvp(Event.RSVP newRsvp) {
+
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.RSVP_UPDATED, "user - " + userService.getActiveUserId() + "event - " + events.get(activePosition).getId() + "rsvp - " + newRsvp.toString());
+
         renderRsvpButton(newRsvp);
 
         Event.RSVP oldRsvp = events.get(activePosition).getRsvp();

@@ -181,6 +181,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         try {
             ChatHelper.getXmppConnection();
         } catch (Exception e) {
+
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_GET_XMPP_CONNECTION, userService.getActiveUserId());
+
             renderNoSessionView();
         }
 
@@ -267,6 +270,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         try {
             chatService.fetchHistory(multiUserChat, userService.getActiveUserName() + "_" + userService.getActiveUserId(), userService.getActiveUserId(), connection.getPacketReplyTimeout(), 20);
         } catch (Exception e) {
+
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_LOAD_CHAT_HISTORY, userService.getActiveUserId());
+
             renderNoSessionView();
         }
     }
@@ -283,6 +289,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
             try {
                 chatService.postMessage(multiUserChat, message, userService.getActiveUserName() + "_" + userService.getActiveUserId(), connection.getPacketReplyTimeout());
             } catch (Exception e) {
+
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_SEND_CHAT_MESSAGE, userService.getActiveUserId());
+
                 typeMessage.setText(message);
                 Snackbar.make(getView(), R.string.chat_message_not_sent, Snackbar.LENGTH_LONG).show();
                 return;
@@ -315,6 +324,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
             try {
                 chatService.fetchHistory(multiUserChat, userService.getActiveUserName() + "_" + userService.getActiveUserId(), userService.getActiveUserId(), connection.getPacketReplyTimeout(), maxStanzas);
             } catch (Exception e) {
+
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_LOAD_CHAT_HISTORY, userService.getActiveUserId());
+
                 renderNoSessionView();
             }
             loadHistory.setEnabled(true);
@@ -326,6 +338,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         try {
             ChatHelper.getXmppConnection();
         } catch (Exception e) {
+
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_GET_XMPP_CONNECTION, userService.getActiveUserId());
+
             renderNoSessionView();
         }
 
