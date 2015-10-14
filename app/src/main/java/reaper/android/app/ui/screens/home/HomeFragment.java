@@ -2,9 +2,11 @@ package reaper.android.app.ui.screens.home;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -20,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
@@ -88,6 +91,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
     View noEvents;
     View error;
     View loading;
+    ProgressBar progressBar;
 
     MenuItem notification;
 
@@ -115,6 +119,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
         error = view.findViewById(R.id.ll_home_error);
         loading = view.findViewById(R.id.ll_home_loading);
         createEvent = (ViewPager) view.findViewById(R.id.vp_home_create);
+        progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_home);
 
         return view;
     }
@@ -123,6 +128,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+
+        progressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(getActivity(), R.color.accent), PorterDuff.Mode.SRC_IN);
 
         toolbar.setTitle(R.string.app_name);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);

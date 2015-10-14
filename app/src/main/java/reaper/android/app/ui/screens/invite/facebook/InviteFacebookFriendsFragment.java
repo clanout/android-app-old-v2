@@ -1,6 +1,7 @@
 package reaper.android.app.ui.screens.invite.facebook;
 
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,6 +17,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
@@ -62,6 +65,8 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     private FloatingActionButton inviteWhatsapp;
     private Menu menu;
     private Drawable refreshDrawable;
+    private LinearLayout loading;
+    private ProgressBar progressBar;
 
     private InviteFriendsAdapter inviteFriendsAdapter;
     private UserService userService;
@@ -94,6 +99,8 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_invite_facebook_friends);
         noFriendsMessage = (TextView) view.findViewById(R.id.tv_invite_facebook_friends_no_users);
         inviteWhatsapp = (FloatingActionButton) view.findViewById(R.id.fib_fragment_invite_facebook_friends_invite_people_whatsapp);
+        loading = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_facebook_friends_loading);
+        progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_invite_facebook_friends);
 
         return view;
     }
@@ -103,7 +110,8 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     {
         super.onActivityCreated(savedInstanceState);
 
-        displayBasicView();
+        displayLoadingView();
+        progressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(getActivity(), R.color.accent), PorterDuff.Mode.SRC_IN);
 
         Bundle bundle = getArguments();
 
@@ -196,11 +204,20 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
         bus.unregister(this);
     }
 
+    private void displayLoadingView()
+    {
+        recyclerView.setVisibility(View.GONE);
+        noFriendsMessage.setVisibility(View.GONE);
+        inviteWhatsapp.setVisibility(View.GONE);
+        loading.setVisibility(View.VISIBLE);
+    }
+
     private void displayBasicView()
     {
         recyclerView.setVisibility(View.VISIBLE);
         noFriendsMessage.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
+        loading.setVisibility(View.GONE);
     }
 
     private void displayNoFriendsView()
@@ -208,6 +225,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
         recyclerView.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.VISIBLE);
+        loading.setVisibility(View.GONE);
 
         noFriendsMessage.setText(R.string.no_local_facebook_friends);
     }
@@ -219,6 +237,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
         recyclerView.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.GONE);
+        loading.setVisibility(View.GONE);
 
         noFriendsMessage.setText(R.string.facebook_friends_not_fetched);
     }

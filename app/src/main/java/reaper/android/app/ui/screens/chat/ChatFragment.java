@@ -2,6 +2,7 @@ package reaper.android.app.ui.screens.chat;
 
 import android.app.FragmentManager;
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -21,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
@@ -73,8 +75,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
     private ImageView send;
     private ListView listView;
     private TextView noSessionMessage;
-    private LinearLayout mainContent;
+    private LinearLayout mainContent, loading;
     private Button loadHistory;
+    private ProgressBar progressBar;
 
     private ChatAdapter chatAdapter;
     private List<ChatMessage> chatMessageList;
@@ -116,8 +119,10 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         listView = (ListView) view.findViewById(R.id.lv_chat_fragment);
         noSessionMessage = (TextView) view.findViewById(R.id.tv_fragment_chat_no_session);
         mainContent = (LinearLayout) view.findViewById(R.id.ll_fragment_chat_main_content);
+        loading = (LinearLayout) view.findViewById(R.id.ll_fragment_chat_loading);
         loadHistory = (Button) view.findViewById(R.id.b_chat_fragment_load_history);
         toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_chat);
+        progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_chat);
 
         return view;
     }
@@ -127,6 +132,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         super.onActivityCreated(savedInstanceState);
 
         ((MainActivity) getActivity()).setSupportActionBar(toolbar);
+
+        renderLoadingView();
+        progressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(getActivity(), R.color.accent), PorterDuff.Mode.SRC_IN);
 
         send.setOnClickListener(this);
         loadHistory.setOnClickListener(this);
@@ -192,6 +200,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
     private void renderNoSessionView() {
         mainContent.setVisibility(View.GONE);
+        loading.setVisibility(View.GONE);
         noSessionMessage.setVisibility(View.VISIBLE);
         noSessionMessage.setText(R.string.chat_messages_not_fetched);
         return;
@@ -201,11 +210,20 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         mainContent.setVisibility(View.VISIBLE);
         loadHistory.setVisibility(View.GONE);
         noSessionMessage.setVisibility(View.GONE);
+        loading.setVisibility(View.GONE);
     }
 
     private void initChatAdapter() {
         chatAdapter = new ChatAdapter(new ArrayList<ChatMessage>(), getActivity());
         listView.setAdapter(chatAdapter);
+    }
+
+    private void renderLoadingView()
+    {
+        mainContent.setVisibility(View.GONE);
+        loadHistory.setVisibility(View.GONE);
+        noSessionMessage.setVisibility(View.GONE);
+        loading.setVisibility(View.VISIBLE);
     }
 
     @Override

@@ -5,6 +5,18 @@
               android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/ll_fragment_invite_phone_contacts_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal|center_vertical">
+
+        <ProgressBar
+            android:id="@+id/pb_fragment_invite_phone_contacts"
+            android:layout_width="48dp"
+            android:layout_height="48dp" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/ll_fragment_invite_phone_contacts_locked_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

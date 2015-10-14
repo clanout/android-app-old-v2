@@ -27,6 +27,18 @@
     android:gravity="center_vertical|center_horizontal"/>
 
     <LinearLayout
+        android:id="@+id/ll_fragment_chat_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical|center_horizontal">
+    <ProgressBar
+        android:id="@+id/pb_fragment_chat"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/ll_fragment_chat_main_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"

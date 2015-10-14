@@ -2,6 +2,7 @@ package reaper.android.app.ui.screens.accounts.friends;
 
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,6 +19,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
@@ -63,6 +66,8 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     private Menu menu;
     private Drawable refreshDrawable, checkDrawable;
     private Toolbar toolbar;
+    private LinearLayout loading;
+    private ProgressBar progressBar;
 
     private ManageFriendsAdapter manageFriendsAdapter;
     private UserService userService;
@@ -94,6 +99,8 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         done = (ImageButton) view.findViewById(R.id.ib_manage_friends_done);
         inviteWhatsapp = (FloatingActionButton) view.findViewById(R.id.fib_fragment_manage_friends_invite_people_whatsapp);
         toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_manage_friends);
+        loading = (LinearLayout) view.findViewById(R.id.ll_fragment_manage_friends_loading);
+        progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_manage_friends);
 
         return view;
     }
@@ -105,7 +112,8 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         ((MainActivity) getActivity()).setSupportActionBar(toolbar);
         setHasOptionsMenu(true);
 
-        displayBasicView();
+        displayLoadingView();
+        progressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(getActivity(), R.color.accent), PorterDuff.Mode.SRC_IN);
 
         blockList = new ArrayList<>();
         unblockList = new ArrayList<>();
@@ -181,12 +189,14 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         recyclerView.setVisibility(View.VISIBLE);
         noFriendsMessage.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
+        loading.setVisibility(View.GONE);
     }
 
     private void displayErrorView() {
         recyclerView.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.GONE);
+        loading.setVisibility(View.GONE);
 
         noFriendsMessage.setText(R.string.facebook_friends_not_fetched);
     }
@@ -197,6 +207,14 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         inviteWhatsapp.setVisibility(View.VISIBLE);
 
         noFriendsMessage.setText(R.string.no_facebook_friends);
+    }
+
+    private void displayLoadingView()
+    {
+        recyclerView.setVisibility(View.GONE);
+        noFriendsMessage.setVisibility(View.GONE);
+        inviteWhatsapp.setVisibility(View.GONE);
+        loading.setVisibility(View.VISIBLE);
     }
 
     @Override

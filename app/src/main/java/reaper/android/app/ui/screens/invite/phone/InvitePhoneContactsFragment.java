@@ -3,11 +3,13 @@ package reaper.android.app.ui.screens.invite.phone;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
@@ -60,9 +63,10 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
     private RecyclerView recyclerView;
     private TextView noContactsMessage, invitesLockedMessage;
     private Menu menu;
-    private LinearLayout lockedContent, mainContent;
+    private LinearLayout lockedContent, mainContent, loading;
     private FloatingActionButton addPhone, inviteWhatsapp;
     private Drawable refreshDrawable, whatsappDrawable;
+    private ProgressBar progressBar;
 
     private ArrayList<EventDetails.Invitee> inviteeList;
     private ArrayList<EventDetails.Attendee> attendeeList;
@@ -97,6 +101,8 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
         inviteWhatsapp = (FloatingActionButton) view.findViewById(R.id.fib_fragment_invite_phone_contacts_invite_people_whatsapp);
         lockedContent = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_phone_contacts_locked_content);
         mainContent = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_phone_contacts_main_content);
+        loading = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_phone_contacts_loading);
+        progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_invite_phone_contacts);
 
         return view;
     }
@@ -127,7 +133,8 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
         } else
         {
             isPhoneAdded = true;
-            displayBasicView();
+            displayLoadingView();
+            progressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(getActivity(), R.color.accent), PorterDuff.Mode.SRC_IN);
         }
 
         Bundle bundle = getArguments();
@@ -213,6 +220,7 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
         lockedContent.setVisibility(View.VISIBLE);
         invitesLockedMessage.setText(R.string.add_phone_number);
         addPhone.setImageDrawable(phoneDrawable);
+        loading.setVisibility(View.GONE);
     }
 
     private void displayNoContactsView()
@@ -223,6 +231,7 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
         recyclerView.setVisibility(View.GONE);
         lockedContent.setVisibility(View.GONE);
         mainContent.setVisibility(View.VISIBLE);
+        loading.setVisibility(View.GONE);
     }
 
     private void displayBasicView()
@@ -232,6 +241,7 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
         inviteWhatsapp.setVisibility(View.GONE);
         noContactsMessage.setVisibility(View.GONE);
         lockedContent.setVisibility(View.GONE);
+        loading.setVisibility(View.GONE);
     }
 
     private void displayErrorView()
@@ -245,6 +255,17 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
         noContactsMessage.setVisibility(View.VISIBLE);
         noContactsMessage.setText(R.string.phone_contacts_not_fetched);
         lockedContent.setVisibility(View.GONE);
+        loading.setVisibility(View.GONE);
+    }
+
+    private void displayLoadingView() {
+
+        mainContent.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
+        inviteWhatsapp.setVisibility(View.GONE);
+        noContactsMessage.setVisibility(View.GONE);
+        lockedContent.setVisibility(View.GONE);
+        loading.setVisibility(View.VISIBLE);
     }
 
     @Override
