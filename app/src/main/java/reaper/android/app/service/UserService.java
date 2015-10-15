@@ -241,12 +241,14 @@ public class UserService {
                 .map(new Func1<GetPhoneContactsApiResponse, List<Friend>>() {
                     @Override
                     public List<Friend> call(GetPhoneContactsApiResponse getPhoneContactsApiResponse) {
+
                         return getPhoneContactsApiResponse.getPhoneContacts();
                     }
                 })
                 .doOnNext(new Action1<List<Friend>>() {
                     @Override
                     public void call(List<Friend> contacts) {
+
                         userCache.saveContacts(contacts);
                     }
                 })
