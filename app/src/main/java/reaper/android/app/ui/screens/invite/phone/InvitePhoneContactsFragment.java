@@ -329,14 +329,17 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
 
     private void refreshRecyclerView()
     {
+        Log.d("APP", "refresh recycler view");
         inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, false, bus, event, attendeeList);
         recyclerView.setAdapter(inviteFriendsAdapter);
 
         if (friendList.size() == 0)
         {
+            Log.d("APP", "in 1");
             displayNoContactsView();
         } else
         {
+            Log.d("APP", "in 2");
             displayBasicView();
         }
     }
@@ -344,7 +347,12 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
     @Subscribe
     public void onPhoneContactsFetched(PhoneContactsFetchedTrigger trigger)
     {
+        Log.d("APP", "phone contacts fetched trigger recd");
+
         friendList = trigger.getPhoneContacts();
+
+        Log.d("APP", "size ---- " + friendList.size());
+
         Collections.sort(friendList, new FriendsComparator());
         refreshRecyclerView();
 
@@ -359,6 +367,8 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
     {
         if (trigger.getErrorCode() == ErrorCode.PHONE_CONTACTS_FETCH_FAILURE)
         {
+            Log.d("APP", "phone contacts not fetched trigger recd");
+
             displayErrorView();
 
             if (menu != null)
@@ -371,8 +381,10 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
     @Subscribe
     public void onPhoneAdded(PhoneAddedTrigger trigger)
     {
+        Log.d("APP", "Phone added trigger recd");
+
         isPhoneAdded = true;
-        displayBasicView();
+        displayLoadingView();
         userService.refreshPhoneContacts(getActivity().getContentResolver(), locationService
                 .getUserLocation().getZone());
     }
@@ -382,6 +394,8 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
     {
         if (trigger.getErrorCode() == ErrorCode.PHONE_ADD_FAILURE)
         {
+            Log.d("APP", "Phone not added trigger recd");
+
             isPhoneAdded = false;
             displayInvitesLockedView();
         }

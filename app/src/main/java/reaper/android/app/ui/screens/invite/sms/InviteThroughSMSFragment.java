@@ -317,7 +317,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     @Subscribe
     public void onPhoneAdded(PhoneAddedTrigger trigger) {
         isPhoneAdded = true;
-        displayBasicView();
+        displayLoadingView();
         userService.fetchAllPhoneContacts(getActivity().getContentResolver());
     }
 

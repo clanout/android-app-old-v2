@@ -100,7 +100,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
         if (event.getOrganizerId().equals(current.getId())) {
 
             holder.checkBox.setVisibility(View.GONE);
-            holder.alreadyInvited.setText("Already Going");
+            holder.alreadyInvited.setText("Going");
             holder.alreadyInvited.setVisibility(View.VISIBLE);
         } else {
 
@@ -114,13 +114,13 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
 
                 if (attendeeList.contains(attendee)) {
                     holder.checkBox.setVisibility(View.GONE);
-                    holder.alreadyInvited.setText("Already Going");
+                    holder.alreadyInvited.setText("Going");
                     holder.alreadyInvited.setVisibility(View.VISIBLE);
                 } else {
 
                     if (invitees.contains(invitee)) {
                         holder.checkBox.setVisibility(View.GONE);
-                        holder.alreadyInvited.setText("Already Invited");
+                        holder.alreadyInvited.setText("Invited");
                         holder.alreadyInvited.setVisibility(View.VISIBLE);
                     } else {
                         holder.alreadyInvited.setVisibility(View.GONE);
