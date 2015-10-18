@@ -22,7 +22,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
-import timber.log.Timber;
 
 public class CreateEventPresenterImpl implements CreateEventPresenter
 {
@@ -82,6 +81,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     @Override
     public void changeCategory(EventCategory category)
     {
+        eventCategory = category;
         fetchSuggestions();
     }
 

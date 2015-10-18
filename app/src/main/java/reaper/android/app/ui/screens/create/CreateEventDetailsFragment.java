@@ -58,6 +58,7 @@ import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
+import timber.log.Timber;
 
 public class CreateEventDetailsFragment extends BaseFragment implements CreateEventView,
         LocationSuggestionAdapter.SuggestionClickListener,
@@ -338,6 +339,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
         clickListener = new ClickListener();
         dayContainer.setOnClickListener(clickListener);
         timeContainer.setOnClickListener(clickListener);
+        icon.setOnClickListener(clickListener);
 
         initDaySelector();
         initTimeSelector();
