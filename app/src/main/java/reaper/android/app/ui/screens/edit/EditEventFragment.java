@@ -48,10 +48,12 @@ import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.Dimensions;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Suggestion;
+import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.create.LocationSuggestionAdapter;
@@ -61,6 +63,7 @@ import reaper.android.app.ui.util.DateTimeUtils;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 import timber.log.Timber;
 
@@ -82,8 +85,6 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
 
         return fragment;
     }
-
-    Bus bus;
 
     /* UI Elements */
     ScrollView parent;
@@ -138,6 +139,9 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
     ClickListener clickListener;
 
     EditEventPresenter presenter;
+
+    Bus bus;
+    UserService userService;
 
     /* Lifecycle Methods */
     @Override
@@ -204,6 +208,9 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         }
 
         presenter = new EditEventPresenterImpl(bus, event, eventDetails);
+
+        bus = Communicator.getInstance().getBus();
+        userService = new UserService(bus);
 
         locationListener = new TextWatcher()
         {
@@ -285,6 +292,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
     {
         presenter.setDescription(description.getText().toString());
         presenter.edit();
+
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_EDITED, userService.getActiveUserId());
     }
 
     private void initRecyclerView()
@@ -660,6 +669,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
     @Override
     public void onSuggestionClicked(Suggestion suggestion)
     {
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.SUGGESTION_CLICKED_EDIT, userService.getActiveUserId());
+
         presenter.selectSuggestion(suggestion);
     }
 
@@ -790,6 +801,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
                         public void onClick(DialogInterface dialog, int which)
                         {
                             presenter.unfinalizeEvent();
+
+                            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_UNFINALIZED, userService.getActiveUserId());
                         }
                     });
 
@@ -819,6 +832,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
                         public void onClick(DialogInterface dialog, int which)
                         {
                             presenter.finalizeEvent();
+
+                            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_FINALIZED, userService.getActiveUserId());
                         }
                     });
 
@@ -855,6 +870,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
                     public void onClick(DialogInterface dialog, int which)
                     {
                         presenter.delete();
+
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_DELETED, userService.getActiveUserId());
                     }
                 });
 

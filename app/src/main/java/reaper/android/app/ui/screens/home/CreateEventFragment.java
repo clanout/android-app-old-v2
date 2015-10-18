@@ -40,12 +40,14 @@ import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.CreateEventModel;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.Location;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
+import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.common.ViewPagerClickedTrigger;
 import reaper.android.app.trigger.event.EventCreatedTrigger;
@@ -56,6 +58,7 @@ import reaper.android.app.ui.util.DateTimeUtils;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 import rx.Subscription;
 
@@ -116,6 +119,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
     Bus bus;
 
     GenericCache genericCache;
+    UserService userService;
 
     /* Static Factory */
     public static CreateEventFragment newInstance(CreateEventModel createEventModel)
@@ -176,6 +180,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
         clickListener = new ClickListener();
         bus = Communicator.getInstance().getBus();
         genericCache = CacheManager.getGenericCache();
+        userService = new UserService(bus);
         dateTimeUtils = new DateTimeUtils();
 
         title.setOnFocusChangeListener(new View.OnFocusChangeListener()
@@ -243,6 +248,8 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
 
     private void onMoreDetailsClicked()
     {
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.MORE_DETAILS_CLICKED, userService.getActiveUserId());
+
         String eventTitle = title.getText().toString();
 
         CreateEventDetailsFragment fragment = CreateEventDetailsFragment
@@ -290,6 +297,8 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
 
         eventService
                 .createEvent(eventTitle, type, eventCategory, "", location, start, end);
+
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.CRAETED_EVENT_FROM_HOME, userService.getActiveUserId());
     }
 
     @Subscribe
@@ -641,6 +650,8 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
 
     private void displayCategoryChangeDialog()
     {
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.CATEGORY_CHANGE_DIALOG_CLICKED_FROM_HOME, userService.getActiveUserId());
+
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
 

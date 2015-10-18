@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.squareup.otto.Bus;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -50,6 +51,7 @@ import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.Suggestion;
+import reaper.android.app.service.UserService;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.DateTimeUtils;
@@ -131,6 +133,9 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     LocalTime startTime;
     LocalDate startDate;
 
+    UserService userService;
+    Bus bus;
+
     /* Listeners */
     ClickListener clickListener;
 
@@ -171,6 +176,8 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     @Override
     public void onSuggestionClicked(Suggestion suggestion)
     {
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.SUGGESTION_CLICKED_CREATE_DETAILS, userService.getActiveUserId());
+
         presenter.selectSuggestion(suggestion);
     }
 
@@ -341,6 +348,9 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
         timeContainer.setOnClickListener(clickListener);
         icon.setOnClickListener(clickListener);
 
+        bus = Communicator.getInstance().getBus();
+        userService = new UserService(bus);
+
         initDaySelector();
         initTimeSelector();
         initRecyclerView();
@@ -482,6 +492,8 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
 
                     presenter
                             .create(eventTitle, type, eventDescription, start, end);
+
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.CREATE_EVENT_CLICKED_FROM_DETAILS, userService.getActiveUserId());
 
                     return true;
                 }
@@ -660,6 +672,8 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
 
     private void displayCategoryChangeDialog()
     {
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_CATEGORY_CHANGE_DIALOG_CLICKED_FROM_DETAILS, userService.getActiveUserId());
+
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
 

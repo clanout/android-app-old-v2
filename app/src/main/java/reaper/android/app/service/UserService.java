@@ -3,7 +3,6 @@ package reaper.android.app.service;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract;
-import android.util.Log;
 
 import com.squareup.otto.Bus;
 
@@ -82,8 +81,6 @@ public class UserService {
 
     public void updatePhoneNumber(final String phoneNumber) {
 
-        Log.d("APP", "inside update phone number");
-
         AddPhoneApiRequest request = new AddPhoneApiRequest(phoneNumber);
 
         meApi.updatePhoneNumber(request)
@@ -98,8 +95,6 @@ public class UserService {
                     @Override
                     public void onError(Throwable e) {
 
-                        Log.d("APP", "onError " + e.getMessage());
-
                         bus.post(new GenericErrorTrigger(ErrorCode.PHONE_ADD_FAILURE, (Exception) e));
                     }
 
@@ -107,15 +102,9 @@ public class UserService {
                     public void onNext(Response response) {
                         if (response.getStatus() == 200) {
 
-                            Log.d("APP", "onNext");
-
                             cache.put(CacheKeys.MY_PHONE_NUMBER, phoneNumber);
                             bus.post(new PhoneAddedTrigger());
-
-                            Log.d("APP", "trigger posted");
                         } else {
-
-                            Log.d("APP", "onNext error");
                             bus.post(new GenericErrorTrigger(ErrorCode.PHONE_ADD_FAILURE, null));
                         }
                     }
@@ -248,8 +237,6 @@ public class UserService {
 
     public void refreshPhoneContacts(ContentResolver contentResolver, String zone) {
 
-        Log.d("APP", "inside refresh phone contacts");
-
         Set<String> allContacts = fetchAllContacts(contentResolver);
         GetPhoneContactsApiRequest request = new GetPhoneContactsApiRequest(allContacts, zone);
 
@@ -279,15 +266,11 @@ public class UserService {
                     @Override
                     public void onError(Throwable e) {
 
-                        Log.d("APP", "inside onError refresh phone contacts");
-
                         bus.post(new GenericErrorTrigger(ErrorCode.PHONE_CONTACTS_FETCH_FAILURE, (Exception) e));
                     }
 
                     @Override
                     public void onNext(List<Friend> contacts) {
-
-                        Log.d("APP", "inside onNext refresh phone contacts");
 
                         bus.post(new PhoneContactsFetchedTrigger(contacts));
                     }
@@ -457,7 +440,6 @@ public class UserService {
         });
 
     }
-
 
     public void fetchPendingInvites(String phoneNumber, String zone) {
 

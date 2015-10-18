@@ -58,7 +58,7 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     private GenericCache genericCache;
 
     // TODO -- Fetch pending invites
-    // TODO -- Analytics events -- edit and create + new features to be added
+    // TODO -- Analytics events -- fetch pending invtes + status
 
     @Override
     public void onCreate()

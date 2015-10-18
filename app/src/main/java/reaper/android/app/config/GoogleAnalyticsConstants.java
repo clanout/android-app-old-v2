@@ -70,4 +70,15 @@ public class GoogleAnalyticsConstants
     public static final String UPDATE_PHONE_CLICKED_INVITE_SMS_FRAGMENT = "update_phone_clicked_invite_sms_fragment";
     public static final String UPDATED_PHONE_INVITE_SMS_FRAGMENT = "updated_phone_invite_sms_fragment";
     public static final String WHATSAPP_INVITATION_INVITE_THROUGH_SMS_FRAGMENT = "whatsapp_invitation_invite_through_sms_fragment";
+    public static final String MORE_DETAILS_CLICKED = "more_details_clicked";
+    public static final String CRAETED_EVENT_FROM_HOME = "created_event_from_home";
+    public static final String CATEGORY_CHANGE_DIALOG_CLICKED_FROM_HOME = "category_change_dialog_clicked_from_home";
+    public static final String CREATE_EVENT_CLICKED_FROM_DETAILS = "create_event_clicked_from_details";
+    public static final String EVENT_CATEGORY_CHANGE_DIALOG_CLICKED_FROM_DETAILS = "event_category_change_dialog_clicked_from_details";
+    public static final String SUGGESTION_CLICKED_CREATE_DETAILS = "suggestion_clicked_create_details";
+    public static final String SUGGESTION_CLICKED_EDIT = "suggestion_clicked_edit";
+    public static final String EVENT_UNFINALIZED = "event_unfinalized";
+    public static final String EVENT_DELETED = "event_deleted";
+    public static final String EVENT_FINALIZED = "event_finalized";
+    public static final String EVENT_EDITED = "event_edited";
 }
