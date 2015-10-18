@@ -3,20 +3,27 @@ package reaper.android.app.ui.screens.edit;
 import java.util.List;
 
 import reaper.android.app.model.Event;
+import reaper.android.app.model.Suggestion;
 
 public interface EditEventView
 {
     void init(Event event, String description);
 
-    void enableDeleteOption();
+    void showLoading();
+
+    void displayDeleteOption();
 
     void displayFinalizationOption();
 
     void displayUnfinalizationOption();
 
-    void displayFinalizationError();
+    void displaySuggestions(List<Suggestion> suggestions);
 
-    void displayUnfinalizationError();
+    void setLocation(String locationName);
+
+    void displayEventLockedError();
+
+    void displayError();
 
     void navigateToDetailsScreen(List<Event> events, int activePosition);
 

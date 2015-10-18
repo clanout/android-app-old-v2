@@ -66,6 +66,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 public class EventService
 {
@@ -1141,6 +1142,100 @@ public class EventService
                     {
                         event.setIsFinalized(isFinalised);
                         eventCache.save(event);
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
+
+    public Observable<Response> _deleteEvent(final String eventId)
+    {
+        DeleteEventApiRequest request = new DeleteEventApiRequest(eventId);
+
+        return eventApi
+                .deleteEvent(request)
+                .doOnNext(new Action1<Response>()
+                {
+                    @Override
+                    public void call(Response response)
+                    {
+                        if (response.getStatus() == 200)
+                        {
+                            eventCache.deleteCompletely(eventId);
+
+                            if (genericCache.get(CacheKeys.GCM_TOKEN) != null)
+                            {
+                                gcmService.unsubscribeTopic(genericCache
+                                        .get(CacheKeys.GCM_TOKEN), eventId);
+                            }
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
+
+    public Observable<Event> _editEvent(final String eventId, DateTime startTime, DateTime endTime,
+                                        Location placeLocation, String description)
+    {
+        final EditEventApiRequest request = new EditEventApiRequest(placeLocation
+                .getLongitude(), description, endTime, eventId, placeLocation
+                .getLatitude(), placeLocation.getName(), placeLocation
+                .getZone(), startTime);
+
+        return Observable
+                .create(new Observable.OnSubscribe<Event>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Event> subscriber)
+                    {
+                        try
+                        {
+                            Response response = eventApi.editEvent(request);
+                            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response
+                                    .getBody().in()));
+
+                            String line;
+                            StringBuilder jsonBuilder = new StringBuilder();
+
+                            while ((line = bufferedReader.readLine()) != null)
+                            {
+                                jsonBuilder.append(line).append("\n");
+                            }
+
+                            bufferedReader.close();
+                            String json = jsonBuilder.toString();
+                            Event event = GsonProvider.getGson()
+                                                      .fromJson(json, EditEventApiResponse.class)
+                                                      .getEvent();
+
+                            subscriber.onNext(event);
+
+                        }
+                        catch (RetrofitError e)
+                        {
+                            if (e.getResponse().getStatus() == 400)
+                            {
+                                subscriber.onError(new Throwable(ExceptionMessages.EVENT_LOCKED));
+                            }
+                            else
+                            {
+                                subscriber.onError(new Throwable(ExceptionMessages.BAD_REQUEST));
+                            }
+
+                        }
+                        catch (IOException e)
+                        {
+                            subscriber.onError(new Throwable(ExceptionMessages.BAD_REQUEST));
+                        }
+                        subscriber.onCompleted();
+                    }
+                })
+                .doOnNext(new Action1<Event>()
+                {
+                    @Override
+                    public void call(Event event)
+                    {
+                        eventCache.save(event);
+                        eventCache.deleteDetails(event.getId());
                     }
                 })
                 .subscribeOn(Schedulers.newThread());

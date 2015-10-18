@@ -384,34 +384,44 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
         menu.findItem(R.id.action_edit_event).setIcon(pencilDrawable);
 
-        menu.findItem(R.id.action_edit_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
-            @Override
-            public boolean onMenuItemClick(MenuItem item)
+        menu.findItem(R.id.action_edit_event)
+            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
             {
-
-                if (EventUtils.canEdit(event, userService.getActiveUserId()) == EventUtilsConstants.CAN_EDIT)
+                @Override
+                public boolean onMenuItemClick(MenuItem item)
                 {
-                    if (areEventDetailsFetched)
+                    if (EventUtils.canEdit(event, userService
+                            .getActiveUserId()) == EventUtilsConstants.CAN_EDIT)
                     {
-                        EditEventFragment editEventFragment = new EditEventFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT, event);
-                        bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT_DETAILS, eventDetails);
-                        editEventFragment.setArguments(bundle);
-                        FragmentUtils.changeFragment(fragmentManager, editEventFragment);
+                        if (areEventDetailsFetched)
+                        {
+//                        EditEventFragment editEventFragment = new EditEventFragment();
+//                        Bundle bundle = new Bundle();
+//                        bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT, event);
+//                        bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT_DETAILS, eventDetails);
+//                        editEventFragment.setArguments(bundle);
+//                        FragmentUtils.changeFragment(fragmentManager, editEventFragment);
+                            FragmentUtils
+                                    .changeFragment(fragmentManager, reaper.android.app.ui.screens.edit.EditEventFragment
+                                            .newInstance(event, eventDetails));
+                        }
                     }
-                } else if (EventUtils.canEdit(event, userService.getActiveUserId()) == EventUtilsConstants.CANNOT_EDIT_LOCKED)
-                {
-                    Snackbar.make(getView(), R.string.cannot_edit_event_locked, Snackbar.LENGTH_LONG).show();
+                    else if (EventUtils.canEdit(event, userService
+                            .getActiveUserId()) == EventUtilsConstants.CANNOT_EDIT_LOCKED)
+                    {
+                        Snackbar.make(getView(), R.string.cannot_edit_event_locked, Snackbar.LENGTH_LONG)
+                                .show();
 
-                } else if (EventUtils.canEdit(event, userService.getActiveUserId()) == EventUtilsConstants.CANNOT_EDIT_NOT_GOING)
-                {
-                    Snackbar.make(getView(), R.string.cannot_edit_event_not_going, Snackbar.LENGTH_LONG).show();
+                    }
+                    else if (EventUtils.canEdit(event, userService
+                            .getActiveUserId()) == EventUtilsConstants.CANNOT_EDIT_NOT_GOING)
+                    {
+                        Snackbar.make(getView(), R.string.cannot_edit_event_not_going, Snackbar.LENGTH_LONG)
+                                .show();
+                    }
+                    return true;
                 }
-                return true;
-            }
-        });
+            });
     }
 
     @Override

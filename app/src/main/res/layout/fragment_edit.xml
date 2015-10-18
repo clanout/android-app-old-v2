@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:cardView="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/background_default"
+              android:orientation="vertical">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/tb_editEvent"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+
+    <ScrollView
+        android:id="@+id/sv_editEvent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/focus_thief"
+                android:layout_width="match_parent"
+                android:layout_height="0.1dp"
+                android:focusable="true"
+                android:focusableInTouchMode="true"/>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                cardView:cardElevation="2dp"
+                cardView:cardPreventCornerOverlap="true"
+                cardView:cardUseCompatPadding="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="12dp"
+                            android:layout_marginLeft="16dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tv_editEvent_title"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:maxLines="2"
+                                android:textColor="@color/text_title"
+                                android:textSize="24sp"
+                                android:text="Hello, World"/>
+
+                            <TextView
+                                android:id="@+id/tv_editEvent_type"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/text_subtitle"
+                                android:layout_marginTop="4dp"
+                                android:text="Open"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical">
+
+                            <LinearLayout
+                                android:id="@+id/ll_create_event_iconContainer"
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                android:layout_margin="16dp"
+                                android:background="@color/background_bar"
+                                android:gravity="center_horizontal|center_vertical">
+
+                                <ImageView
+                                    android:id="@+id/iv_editEvent_icon"
+                                    android:layout_width="48dp"
+                                    android:layout_height="48dp"/>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginBottom="16dp">
+
+                        <EditText
+                            android:id="@+id/et_editEvent_description"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Description"
+                            android:textSize="14sp"/>
+                    </android.support.design.widget.TextInputLayout>
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"
+                cardView:cardElevation="2dp"
+                cardView:cardPreventCornerOverlap="true"
+                cardView:cardUseCompatPadding="true">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:id="@+id/ll_editEvent_dayContainer"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:id="@+id/iv_dayIcon"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_margin="16dp"/>
+
+                            <TextView
+                                android:id="@+id/tv_editEvent_day"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:text="TODAY"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ll_editEvent_timeContainer"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:id="@+id/iv_timeIcon"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_margin="16dp"/>
+
+                            <TextView
+                                android:id="@+id/tv_editEvent_time"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:text="07:30 PM"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_editEvent_daySelectorContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <android.support.design.widget.TabLayout
+                            android:id="@+id/tl_editEvent_daySelector"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="16dp"
+                            android:layout_marginRight="16dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_editEvent_timeSelectorContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <android.support.design.widget.TabLayout
+                            android:id="@+id/tl_editEvent_timeSelector"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="16dp"
+                            android:layout_marginRight="16dp"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cv_editEvent_locationContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                cardView:cardElevation="2dp"
+                cardView:cardPreventCornerOverlap="true"
+                cardView:cardUseCompatPadding="true">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/iv_editEvent_locationIcon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginRight="8dp"/>
+
+                        <EditText
+                            android:id="@+id/et_editEvent_location"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="Location"
+                            android:textSize="16sp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_editEvent_locationContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/rv_editEvent_locationSuggestions"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_marginBottom="16dp"
+                            android:layout_marginLeft="48dp"
+                            android:layout_marginRight="16dp"/>
+
+                    </LinearLayout>
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

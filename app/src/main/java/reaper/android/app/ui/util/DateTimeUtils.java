@@ -14,6 +14,7 @@ import java.util.Map;
 public class DateTimeUtils
 {
     public static DateTimeFormatter DAY_FORMATTER = DateTimeFormat.forPattern("EEEE");
+    public static DateTimeFormatter PREV_DAY_FORMATTER = DateTimeFormat.forPattern("dd MMM");
     public static DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("hh:mm a");
 
     public static final String TODAY = "TODAY";
@@ -133,6 +134,10 @@ public class DateTimeUtils
         else if (tomorrow.equals(date))
         {
             return TOMORROW;
+        }
+        else if (date.isBefore(today))
+        {
+            return date.toString(PREV_DAY_FORMATTER).toUpperCase();
         }
         else
         {

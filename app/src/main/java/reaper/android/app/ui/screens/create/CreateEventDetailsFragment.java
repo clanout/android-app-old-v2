@@ -126,6 +126,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     DateTimeUtils dateTimeUtils;
 
     Event.Type type;
+    EventCategory category;
     LocalTime startTime;
     LocalDate startDate;
 
@@ -162,6 +163,8 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
         InputMethodManager imm = (InputMethodManager) getActivity()
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(title.getWindowToken(), 0);
+
+        presenter.changeCategory(category);
     }
 
     @Override
@@ -225,7 +228,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
             progressDialog.dismiss();
         }
 
-        Snackbar.make(getView(), "Unable to create event", Snackbar.LENGTH_LONG)
+        Snackbar.make(getView(), "Unable to create clan", Snackbar.LENGTH_LONG)
                 .show();
     }
 
@@ -340,7 +343,11 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
         initTimeSelector();
         initRecyclerView();
 
-        EventCategory category = (EventCategory) getArguments().getSerializable(ARG_CATEGORY);
+        category = (EventCategory) getArguments().getSerializable(ARG_CATEGORY);
+        if (category == null)
+        {
+            category = EventCategory.GENERAL;
+        }
         presenter = new CreateEventPresenterImpl(Communicator.getInstance().getBus(), category);
 
         icon.setImageDrawable(DrawableFactory
@@ -370,7 +377,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                 {
                     if (s.length() == 0)
                     {
-                        presenter.changeCategory(EventCategory.EAT_OUT);
+                        presenter.changeCategory(category);
                     }
                     else if (s.length() >= 3)
                     {
@@ -822,6 +829,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
 
     private void changeCategory(EventCategory category)
     {
+        this.category = category;
         presenter.changeCategory(category);
     }
 
@@ -862,6 +870,10 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                 {
                     hideTimeSelector();
                 }
+            }
+            else if (v == icon)
+            {
+                displayCategoryChangeDialog();
             }
         }
     }

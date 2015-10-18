@@ -161,6 +161,8 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     @Override
     public void selectSuggestion(final Suggestion suggestion)
     {
+        isLocationFetchInProgress = true;
+
         if (suggestion.getLatitude() != null && suggestion.getLongitude() != null)
         {
             location = new Location();
@@ -171,13 +173,15 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
             view.setLocation(location.getName());
 
             isLocationFetchInProgress = false;
+            if (isCreationInitiated)
+            {
+                create();
+            }
         }
         else
         {
             if (suggestion.getId() != null)
             {
-                isLocationFetchInProgress = true;
-
                 Subscription subscription = googleService
                         ._getPlaceDetails(suggestion.getId())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -231,6 +235,10 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
                 }
 
                 isLocationFetchInProgress = false;
+                if (isCreationInitiated)
+                {
+                    create();
+                }
             }
         }
     }
