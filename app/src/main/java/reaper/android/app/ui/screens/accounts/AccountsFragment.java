@@ -185,6 +185,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
         menu.findItem(R.id.action_notifications).setVisible(false);
+        menu.findItem(R.id.action_status).setVisible(false);
 
         menu.findItem(R.id.action_home).setIcon(homeDrawable);
 

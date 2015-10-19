@@ -17,45 +17,51 @@
         app:showAsAction="always"
         />
 
+    <item
+        android:id="@+id/action_status"
+        android:orderInCategory="3"
+        android:title="Status"
+        app:showAsAction= "always"
+        />
 
     <item
         android:id="@+id/action_edit_event"
-        android:orderInCategory="3"
+        android:orderInCategory="4"
         android:title="@string/action_edit_event"
         app:showAsAction="always"
         />
 
     <item
         android:id="@+id/action_finalize_event"
-        android:orderInCategory="4"
+        android:orderInCategory="5"
         android:title="@string/action_finalize_event"
         app:showAsAction="always"
         />
 
     <item
         android:id="@+id/action_delete_event"
-        android:orderInCategory="5"
+        android:orderInCategory="6"
         android:title="@string/action_delete_event"
         app:showAsAction="always"
         />
 
     <item
         android:id="@+id/action_home"
-        android:orderInCategory="6"
+        android:orderInCategory="7"
         android:title="@string/action_home"
         app:showAsAction="always"
         />
 
     <item
         android:id="@+id/action_refresh"
-        android:orderInCategory="7"
+        android:orderInCategory="8"
         android:title="Refresh Friend List"
         app:showAsAction="always"
         />
 
     <item
         android:id="@+id/action_notifications"
-        android:orderInCategory="8"
+        android:orderInCategory="9"
         android:title="Notifications"
         app:showAsAction="always"
         />

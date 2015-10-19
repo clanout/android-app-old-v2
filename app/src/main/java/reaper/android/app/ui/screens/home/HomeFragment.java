@@ -499,6 +499,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
         menu.findItem(R.id.action_notifications).setVisible(true);
+        menu.findItem(R.id.action_status).setVisible(false);
 
         menu.findItem(R.id.action_account).setIcon(MaterialDrawableBuilder.with(getActivity())
                                                                           .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)

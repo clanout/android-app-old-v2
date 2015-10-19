@@ -241,6 +241,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
         menu.findItem(R.id.action_notifications).setVisible(false);
+        menu.findItem(R.id.action_status).setVisible(false);
     }
 
     @Override
@@ -387,10 +388,10 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
                             String[] fromUser = message.getFrom().split("/");
 
-                            if (fromUser[1].equals("@reap3r")) {
+                            if (fromUser[1].equals("clanout")) {
                                 newMessage.setMessage(message.getBody());
-                                newMessage.setSenderName("@reap3r");
-                                newMessage.setSenderId("@reap3r");
+                                newMessage.setSenderName("clanout");
+                                newMessage.setSenderId("clanout");
                                 newMessage.setMe(false);
 
                             } else {

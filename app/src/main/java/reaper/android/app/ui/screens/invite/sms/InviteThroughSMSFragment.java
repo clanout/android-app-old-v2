@@ -241,6 +241,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
         menu.findItem(R.id.action_notifications).setVisible(false);
+        menu.findItem(R.id.action_status).setVisible(false);
     }
 
 

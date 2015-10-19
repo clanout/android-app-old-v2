@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -60,8 +61,7 @@ import reaper.android.app.ui.util.event.EventUtilsConstants;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class EventDetailsFragment extends BaseFragment implements View.OnClickListener, AttendeeClickCommunicator
-{
+public class EventDetailsFragment extends BaseFragment implements View.OnClickListener, AttendeeClickCommunicator {
     private FragmentManager fragmentManager;
     private Bus bus;
 
@@ -87,17 +87,16 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
     private boolean areEventDetailsFetched;
     private List<EventDetails.Attendee> attendees;
+    private Drawable statusDrawable;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_details, container, false);
 
         icon = (MaterialIconView) view.findViewById(R.id.miv_event_details_icon);
@@ -116,15 +115,13 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState)
-    {
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         Bundle bundle = getArguments();
         event = (Event) bundle.get(BundleKeys.EVENT_DETAILS_FRAGMENT_EVENT);
 
-        if (event == null)
-        {
+        if (event == null) {
             throw new IllegalStateException("Event cannot be null while creating EventDetailsFragment instance");
         }
 
@@ -145,18 +142,22 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
         initRecyclerView();
     }
 
-    private void generateDrawables()
-    {
+    private void generateDrawables() {
         pencilDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.PENCIL)
+                .setColor(ContextCompat.getColor(getActivity(), R.color.whity))
+                .setSizeDp(36)
+                .build();
+
+        statusDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE_ALERT)
                 .setColor(ContextCompat.getColor(getActivity(), R.color.whity))
                 .setSizeDp(36)
                 .build();
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EVENT_DETAILS_FRAGMENT);
@@ -173,24 +174,19 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
         bus.unregister(this);
     }
 
     @Subscribe
-    public void onEventDetailsFetchedFromNetwork(EventDetailsFetchedFromNetworkTrigger trigger)
-    {
-        if (trigger.getEventDetails().getId().equals(event.getId()))
-        {
+    public void onEventDetailsFetchedFromNetwork(EventDetailsFetchedFromNetworkTrigger trigger) {
+        if (trigger.getEventDetails().getId().equals(event.getId())) {
             eventDetails = trigger.getEventDetails();
 
-            if (eventDetails.getDescription() == null || eventDetails.getDescription().isEmpty())
-            {
+            if (eventDetails.getDescription() == null || eventDetails.getDescription().isEmpty()) {
                 description.setText(R.string.event_details_no_description);
-            } else
-            {
+            } else {
                 description.setText(eventDetails.getDescription());
             }
 
@@ -203,10 +199,8 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
             int numberOfFriendsGoing = 0;
             List<EventDetails.Attendee> attendeeList = trigger.getEventDetails().getAttendees();
-            for (EventDetails.Attendee attendee : attendeeList)
-            {
-                if (attendee.isFriend())
-                {
+            for (EventDetails.Attendee attendee : attendeeList) {
+                if (attendee.isFriend()) {
                     numberOfFriendsGoing++;
                 }
             }
@@ -218,17 +212,13 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
     }
 
     @Subscribe
-    public void onEventDetailsFetchTrigger(EventDetailsFetchTrigger trigger)
-    {
-        if (trigger.getEventDetails().getId().equals(event.getId()))
-        {
+    public void onEventDetailsFetchTrigger(EventDetailsFetchTrigger trigger) {
+        if (trigger.getEventDetails().getId().equals(event.getId())) {
             eventDetails = trigger.getEventDetails();
 
-            if (eventDetails.getDescription() == null || eventDetails.getDescription().isEmpty())
-            {
+            if (eventDetails.getDescription() == null || eventDetails.getDescription().isEmpty()) {
                 description.setText(R.string.event_details_no_description);
-            } else
-            {
+            } else {
                 description.setText(eventDetails.getDescription());
             }
 
@@ -238,8 +228,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
         }
     }
 
-    private void initRecyclerView()
-    {
+    private void initRecyclerView() {
         attendeeList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         eventAttendeesAdapter = new EventAttendeesAdapter(new ArrayList<EventDetails.Attendee>(), getActivity());
@@ -247,26 +236,21 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
         attendeeList.setAdapter(eventAttendeesAdapter);
     }
 
-    private void refreshRecyclerView()
-    {
-        if (eventDetails == null)
-        {
+    private void refreshRecyclerView() {
+        if (eventDetails == null) {
             return;
         }
 
-        if (eventDetails.getAttendees().size() == 0)
-        {
+        if (eventDetails.getAttendees().size() == 0) {
             setNoAttendeeView();
-        } else
-        {
+        } else {
             setNormalView();
         }
 
         EventDetails.Attendee attendee = new EventDetails.Attendee();
         attendee.setId(userService.getActiveUserId());
 
-        if (eventDetails.getAttendees().contains(attendee))
-        {
+        if (eventDetails.getAttendees().contains(attendee)) {
             eventDetails.getAttendees().remove(attendee);
         }
 
@@ -275,8 +259,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
         attendee.setInviter(false);
         attendee.setRsvp(event.getRsvp());
 
-        if (!(event.getRsvp() == Event.RSVP.NO))
-        {
+        if (!(event.getRsvp() == Event.RSVP.NO)) {
             eventDetails.getAttendees().add(attendee);
         }
 
@@ -287,24 +270,20 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
         attendeeList.setAdapter(eventAttendeesAdapter);
     }
 
-    private void setNormalView()
-    {
+    private void setNormalView() {
         attendeeList.setVisibility(View.VISIBLE);
         noAttendeeMessage.setVisibility(View.GONE);
     }
 
-    private void setNoAttendeeView()
-    {
+    private void setNoAttendeeView() {
         noAttendeeMessage.setText(R.string.event_details_no_attendees);
         noAttendeeMessage.setVisibility(View.VISIBLE);
         attendeeList.setVisibility(View.GONE);
     }
 
-    private void renderEventSummary()
-    {
+    private void renderEventSummary() {
         EventCategory category = EventCategory.valueOf(event.getCategory());
-        switch (category)
-        {
+        switch (category) {
             case GENERAL:
                 icon.setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD);
                 break;
@@ -340,12 +319,10 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
         title.setText(event.getTitle());
 
-        if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty())
-        {
+        if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty()) {
             location.setText(R.string.event_details_no_location);
             location.setOnClickListener(null);
-        } else
-        {
+        } else {
             location.setText(event.getLocation().getName());
         }
 
@@ -355,18 +332,15 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
         dateTime.setText(start.toString(timeFormatter) + " (" + start.toString(dateFormatter) + ")");
 
-        if (event.getType() == Event.Type.PUBLIC)
-        {
+        if (event.getType() == Event.Type.PUBLIC) {
             type.setText(R.string.event_details_type_public);
-        } else
-        {
+        } else {
             type.setText(R.string.event_details_type_invite_only);
         }
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
         menu.clear();
@@ -380,106 +354,123 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
         menu.findItem(R.id.action_refresh).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(true);
         menu.findItem(R.id.action_notifications).setVisible(false);
+        menu.findItem(R.id.action_status).setVisible(true);
 
         menu.findItem(R.id.action_edit_event).setIcon(pencilDrawable);
+        menu.findItem(R.id.action_status).setIcon(statusDrawable);
+
+        menu.findItem(R.id.action_status).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                if (event.getRsvp() == Event.RSVP.NO) {
+                    displayInvitationResponseAlertDialog();
+                } else {
+                    Toast.makeText(getActivity(), "Yes/Maybe", Toast.LENGTH_LONG).show();
+                }
+
+                return true;
+            }
+        });
 
         menu.findItem(R.id.action_edit_event)
-            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-            {
-                @Override
-                public boolean onMenuItemClick(MenuItem item)
-                {
-                    if (EventUtils.canEdit(event, userService
-                            .getActiveUserId()) == EventUtilsConstants.CAN_EDIT)
-                    {
-                        if (areEventDetailsFetched)
-                        {
+                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if (EventUtils.canEdit(event, userService
+                                .getActiveUserId()) == EventUtilsConstants.CAN_EDIT) {
+                            if (areEventDetailsFetched) {
 //                        EditEventFragment editEventFragment = new EditEventFragment();
 //                        Bundle bundle = new Bundle();
 //                        bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT, event);
 //                        bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT_DETAILS, eventDetails);
 //                        editEventFragment.setArguments(bundle);
 //                        FragmentUtils.changeFragment(fragmentManager, editEventFragment);
-                            FragmentUtils
-                                    .changeFragment(fragmentManager, reaper.android.app.ui.screens.edit.EditEventFragment
-                                            .newInstance(event, eventDetails));
-                        }
-                    }
-                    else if (EventUtils.canEdit(event, userService
-                            .getActiveUserId()) == EventUtilsConstants.CANNOT_EDIT_LOCKED)
-                    {
-                        Snackbar.make(getView(), R.string.cannot_edit_event_locked, Snackbar.LENGTH_LONG)
-                                .show();
+                                FragmentUtils
+                                        .changeFragment(fragmentManager, reaper.android.app.ui.screens.edit.EditEventFragment
+                                                .newInstance(event, eventDetails));
+                            }
+                        } else if (EventUtils.canEdit(event, userService
+                                .getActiveUserId()) == EventUtilsConstants.CANNOT_EDIT_LOCKED) {
+                            Snackbar.make(getView(), R.string.cannot_edit_event_locked, Snackbar.LENGTH_LONG)
+                                    .show();
 
+                        } else if (EventUtils.canEdit(event, userService
+                                .getActiveUserId()) == EventUtilsConstants.CANNOT_EDIT_NOT_GOING) {
+                            Snackbar.make(getView(), R.string.cannot_edit_event_not_going, Snackbar.LENGTH_LONG)
+                                    .show();
+                        }
+                        return true;
                     }
-                    else if (EventUtils.canEdit(event, userService
-                            .getActiveUserId()) == EventUtilsConstants.CANNOT_EDIT_NOT_GOING)
-                    {
-                        Snackbar.make(getView(), R.string.cannot_edit_event_not_going, Snackbar.LENGTH_LONG)
-                                .show();
-                    }
-                    return true;
-                }
-            });
+                });
+    }
+
+    private void displayInvitationResponseAlertDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(true);
+
+        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+        View dialogView = layoutInflater.inflate(R.layout.alert_dialog_invitation_response, null);
+        builder.setView(dialogView);
+
+        EditText message = (EditText) dialogView.findViewById(R.id.et_alert_dialog_invitation_response_message);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                Toast.makeText(getActivity(), "Done", Toast.LENGTH_LONG).show();
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     @Override
-    public void onClick(View view)
-    {
-        if (view.getId() == R.id.tv_event_details_location)
-        {
-            if (event.getLocation().getLatitude() != null && event.getLocation().getLongitude() != null)
-            {
+    public void onClick(View view) {
+        if (view.getId() == R.id.tv_event_details_location) {
+            if (event.getLocation().getLatitude() != null && event.getLocation().getLongitude() != null) {
                 Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
                         Uri.parse("http://maps.google.com/maps?daddr=" + event.getLocation().getLatitude() + "," + event.getLocation().getLongitude()));
                 startActivity(intent);
-            } else
-            {
+            } else {
                 Snackbar.make(getView(), R.string.location_not_available_on_map, Snackbar.LENGTH_LONG).show();
             }
-        } else if (view.getId() == R.id.tv_event_details_description)
-        {
+        } else if (view.getId() == R.id.tv_event_details_description) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.Base_Theme_AppCompat_Light_Dialog_Alert);
 
-            if (description.getText().toString().isEmpty())
-            {
+            if (description.getText().toString().isEmpty()) {
                 builder.setMessage(description.getText().toString());
-            } else
-            {
+            } else {
                 builder.setMessage(description.getText().toString());
             }
 
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
-            {
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialogInterface, int i)
-                {
+                public void onClick(DialogInterface dialogInterface, int i) {
                     dialogInterface.dismiss();
                 }
             });
 
             builder.create().show();
-        } else if (view.getId() == R.id.tv_event_details_date_time)
-        {
+        } else if (view.getId() == R.id.tv_event_details_date_time) {
         }
     }
 
     @Subscribe
-    public void onRsvpChanged(ChangeAttendeeListTrigger trigger)
-    {
-        if (event.getId().equals(trigger.getEventId()))
-        {
+    public void onRsvpChanged(ChangeAttendeeListTrigger trigger) {
+        if (event.getId().equals(trigger.getEventId())) {
             EventDetails.Attendee attendee = new EventDetails.Attendee();
             attendee.setId(userService.getActiveUserId());
 
-            if (trigger.getRsvp() == Event.RSVP.YES)
-            {
-                if (eventDetails != null)
-                {
+            if (trigger.getRsvp() == Event.RSVP.YES) {
+                if (eventDetails != null) {
                     event.setRsvp(Event.RSVP.YES);
 
-                    if (eventDetails.getAttendees().contains(attendee))
-                    {
+                    if (eventDetails.getAttendees().contains(attendee)) {
                         eventDetails.getAttendees().remove(attendee);
                     }
 
@@ -491,14 +482,11 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
                     eventDetails.getAttendees().add(attendee);
                     refreshRecyclerView();
                 }
-            } else if (trigger.getRsvp() == Event.RSVP.MAYBE)
-            {
-                if (eventDetails != null)
-                {
+            } else if (trigger.getRsvp() == Event.RSVP.MAYBE) {
+                if (eventDetails != null) {
                     event.setRsvp(Event.RSVP.MAYBE);
 
-                    if (eventDetails.getAttendees().contains(attendee))
-                    {
+                    if (eventDetails.getAttendees().contains(attendee)) {
                         eventDetails.getAttendees().remove(attendee);
                     }
 
@@ -511,15 +499,12 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
                     refreshRecyclerView();
                 }
 
-            } else if (trigger.getRsvp() == Event.RSVP.NO)
-            {
-                if (eventDetails != null)
-                {
+            } else if (trigger.getRsvp() == Event.RSVP.NO) {
+                if (eventDetails != null) {
                     event.setRsvp(Event.RSVP.NO);
 
                     attendee.setRsvp(Event.RSVP.NO);
-                    if (eventDetails.getAttendees().contains(attendee))
-                    {
+                    if (eventDetails.getAttendees().contains(attendee)) {
                         eventDetails.getAttendees().remove(attendee);
                         refreshRecyclerView();
                     }
@@ -529,17 +514,14 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
     }
 
     @Subscribe
-    public void onRsvpNotChanged(EventRsvpNotChangedTrigger trigger)
-    {
-        if (trigger.getEventId().equals(event.getId()))
-        {
+    public void onRsvpNotChanged(EventRsvpNotChangedTrigger trigger) {
+        if (trigger.getEventId().equals(event.getId())) {
             event.setRsvp(trigger.getOldRsvp());
         }
     }
 
     @Override
-    public void onAttendeeClicked(String name)
-    {
+    public void onAttendeeClicked(String name) {
         Toast.makeText(getActivity(), name + " invited you", Toast.LENGTH_LONG).show();
     }
 }
