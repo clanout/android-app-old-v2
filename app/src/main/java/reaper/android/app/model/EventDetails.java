@@ -10,6 +10,7 @@ public class EventDetails implements Model
     {
         private String id;
         private String name;
+        private String status;
         private Event.RSVP rsvp;
         private boolean isFriend;
         private boolean isInviter;
@@ -62,6 +63,14 @@ public class EventDetails implements Model
         public void setInviter(boolean isInviter)
         {
             this.isInviter = isInviter;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
         }
 
         @Override

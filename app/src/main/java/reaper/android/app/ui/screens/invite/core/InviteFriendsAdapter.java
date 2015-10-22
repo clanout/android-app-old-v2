@@ -61,8 +61,8 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
 
     private void generateDrawables() {
         personDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
-                .setColor(ContextCompat.getColor(context, R.color.black))
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
+                .setColor(ContextCompat.getColor(context, R.color.light_grey))
                 .setSizeDp(24)
                 .build();
     }

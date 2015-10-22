@@ -33,6 +33,8 @@
 
     <string name="refreshing_attendee_list">Updating</string>
 
+    <string name="invitation_response_sent">Your response is sent</string>
+
     <!-- RSVP -->
     <string name="rsvp_yes"> Yay </string>
     <string name="rsvp_maybe"> Maybe </string>
@@ -94,6 +96,8 @@
     <string name="notifications_fetch_failure">Unable to load notifications</string>
 
     <string name="event_not_found">Unable to locate this clan</string>
+
+    <string name="default_event_status">This is my status</string>
 
     <!-- Facebook -->
     <string name="facebook_app_id">711701748936592</string>

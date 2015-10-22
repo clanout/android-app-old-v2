@@ -48,8 +48,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 .build();
 
         personDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
-                .setColor(ContextCompat.getColor(context, R.color.grey))
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
+                .setColor(ContextCompat.getColor(context, R.color.light_grey))
                 .setSizeDp(24)
                 .build();
 

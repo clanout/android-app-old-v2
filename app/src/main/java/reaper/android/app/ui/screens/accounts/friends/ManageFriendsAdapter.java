@@ -3,6 +3,7 @@ package reaper.android.app.ui.screens.accounts.friends;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -62,8 +63,8 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
                 .build();
 
         personDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
-                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
-                .setColor(Color.BLACK)
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
+                .setColor(ContextCompat.getColor(context, R.color.light_grey))
                 .setSizeDp(24)
                 .build();
     }

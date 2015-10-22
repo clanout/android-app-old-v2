@@ -5,7 +5,7 @@
     <color name="primary_dark">#4d394b</color>
     <color name="white">#FFFFFF</color>
     <color name="accent">#29b9a0</color>
-    <color name="accent_secondary">#EF9A9A</color>
+    <color name="accent_secondary">#EF9A9B</color>
 
     <!-- Background -->
     <color name="background_default">#FAFAFA</color>
@@ -20,6 +20,7 @@
     <color name="yellow">#FFC107</color>
     <color name="grey">#424242</color>
     <color name="black">#000000</color>
+    <color name="light_grey">#EEEEEE</color>
 
     <!-- App Intro Background -->
     <color name="purple_app_inro">#9C27B0</color>

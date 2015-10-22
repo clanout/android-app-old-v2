@@ -405,8 +405,7 @@ public class UserService {
                                 phoneContact.setPhone(sanitizedPhone);
                                 phoneContact.setIsSelected(false);
 
-                                if(!phoneContactList.contains(phoneContact))
-                                {
+                                if (!phoneContactList.contains(phoneContact)) {
                                     phoneContactList.add(phoneContact);
                                 }
 

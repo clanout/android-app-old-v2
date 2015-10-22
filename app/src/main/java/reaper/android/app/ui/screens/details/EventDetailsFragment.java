@@ -12,14 +12,18 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -182,6 +186,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
     @Subscribe
     public void onEventDetailsFetchedFromNetwork(EventDetailsFetchedFromNetworkTrigger trigger) {
         if (trigger.getEventDetails().getId().equals(event.getId())) {
+
             eventDetails = trigger.getEventDetails();
 
             if (eventDetails.getDescription() == null || eventDetails.getDescription().isEmpty()) {
@@ -250,7 +255,14 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
         EventDetails.Attendee attendee = new EventDetails.Attendee();
         attendee.setId(userService.getActiveUserId());
 
+        // TODO -- change default status
+        String userStatus = "This is my status";
+
         if (eventDetails.getAttendees().contains(attendee)) {
+
+            int index = eventDetails.getAttendees().indexOf(attendee);
+            userStatus = eventDetails.getAttendees().get(index).getStatus();
+
             eventDetails.getAttendees().remove(attendee);
         }
 
@@ -258,12 +270,14 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
         attendee.setFriend(false);
         attendee.setInviter(false);
         attendee.setRsvp(event.getRsvp());
+        attendee.setStatus(userStatus);
 
         if (!(event.getRsvp() == Event.RSVP.NO)) {
             eventDetails.getAttendees().add(attendee);
         }
 
         attendees = eventDetails.getAttendees();
+
         Collections.sort(attendees, new EventAttendeeComparator(userService.getActiveUserId()));
         eventAttendeesAdapter = new EventAttendeesAdapter(eventDetails.getAttendees(), getActivity());
         eventAttendeesAdapter.setAttendeeClickCommunicator(this);
@@ -366,7 +380,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
                 if (event.getRsvp() == Event.RSVP.NO) {
                     displayInvitationResponseAlertDialog();
                 } else {
-                    Toast.makeText(getActivity(), "Yes/Maybe", Toast.LENGTH_LONG).show();
+                    displayStatusDialog();
                 }
 
                 return true;
@@ -405,7 +419,83 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
                 });
     }
 
+    private void displayStatusDialog() {
+
+        // TODO -- add status messages
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(true);
+
+        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+        View dialogView = layoutInflater.inflate(R.layout.alert_dialog_status, null);
+        builder.setView(dialogView);
+
+        final EditText status = (EditText) dialogView.findViewById(R.id.et_alert_dialog_status_message);
+        ListView list = (ListView) dialogView.findViewById(R.id.lv_alert_dialog_status);
+
+        final List<String> statusList = new ArrayList<>();
+        statusList.add("On my way");
+        statusList.add("LAst minute back out");
+        statusList.add("Feeling very excited");
+        statusList.add("Drinks on me!");
+
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, statusList);
+
+        list.setAdapter(statusAdapter);
+
+
+        EventDetails.Attendee attendee = new EventDetails.Attendee();
+        attendee.setId(userService.getActiveUserId());
+
+        if(eventDetails.getAttendees().contains(attendee))
+        {
+            int index = eventDetails.getAttendees().indexOf(attendee);
+
+            if(eventDetails.getAttendees().get(index).getStatus() == null || eventDetails.getAttendees().get(index).getStatus().isEmpty()){
+
+                status.setHint(R.string.default_event_status);
+            }else{
+                status.setText(eventDetails.getAttendees().get(index).getStatus());
+            }
+        }
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                status.setText(statusList.get(position));
+            }
+        });
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                EventDetails.Attendee attendee1 = new EventDetails.Attendee();
+                attendee1.setId(userService.getActiveUserId());
+
+                if(eventDetails.getAttendees().contains(attendee1))
+                {
+                    int index = eventDetails.getAttendees().indexOf(attendee1);
+
+                    eventDetails.getAttendees().get(index).setStatus(status.getText().toString());
+                    eventCache.saveDetails(eventDetails);
+                    refreshRecyclerView();
+                }
+
+                eventService.updateStatus(event.getId(), status.getText().toString());
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
     private void displayInvitationResponseAlertDialog() {
+
+        // TODO -- change dialog title
+        // TODO -- change chat message
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
@@ -414,14 +504,17 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
         View dialogView = layoutInflater.inflate(R.layout.alert_dialog_invitation_response, null);
         builder.setView(dialogView);
 
-        EditText message = (EditText) dialogView.findViewById(R.id.et_alert_dialog_invitation_response_message);
+        final EditText message = (EditText) dialogView.findViewById(R.id.et_alert_dialog_invitation_response_message);
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                Toast.makeText(getActivity(), "Done", Toast.LENGTH_LONG).show();
-                dialog.dismiss();
+                if (message.getText().toString() != null || !(message.getText().toString().isEmpty())) {
+                    eventService.sendInvitationResponse(event.getId(), message.getText().toString());
+                    Toast.makeText(getActivity(), R.string.invitation_response_sent, Toast.LENGTH_LONG).show();
+                    dialog.dismiss();
+                }
             }
         });
 

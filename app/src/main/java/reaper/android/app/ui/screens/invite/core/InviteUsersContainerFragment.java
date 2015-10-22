@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -173,8 +174,8 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
     private void generateDrawables() {
         checkDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
-                .setColor(getResources().getColor(R.color.whity))
-                .setSizeDp(24)
+                .setColor(ContextCompat.getColor(getActivity(), R.color.primary))
+                .setSizeDp(36)
                 .build();
     }
 

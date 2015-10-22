@@ -14,10 +14,17 @@ public class CreateEventSuggestionFactory {
     public static List<CreateEventModel> getEventSuggestions() {
 
         List<CreateEventModel> eventSuggestionList = new ArrayList<>();
-        eventSuggestionList.add(new CreateEventModel(EventCategory.MOVIES, "Plan a movie tonight"));
-        eventSuggestionList.add(new CreateEventModel(EventCategory.EAT_OUT, "Hungry? Go eat out with friends"));
-        eventSuggestionList.add(new CreateEventModel(EventCategory.OUTDOORS, "Long drive away from the city"));
+        eventSuggestionList.add(new CreateEventModel(EventCategory.CAFE, "Coffee :)"));
+        eventSuggestionList.add(new CreateEventModel(EventCategory.SHOPPING, "Who shops alone?"));
+        eventSuggestionList.add(new CreateEventModel(EventCategory.INDOORS, "The call of duty"));
+        eventSuggestionList.add(new CreateEventModel(EventCategory.CAFE, "Escape the office. Get a coffee break!"));
+        eventSuggestionList.add(new CreateEventModel(EventCategory.SPORTS, "Are you game?"));
         eventSuggestionList.add(new CreateEventModel(EventCategory.DRINKS, "Lose Control"));
+        eventSuggestionList.add(new CreateEventModel(EventCategory.CAFE, "Catch up on Coffee"));
+        eventSuggestionList.add(new CreateEventModel(EventCategory.DRINKS, "Party till 4!"));
+        eventSuggestionList.add(new CreateEventModel(EventCategory.CAFE, "I <3 coffee"));
+        eventSuggestionList.add(new CreateEventModel(EventCategory.DRINKS, "A beer everyday makes me feel yay!"));
+        eventSuggestionList.add(new CreateEventModel(EventCategory.CAFE, "Coffee :)"));
 
         return eventSuggestionList;
     }

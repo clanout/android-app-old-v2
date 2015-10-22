@@ -24,24 +24,21 @@ import reaper.android.app.model.EventDetails;
 import reaper.android.app.root.Reaper;
 import reaper.android.app.ui.util.CircleTransform;
 
-public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAdapter.EventDetailsViewHolder>
-{
+public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAdapter.EventDetailsViewHolder> {
     private Context context;
     List<EventDetails.Attendee> attendees;
     private AttendeeClickCommunicator attendeeClickCommunicator;
     private Drawable goingDrawable, maybeDrawable, invitedDrawable;
     private Drawable personDrawable;
 
-    public EventAttendeesAdapter(List<EventDetails.Attendee> attendees, Context context)
-    {
+    public EventAttendeesAdapter(List<EventDetails.Attendee> attendees, Context context) {
         this.attendees = attendees;
         this.context = context;
 
         generateDrawables();
     }
 
-    private void generateDrawables()
-    {
+    private void generateDrawables() {
         goingDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
                 .setColor(ContextCompat.getColor(context, R.color.going))
@@ -61,59 +58,53 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
                 .build();
 
         personDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
-                .setColor(ContextCompat.getColor(context, R.color.black))
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
+                .setColor(ContextCompat.getColor(context, R.color.light_grey))
                 .setSizeDp(24)
                 .build();
     }
 
     @Override
-    public EventDetailsViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
-    {
+    public EventDetailsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_event_attendee, parent, false);
         EventDetailsViewHolder eventDetailsViewHolder = new EventDetailsViewHolder(view);
         return eventDetailsViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(EventDetailsViewHolder holder, int position)
-    {
+    public void onBindViewHolder(EventDetailsViewHolder holder, int position) {
         EventDetails.Attendee attendee = attendees.get(position);
 
         holder.render(attendee);
     }
 
     @Override
-    public int getItemCount()
-    {
+    public int getItemCount() {
         return attendees.size();
     }
 
-    public void setAttendeeClickCommunicator(AttendeeClickCommunicator attendeeClickCommunicator)
-    {
+    public void setAttendeeClickCommunicator(AttendeeClickCommunicator attendeeClickCommunicator) {
         this.attendeeClickCommunicator = attendeeClickCommunicator;
     }
 
-    public class EventDetailsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
-    {
+    public class EventDetailsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView inviter, rsvp;
         private ImageView pic;
-        private TextView name;
+        private TextView name, status;
 
-        public EventDetailsViewHolder(View itemView)
-        {
+        public EventDetailsViewHolder(View itemView) {
             super(itemView);
 
             pic = (ImageView) itemView.findViewById(R.id.iv_event_attendee_pic);
             inviter = (ImageView) itemView.findViewById(R.id.iv_event_attendee_inviter);
             rsvp = (ImageView) itemView.findViewById(R.id.iv_event_attendee_rsvp);
             name = (TextView) itemView.findViewById(R.id.tv_event_attendee_name);
+            status = (TextView) itemView.findViewById(R.id.tv_event_attendee_status);
 
             itemView.setOnClickListener(this);
         }
 
-        public void render(EventDetails.Attendee attendee)
-        {
+        public void render(EventDetails.Attendee attendee) {
             Picasso.with(context)
                     .load(AppConstants.FACEBOOK_END_POINT + attendee.getId() + "/picture")
                     .placeholder(personDrawable)
@@ -122,17 +113,20 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
 
             name.setText(attendee.getName());
 
-            if (attendee.isInviter())
-            {
+            if (attendee.getStatus() == null || attendee.getStatus().isEmpty()) {
+                status.setText(R.string.default_event_status);
+            } else {
+                status.setText(attendee.getStatus());
+            }
+
+            if (attendee.isInviter()) {
                 inviter.setVisibility(View.VISIBLE);
                 inviter.setImageDrawable(invitedDrawable);
-            } else
-            {
+            } else {
                 inviter.setVisibility(View.INVISIBLE);
             }
 
-            switch (attendee.getRsvp())
-            {
+            switch (attendee.getRsvp()) {
                 case YES:
                     rsvp.setImageDrawable(goingDrawable);
                     break;
@@ -143,12 +137,9 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
         }
 
         @Override
-        public void onClick(View v)
-        {
-            if (attendeeClickCommunicator != null)
-            {
-                if (attendees.get(getAdapterPosition()).isInviter())
-                {
+        public void onClick(View v) {
+            if (attendeeClickCommunicator != null) {
+                if (attendees.get(getAdapterPosition()).isInviter()) {
                     attendeeClickCommunicator.onAttendeeClicked(attendees.get(getAdapterPosition()).getName());
                 }
             }

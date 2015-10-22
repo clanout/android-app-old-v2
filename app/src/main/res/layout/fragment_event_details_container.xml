@@ -43,8 +43,9 @@
                 android:id="@+id/btn_event_details_rsvp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/custom_button_background"
-                android:textColor="@color/white"
+                android:background="@color/background_default"
+                android:textColor="@drawable/button_text_color"
+                android:textStyle="bold"
                 android:textSize="14sp"/>
         </LinearLayout>
 
@@ -58,8 +59,9 @@
                 android:id="@+id/btn_event_details_invite"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/custom_button_background"
-                android:textColor="@color/white"
+                android:background="@color/background_default"
+                android:textColor="@drawable/button_text_color"
+                android:textStyle="bold"
                 android:textSize="14sp"
                 />
         </LinearLayout>
@@ -75,8 +77,9 @@
                 android:id="@+id/btn_event_details_chat"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/custom_button_background"
-                android:textColor="@color/white"
+                android:background="@color/background_default"
+                android:textColor="@drawable/button_text_color"
+                android:textStyle="bold"
                 android:textSize="14sp"
                 />
         </LinearLayout>

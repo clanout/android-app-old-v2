@@ -144,8 +144,8 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
 
         checkDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
-                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
-                .setSizeDp(24)
+                .setColor(ContextCompat.getColor(getActivity(), R.color.primary))
+                .setSizeDp(36)
                 .build();
 
         whatsappDrawable = MaterialDrawableBuilder.with(getActivity())
