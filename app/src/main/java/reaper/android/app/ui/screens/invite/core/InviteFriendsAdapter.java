@@ -82,7 +82,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
             holder.userPic.setVisibility(View.VISIBLE);
 
             Picasso.with(context)
-                    .load(AppConstants.FACEBOOK_END_POINT + current.getId() + "/picture")
+                    .load(AppConstants.FACEBOOK_END_POINT + current.getId() + "/picture?width=500")
                     .placeholder(personDrawable)
                     .transform(new CircleTransform())
                     .into(holder.userPic);

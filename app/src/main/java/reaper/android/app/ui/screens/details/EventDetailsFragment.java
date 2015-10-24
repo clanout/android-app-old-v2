@@ -47,6 +47,7 @@ import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
+import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventAttendeeComparator;
 import reaper.android.app.model.EventCategory;
@@ -154,7 +155,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
                 .build();
 
         statusDrawable = MaterialDrawableBuilder.with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE_ALERT)
+                .setIcon(MaterialDrawableBuilder.IconValue.COMMENT_ALERT)
                 .setColor(ContextCompat.getColor(getActivity(), R.color.whity))
                 .setSizeDp(36)
                 .build();
@@ -382,7 +383,6 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
                 } else {
                     displayStatusDialog();
                 }
-
                 return true;
             }
         });
@@ -483,7 +483,17 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
                     refreshRecyclerView();
                 }
 
-                eventService.updateStatus(event.getId(), status.getText().toString());
+                boolean shouldNotifyOthers = false;
+
+                // TODO - discuss condition
+
+                if((event.getStartTime().getMillis() - DateTime.now().getMillis() < Timestamps.STATUS_UPDATE_NOTIFICATION_WINDOW) || (DateTime.now().getMillis() > event.getStartTime().getMillis()))
+                {
+                    Log.d("APP", "should notify others");
+                    shouldNotifyOthers = true;
+                }
+
+                eventService.updateStatus(event.getId(), status.getText().toString(), shouldNotifyOthers);
                 dialog.dismiss();
             }
         });

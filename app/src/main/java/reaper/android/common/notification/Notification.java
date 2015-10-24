@@ -21,6 +21,7 @@ public class Notification
     public static final int FRIEND_RELOCATED = 7;
     public static final int NEW_FRIEND_ADDED = 8;
     public static final int CHAT = 9;
+    public static final int STATUS = 10;
 
     private int id;
     private int type;

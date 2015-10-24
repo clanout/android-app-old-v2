@@ -1208,9 +1208,9 @@ public class EventService
         });
     }
 
-    public void updateStatus(String eventId, String status) {
+    public void updateStatus(String eventId, String status, boolean shouldNotifyOthers) {
 
-        UpdateStatusApiRequest request = new UpdateStatusApiRequest(eventId, status);
+        UpdateStatusApiRequest request = new UpdateStatusApiRequest(eventId, status, shouldNotifyOthers);
 
         eventApi.updateStatus(request).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<Response>() {
 

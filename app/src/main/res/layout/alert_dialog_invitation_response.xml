@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:gravity="center_horizontal"
-        android:text="Tell your friends the reason for your absence"
+        android:text="@string/invitation_response_title"
         android:textColor="@color/text_title"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"

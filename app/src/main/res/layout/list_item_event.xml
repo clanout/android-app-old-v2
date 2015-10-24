@@ -149,7 +149,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/rsvp_yes"
                 android:textSize="14sp"
-                android:textColor="@color/text_subtitle"/>
+                android:textColor="@color/primary"/>
         </LinearLayout>
 
         <LinearLayout
@@ -173,7 +173,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/rsvp_maybe"
                 android:textSize="14sp"
-                android:textColor="@color/text_subtitle"/>
+                android:textColor="@color/primary"/>
         </LinearLayout>
 
         <LinearLayout
@@ -196,7 +196,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/rsvp_no"
                 android:textSize="14sp"
-                android:textColor="@color/text_subtitle"/>
+                android:textColor="@color/primary"/>
         </LinearLayout>
 
     </LinearLayout>

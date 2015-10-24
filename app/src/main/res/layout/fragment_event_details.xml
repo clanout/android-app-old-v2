@@ -62,7 +62,7 @@
                     android:scaleType="center"
                     app:materialIcon="bulletin_board"
                     app:materialIconColor="@color/whity"
-                    app:materialIconSize="48dp"
+                    app:materialIconSize="36dp"
                     android:layout_gravity="center" />
 
             </LinearLayout>
@@ -89,7 +89,7 @@
                 android:layout_height="wrap_content"
                 android:scaleType="center"
                 app:materialIcon="map_marker"
-                app:materialIconColor="@color/accent"
+                app:materialIconColor="@color/primary"
                 app:materialIconSize="18dp"
                 />
 
@@ -127,7 +127,7 @@
                 android:layout_height="wrap_content"
                 android:scaleType="center"
                 app:materialIcon="clock"
-                app:materialIconColor="@color/accent"
+                app:materialIconColor="@color/primary"
                 app:materialIconSize="18dp"
                 />
 
@@ -165,7 +165,7 @@
                 android:layout_height="wrap_content"
                 android:scaleType="center"
                 app:materialIcon="note_text"
-                app:materialIconColor="@color/accent"
+                app:materialIconColor="@color/primary"
                 app:materialIconSize="18dp"
                 />
 

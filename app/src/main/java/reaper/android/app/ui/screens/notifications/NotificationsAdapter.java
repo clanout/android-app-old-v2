@@ -42,8 +42,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     private void generateDrawables() {
         chatDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE_TEXT)
-                .setColor(ContextCompat.getColor(context, R.color.grey))
+                .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE)
+                .setColor(ContextCompat.getColor(context, R.color.light_grey))
                 .setSizeDp(24)
                 .build();
 
@@ -55,7 +55,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
         rsvpDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_MULTIPLE_PLUS)
-                .setColor(ContextCompat.getColor(context, R.color.grey))
+                .setColor(ContextCompat.getColor(context, R.color.light_grey))
                 .setSizeDp(24)
                 .build();
     }
@@ -110,7 +110,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 case Notification.NEW_FRIEND_ADDED:
 
                     Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?height=500")
+                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?width=500")
                             .placeholder(personDrawable)
                             .transform(new CircleTransform())
                             .into(notificationIcon);
@@ -118,7 +118,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 case Notification.EVENT_UPDATED:
 
                     Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?height=500")
+                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?width=500")
                             .placeholder(personDrawable)
                             .transform(new CircleTransform())
                             .into(notificationIcon);
@@ -126,19 +126,24 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 case Notification.EVENT_REMOVED:
 
                     Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?height=500")
+                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?width=500")
                             .placeholder(personDrawable)
                             .transform(new CircleTransform())
                             .into(notificationIcon);
                     break;
                 case Notification.RSVP:
 
-                    notificationIcon.setImageDrawable(rsvpDrawable);
+                    Picasso.with(context)
+                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?width=500")
+                            .placeholder(personDrawable)
+                            .transform(new CircleTransform())
+                            .into(notificationIcon);
+
                     break;
                 case Notification.EVENT_INVITATION:
 
                     Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?height=500")
+                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?width=500")
                             .placeholder(personDrawable)
                             .transform(new CircleTransform())
                             .into(notificationIcon);
@@ -146,7 +151,15 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 case Notification.EVENT_CREATED:
 
                     Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?height=500")
+                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?width=500")
+                            .placeholder(personDrawable)
+                            .transform(new CircleTransform())
+                            .into(notificationIcon);
+                    break;
+                case Notification.STATUS:
+
+                    Picasso.with(context)
+                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?width=500")
                             .placeholder(personDrawable)
                             .transform(new CircleTransform())
                             .into(notificationIcon);

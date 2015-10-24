@@ -97,6 +97,37 @@ public class NotificationService {
             case Notification.CHAT:
                 handleNewChatMessageNotification(notification);
                 break;
+            case Notification.STATUS:
+                handleNewStatusUpdateNotification(notification);
+                break;
+        }
+    }
+
+    private void handleNewStatusUpdateNotification(final Notification notification) {
+
+        if (!(notification.getArgs().get("user_id").equals(userService.getActiveUserId()))) {
+            notificationCache.put(notification).observeOn(Schedulers.newThread()).subscribe(new Subscriber<Object>() {
+                @Override
+                public void onCompleted() {
+
+                    if (ifAppRunningInForeground()) {
+                        bus.post(new NewNotificationReceivedTrigger());
+
+                    } else {
+                        buildNotification(notification, true);
+                    }
+                }
+
+                @Override
+                public void onError(Throwable e) {
+
+                }
+
+                @Override
+                public void onNext(Object o) {
+
+                }
+            });
         }
     }
 

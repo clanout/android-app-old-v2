@@ -39,6 +39,9 @@ public class NotificationHelper
         }else if(name.equals(NotificationConstants.CHAT))
         {
             return Notification.CHAT;
+        }else if(name.equals(NotificationConstants.STATUS))
+        {
+            return Notification.STATUS;
         }
         else
         {
@@ -70,9 +73,18 @@ public class NotificationHelper
                 return newFriendJoinedAppMessage(args);
             case Notification.CHAT:
                 return newChatMessageReceivedMessage(args);
+            case Notification.STATUS:
+                return newStatusUpdateReceived(args);
             default:
                 return "";
         }
+    }
+
+    private static String newStatusUpdateReceived(Map<String, String> args) {
+
+        // TODO --- change message
+
+        return args.get("user_name") + " in " + args.get("event_name") + " ----- " + args.get("status");
     }
 
     private static String newChatMessageReceivedMessage(Map<String, String> args) {

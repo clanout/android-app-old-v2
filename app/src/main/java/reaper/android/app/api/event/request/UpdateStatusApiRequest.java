@@ -15,8 +15,12 @@ public class UpdateStatusApiRequest extends ApiRequest {
     @SerializedName("status")
     private String status;
 
-    public UpdateStatusApiRequest(String eventId, String status) {
+    @SerializedName("notification")
+    private boolean shouldNotifyFriends;
+
+    public UpdateStatusApiRequest(String eventId, String status, boolean shouldNotifyFriends) {
         this.eventId = eventId;
         this.status = status;
+        this.shouldNotifyFriends = shouldNotifyFriends;
     }
 }

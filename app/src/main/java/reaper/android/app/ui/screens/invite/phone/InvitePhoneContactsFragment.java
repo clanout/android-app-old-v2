@@ -295,7 +295,7 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
             public boolean onMenuItemClick(MenuItem menuItem) {
 
                 if (!isPhoneAdded) {
-                    Snackbar.make(getView(), R.string.add_phone_number, Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(getView(), R.string.add_phone_number_toast, Snackbar.LENGTH_LONG).show();
                     return true;
                 } else {
 

@@ -33,12 +33,13 @@
 
     <string name="refreshing_attendee_list">Updating</string>
 
-    <string name="invitation_response_sent">Your response is sent</string>
+    <string name="invitation_response_sent">Your friends will be notified</string>
+    <string name="invitation_response_title">Inform friends of your absence by leaving a message</string>
 
     <!-- RSVP -->
-    <string name="rsvp_yes"> Yay </string>
-    <string name="rsvp_maybe"> Maybe </string>
-    <string name="rsvp_no"> Nay </string>
+    <string name="rsvp_yes"> YAY </string>
+    <string name="rsvp_maybe"> MAYBE </string>
+    <string name="rsvp_no"> NAY </string>
 
     <!-- Action Bar -->
     <string name="action_account">Account</string>
@@ -86,7 +87,8 @@
     <string name="messed_up"> Looks like we screwed up. While we fix this issue, go feed your dog </string>
 
     <string name="phone_invalid"> Please enter a valid phone number</string>
-    <string name="add_phone_number"> Clanout is exciting with your friends around. Add your number to instantly connect with your nearby phonebook friends. ClanOut won\'t share your personal information with anyone</string>
+    <string name="add_phone_number"> Clanout is exciting with your friends around. Add your number to instantly connect with your nearby phonebook friends.\n\nClanOut won\'t share your personal information with anyone</string>
+    <string name="add_phone_number_toast">Please add your phone number</string>
 
     <string name="event_edit_failed_locked"> Organizer finalized the details </string>
     <string name="event_finalisation_failed"> Currently unable to finalize details. Try again</string>
