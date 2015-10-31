@@ -10,6 +10,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,9 +19,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -58,8 +62,7 @@ import reaper.android.app.ui.screens.invite.core.InviteFriendsAdapter;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class InviteFacebookFriendsFragment extends BaseFragment implements View.OnClickListener
-{
+public class InviteFacebookFriendsFragment extends BaseFragment implements View.OnClickListener {
     private RecyclerView recyclerView;
     private TextView noFriendsMessage;
     private FloatingActionButton inviteWhatsapp;
@@ -67,6 +70,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     private Drawable refreshDrawable;
     private LinearLayout loading;
     private ProgressBar progressBar;
+    private EditText search;
 
     private InviteFriendsAdapter inviteFriendsAdapter;
     private UserService userService;
@@ -80,20 +84,21 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     private ArrayList<EventDetails.Invitee> inviteeList;
     private ArrayList<EventDetails.Attendee> attendeeList;
     private List<Friend> friendList;
+    private List<Friend> visibleFriendList;
     private Event event;
     private Drawable whatsappDrawable;
 
+    private TextWatcher searchWatcher;
+
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_invite_facebook_friends, container, false);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_invite_facebook_friends);
@@ -101,13 +106,13 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
         inviteWhatsapp = (FloatingActionButton) view.findViewById(R.id.fib_fragment_invite_facebook_friends_invite_people_whatsapp);
         loading = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_facebook_friends_loading);
         progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_invite_facebook_friends);
+        search = (EditText) view.findViewById(R.id.et_fragment_invite_facebook_friends_search);
 
         return view;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState)
-    {
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         displayLoadingView();
@@ -115,28 +120,68 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
 
         Bundle bundle = getArguments();
 
-        if (bundle == null)
-        {
+        if (bundle == null) {
             inviteeList = new ArrayList<>();
             attendeeList = new ArrayList<>();
-        } else
-        {
+        } else {
             inviteeList = (ArrayList<EventDetails.Invitee>) bundle.get(BundleKeys.INVITEE_LIST);
             attendeeList = (ArrayList<EventDetails.Attendee>) bundle.get(BundleKeys.ATTENDEE_LIST);
             event = (Event) bundle.get(BundleKeys.EVENT);
 
-            if (inviteeList == null)
-            {
+            if (inviteeList == null) {
                 inviteeList = new ArrayList<>();
             }
 
-            if(attendeeList == null)
-            {
+            if (attendeeList == null) {
                 attendeeList = new ArrayList<>();
             }
         }
 
         friendList = new ArrayList<>();
+        visibleFriendList = new ArrayList<>();
+
+        searchWatcher = new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                if(s.length() >= 1)
+                {
+                    visibleFriendList = new ArrayList<>();
+                    for(Friend friend : friendList)
+                    {
+                        if(friend.getName().toLowerCase().contains(s.toString().toLowerCase()))
+                        {
+                            visibleFriendList.add(friend);
+                        }
+                    }
+
+                    Collections.sort(visibleFriendList, new FriendsComparator());
+                    refreshRecyclerView();
+                }else if(s.length() == 0)
+                {
+                    visibleFriendList = new ArrayList<>();
+
+                    for(Friend friend : friendList)
+                    {
+                        visibleFriendList.add(friend);
+                    }
+
+                    Collections.sort(visibleFriendList, new FriendsComparator());
+                    refreshRecyclerView();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        };
 
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
@@ -155,8 +200,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
         initRecyclerView();
     }
 
-    private void generateDrawables()
-    {
+    private void generateDrawables() {
         refreshDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
                 .setColor(ContextCompat.getColor(getActivity(), R.color.white))
@@ -171,58 +215,58 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     }
 
     @Override
-    public void onStop()
-    {
+    public void onStop() {
         super.onStop();
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_FACEBOOK_FRIENDS_FRAGMENT);
 
         bus.register(this);
         userService.getAppFriends(locationService.getUserLocation().getZone());
+
+        search.addTextChangedListener(searchWatcher);
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
-        if(isVisibleToUser)
-        {
+        if (isVisibleToUser) {
             setHasOptionsMenu(true);
         }
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
         bus.unregister(this);
+
+        search.removeTextChangedListener(searchWatcher);
     }
 
-    private void displayLoadingView()
-    {
+    private void displayLoadingView() {
         recyclerView.setVisibility(View.GONE);
+        search.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
         loading.setVisibility(View.VISIBLE);
     }
 
-    private void displayBasicView()
-    {
+    private void displayBasicView() {
         recyclerView.setVisibility(View.VISIBLE);
+        search.setVisibility(View.VISIBLE);
         noFriendsMessage.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
     }
 
-    private void displayNoFriendsView()
-    {
+    private void displayNoFriendsView() {
         recyclerView.setVisibility(View.GONE);
+        search.setVisibility(View.VISIBLE);
         noFriendsMessage.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.VISIBLE);
         loading.setVisibility(View.GONE);
@@ -230,11 +274,11 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
         noFriendsMessage.setText(R.string.no_local_facebook_friends);
     }
 
-    private void displayErrorView()
-    {
+    private void displayErrorView() {
         AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_LOAD_FACEBOOK_FRIENDS, userService.getActiveUserId());
 
         recyclerView.setVisibility(View.GONE);
+        search.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
@@ -243,8 +287,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
         menu.clear();
@@ -264,11 +307,9 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
 
         menu.findItem(R.id.action_refresh).setIcon(refreshDrawable);
 
-        menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
+        menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item)
-            {
+            public boolean onMenuItemClick(MenuItem item) {
 
                 AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.INVITE_FACEBOOK_FRIENDS_REFRESH_CLIKCED, userService.getActiveUserId());
 
@@ -279,47 +320,40 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
         });
     }
 
-    private void initRecyclerView()
-    {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, true, bus, event, attendeeList);
+    private void initRecyclerView() {
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, visibleFriendList, true, bus, event, attendeeList);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    private void refreshRecyclerView()
-    {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, true, bus, event, attendeeList);
+    private void refreshRecyclerView() {
+
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, visibleFriendList, true, bus, event, attendeeList);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
 
-        if (friendList.size() == 0)
-        {
+        if (visibleFriendList.size() == 0) {
             displayNoFriendsView();
 
-        } else
-        {
+        } else {
             displayBasicView();
         }
     }
 
     @Subscribe
-    public void onFacebookFriendsUpdatedOnServer(FacebookFriendsUpdatedOnServerTrigger trigger)
-    {
-        if (!trigger.isPolling())
-        {
+    public void onFacebookFriendsUpdatedOnServer(FacebookFriendsUpdatedOnServerTrigger trigger) {
+        if (!trigger.isPolling()) {
             userService.getAppFriendsFromNetwork(locationService.getUserLocation().getZone());
             genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now());
         }
     }
 
     @Subscribe
-    public void onFacebookFriendsNotUpdatedOnServer(GenericErrorTrigger trigger)
-    {
-        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE)
-        {
-            if (menu != null)
-            {
+    public void onFacebookFriendsNotUpdatedOnServer(GenericErrorTrigger trigger) {
+        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE) {
+
+            if (menu != null) {
                 menu.findItem(R.id.action_refresh).setActionView(null);
             }
             displayErrorView();
@@ -327,21 +361,17 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     }
 
     @Subscribe
-    public void onFacebookFriendsIdFetched(FacebookFriendsIdFetchedTrigger trigger)
-    {
-        if (!trigger.isPolling())
-        {
+    public void onFacebookFriendsIdFetched(FacebookFriendsIdFetchedTrigger trigger) {
+        if (!trigger.isPolling()) {
             userService.updateFacebookFriends(trigger.getFriendsIdList(), trigger.isPolling());
         }
     }
 
     @Subscribe
-    public void onFacebookFriendsIdNotFetched(GenericErrorTrigger trigger)
-    {
-        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE)
-        {
-            if (menu != null)
-            {
+    public void onFacebookFriendsIdNotFetched(GenericErrorTrigger trigger) {
+        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE) {
+
+            if (menu != null) {
                 menu.findItem(R.id.action_refresh).setActionView(null);
             }
             displayErrorView();
@@ -349,41 +379,51 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     }
 
     @Subscribe
-    public void onZonalAppFriendsFetched(AppFriendsFetchedTrigger trigger)
-    {
+    public void onZonalAppFriendsFetched(AppFriendsFetchedTrigger trigger) {
+
         friendList = trigger.getFriends();
-        Collections.sort(friendList, new FriendsComparator());
+
+        visibleFriendList = new ArrayList<>();
+
+        for(Friend friend : friendList)
+        {
+            visibleFriendList.add(friend);
+        }
+
+        Collections.sort(visibleFriendList, new FriendsComparator());
         refreshRecyclerView();
     }
 
     @Subscribe
-    public void onZonalAppFriendsNotFetched(GenericErrorTrigger trigger)
-    {
-        if (trigger.getErrorCode() == ErrorCode.USER_APP_FRIENDS_FETCH_FAILURE)
-        {
+    public void onZonalAppFriendsNotFetched(GenericErrorTrigger trigger) {
+        if (trigger.getErrorCode() == ErrorCode.USER_APP_FRIENDS_FETCH_FAILURE) {
             displayErrorView();
         }
     }
 
     @Subscribe
-    public void onZonalFriendsFetchedFromNetwork(AppFriendsFetchedFromNetworkTrigger trigger)
-    {
-        if (menu != null)
-        {
+    public void onZonalFriendsFetchedFromNetwork(AppFriendsFetchedFromNetworkTrigger trigger) {
+
+        if (menu != null) {
             menu.findItem(R.id.action_refresh).setActionView(null);
         }
         friendList = trigger.getFriends();
-        Collections.sort(friendList, new FriendsComparator());
+
+        visibleFriendList = new ArrayList<>();
+
+        for(Friend friend : friendList)
+        {
+            visibleFriendList.add(friend);
+        }
+
+        Collections.sort(visibleFriendList, new FriendsComparator());
         refreshRecyclerView();
     }
 
     @Subscribe
-    public void onZonalFriendsNotFetchedFromNetwork(GenericErrorTrigger trigger)
-    {
-        if (trigger.getErrorCode() == ErrorCode.APP_FRIENDS_FETCH_FROM_NETWORK_FAILURE)
-        {
-            if (menu != null)
-            {
+    public void onZonalFriendsNotFetchedFromNetwork(GenericErrorTrigger trigger) {
+        if (trigger.getErrorCode() == ErrorCode.APP_FRIENDS_FETCH_FROM_NETWORK_FAILURE) {
+            if (menu != null) {
                 menu.findItem(R.id.action_refresh).setActionView(null);
             }
 
@@ -392,22 +432,18 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     }
 
     @Override
-    public void onClick(View view)
-    {
-        if (view.getId() == R.id.fib_fragment_invite_facebook_friends_invite_people_whatsapp)
-        {
+    public void onClick(View view) {
+        if (view.getId() == R.id.fib_fragment_invite_facebook_friends_invite_people_whatsapp) {
             AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.WHATSAPP_INVITATION_INVITE_FACEBOOK_FRAGMENT, userService.getActiveUserId());
 
             boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
-            if (isWhatsappInstalled)
-            {
+            if (isWhatsappInstalled) {
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, userService.getActiveUserName() + AppConstants.WHATSAPP_INVITATION_MESSAGE + AppConstants.APP_LINK);
                 sendIntent.setType("text/plain");
                 startActivity(sendIntent);
-            } else
-            {
+            } else {
                 Snackbar.make(getView(), R.string.whatsapp_not_installed, Snackbar.LENGTH_LONG).show();
             }
         }

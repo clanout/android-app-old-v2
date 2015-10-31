@@ -101,6 +101,7 @@
 
     <string name="default_event_status"></string>
     <string name="event_status_dialog_title">Dude, where are you? Inform friends of your last minute status</string>
+    <string name="event_status_dialog_title_alternate">Your clan status</string>
 
     <string name="reminder_notification_message">1 hour to go. Giddy up!</string>
 

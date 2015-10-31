@@ -1,7 +1,12 @@
 package reaper.android.app.ui.activity;
 
+import android.app.AlarmManager;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -42,6 +47,8 @@ import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.common.alarm.AlarmReceiver;
+import reaper.android.common.alarm.DeviceBootReceiver;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.chat.ChatHelper;
 import reaper.android.common.communicator.Communicator;
@@ -66,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     boolean shouldPopUpStatusDialog;
+    private PendingIntent pendingIntent;
+    private AlarmManager alarmManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
         genericCache = CacheManager.getGenericCache();
         eventCache = CacheManager.getEventCache();
         userCache = CacheManager.getUserCache();
+
+
 
         String shouldGoToDetailsFragment = getIntent()
                 .getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);
@@ -168,6 +179,8 @@ public class MainActivity extends AppCompatActivity {
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.MAIN_ACTIVITY);
 
         notificationManager.cancelAll();
+
+        genericCache.put(CacheKeys.IS_APP_IN_FOREGROUND, true);
     }
 
     @Override
@@ -308,5 +321,25 @@ public class MainActivity extends AppCompatActivity {
         if (trigger.getErrorCode() == ErrorCode.EVENT_COULD_NOT_BE_UNFINALISED) {
             Toast.makeText(this, R.string.event_unfinalisation_failed, Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void enableDeviceBootReceiver() {
+
+        ComponentName receiver = new ComponentName(this, DeviceBootReceiver.class);
+        PackageManager pm = getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+    }
+
+    private void initAlarm() {
+
+        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+        pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, AlarmManager.INTERVAL_FIFTEEN_MINUTES, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
     }
 }

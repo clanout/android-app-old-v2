@@ -13,7 +13,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -64,6 +65,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     private FloatingActionButton addPhone, inviteWhatsapp;
     private Drawable whatsappDrawable;
     private ProgressBar progressBar;
+    private EditText search;
 
     private boolean isPhoneAdded;
 
@@ -72,8 +74,11 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     private GenericCache genericCache;
     private Drawable phoneDrawable;
     private List<PhoneContact> phoneContactList;
+    private List<PhoneContact> visiblePhoneContactList;
 
     private InviteThroughSMSAdapter inviteThroughSMSAdapter;
+
+    private TextWatcher searchWatcher;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,6 +99,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         mainContent = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_through_sms_main_content);
         loading = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_through_sms_loading);
         progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_invite_through_sms);
+        search = (EditText) view.findViewById(R.id.et_fragment_invite_through_sms_search);
 
         return view;
     }
@@ -124,6 +130,48 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         }
 
         phoneContactList = new ArrayList<>();
+
+        visiblePhoneContactList = new ArrayList<>();
+
+        searchWatcher = new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                if (s.length() >= 1) {
+                    visiblePhoneContactList = new ArrayList<>();
+                    for (PhoneContact phoneContact : phoneContactList) {
+                        if (phoneContact.getName().toLowerCase().contains(s.toString().toLowerCase())) {
+                            visiblePhoneContactList.add(phoneContact);
+                        }
+                    }
+
+                    Collections.sort(phoneContactList, new PhoneContactComparator());
+                    refreshRecyclerView();
+                } else if (s.length() == 0) {
+                    visiblePhoneContactList = new ArrayList<>();
+
+                    for (PhoneContact phoneContact : phoneContactList) {
+                        visiblePhoneContactList.add(phoneContact);
+                    }
+
+                    Collections.sort(visiblePhoneContactList, new PhoneContactComparator());
+                    refreshRecyclerView();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        };
+
+
         initRecyclerView();
     }
 
@@ -138,6 +186,8 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         if (isPhoneAdded) {
             userService.fetchAllPhoneContacts(getActivity().getContentResolver());
         }
+
+        search.addTextChangedListener(searchWatcher);
     }
 
     private void generateDrawables() {
@@ -164,20 +214,22 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     public void onPause() {
         super.onPause();
         bus.unregister(this);
+
+        search.removeTextChangedListener(searchWatcher);
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
-        if(isVisibleToUser)
-        {
+        if (isVisibleToUser) {
             setHasOptionsMenu(true);
         }
     }
 
     private void displayInvitesLockedView() {
         mainContent.setVisibility(View.GONE);
+        search.setVisibility(View.GONE);
         lockedContent.setVisibility(View.VISIBLE);
         invitesLockedMessage.setText(R.string.add_phone_number);
         addPhone.setImageDrawable(phoneDrawable);
@@ -192,6 +244,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         lockedContent.setVisibility(View.GONE);
         mainContent.setVisibility(View.VISIBLE);
         loading.setVisibility(View.GONE);
+        search.setVisibility(View.VISIBLE);
     }
 
     private void displayBasicView() {
@@ -201,6 +254,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         noContactsMessage.setVisibility(View.GONE);
         lockedContent.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
+        search.setVisibility(View.VISIBLE);
     }
 
     private void displayErrorView() {
@@ -214,16 +268,17 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         noContactsMessage.setText(R.string.phone_contacts_not_fetched);
         lockedContent.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
+        search.setVisibility(View.GONE);
     }
 
-    private void displayLoadingView()
-    {
+    private void displayLoadingView() {
         mainContent.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
         noContactsMessage.setVisibility(View.GONE);
         lockedContent.setVisibility(View.GONE);
         loading.setVisibility(View.VISIBLE);
+        search.setVisibility(View.GONE);
     }
 
     @Override
@@ -331,18 +386,23 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     }
 
     @Subscribe
-    public void onAllContactsForSMSFetched(AllPhoneContactsForSMSFetchedTrigger trigger)
-    {
+    public void onAllContactsForSMSFetched(AllPhoneContactsForSMSFetchedTrigger trigger) {
         phoneContactList = trigger.getPhoneContactList();
-        Collections.sort(phoneContactList, new PhoneContactComparator());
+
+        visiblePhoneContactList = new ArrayList<>();
+
+        for(PhoneContact phoneContact : phoneContactList)
+        {
+            visiblePhoneContactList.add(phoneContact);
+        }
+
+        Collections.sort(visiblePhoneContactList, new PhoneContactComparator());
         refreshRecyclerView();
     }
 
     @Subscribe
-    public void onAllContactsForSMSNotFetched(GenericErrorTrigger trigger)
-    {
-        if(trigger.getErrorCode() == ErrorCode.PHONE_CONTACTS_FOR_SMS_FETCH_FAILURE)
-        {
+    public void onAllContactsForSMSNotFetched(GenericErrorTrigger trigger) {
+        if (trigger.getErrorCode() == ErrorCode.PHONE_CONTACTS_FOR_SMS_FETCH_FAILURE) {
             displayErrorView();
         }
     }
@@ -350,7 +410,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
     private void initRecyclerView() {
 
-        inviteThroughSMSAdapter = new InviteThroughSMSAdapter(getActivity(), phoneContactList, bus);
+        inviteThroughSMSAdapter = new InviteThroughSMSAdapter(getActivity(), visiblePhoneContactList, bus);
         recyclerView.setAdapter(inviteThroughSMSAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -358,13 +418,12 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
     private void refreshRecyclerView() {
 
-        inviteThroughSMSAdapter = new InviteThroughSMSAdapter(getActivity(), phoneContactList, bus);
+        inviteThroughSMSAdapter = new InviteThroughSMSAdapter(getActivity(), visiblePhoneContactList, bus);
         recyclerView.setAdapter(inviteThroughSMSAdapter);
 
-        if(phoneContactList.size() == 0)
-        {
+        if (visiblePhoneContactList.size() == 0) {
             displayNoContactsView();
-        }else{
+        } else {
             displayBasicView();
         }
     }

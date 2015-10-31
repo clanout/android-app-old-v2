@@ -64,6 +64,9 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
 
     private GenericCache genericCache;
 
+    private AlarmManager alarmManager;
+    private PendingIntent pendingIntent;
+
     // TODO -- Fetch pending invites
     // TODO -- Analytics events -- fetch pending invtes + status
 
@@ -74,29 +77,6 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
 
         init();
         Stetho.initializeWithDefaults(this);
-
-        initAlarm();
-        enableDeviceBootReceiver();
-    }
-
-    private void enableDeviceBootReceiver() {
-
-        ComponentName receiver = new ComponentName(this, DeviceBootReceiver.class);
-        PackageManager pm = getPackageManager();
-
-        pm.setComponentEnabledSetting(receiver,
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP);
-    }
-
-    private void initAlarm() {
-
-        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
-
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, AlarmManager.INTERVAL_HOUR, AlarmManager.INTERVAL_HOUR, pendingIntent);
     }
 
     protected void init()
@@ -126,8 +106,6 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-
-        genericCache.put(CacheKeys.IS_APP_IN_FOREGROUND, true);
     }
 
     @Subscribe

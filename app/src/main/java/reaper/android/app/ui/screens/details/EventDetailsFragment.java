@@ -430,8 +430,6 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
     private void displayStatusDialog() {
 
-        // TODO -- add status messages
-
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
 
@@ -441,6 +439,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
         final EditText status = (EditText) dialogView.findViewById(R.id.et_alert_dialog_status_message);
         ListView list = (ListView) dialogView.findViewById(R.id.lv_alert_dialog_status);
+        TextView title = (TextView) dialogView.findViewById(R.id.tv_alert_dialog_status_title);
 
         final List<String> statusList = new ArrayList<>();
         statusList.add("On my way");
@@ -454,13 +453,19 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
         if ((event.getStartTime().getMillis() - DateTime.now().getMillis() < Timestamps.STATUS_UPDATE_NOTIFICATION_WINDOW) || (DateTime.now().getMillis() > event.getStartTime().getMillis())) {
             list.setVisibility(View.VISIBLE);
+            title.setText(R.string.event_status_dialog_title);
         } else {
             list.setVisibility(View.GONE);
+            title.setText(R.string.event_status_dialog_title_alternate);
         }
 
         if(shouldPopupStatusDialog)
         {
             list.setVisibility(View.VISIBLE);
+            title.setText(R.string.event_status_dialog_title);
+        }else{
+            list.setVisibility(View.GONE);
+            title.setText(R.string.event_status_dialog_title_alternate);
         }
 
         EventDetails.Attendee attendee = new EventDetails.Attendee();

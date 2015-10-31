@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -257,13 +258,17 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
     @Subscribe
     public void onManageFacebookFriendsTriggerReceived(ManageAppFriendsTrigger trigger) {
 
+
         if (trigger.isSelected()) {
+
             if (!(invitedFacebookFriends.contains(trigger.getId()))) {
+
                 invitedFacebookFriends.add(trigger.getId());
             }
         } else {
 
-            if (invitedPhoneContacts.contains(trigger.getId())) {
+            if (invitedFacebookFriends.contains(trigger.getId())) {
+
                 invitedFacebookFriends.remove(trigger.getId());
             }
         }
@@ -271,13 +276,17 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
 
     @Subscribe
     public void onManagePhoneContactsTriggerReceived(ManagePhoneContactsTrigger trigger) {
+
         if (trigger.isSelected()) {
+
             if (!(invitedPhoneContacts.contains(trigger.getId()))) {
+
                 invitedPhoneContacts.add(trigger.getId());
             }
         } else {
 
             if (invitedPhoneContacts.contains(trigger.getId())) {
+
                 invitedPhoneContacts.remove(trigger.getId());
             }
         }

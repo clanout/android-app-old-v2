@@ -13,6 +13,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -67,10 +69,12 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
     private FloatingActionButton addPhone, inviteWhatsapp;
     private Drawable refreshDrawable, whatsappDrawable;
     private ProgressBar progressBar;
+    private EditText search;
 
     private ArrayList<EventDetails.Invitee> inviteeList;
     private ArrayList<EventDetails.Attendee> attendeeList;
     private List<Friend> friendList;
+    private List<Friend> visibleFriendList;
     private Event event;
     private InviteFriendsAdapter inviteFriendsAdapter;
     private boolean isPhoneAdded;
@@ -81,6 +85,8 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
     private android.app.FragmentManager fragmentManager;
     private GenericCache genericCache;
     private Drawable phoneDrawable;
+
+    private TextWatcher searchWatcher;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -103,6 +109,7 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
         mainContent = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_phone_contacts_main_content);
         loading = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_phone_contacts_loading);
         progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_invite_phone_contacts);
+        search = (EditText) view.findViewById(R.id.et_fragment_invite_phone_contacts_search);
 
         return view;
     }
@@ -161,6 +168,50 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
         }
 
         friendList = new ArrayList<>();
+        visibleFriendList = new ArrayList<>();
+
+        searchWatcher = new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                if(s.length() >= 1)
+                {
+                    visibleFriendList = new ArrayList<>();
+                    for(Friend friend : friendList)
+                    {
+                        if(friend.getName().toLowerCase().contains(s.toString().toLowerCase()))
+                        {
+                            visibleFriendList.add(friend);
+                        }
+                    }
+
+                    Collections.sort(visibleFriendList, new FriendsComparator());
+                    refreshRecyclerView();
+                }else if(s.length() == 0)
+                {
+                    visibleFriendList = new ArrayList<>();
+
+                    for(Friend friend : friendList)
+                    {
+                        visibleFriendList.add(friend);
+                    }
+
+                    Collections.sort(visibleFriendList, new FriendsComparator());
+                    refreshRecyclerView();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        };
 
         initRecyclerView();
     }
@@ -197,6 +248,8 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
     {
         super.onPause();
         bus.unregister(this);
+
+        search.removeTextChangedListener(searchWatcher);
     }
 
     @Override
@@ -212,11 +265,14 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
         {
             userService.getPhoneContacts();
         }
+
+        search.addTextChangedListener(searchWatcher);
     }
 
     private void displayInvitesLockedView()
     {
         mainContent.setVisibility(View.GONE);
+        search.setVisibility(View.GONE);
         lockedContent.setVisibility(View.VISIBLE);
         invitesLockedMessage.setText(R.string.add_phone_number);
         addPhone.setImageDrawable(phoneDrawable);
@@ -226,6 +282,7 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
     private void displayNoContactsView()
     {
         noContactsMessage.setText(R.string.no_local_phone_contacts);
+        search.setVisibility(View.VISIBLE);
         noContactsMessage.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
@@ -237,6 +294,7 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
     private void displayBasicView()
     {
         mainContent.setVisibility(View.VISIBLE);
+        search.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.GONE);
         noContactsMessage.setVisibility(View.GONE);
@@ -250,6 +308,7 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
         AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_LOAD_ON_APP_FRIENDS, userService.getActiveUserId());
 
         mainContent.setVisibility(View.VISIBLE);
+        search.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
         noContactsMessage.setVisibility(View.VISIBLE);
@@ -261,6 +320,7 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
     private void displayLoadingView() {
 
         mainContent.setVisibility(View.GONE);
+        search.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
         noContactsMessage.setVisibility(View.GONE);
@@ -321,7 +381,7 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
 
     private void initRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, false, bus, event, attendeeList);
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, visibleFriendList, false, bus, event, attendeeList);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -329,10 +389,10 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
 
     private void refreshRecyclerView()
     {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, friendList, false, bus, event, attendeeList);
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, visibleFriendList, false, bus, event, attendeeList);
         recyclerView.setAdapter(inviteFriendsAdapter);
 
-        if (friendList.size() == 0)
+        if (visibleFriendList.size() == 0)
         {
             displayNoContactsView();
         } else
@@ -346,7 +406,14 @@ public class InvitePhoneContactsFragment extends BaseFragment implements View.On
     {
         friendList = trigger.getPhoneContacts();
 
-        Collections.sort(friendList, new FriendsComparator());
+        visibleFriendList = new ArrayList<>();
+
+        for(Friend friend : friendList)
+        {
+            visibleFriendList.add(friend);
+        }
+
+        Collections.sort(visibleFriendList, new FriendsComparator());
         refreshRecyclerView();
 
         if (menu != null)
