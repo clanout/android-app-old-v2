@@ -82,13 +82,11 @@ public class NotificationHelper
 
     private static String newStatusUpdateReceived(Map<String, String> args) {
 
-        // TODO --- change message
-
-        return args.get("user_name") + " in " + args.get("event_name") + " ----- " + args.get("status");
+        return args.get("event_name") + " starting at " + args.get("event_name") + " ----- " + args.get("status");
     }
 
     private static String newChatMessageReceivedMessage(Map<String, String> args) {
-        return "New chat in " + args.get("event_name");
+        return "New chat message";
     }
 
     private static String newFriendJoinedAppMessage(Map<String, String> args)
@@ -123,7 +121,7 @@ public class NotificationHelper
 
     private static String getRSVPChangeMessage(Map<String, String> args)
     {
-        return "New friends joined " + args.get("event_name");
+        return "New friends joined";
     }
 
     private static String getEventInvitationMessage(Map<String, String> args)

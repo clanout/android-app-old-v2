@@ -69,6 +69,8 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
 
     private PagerAdapter pagerAdapter;
 
+    private boolean shoulPopupStatusDialog;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +101,7 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
             Bundle bundle = getArguments();
             events = (List<Event>) bundle.get(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
             activePosition = bundle.getInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION);
+            shoulPopupStatusDialog = bundle.getBoolean(BundleKeys.POPUP_STATUS_DIALOG);
         }
 
         if (events == null) {
@@ -118,7 +121,7 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
         chat.setText("Chat");
         invite.setText("Invite");
 
-        pagerAdapter = new EventDetailsPagerAdapter(getChildFragmentManager(), events);
+        pagerAdapter = new EventDetailsPagerAdapter(getChildFragmentManager(), events, activePosition, shoulPopupStatusDialog);
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(activePosition);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

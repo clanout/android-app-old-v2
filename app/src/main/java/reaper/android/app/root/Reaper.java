@@ -1,6 +1,10 @@
 package reaper.android.app.root;
 
+import android.app.AlarmManager;
 import android.app.Application;
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -30,6 +34,7 @@ import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.core.DatabaseManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.Timestamps;
 import reaper.android.app.service.LocationService;
@@ -39,6 +44,8 @@ import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.gcm.GcmregistrationIntentTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshRequestTrigger;
+import reaper.android.common.alarm.AlarmReceiver;
+import reaper.android.common.alarm.DeviceBootReceiver;
 import reaper.android.common.communicator.Communicator;
 import reaper.android.common.gcm.RegistrationIntentService;
 import timber.log.Timber;
@@ -64,8 +71,32 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     public void onCreate()
     {
         super.onCreate();
+
         init();
         Stetho.initializeWithDefaults(this);
+
+        initAlarm();
+        enableDeviceBootReceiver();
+    }
+
+    private void enableDeviceBootReceiver() {
+
+        ComponentName receiver = new ComponentName(this, DeviceBootReceiver.class);
+        PackageManager pm = getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+    }
+
+    private void initAlarm() {
+
+        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, AlarmManager.INTERVAL_HOUR, AlarmManager.INTERVAL_HOUR, pendingIntent);
     }
 
     protected void init()
@@ -95,6 +126,8 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+
+        genericCache.put(CacheKeys.IS_APP_IN_FOREGROUND, true);
     }
 
     @Subscribe

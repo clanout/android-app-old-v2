@@ -94,6 +94,8 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
     private List<EventDetails.Attendee> attendees;
     private Drawable statusDrawable;
 
+    private boolean shouldPopupStatusDialog;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,6 +127,8 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
         Bundle bundle = getArguments();
         event = (Event) bundle.get(BundleKeys.EVENT_DETAILS_FRAGMENT_EVENT);
+
+        shouldPopupStatusDialog = bundle.getBoolean(BundleKeys.POPUP_STATUS_DIALOG);
 
         if (event == null) {
             throw new IllegalStateException("Event cannot be null while creating EventDetailsFragment instance");
@@ -176,6 +180,11 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
         refreshDetailsProgressBar.setVisibility(View.VISIBLE);
         refreshDetailsTextView.setVisibility(View.VISIBLE);
         refreshDetailsTextView.setText(R.string.refreshing_attendee_list);
+
+        if(shouldPopupStatusDialog)
+        {
+            displayStatusDialog();
+        }
     }
 
     @Override
@@ -435,27 +444,41 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
         final List<String> statusList = new ArrayList<>();
         statusList.add("On my way");
-        statusList.add("LAst minute back out");
-        statusList.add("Feeling very excited");
-        statusList.add("Drinks on me!");
+        statusList.add("Running late");
+        statusList.add("Sorry, changed my mind");
+        statusList.add("Yippie-kai yay!");
 
-        ArrayAdapter<String> statusAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, statusList);
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_list_view_dialog, statusList);
 
         list.setAdapter(statusAdapter);
 
+        if ((event.getStartTime().getMillis() - DateTime.now().getMillis() < Timestamps.STATUS_UPDATE_NOTIFICATION_WINDOW) || (DateTime.now().getMillis() > event.getStartTime().getMillis())) {
+            list.setVisibility(View.VISIBLE);
+        } else {
+            list.setVisibility(View.GONE);
+        }
+
+        if(shouldPopupStatusDialog)
+        {
+            list.setVisibility(View.VISIBLE);
+        }
 
         EventDetails.Attendee attendee = new EventDetails.Attendee();
         attendee.setId(userService.getActiveUserId());
 
-        if(eventDetails.getAttendees().contains(attendee))
-        {
-            int index = eventDetails.getAttendees().indexOf(attendee);
+        if (eventDetails != null) {
 
-            if(eventDetails.getAttendees().get(index).getStatus() == null || eventDetails.getAttendees().get(index).getStatus().isEmpty()){
+            if (eventDetails.getAttendees() != null) {
+                if (eventDetails.getAttendees().contains(attendee)) {
+                    int index = eventDetails.getAttendees().indexOf(attendee);
 
-                status.setHint(R.string.default_event_status);
-            }else{
-                status.setText(eventDetails.getAttendees().get(index).getStatus());
+                    if (eventDetails.getAttendees().get(index).getStatus() == null || eventDetails.getAttendees().get(index).getStatus().isEmpty()) {
+
+                        status.setHint(R.string.default_event_status);
+                    } else {
+                        status.setText(eventDetails.getAttendees().get(index).getStatus());
+                    }
+                }
             }
         }
 
@@ -467,15 +490,17 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
             }
         });
 
+
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
+                shouldPopupStatusDialog = false;
+
                 EventDetails.Attendee attendee1 = new EventDetails.Attendee();
                 attendee1.setId(userService.getActiveUserId());
 
-                if(eventDetails.getAttendees().contains(attendee1))
-                {
+                if (eventDetails.getAttendees().contains(attendee1)) {
                     int index = eventDetails.getAttendees().indexOf(attendee1);
 
                     eventDetails.getAttendees().get(index).setStatus(status.getText().toString());
@@ -485,16 +510,20 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
                 boolean shouldNotifyOthers = false;
 
-                // TODO - discuss condition
-
-                if((event.getStartTime().getMillis() - DateTime.now().getMillis() < Timestamps.STATUS_UPDATE_NOTIFICATION_WINDOW) || (DateTime.now().getMillis() > event.getStartTime().getMillis()))
-                {
-                    Log.d("APP", "should notify others");
+                if ((event.getStartTime().getMillis() - DateTime.now().getMillis() < Timestamps.STATUS_UPDATE_NOTIFICATION_WINDOW) || (DateTime.now().getMillis() > event.getStartTime().getMillis())) {
                     shouldNotifyOthers = true;
                 }
 
                 eventService.updateStatus(event.getId(), status.getText().toString(), shouldNotifyOthers);
                 dialog.dismiss();
+            }
+        });
+
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+
+                shouldPopupStatusDialog = false;
             }
         });
 
@@ -504,7 +533,6 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
     private void displayInvitationResponseAlertDialog() {
 
-        // TODO -- change dialog title
         // TODO -- change chat message
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -515,6 +543,25 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
         builder.setView(dialogView);
 
         final EditText message = (EditText) dialogView.findViewById(R.id.et_alert_dialog_invitation_response_message);
+        ListView list = (ListView) dialogView.findViewById(R.id.lv_alert_dialog_invitation_response);
+
+        final List<String> responseList = new ArrayList<>();
+        responseList.add("Not in a mood");
+        responseList.add("Busy with other plans");
+        responseList.add("Thanks. Can't make it this time");
+        responseList.add("Staying in bed. Waiting for aliens to pick me up");
+
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_list_view_dialog, responseList);
+
+        list.setAdapter(statusAdapter);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                message.setText(responseList.get(position));
+            }
+        });
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override

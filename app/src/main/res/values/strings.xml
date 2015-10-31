@@ -99,7 +99,10 @@
 
     <string name="event_not_found">Unable to locate this clan</string>
 
-    <string name="default_event_status">This is my status</string>
+    <string name="default_event_status"></string>
+    <string name="event_status_dialog_title">Dude, where are you? Inform friends of your last minute status</string>
+
+    <string name="reminder_notification_message">1 hour to go. Giddy up!</string>
 
     <!-- Facebook -->
     <string name="facebook_app_id">711701748936592</string>

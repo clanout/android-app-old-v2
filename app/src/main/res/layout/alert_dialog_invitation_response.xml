@@ -23,15 +23,20 @@
         android:layout_marginLeft="48dp"
         android:layout_marginRight="48dp"
         android:layout_marginTop="10dp"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <EditText
             android:id="@+id/et_alert_dialog_invitation_response_message"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:textSize="14sp"
             android:textColor="@color/text_subtitle"/>
+
+        <ListView
+            android:id="@+id/lv_alert_dialog_invitation_response"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></ListView>
+
 
     </LinearLayout>
 

@@ -47,6 +47,6 @@ public interface MeApi
     @POST("/me/add_friends")
     Observable<Response> updateFacebookFriends(@Body UpdateFacebookFriendsApiRequest request);
 
-    @POST("/me/fetch_pending_invites")
+    @POST("/event/pending_invitations")
     Observable<FetchPendingInvitesApiResponse> fetchPendingInvites(@Body FetchPendingInvitesApiRequest request);
 }

@@ -13,11 +13,15 @@ import reaper.android.app.model.Event;
 public class EventDetailsPagerAdapter extends FragmentStatePagerAdapter
 {
     private List<Event> events;
+    private int activePosition;
+    private boolean shouldPopupStatusDialog;
 
-    public EventDetailsPagerAdapter(FragmentManager fm, List<Event> events)
+    public EventDetailsPagerAdapter(FragmentManager fm, List<Event> events, int activePosition, boolean shouldPopupStatusDialog)
     {
         super(fm);
         this.events = events;
+        this.shouldPopupStatusDialog = shouldPopupStatusDialog;
+        this.activePosition = activePosition;
     }
 
     @Override
@@ -26,6 +30,14 @@ public class EventDetailsPagerAdapter extends FragmentStatePagerAdapter
         EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable(BundleKeys.EVENT_DETAILS_FRAGMENT_EVENT, events.get(position));
+
+        if(position == activePosition)
+        {
+            bundle.putBoolean(BundleKeys.POPUP_STATUS_DIALOG, shouldPopupStatusDialog);
+        }else{
+            bundle.putBoolean(BundleKeys.POPUP_STATUS_DIALOG, false);
+        }
+
         eventDetailsFragment.setArguments(bundle);
         return eventDetailsFragment;
     }

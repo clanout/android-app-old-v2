@@ -3,6 +3,7 @@ package reaper.android.app.service;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import com.squareup.otto.Bus;
 

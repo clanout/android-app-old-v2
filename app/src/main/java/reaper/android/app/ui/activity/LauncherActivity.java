@@ -270,6 +270,13 @@ public class LauncherActivity extends AppCompatActivity
                 intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
                 intent.putExtra("event_id", eventId);
 
+                if(getIntent().getBooleanExtra(BundleKeys.POPUP_STATUS_DIALOG, false))
+                {
+                    intent.putExtra(BundleKeys.POPUP_STATUS_DIALOG, true);
+                }else{
+                    intent.putExtra(BundleKeys.POPUP_STATUS_DIALOG, false);
+                }
+
             } else
             {
                 intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);

@@ -12,5 +12,5 @@ public class Timestamps
 
     public static final String LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP = "last_facebook_friends_refresh_timestamp";
 
-    public static final int STATUS_UPDATE_NOTIFICATION_WINDOW = 1800000;
+    public static final int STATUS_UPDATE_NOTIFICATION_WINDOW = 3600000;
 }

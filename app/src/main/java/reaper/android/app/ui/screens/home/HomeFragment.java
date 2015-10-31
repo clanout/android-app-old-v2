@@ -50,6 +50,7 @@ import reaper.android.app.service.LocationService;
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.ViewPagerClickedTrigger;
+import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationReceivedTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationsAvailableTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationsNotAvailableTrigger;
@@ -303,21 +304,17 @@ public class HomeFragment extends BaseFragment implements EventsView,
         eventList
                 .setAdapter(new EventsAdapter(new ArrayList<Event>(), this, this, getFragmentManager(), this));
 
-        eventList.addOnScrollListener(new RecyclerView.OnScrollListener()
-        {
+        eventList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
-            {
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
 
             }
 
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
-            {
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 
                 boolean enabled = false;
-                if (eventList != null && eventList.getChildCount() > 0)
-                {
+                if (eventList != null && eventList.getChildCount() > 0) {
                     LinearLayoutManager linearLayoutManager = (LinearLayoutManager) eventList
                             .getLayoutManager();
 
@@ -339,23 +336,19 @@ public class HomeFragment extends BaseFragment implements EventsView,
         createEvent
                 .setAdapter(new CreateEventPagerAdapter(getFragmentManager(), eventSuggestionList));
 
-        createEvent.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
-        {
+        createEvent.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
-            {
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
             }
 
             @Override
-            public void onPageSelected(int position)
-            {
+            public void onPageSelected(int position) {
 
             }
 
             @Override
-            public void onPageScrollStateChanged(int state)
-            {
+            public void onPageScrollStateChanged(int state) {
                 onPagerSwipe(state);
             }
         });
@@ -473,6 +466,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
                            if (wantToCloseDialog)
                            {
                                alertDialog.dismiss();
+
+                               showLoading();
                            }
                        }
                    });
@@ -502,18 +497,16 @@ public class HomeFragment extends BaseFragment implements EventsView,
         menu.findItem(R.id.action_status).setVisible(false);
 
         menu.findItem(R.id.action_account).setIcon(MaterialDrawableBuilder.with(getActivity())
-                                                                          .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
-                                                                          .setColor(getResources()
-                                                                                  .getColor(R.color.whity))
-                                                                          .setSizeDp(36)
-                                                                          .build());
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
+                .setColor(getResources()
+                        .getColor(R.color.whity))
+                .setSizeDp(36)
+                .build());
 
         menu.findItem(R.id.action_notifications)
-            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-            {
+            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
-                public boolean onMenuItemClick(MenuItem item)
-                {
+                public boolean onMenuItemClick(MenuItem item) {
                     FragmentUtils.changeFragment(getFragmentManager(), new NotificationFragment());
                     return true;
                 }
@@ -609,11 +602,9 @@ public class HomeFragment extends BaseFragment implements EventsView,
         }
 
         menu.findItem(R.id.action_account)
-            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-            {
+            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
-                public boolean onMenuItemClick(MenuItem menuItem)
-                {
+                public boolean onMenuItemClick(MenuItem menuItem) {
                     FragmentUtils.changeFragment(getFragmentManager(), new AccountsFragment());
                     return true;
                 }
@@ -645,17 +636,15 @@ public class HomeFragment extends BaseFragment implements EventsView,
     @Subscribe
     public void newNotificationReceived(NewNotificationReceivedTrigger trigger)
     {
-        getActivity().runOnUiThread(new Runnable()
-        {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 notification.setIcon(MaterialDrawableBuilder.with(getActivity())
-                                                            .setIcon(MaterialDrawableBuilder.IconValue.BELL)
-                                                            .setColor(getResources()
-                                                                    .getColor(R.color.accent))
-                                                            .setSizeDp(36)
-                                                            .build());
+                        .setIcon(MaterialDrawableBuilder.IconValue.BELL)
+                        .setColor(getResources()
+                                .getColor(R.color.accent))
+                        .setSizeDp(36)
+                        .build());
             }
         });
     }
@@ -665,4 +654,18 @@ public class HomeFragment extends BaseFragment implements EventsView,
     {
         subscriptions.clear();
     }
+
+    @Subscribe
+    public void onEventsFetched(EventsFetchTrigger trigger)
+    {
+        if(trigger.getEvents().size() == 0)
+        {
+            showNoEventsMessage();
+        }else
+        {
+            showEvents(trigger.getEvents());
+        }
+
+    }
+
 }

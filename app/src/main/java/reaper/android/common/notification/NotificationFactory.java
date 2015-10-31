@@ -52,7 +52,7 @@ public class NotificationFactory
                 Notification notification =
                         new Notification.Builder(Integer.parseInt(args.get("notification_id")))
                                 .type(typeCode)
-                                .title(TITLE)
+                                .title(args.get("event_name"))
                                 .eventId(args.get("event_id"))
                                 .eventName(args.get("event_name"))
                                 .userId(args.get("user_id"))
@@ -68,7 +68,7 @@ public class NotificationFactory
                 Notification notification =
                         new Notification.Builder(Integer.parseInt(args.get("notification_id")))
                                 .type(typeCode)
-                                .title(TITLE)
+                                .title(args.get("event_name"))
                                 .eventId(args.get("event_id"))
                                 .eventName(args.get("event_name"))
                                 .userId(args.get("user_id"))

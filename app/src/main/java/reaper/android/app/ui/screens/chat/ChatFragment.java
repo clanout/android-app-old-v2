@@ -11,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -218,8 +219,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         listView.setAdapter(chatAdapter);
     }
 
-    private void renderLoadingView()
-    {
+    private void renderLoadingView() {
         mainContent.setVisibility(View.GONE);
         loadHistory.setVisibility(View.GONE);
         noSessionMessage.setVisibility(View.GONE);
@@ -325,8 +325,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
         } else if (v.getId() == R.id.b_chat_fragment_load_history) {
 
-            if((SystemClock.elapsedRealtime() - loadHistoryLastClickedTime) < 1000)
-            {
+            if ((SystemClock.elapsedRealtime() - loadHistoryLastClickedTime) < 1000) {
                 return;
             }
 
