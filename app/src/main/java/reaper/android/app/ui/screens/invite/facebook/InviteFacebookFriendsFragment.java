@@ -1,5 +1,6 @@
 package reaper.android.app.ui.screens.invite.facebook;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -19,6 +20,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -59,8 +61,10 @@ import reaper.android.app.trigger.user.AppFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.invite.core.InviteFriendsAdapter;
+import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
+import timber.log.Timber;
 
 public class InviteFacebookFriendsFragment extends BaseFragment implements View.OnClickListener {
     private RecyclerView recyclerView;
@@ -71,6 +75,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     private LinearLayout loading;
     private ProgressBar progressBar;
     private EditText search;
+    private LinearLayout searchContainer;
 
     private InviteFriendsAdapter inviteFriendsAdapter;
     private UserService userService;
@@ -107,6 +112,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
         loading = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_facebook_friends_loading);
         progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_invite_facebook_friends);
         search = (EditText) view.findViewById(R.id.et_fragment_invite_facebook_friends_search);
+        searchContainer = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_facebook_friends_search);
 
         return view;
     }
@@ -150,25 +156,24 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                if(s.length() >= 1)
-                {
+                if (s.length() >= 1) {
                     visibleFriendList = new ArrayList<>();
-                    for(Friend friend : friendList)
-                    {
-                        if(friend.getName().toLowerCase().contains(s.toString().toLowerCase()))
-                        {
+                    for (Friend friend : friendList) {
+                        if (friend.getName().toLowerCase().contains(s.toString().toLowerCase())) {
                             visibleFriendList.add(friend);
                         }
                     }
 
-                    Collections.sort(visibleFriendList, new FriendsComparator());
-                    refreshRecyclerView();
-                }else if(s.length() == 0)
-                {
+                    if (visibleFriendList.size() == 0) {
+                        displayNoSearchResultsView();
+                    } else {
+                        Collections.sort(visibleFriendList, new FriendsComparator());
+                        refreshRecyclerView();
+                    }
+                } else if (s.length() == 0) {
                     visibleFriendList = new ArrayList<>();
 
-                    for(Friend friend : friendList)
-                    {
+                    for (Friend friend : friendList) {
                         visibleFriendList.add(friend);
                     }
 
@@ -250,7 +255,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
 
     private void displayLoadingView() {
         recyclerView.setVisibility(View.GONE);
-        search.setVisibility(View.GONE);
+        searchContainer.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
         loading.setVisibility(View.VISIBLE);
@@ -258,7 +263,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
 
     private void displayBasicView() {
         recyclerView.setVisibility(View.VISIBLE);
-        search.setVisibility(View.VISIBLE);
+        searchContainer.setVisibility(View.VISIBLE);
         noFriendsMessage.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
@@ -266,7 +271,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
 
     private void displayNoFriendsView() {
         recyclerView.setVisibility(View.GONE);
-        search.setVisibility(View.VISIBLE);
+        searchContainer.setVisibility(View.VISIBLE);
         noFriendsMessage.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.VISIBLE);
         loading.setVisibility(View.GONE);
@@ -274,11 +279,21 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
         noFriendsMessage.setText(R.string.no_local_facebook_friends);
     }
 
+    private void displayNoSearchResultsView() {
+        recyclerView.setVisibility(View.GONE);
+        searchContainer.setVisibility(View.VISIBLE);
+        noFriendsMessage.setVisibility(View.VISIBLE);
+        inviteWhatsapp.setVisibility(View.GONE);
+        loading.setVisibility(View.GONE);
+
+        noFriendsMessage.setText(R.string.no_search_results_facebook);
+    }
+
     private void displayErrorView() {
         AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_LOAD_FACEBOOK_FRIENDS, userService.getActiveUserId());
 
         recyclerView.setVisibility(View.GONE);
-        search.setVisibility(View.GONE);
+        searchContainer.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
@@ -310,6 +325,8 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
         menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+
+                SoftKeyboardHandler.hideKeyboard(getActivity(),getView());
 
                 AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.INVITE_FACEBOOK_FRIENDS_REFRESH_CLIKCED, userService.getActiveUserId());
 
@@ -385,8 +402,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
 
         visibleFriendList = new ArrayList<>();
 
-        for(Friend friend : friendList)
-        {
+        for (Friend friend : friendList) {
             visibleFriendList.add(friend);
         }
 
@@ -411,8 +427,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
 
         visibleFriendList = new ArrayList<>();
 
-        for(Friend friend : friendList)
-        {
+        for (Friend friend : friendList) {
             visibleFriendList.add(friend);
         }
 

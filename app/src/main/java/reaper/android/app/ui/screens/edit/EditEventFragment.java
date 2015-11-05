@@ -55,6 +55,7 @@ import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Suggestion;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
+import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.create.LocationSuggestionAdapter;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
@@ -62,6 +63,7 @@ import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.DateTimeUtils;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
@@ -199,6 +201,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         setHasOptionsMenu(true);
 
+        ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         Event event = (Event) getArguments().getSerializable(ARG_EVENT);
         EventDetails eventDetails = (EventDetails) getArguments()
                 .getSerializable(ARG_EVENT_DETAILS);
@@ -211,6 +215,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
 
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
+
+        setActionBarTitle(event);
 
         locationListener = new TextWatcher()
         {
@@ -689,6 +695,9 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         @Override
         public void onClick(View v)
         {
+
+            SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+
             if (v == dayContainer)
             {
                 if (isTimeSelectorVisible)
@@ -727,8 +736,6 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
-        Timber.v("menu created");
-
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.action_edit, menu);
 
@@ -738,6 +745,9 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
                 @Override
                 public boolean onMenuItemClick(MenuItem item)
                 {
+
+                    SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+
                     edit();
                     return true;
                 }
@@ -788,6 +798,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
+                SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+
                 if (isFinalized)
                 {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -859,6 +871,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
+                SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setCancelable(true);
                 builder.setTitle(R.string.event_delete_heading);
@@ -892,12 +906,54 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+
+            ((MainActivity)getActivity()).onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     @Subscribe
     public void onBackPressedTrigger(BackPressedTrigger trigger)
     {
         if(trigger.getActiveFragment() == BackstackTags.EDIT)
         {
             presenter.initiateEventDetailsNavigation();
+        }
+    }
+
+    private void setActionBarTitle(Event event)
+    {
+        switch (event.getCategory()) {
+            case "CAFE":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Cafe");
+                break;
+            case "MOVIES":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Movie");
+                break;
+            case "SHOPPING":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Shopping");
+                break;
+            case "SPORTS":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Sports");
+                break;
+            case "INDOORS":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Indoors");
+                break;
+            case "EAT_OUT":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Eat Out");
+                break;
+            case "DRINKS":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Drinks");
+                break;
+            case "OUTDOORS":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("Outdoors");
+                break;
+            case "GENERAL":
+                ((MainActivity) getActivity()).getSupportActionBar().setTitle("General");
+                break;
         }
     }
 }

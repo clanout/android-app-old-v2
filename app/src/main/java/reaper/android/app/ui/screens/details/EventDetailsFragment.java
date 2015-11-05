@@ -265,8 +265,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
         EventDetails.Attendee attendee = new EventDetails.Attendee();
         attendee.setId(userService.getActiveUserId());
 
-        // TODO -- change default status
-        String userStatus = "This is my status";
+        String userStatus = "";
 
         if (eventDetails.getAttendees().contains(attendee)) {
 
@@ -352,7 +351,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
         DateTime start = event.getStartTime();
         DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("dd MMM");
-        DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("HH:mm");
+        DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("hh:mm a");
 
         dateTime.setText(start.toString(timeFormatter) + " (" + start.toString(dateFormatter) + ")");
 

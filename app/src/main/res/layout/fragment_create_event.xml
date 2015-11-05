@@ -71,6 +71,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@null"
+                            android:maxLines="1"
+                            android:maxLength="26"
                             android:hint="Want to go out for a beer?"/>
                     </android.support.design.widget.TextInputLayout>
 

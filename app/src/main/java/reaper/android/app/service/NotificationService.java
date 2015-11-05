@@ -11,6 +11,9 @@ import android.util.Log;
 
 import com.squareup.otto.Bus;
 
+import org.joda.time.DateTime;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
@@ -484,8 +487,58 @@ public class NotificationService {
             }
 
             @Override
-            public void onNext(List<Notification> notifications) {
-                bus.post(new NotificationsFetchedTrigger(notifications));
+            public void onNext(final List<Notification> notifications) {
+
+                eventCache.getEvents()
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<List<Event>>() {
+
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(List<Event> events) {
+
+                                List<Notification> filteredNotifications = new ArrayList<Notification>();
+
+                                for (Notification notification : notifications) {
+                                    String eventId = notification.getEventId();
+
+                                    if (eventId == null || eventId.isEmpty()) {
+
+                                        Log.d("APP", "event id empty");
+                                        filteredNotifications.add(notification);
+                                    } else {
+
+                                        Event event = new Event();
+                                        event.setId(eventId);
+
+                                        if (events.contains(event)) {
+
+                                            Log.d("APP", "contains");
+
+                                            if (events.get(events.indexOf(event)).getEndTime().getMillis() > DateTime.now().getMillis()) {
+
+                                                Log.d("APP", "adding");
+                                                filteredNotifications.add(notification);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Log.d("APP", "size --- " + filteredNotifications.size());
+                                bus.post(new NotificationsFetchedTrigger(filteredNotifications));
+
+                            }
+                        });
             }
         });
     }

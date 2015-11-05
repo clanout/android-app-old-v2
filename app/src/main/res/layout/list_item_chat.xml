@@ -27,7 +27,7 @@
                 android:layout_gravity="right"
                 android:layout_marginLeft="5dp"
                 android:textStyle="bold"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:textColor="@color/accent"
                 />
 
@@ -39,7 +39,7 @@
                 android:layout_marginLeft="5dp"
                 android:maxWidth="240dp"
                 android:minWidth="60dp"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 />
 
         </LinearLayout>

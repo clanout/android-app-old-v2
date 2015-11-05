@@ -53,7 +53,8 @@ import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.chat.ChatHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class MainActivity extends AppCompatActivity {
+public class pwd
+        MainActivity extends AppCompatActivity {
     private android.app.FragmentManager fragmentManager;
     private Bus bus;
     private GCMService gcmService;
@@ -222,7 +223,8 @@ public class MainActivity extends AppCompatActivity {
         } else if (activeFragment.equals(BackstackTags.INVITE_USERS_CONTAINER)) {
             bus.post(new BackPressedTrigger(BackstackTags.INVITE_USERS_CONTAINER));
         } else if (activeFragment.equals(BackstackTags.EVENT_DETAILS_CONTAINER)) {
-            FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
+
+            bus.post(new BackPressedTrigger(BackstackTags.EVENT_DETAILS_CONTAINER));
         } else if (activeFragment.equals(BackstackTags.EDIT)) {
             bus.post(new BackPressedTrigger(BackstackTags.EDIT));
         } else if (activeFragment.equals(BackstackTags.CHAT)) {

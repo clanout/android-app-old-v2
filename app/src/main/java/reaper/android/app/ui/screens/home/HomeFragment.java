@@ -1,6 +1,5 @@
 package reaper.android.app.ui.screens.home;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -20,10 +19,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -49,17 +48,20 @@ import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.common.ViewPagerClickedTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationReceivedTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationsAvailableTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationsNotAvailableTrigger;
+import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.notifications.NotificationFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 import rx.Observable;
@@ -72,8 +74,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
         SwipeRefreshLayout.OnRefreshListener,
         EventsAdapter.EventActionListener,
         EventsAdapter.PagerSwipeListener,
-        CreateEventFragment.CreateEventCycleHandler
-{
+        CreateEventFragment.CreateEventCycleHandler {
     /* Event Bus */
     Bus bus;
 
@@ -96,21 +97,28 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
     MenuItem notification;
 
+    int activePosition = 0;
+
     /* Lifecycle Methods */
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ArrayList<Event> events = null;
+
+        if(getArguments() != null) {
+            events = (ArrayList<Event>) getArguments().getSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
+            activePosition = getArguments().getInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION);
+        }
+
         bus = Communicator.getInstance().getBus();
-        presenter = new EventsPresenterImpl(bus);
+        presenter = new EventsPresenterImpl(bus, events);
         subscriptions = new CompositeSubscription();
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_home);
@@ -126,8 +134,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         progressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(getActivity(), R.color.accent), PorterDuff.Mode.SRC_IN);
@@ -143,8 +150,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
         bus.register(this);
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.HOME_FRAGMENT);
@@ -153,66 +159,64 @@ public class HomeFragment extends BaseFragment implements EventsView,
         initView();
         presenter.attachView(this);
 
-        if (CacheManager.getGenericCache().get(CacheKeys.HAS_FETCHED_PENDING_INVITES) == null)
-        {
+        if (CacheManager.getGenericCache().get(CacheKeys.HAS_FETCHED_PENDING_INVITES) == null) {
             displayUpdatePhoneDialog();
         }
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
         bus.unregister(this);
 
-        if (presenter != null)
-        {
+        if (presenter != null) {
             presenter.detachView();
         }
     }
 
     /* Listeners */
     @Override
-    public void onRefresh()
-    {
+    public void onRefresh() {
+
+        SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+
+        activePosition = 0;
         presenter.refreshEvents();
     }
 
     @Override
-    public void onEventClicked(Event event)
-    {
+    public void onEventClicked(Event event) {
+
+        SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+
         presenter.selectEvent(event);
     }
 
     @Override
-    public void onRsvpChanged(EventListItem eventListItem, Event event, Event.RSVP rsvp)
-    {
+    public void onRsvpChanged(EventListItem eventListItem, Event event, Event.RSVP rsvp) {
+
+        SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+
         presenter.updateRsvp(eventListItem, event, rsvp);
     }
 
     @Override
-    public void onPagerSwipe(int state)
-    {
-        if (state == ViewPager.SCROLL_STATE_DRAGGING)
-        {
+    public void onPagerSwipe(int state) {
+        if (state == ViewPager.SCROLL_STATE_DRAGGING) {
             swipeRefreshLayout.setEnabled(false);
-        }
-        else
-        {
+        } else {
             swipeRefreshLayout.setEnabled(true);
         }
     }
 
     @Override
-    public void addCycle(Subscription subscription)
-    {
+    public void addCycle(Subscription subscription) {
         subscriptions.add(subscription);
     }
 
     /* View Methods */
     @Override
-    public void showLoading()
-    {
+    public void showLoading() {
         eventList.setVisibility(View.GONE);
         loading.setVisibility(View.VISIBLE);
         noEvents.setVisibility(View.GONE);
@@ -221,8 +225,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
     }
 
     @Override
-    public void showEvents(List<Event> events)
-    {
+    public void showEvents(List<Event> events) {
         eventList.setVisibility(View.VISIBLE);
         loading.setVisibility(View.GONE);
         noEvents.setVisibility(View.GONE);
@@ -232,11 +235,11 @@ public class HomeFragment extends BaseFragment implements EventsView,
         swipeRefreshLayout.setRefreshing(false);
 
         eventList.setAdapter(new EventsAdapter(events, this, this, getFragmentManager(), this));
+        eventList.scrollToPosition(activePosition);
     }
 
     @Override
-    public void showNoEventsMessage()
-    {
+    public void showNoEventsMessage() {
         eventList.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
         noEvents.setVisibility(View.VISIBLE);
@@ -248,8 +251,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
     }
 
     @Override
-    public void showError()
-    {
+    public void showError() {
         eventList.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
         noEvents.setVisibility(View.GONE);
@@ -261,22 +263,19 @@ public class HomeFragment extends BaseFragment implements EventsView,
     }
 
     @Override
-    public void showOrganizerCannotUpdateRsvpError()
-    {
+    public void showOrganizerCannotUpdateRsvpError() {
         Snackbar.make(getView(), R.string.cannot_change_rsvp, Snackbar.LENGTH_LONG)
                 .show();
     }
 
     @Override
-    public void showRsvpUpdateError()
-    {
+    public void showRsvpUpdateError() {
         Snackbar.make(getView(), R.string.message_rsvp_update_failure, Snackbar.LENGTH_LONG)
                 .show();
     }
 
     @Override
-    public void gotoDetailsView(List<Event> events, int activePosition)
-    {
+    public void gotoDetailsView(List<Event> events, int activePosition) {
         EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, (ArrayList<Event>) events);
@@ -287,8 +286,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
     }
 
     /* Helper Methods */
-    private void initView()
-    {
+    private void initView() {
         eventList.setVisibility(View.VISIBLE);
         loading.setVisibility(View.GONE);
         noEvents.setVisibility(View.GONE);
@@ -298,8 +296,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
         swipeRefreshLayout.setRefreshing(false);
     }
 
-    private void initRecyclerView()
-    {
+    private void initRecyclerView() {
         eventList.setLayoutManager(new LinearLayoutManager(getActivity()));
         eventList
                 .setAdapter(new EventsAdapter(new ArrayList<Event>(), this, this, getFragmentManager(), this));
@@ -326,8 +323,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
         });
     }
 
-    private void initCreateViewPager()
-    {
+    private void initCreateViewPager() {
         subscriptions.clear();
 
         List<CreateEventModel> eventSuggestionList = CreateEventSuggestionFactory
@@ -355,42 +351,34 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
         Subscription subscription =
                 Observable.interval(2, TimeUnit.SECONDS)
-                          .observeOn(AndroidSchedulers.mainThread())
-                          .subscribe(new Subscriber<Long>()
-                          {
-                              @Override
-                              public void onCompleted()
-                              {
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<Long>() {
+                            @Override
+                            public void onCompleted() {
 
-                              }
+                            }
 
-                              @Override
-                              public void onError(Throwable e)
-                              {
+                            @Override
+                            public void onError(Throwable e) {
 
-                              }
+                            }
 
-                              @Override
-                              public void onNext(Long aLong)
-                              {
-                                  int position = createEvent.getCurrentItem() + 1;
-                                  if (position >= createEvent.getAdapter().getCount())
-                                  {
-                                      createEvent.setCurrentItem(0, false);
-                                  }
-                                  else
-                                  {
-                                      createEvent.setCurrentItem(position);
-                                  }
-                              }
-                          });
+                            @Override
+                            public void onNext(Long aLong) {
+                                int position = createEvent.getCurrentItem() + 1;
+                                if (position >= createEvent.getAdapter().getCount()) {
+                                    createEvent.setCurrentItem(0, false);
+                                } else {
+                                    createEvent.setCurrentItem(position);
+                                }
+                            }
+                        });
 
         addCycle(subscription);
     }
 
     /* Unrefactored */
-    private void displayUpdatePhoneDialog()
-    {
+    private void displayUpdatePhoneDialog() {
         final GenericCache genericCache = CacheManager.getGenericCache();
         final EventService eventService = new EventService(bus);
         final LocationService locationService = new LocationService(bus);
@@ -410,20 +398,16 @@ public class HomeFragment extends BaseFragment implements EventsView,
         TextView message = (TextView) dialogView.findViewById(R.id.tv_alert_dialog_add_phone_message);
         message.setVisibility(View.GONE);
 
-        builder.setPositiveButton(R.string.fetch_pending_invites_positive_button, new DialogInterface.OnClickListener()
-        {
+        builder.setPositiveButton(R.string.fetch_pending_invites_positive_button, new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
+            public void onClick(DialogInterface dialog, int which) {
 
             }
         });
 
-        builder.setNegativeButton(R.string.fetch_pending_invites_negative_button, new DialogInterface.OnClickListener()
-        {
+        builder.setNegativeButton(R.string.fetch_pending_invites_negative_button, new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
+            public void onClick(DialogInterface dialog, int which) {
                 genericCache.put(CacheKeys.HAS_FETCHED_PENDING_INVITES, true);
 
                 eventService.fetchEvents(locationService.getUserLocation().getZone());
@@ -434,49 +418,39 @@ public class HomeFragment extends BaseFragment implements EventsView,
         alertDialog.show();
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                   .setOnClickListener(new View.OnClickListener()
-                   {
-                       @Override
-                       public void onClick(View v)
-                       {
-                           Boolean wantToCloseDialog = false;
-                           String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText()
-                                                                                 .toString(), AppConstants.DEFAULT_COUNTRY_CODE);
-                           if (parsedPhone == null)
-                           {
-                               Snackbar.make(getView(), R.string.phone_invalid, Snackbar.LENGTH_LONG)
-                                       .show();
-                               wantToCloseDialog = false;
-                           }
-                           else
-                           {
-                               userService.updatePhoneNumber(parsedPhone);
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Boolean wantToCloseDialog = false;
+                        String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText()
+                                .toString(), AppConstants.DEFAULT_COUNTRY_CODE);
+                        if (parsedPhone == null) {
+                            Snackbar.make(getView(), R.string.phone_invalid, Snackbar.LENGTH_LONG)
+                                    .show();
+                            wantToCloseDialog = false;
+                        } else {
+                            userService.updatePhoneNumber(parsedPhone);
 
-                               userService.fetchPendingInvites(parsedPhone, locationService
-                                       .getUserLocation().getZone());
+                            userService.fetchPendingInvites(parsedPhone, locationService
+                                    .getUserLocation().getZone());
 
-                               InputMethodManager inputManager = (InputMethodManager) getActivity()
-                                       .getSystemService(Context.INPUT_METHOD_SERVICE);
-                               inputManager.hideSoftInputFromWindow(dialogView
-                                       .getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                            SoftKeyboardHandler.hideKeyboard(getActivity(), dialogView);
 
-                               wantToCloseDialog = true;
-                           }
+                            wantToCloseDialog = true;
+                        }
 
-                           if (wantToCloseDialog)
-                           {
-                               alertDialog.dismiss();
+                        if (wantToCloseDialog) {
+                            alertDialog.dismiss();
 
-                               showLoading();
-                           }
-                       }
-                   });
+                            showLoading();
+                        }
+                    }
+                });
 
     }
 
     @Override
-    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater)
-    {
+    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
         menu.clear();
@@ -498,151 +472,132 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
         menu.findItem(R.id.action_account).setIcon(MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT)
-                .setColor(getResources()
-                        .getColor(R.color.whity))
+                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
                 .setSizeDp(36)
                 .build());
 
         menu.findItem(R.id.action_notifications)
-            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    FragmentUtils.changeFragment(getFragmentManager(), new NotificationFragment());
-                    return true;
-                }
-            });
-
-        if (CacheManager.getGenericCache().get(CacheKeys.MY_PHONE_NUMBER) == null)
-        {
-            menu.findItem(R.id.action_add_phone).setVisible(true);
-            menu.findItem(R.id.action_add_phone).setIcon(MaterialDrawableBuilder.with(getActivity())
-                                                                                .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE_ANDROID)
-                                                                                .setColor(getResources()
-                                                                                        .getColor(R.color.whity))
-                                                                                .setSizeDp(36)
-                                                                                .build());
-
-            menu.findItem(R.id.action_add_phone)
-                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-                {
+                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
-                    public boolean onMenuItemClick(MenuItem item)
-                    {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                        builder.setCancelable(true);
+                    public boolean onMenuItemClick(MenuItem item) {
 
-                        LayoutInflater inflater = getActivity().getLayoutInflater();
-                        final View dialogView = inflater
-                                .inflate(R.layout.alert_dialog_add_phone, null);
-                        builder.setView(dialogView);
+                        SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
 
-                        final EditText phoneNumber = (EditText) dialogView
-                                .findViewById(R.id.et_alert_dialog_add_phone);
-
-                        builder.setPositiveButton("Done", new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-
-                            }
-                        });
-
-                        final AlertDialog alertDialog = builder.create();
-                        alertDialog.show();
-
-                        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                                   .setOnClickListener(new View.OnClickListener()
-                                   {
-                                       @Override
-                                       public void onClick(View v)
-                                       {
-                                           Boolean wantToCloseDialog = false;
-                                           String parsedPhone = PhoneUtils
-                                                   .parsePhone(phoneNumber.getText()
-                                                                          .toString(), AppConstants.DEFAULT_COUNTRY_CODE);
-                                           if (parsedPhone == null)
-                                           {
-                                               Snackbar.make(getView(), R.string.phone_invalid, Snackbar.LENGTH_LONG)
-                                                       .show();
-                                               wantToCloseDialog = false;
-                                           }
-                                           else
-                                           {
-                                               UserService userService = new UserService(bus);
-                                               userService.updatePhoneNumber(parsedPhone);
-
-                                               menu.findItem(R.id.action_add_phone)
-                                                   .setVisible(false);
-
-                                               InputMethodManager inputManager = (InputMethodManager) getActivity()
-                                                       .getSystemService(Context.INPUT_METHOD_SERVICE);
-                                               inputManager.hideSoftInputFromWindow(dialogView
-                                                       .getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-
-                                               wantToCloseDialog = true;
-
-                                           }
-
-                                           if (wantToCloseDialog)
-                                           {
-                                               alertDialog.dismiss();
-                                           }
-                                       }
-                                   });
-
+                        FragmentUtils.changeFragment(getFragmentManager(), new NotificationFragment());
                         return true;
                     }
-
                 });
-        }
-        else
-        {
+
+        if (CacheManager.getGenericCache().get(CacheKeys.MY_PHONE_NUMBER) == null) {
+            menu.findItem(R.id.action_add_phone).setVisible(true);
+            menu.findItem(R.id.action_add_phone).setIcon(MaterialDrawableBuilder.with(getActivity())
+                    .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE_ANDROID)
+                    .setColor(ContextCompat.getColor(getActivity(), R.color.white))
+                    .setSizeDp(36)
+                    .build());
+
+            menu.findItem(R.id.action_add_phone)
+                    .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setCancelable(true);
+
+                            LayoutInflater inflater = getActivity().getLayoutInflater();
+                            final View dialogView = inflater
+                                    .inflate(R.layout.alert_dialog_add_phone, null);
+                            builder.setView(dialogView);
+
+                            final EditText phoneNumber = (EditText) dialogView
+                                    .findViewById(R.id.et_alert_dialog_add_phone);
+
+                            builder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            });
+
+                            final AlertDialog alertDialog = builder.create();
+                            alertDialog.show();
+
+                            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                                    .setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Boolean wantToCloseDialog = false;
+                                            String parsedPhone = PhoneUtils
+                                                    .parsePhone(phoneNumber.getText()
+                                                            .toString(), AppConstants.DEFAULT_COUNTRY_CODE);
+                                            if (parsedPhone == null) {
+                                                Snackbar.make(getView(), R.string.phone_invalid, Snackbar.LENGTH_LONG)
+                                                        .show();
+                                                wantToCloseDialog = false;
+                                            } else {
+                                                UserService userService = new UserService(bus);
+                                                userService.updatePhoneNumber(parsedPhone);
+
+                                                menu.findItem(R.id.action_add_phone)
+                                                        .setVisible(false);
+
+                                                SoftKeyboardHandler.hideKeyboard(getActivity(), dialogView);
+                                                wantToCloseDialog = true;
+
+                                            }
+
+                                            if (wantToCloseDialog) {
+                                                alertDialog.dismiss();
+                                            }
+                                        }
+                                    });
+
+                            return true;
+                        }
+
+                    });
+        } else {
             menu.findItem(R.id.action_add_phone).setVisible(false);
         }
 
         menu.findItem(R.id.action_account)
-            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
-                    FragmentUtils.changeFragment(getFragmentManager(), new AccountsFragment());
-                    return true;
-                }
-            });
+                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+
+                        SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+
+                        FragmentUtils.changeFragment(getFragmentManager(), new AccountsFragment());
+                        return true;
+                    }
+                });
     }
 
     @Subscribe
-    public void newNotificationsAvailable(NewNotificationsAvailableTrigger trigger)
-    {
+    public void newNotificationsAvailable(NewNotificationsAvailableTrigger trigger) {
         notification.setIcon(MaterialDrawableBuilder.with(getActivity())
-                                                    .setIcon(MaterialDrawableBuilder.IconValue.BELL)
-                                                    .setColor(getResources()
-                                                            .getColor(R.color.accent))
-                                                    .setSizeDp(36)
-                                                    .build());
+                .setIcon(MaterialDrawableBuilder.IconValue.BELL)
+                .setColor(ContextCompat.getColor(getActivity(), R.color.accent))
+                .setSizeDp(36)
+                .build());
     }
 
     @Subscribe
-    public void newNotificationsNotAvailable(NewNotificationsNotAvailableTrigger trigger)
-    {
+    public void newNotificationsNotAvailable(NewNotificationsNotAvailableTrigger trigger) {
         notification.setIcon(MaterialDrawableBuilder.with(getActivity())
-                                                    .setIcon(MaterialDrawableBuilder.IconValue.BELL)
-                                                    .setColor(getResources()
-                                                            .getColor(R.color.whity))
-                                                    .setSizeDp(36)
-                                                    .build());
+                .setIcon(MaterialDrawableBuilder.IconValue.BELL)
+                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
+                .setSizeDp(36)
+                .build());
     }
 
     @Subscribe
-    public void newNotificationReceived(NewNotificationReceivedTrigger trigger)
-    {
+    public void newNotificationReceived(NewNotificationReceivedTrigger trigger) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 notification.setIcon(MaterialDrawableBuilder.with(getActivity())
                         .setIcon(MaterialDrawableBuilder.IconValue.BELL)
-                        .setColor(getResources()
-                                .getColor(R.color.accent))
+                        .setColor(ContextCompat.getColor(getActivity(), R.color.accent))
                         .setSizeDp(36)
                         .build());
             }
@@ -650,22 +605,17 @@ public class HomeFragment extends BaseFragment implements EventsView,
     }
 
     @Subscribe
-    public void clickOnViewPagerDetected(ViewPagerClickedTrigger trigger)
-    {
+    public void clickOnViewPagerDetected(ViewPagerClickedTrigger trigger) {
         subscriptions.clear();
     }
 
     @Subscribe
-    public void onEventsFetched(EventsFetchTrigger trigger)
-    {
-        if(trigger.getEvents().size() == 0)
-        {
+    public void onEventsFetched(EventsFetchTrigger trigger) {
+        if (trigger.getEvents().size() == 0) {
             showNoEventsMessage();
-        }else
-        {
+        } else {
             showEvents(trigger.getEvents());
         }
 
     }
-
 }

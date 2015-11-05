@@ -10,14 +10,16 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -28,8 +30,10 @@ import android.widget.TextView;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+import com.squareup.picasso.Picasso;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
+import net.steamcrafted.materialiconlib.MaterialIconView;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.MessageListener;
@@ -61,6 +65,7 @@ import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
+import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.chat.ChatHelper;
@@ -73,7 +78,7 @@ import reaper.android.common.communicator.Communicator;
 public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
     private EditText typeMessage;
-    private ImageView send;
+    private MaterialIconView send;
     private ListView listView;
     private TextView noSessionMessage;
     private LinearLayout mainContent, loading;
@@ -105,6 +110,8 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
     private long loadHistoryLastClickedTime = 0;
 
+    private TextWatcher chatWatcher;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,7 +123,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
 
         typeMessage = (EditText) view.findViewById(R.id.et_chat_fragment_type_message_chat);
-        send = (ImageView) view.findViewById(R.id.ib_fragment_chat_send);
+        send = (MaterialIconView) view.findViewById(R.id.ib_fragment_chat_send);
         listView = (ListView) view.findViewById(R.id.lv_chat_fragment);
         noSessionMessage = (TextView) view.findViewById(R.id.tv_fragment_chat_no_session);
         mainContent = (LinearLayout) view.findViewById(R.id.ll_fragment_chat_main_content);
@@ -133,6 +140,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         super.onActivityCreated(savedInstanceState);
 
         ((MainActivity) getActivity()).setSupportActionBar(toolbar);
+        ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         renderLoadingView();
         progressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(getActivity(), R.color.accent), PorterDuff.Mode.SRC_IN);
@@ -140,8 +148,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         send.setOnClickListener(this);
         loadHistory.setOnClickListener(this);
 
-        generateDrawables();
-        send.setImageDrawable(sendDrawable);
+        send.setColor(ContextCompat.getColor(getActivity(), R.color.light_grey));
 
         Bundle bundle = getArguments();
         if (bundle == null) {
@@ -168,14 +175,29 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         genericCache = CacheManager.getGenericCache();
 
         isMessageSent = false;
-    }
 
-    private void generateDrawables() {
-        sendDrawable = MaterialDrawableBuilder.with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.SEND)
-                .setColor(ContextCompat.getColor(getActivity(), R.color.accent))
-                .setSizeDp(24)
-                .build();
+        chatWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                if(s.length() > 0)
+                {
+                    send.setColor(ContextCompat.getColor(getActivity(), R.color.accent));
+                }else {
+                    send.setColor(ContextCompat.getColor(getActivity(), R.color.light_grey));
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        };
     }
 
     @Override
@@ -197,6 +219,8 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         }
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.CHAT);
+
+        typeMessage.addTextChangedListener(chatWatcher);
     }
 
     private void renderNoSessionView() {
@@ -257,6 +281,8 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
             multiUserChat.removeMessageListener(messageListener);
             messageListener = null;
         }
+
+        typeMessage.removeTextChangedListener(chatWatcher);
     }
 
     @Override
@@ -319,9 +345,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
             isMessageSent = true;
 
             typeMessage.setText("");
-
-            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
         } else if (v.getId() == R.id.b_chat_fragment_load_history) {
 
@@ -456,5 +479,14 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
         eventDetailsContainerFragment.setArguments(bundle);
         FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+
+            ((MainActivity)getActivity()).onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

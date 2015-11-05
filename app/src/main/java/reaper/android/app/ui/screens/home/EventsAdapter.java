@@ -332,7 +332,7 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             // Date, Time and Location
             DateTime dateTime = event.getStartTime();
-            DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("HH:mm");
+            DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("hh:mm a");
 
             int dayToday = DateTime.now().getDayOfWeek();
 
@@ -355,7 +355,7 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty())
             {
                 timeLocation
-                        .setText(dateTime.toString(timeFormatter) + ", Suggest a location");
+                        .setText(dateTime.toString(timeFormatter) + ", Location undecided");
             }
             else
             {
@@ -451,7 +451,7 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             });
 
             Subscription subscription =
-                    Observable.interval(2, TimeUnit.SECONDS)
+                    Observable.interval(4, TimeUnit.SECONDS)
                               .observeOn(AndroidSchedulers.mainThread())
                               .subscribe(new Subscriber<Long>()
                               {

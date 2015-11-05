@@ -67,8 +67,8 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
 
-    // TODO -- Fetch pending invites
     // TODO -- Analytics events -- fetch pending invtes + status
+    // TODO -- test fetch pending invites
 
     @Override
     public void onCreate()

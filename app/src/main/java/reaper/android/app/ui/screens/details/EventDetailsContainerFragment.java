@@ -36,11 +36,13 @@ import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.event.ChangeAttendeeListTrigger;
 import reaper.android.app.trigger.event.EventRsvpNotChangedTrigger;
 import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
+import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.event.EventUtils;
@@ -49,16 +51,16 @@ import reaper.android.common.communicator.Communicator;
 
 public class EventDetailsContainerFragment extends BaseFragment implements View.OnClickListener {
     private android.app.FragmentManager fragmentManager;
-    private Bus bus;
 
     // Services
     private EventService eventService;
     private UserService userService;
 
     private GenericCache genericCache;
+    private Bus bus;
 
     // Data
-    private List<Event> events;
+    private ArrayList<Event> events;
     private int activePosition;
 
     // UI Elements
@@ -95,11 +97,11 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
         super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null) {
-            events = (List<Event>) savedInstanceState.get(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
+            events = (ArrayList<Event>) savedInstanceState.get(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
             activePosition = savedInstanceState.getInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION);
         } else {
             Bundle bundle = getArguments();
-            events = (List<Event>) bundle.get(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
+            events = (ArrayList<Event>) bundle.get(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
             activePosition = bundle.getInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION);
             shoulPopupStatusDialog = bundle.getBoolean(BundleKeys.POPUP_STATUS_DIALOG);
         }
@@ -109,6 +111,8 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
         }
 
         ((MainActivity) getActivity()).setSupportActionBar(toolbar);
+        setHasOptionsMenu(true);
+        ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         bus = Communicator.getInstance().getBus();
         fragmentManager = getActivity().getFragmentManager();
@@ -191,6 +195,15 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
 
         setActionBarTitle();
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EVENT_DETAILS_CONTAINER);
+
+        bus.register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        bus.unregister(this);
     }
 
     private void setActionBarTitle()
@@ -297,6 +310,15 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+
+            ((MainActivity)getActivity()).onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void updateRsvp(Event.RSVP newRsvp) {
 
         AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.RSVP_UPDATED, "user - " + userService.getActiveUserId() + "event - " + events.get(activePosition).getId() + "rsvp - " + newRsvp.toString());
@@ -331,6 +353,23 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
         if (trigger.getEventId().equals(events.get(activePosition).getId())) {
             events.get(activePosition).setRsvp(trigger.getOldRsvp());
             Snackbar.make(getView(), R.string.message_rsvp_update_failure, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    @Subscribe
+    public void backPressed(BackPressedTrigger trigger) {
+
+        if (trigger.getActiveFragment().equals(BackstackTags.EVENT_DETAILS_CONTAINER)) {
+
+            HomeFragment homeFragment = new HomeFragment();
+
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, events);
+            bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
+
+            homeFragment.setArguments(bundle);
+
+            FragmentUtils.changeFragment(getFragmentManager(), homeFragment);
         }
     }
 }

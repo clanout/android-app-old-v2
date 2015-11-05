@@ -1,6 +1,7 @@
 package reaper.android.app.ui.screens.invite.core;
 
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 
 import com.squareup.otto.Bus;
@@ -46,8 +48,10 @@ import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
+import timber.log.Timber;
 
 public class InviteUsersContainerFragment extends BaseFragment implements View.OnClickListener {
     private ViewPager viewPager;
@@ -143,6 +147,8 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
                     public void onTabSelected(TabLayout.Tab tab) {
                         super.onTabSelected(tab);
 
+                        SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+
                         viewPager.setCurrentItem(tab.getPosition());
 
                         switch (tab.getPosition()) {
@@ -166,7 +172,6 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
                 });
             }
         });
-
 
         done.setOnClickListener(this);
         done.setImageDrawable(checkDrawable);
@@ -258,7 +263,6 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
     @Subscribe
     public void onManageFacebookFriendsTriggerReceived(ManageAppFriendsTrigger trigger) {
 
-
         if (trigger.isSelected()) {
 
             if (!(invitedFacebookFriends.contains(trigger.getId()))) {
@@ -272,6 +276,8 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
                 invitedFacebookFriends.remove(trigger.getId());
             }
         }
+
+        tabLayout.getTabAt(0).setText("FACEBOOK \n" + invitedFacebookFriends.size());
     }
 
     @Subscribe
@@ -290,11 +296,15 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
                 invitedPhoneContacts.remove(trigger.getId());
             }
         }
+
+        tabLayout.getTabAt(1).setText("ON APP \n" + invitedPhoneContacts.size());
     }
 
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.ib_invite_friends_container_done) {
+
+            SoftKeyboardHandler.hideKeyboard(getActivity(),getView());
 
             invitedUsers = new ArrayList<>();
             invitedUsers.addAll(invitedFacebookFriends);
@@ -365,5 +375,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
                 smsInviteePhoneList.remove(trigger.getPhone());
             }
         }
+
+        tabLayout.getTabAt(2).setText("PHONEBOOK \n" + smsInviteePhoneList.size());
     }
 }

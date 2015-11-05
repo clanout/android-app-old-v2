@@ -54,7 +54,7 @@
     <!-- Event Details Fragment -->
     <string name="event_details_no_description">Say something</string>
     <string name="event_details_no_attendees">This clan is no longer available. Refresh to remove dismissed clans from your feed</string>
-    <string name="event_details_no_location">Suggest a location</string>
+    <string name="event_details_no_location">Location undecided</string>
 
     <string name="event_details_type_public">Open</string>
     <string name="event_details_type_invite_only">Secret</string>
@@ -72,6 +72,10 @@
     <string name="no_facebook_friends"> Clanout is exciting with your friends around. Invite them by Whatsapp  </string>
     <string name="no_local_facebook_friends"> Clanout is exciting with your friends around. Invite them by Whatsapp </string>
     <string name="facebook_friends_not_fetched"> Unable to show your facebook friends. Refresh </string>
+
+    <string name="no_search_results_facebook">No results found. Try searching in your phonebook contacts or in your On-App friends!</string>
+    <string name="no_search_results_on_app">No results found. Try searching in your facebook friends or phonebook contacts!</string>
+    <string name="no_search_results_phonebook">No results found. Try searching in your facebook or in your On-App friends!</string>
 
     <string name="phone_contacts_not_fetched"> Unable to show your phonebook friends. Refresh</string>
     <string name="no_local_phone_contacts"> Clanout is exciting with your friends around. Invite them by Whatsapp </string>

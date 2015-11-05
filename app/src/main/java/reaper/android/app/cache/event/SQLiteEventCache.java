@@ -311,7 +311,7 @@ public class SQLiteEventCache implements EventCache
                     @Override
                     public void onError(Throwable e)
                     {
-                        Timber.e("Unable to insert event_id = " + event.getId() + " [" + e
+                        Timber.e("Unable to insert event_id = " + " [" + e
                                 .getMessage() + "]");
                     }
 

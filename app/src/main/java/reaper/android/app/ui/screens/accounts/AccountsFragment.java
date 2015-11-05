@@ -98,6 +98,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         super.onActivityCreated(savedInstanceState);
 
         ((MainActivity) getActivity()).setSupportActionBar(toolbar);
+        ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         fragmentManager = getActivity().getFragmentManager();
         bus = Communicator.getInstance().getBus();
@@ -197,6 +198,15 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                 return true;
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+
+            ((MainActivity)getActivity()).onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

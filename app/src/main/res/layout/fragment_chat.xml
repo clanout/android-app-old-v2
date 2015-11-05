@@ -74,7 +74,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingTop="10dp"
+        android:paddingTop="4dp"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
@@ -86,16 +86,21 @@
             android:layout_weight="1"
             android:layout_height="40dp"
             android:autoText="true"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:hint="Write a Message"
             android:textColor="@color/text_title"
+            android:layout_gravity="bottom" />
+
+        <net.steamcrafted.materialiconlib.MaterialIconView
+            android:id="@+id/ib_fragment_chat_send"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="center"
+            app:materialIcon="send"
+            app:materialIconColor="@color/accent"
+            app:materialIconSize="36dp"
             />
 
-        <ImageView
-            android:id="@+id/ib_fragment_chat_send"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginLeft="4dp"
-            android:layout_gravity="center_vertical"/>
     </LinearLayout>
 </LinearLayout>

@@ -66,6 +66,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     private Drawable whatsappDrawable;
     private ProgressBar progressBar;
     private EditText search;
+    private LinearLayout searchContainer;
 
     private boolean isPhoneAdded;
 
@@ -100,6 +101,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         loading = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_through_sms_loading);
         progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_invite_through_sms);
         search = (EditText) view.findViewById(R.id.et_fragment_invite_through_sms_search);
+        searchContainer = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_through_sms_search);
 
         return view;
     }
@@ -151,8 +153,12 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
                         }
                     }
 
-                    Collections.sort(phoneContactList, new PhoneContactComparator());
-                    refreshRecyclerView();
+                    if (visiblePhoneContactList.size() == 0) {
+                        displayNoSearchResultsView();
+                    } else {
+                        Collections.sort(phoneContactList, new PhoneContactComparator());
+                        refreshRecyclerView();
+                    }
                 } else if (s.length() == 0) {
                     visiblePhoneContactList = new ArrayList<>();
 
@@ -229,7 +235,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
     private void displayInvitesLockedView() {
         mainContent.setVisibility(View.GONE);
-        search.setVisibility(View.GONE);
+        searchContainer.setVisibility(View.GONE);
         lockedContent.setVisibility(View.VISIBLE);
         invitesLockedMessage.setText(R.string.add_phone_number);
         addPhone.setImageDrawable(phoneDrawable);
@@ -244,7 +250,18 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         lockedContent.setVisibility(View.GONE);
         mainContent.setVisibility(View.VISIBLE);
         loading.setVisibility(View.GONE);
-        search.setVisibility(View.VISIBLE);
+        searchContainer.setVisibility(View.VISIBLE);
+    }
+
+    private void displayNoSearchResultsView() {
+        noContactsMessage.setText(R.string.no_search_results_phonebook);
+        noContactsMessage.setVisibility(View.VISIBLE);
+        inviteWhatsapp.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
+        lockedContent.setVisibility(View.GONE);
+        mainContent.setVisibility(View.VISIBLE);
+        loading.setVisibility(View.GONE);
+        searchContainer.setVisibility(View.VISIBLE);
     }
 
     private void displayBasicView() {
@@ -254,7 +271,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         noContactsMessage.setVisibility(View.GONE);
         lockedContent.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
-        search.setVisibility(View.VISIBLE);
+        searchContainer.setVisibility(View.VISIBLE);
     }
 
     private void displayErrorView() {
@@ -268,7 +285,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         noContactsMessage.setText(R.string.phone_contacts_not_fetched);
         lockedContent.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
-        search.setVisibility(View.GONE);
+        searchContainer.setVisibility(View.GONE);
     }
 
     private void displayLoadingView() {
@@ -278,7 +295,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         noContactsMessage.setVisibility(View.GONE);
         lockedContent.setVisibility(View.GONE);
         loading.setVisibility(View.VISIBLE);
-        search.setVisibility(View.GONE);
+        searchContainer.setVisibility(View.GONE);
     }
 
     @Override
@@ -391,8 +408,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
         visiblePhoneContactList = new ArrayList<>();
 
-        for(PhoneContact phoneContact : phoneContactList)
-        {
+        for (PhoneContact phoneContact : phoneContactList) {
             visiblePhoneContactList.add(phoneContact);
         }
 

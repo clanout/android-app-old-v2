@@ -112,6 +112,8 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         ((MainActivity) getActivity()).setSupportActionBar(toolbar);
         setHasOptionsMenu(true);
 
+        ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         displayLoadingView();
         progressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(getActivity(), R.color.accent), PorterDuff.Mode.SRC_IN);
 
@@ -246,6 +248,15 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
                 return true;
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+
+            ((MainActivity)getActivity()).onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void initRecyclerView() {

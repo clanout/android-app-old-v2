@@ -4,20 +4,21 @@ import com.google.gson.Gson;
 
 import org.joda.time.DateTime;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import reaper.android.app.api.core.GsonProvider;
 import reaper.android.app.model.core.Model;
 
-public class Event implements Model
+public class Event implements Model, Serializable
 {
-    public static enum Type implements Model
+    public static enum Type implements Model, Serializable
     {
         PUBLIC,
         INVITE_ONLY;
     }
 
-    public static enum RSVP implements Model
+    public static enum RSVP implements Model, Serializable
     {
         YES,
         MAYBE,

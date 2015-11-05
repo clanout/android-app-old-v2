@@ -96,6 +96,8 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
         ((MainActivity)getActivity()).setSupportActionBar(toolbar);
         setHasOptionsMenu(true);
 
+        ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         bus = Communicator.getInstance().getBus();
         notificationService = new NotificationService(bus);
         eventService = new EventService(bus);
@@ -190,6 +192,15 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
                 return true;
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+
+            ((MainActivity)getActivity()).onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
