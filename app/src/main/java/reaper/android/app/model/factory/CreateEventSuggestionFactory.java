@@ -30,8 +30,6 @@ public class CreateEventSuggestionFactory {
 
         if(genericCache.get(CacheKeys.EVENT_SUGGESTIONS) == null)
         {
-            Log.d("APP", "event suggestions not from cache -- static");
-
             List<CreateEventModel> eventSuggestions = new ArrayList<>();
             eventSuggestions.add(new CreateEventModel(EventCategory.CAFE, "Coffee :)"));
             eventSuggestions.add(new CreateEventModel(EventCategory.SHOPPING, "Who shops alone?"));
@@ -59,8 +57,6 @@ public class CreateEventSuggestionFactory {
 
             return eventSuggestions;
         }else{
-
-            Log.d("APP", "event suggestions from cache -- static");
 
             String suggestionsJson = genericCache.get(CacheKeys.EVENT_SUGGESTIONS);
 

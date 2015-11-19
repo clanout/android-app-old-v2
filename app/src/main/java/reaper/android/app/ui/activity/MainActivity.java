@@ -100,12 +100,8 @@ public class MainActivity extends AppCompatActivity {
         eventCache = CacheManager.getEventCache();
         userCache = CacheManager.getUserCache();
 
-        if(genericCache.get(CacheKeys.EVENT_SUGGESTIONS) == null)
-        {
-            Log.d("APP", "event suggestions null in cache");
+        if (genericCache.get(CacheKeys.EVENT_SUGGESTIONS) == null) {
             eventService.getEventSuggestions();
-        }else{
-            Log.d("APP", "event suggestions not null in cache");
         }
 
         String shouldGoToDetailsFragment = getIntent()
