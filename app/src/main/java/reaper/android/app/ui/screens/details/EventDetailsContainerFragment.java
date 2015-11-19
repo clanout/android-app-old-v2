@@ -351,6 +351,9 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
     @Subscribe
     public void onRsvpNotChanged(EventRsvpNotChangedTrigger trigger) {
         if (trigger.getEventId().equals(events.get(activePosition).getId())) {
+
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.RSVP_UPDATE_FAILURE, "user - " + userService.getActiveUserId() + "event - " + events.get(activePosition).getId() + "rsvp - " + trigger.getOldRsvp().toString());
+
             events.get(activePosition).setRsvp(trigger.getOldRsvp());
             Snackbar.make(getView(), R.string.message_rsvp_update_failure, Snackbar.LENGTH_LONG).show();
         }

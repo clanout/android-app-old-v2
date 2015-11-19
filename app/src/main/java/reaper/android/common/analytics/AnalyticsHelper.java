@@ -31,4 +31,12 @@ public class AnalyticsHelper
                 .setLabel(label)
                 .build());
     }
+
+    public static void  sendCaughtExceptions(String exceptionMethod, String exceptionLocation, boolean isFatal)
+    {
+        googleAnalyticsTracker.send(new HitBuilders.ExceptionBuilder()
+                .setDescription(exceptionMethod + ":" + exceptionLocation)
+                .setFatal(isFatal)
+                .build());
+    }
 }

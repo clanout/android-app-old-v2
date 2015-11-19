@@ -9,6 +9,8 @@ import reaper.android.app.api.event.request.EventsApiRequest;
 import reaper.android.app.api.event.request.FetchEventApiRequest;
 import reaper.android.app.api.event.request.FetchNewEventsAndUpdatesApiRequest;
 import reaper.android.app.api.event.request.FinaliseEventApiRequest;
+import reaper.android.app.api.event.request.GetEventSuggestionsApiRequest;
+import reaper.android.app.api.event.response.GetEventSuggestionApiResponse;
 import reaper.android.app.api.event.request.InviteThroughSMSApiRequest;
 import reaper.android.app.api.event.request.InviteUsersApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
@@ -72,4 +74,7 @@ public interface EventApi
 
     @POST("/event/status")
     Observable<Response> updateStatus(@Body UpdateStatusApiRequest request);
+
+    @POST("/event/suggestions")
+    Observable<GetEventSuggestionApiResponse> getEventSuggestions(@Body GetEventSuggestionsApiRequest request);
 }

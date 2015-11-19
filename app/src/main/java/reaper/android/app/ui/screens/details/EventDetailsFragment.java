@@ -429,6 +429,8 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
     private void displayStatusDialog() {
 
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.STATUS_DIALOG_OPENED, userService.getActiveUserId());
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
 
@@ -490,6 +492,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.STATUS_TEMPLATE_CHOSEN, userService.getActiveUserId() + " template - " + position);
                 status.setText(statusList.get(position));
             }
         });
@@ -518,6 +521,11 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
                     shouldNotifyOthers = true;
                 }
 
+                if(!status.getText().toString().isEmpty())
+                {
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.STATUS_UPDATED, userService.getActiveUserId());
+                }
+
                 eventService.updateStatus(event.getId(), status.getText().toString(), shouldNotifyOthers);
                 dialog.dismiss();
             }
@@ -538,6 +546,8 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
     private void displayInvitationResponseAlertDialog() {
 
         // TODO -- change chat message
+
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.INVITATION_RESPONSE_DIALOG_OPENED, userService.getActiveUserId());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
@@ -563,6 +573,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.INVITAION_RESPONSE_TEMPLATE_CHOSEN, userService.getActiveUserId() + " template - " + position);
                 message.setText(responseList.get(position));
             }
         });
@@ -572,6 +583,9 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
             public void onClick(DialogInterface dialog, int which) {
 
                 if (message.getText().toString() != null || !(message.getText().toString().isEmpty())) {
+
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.INVITATION_RESPONSE_SENT, userService.getActiveUserId());
+
                     eventService.sendInvitationResponse(event.getId(), message.getText().toString());
                     Toast.makeText(getActivity(), R.string.invitation_response_sent, Toast.LENGTH_LONG).show();
                     dialog.dismiss();
@@ -586,6 +600,9 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.tv_event_details_location) {
+
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_DETAILS_LOCATION_CLICKED, userService.getActiveUserId());
+
             if (event.getLocation().getLatitude() != null && event.getLocation().getLongitude() != null) {
                 Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
                         Uri.parse("http://maps.google.com/maps?daddr=" + event.getLocation().getLatitude() + "," + event.getLocation().getLongitude()));

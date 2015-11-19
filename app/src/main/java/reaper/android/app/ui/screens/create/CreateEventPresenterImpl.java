@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.app.api.google.response.GooglePlaceAutocompleteApiResponse;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.Location;
@@ -15,6 +16,8 @@ import reaper.android.app.model.Suggestion;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.GoogleService;
 import reaper.android.app.service.LocationService;
+import reaper.android.app.service.UserService;
+import reaper.android.common.analytics.AnalyticsHelper;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
@@ -29,6 +32,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     private EventService eventService;
     private GoogleService googleService;
     private Location userLocation;
+    private UserService userService;
 
     /* Subscriptions */
     private CompositeSubscription subscriptions;
@@ -51,6 +55,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
 
     public CreateEventPresenterImpl(Bus bus, EventCategory eventCategory)
     {
+        userService = new UserService(bus);
         eventService = new EventService(bus);
         googleService = new GoogleService(bus);
         userLocation = new LocationService(bus).getUserLocation();
@@ -310,6 +315,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
                     @Override
                     public void onError(Throwable e)
                     {
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.CREATE_EVENT_FAILURE_FROM_DETAILS, userService.getActiveUserId());
                         isCreationInitiated = false;
                         view.displayError();
                     }
@@ -317,6 +323,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
                     @Override
                     public void onNext(Event event)
                     {
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.CREATE_EVENT_SUCCESS_FROM_DETAILS, userService.getActiveUserId());
                         view.navigateToInviteScreen(event);
                     }
                 });

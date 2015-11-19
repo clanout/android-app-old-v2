@@ -24,6 +24,7 @@ import reaper.android.app.api.event.request.EventsApiRequest;
 import reaper.android.app.api.event.request.FetchEventApiRequest;
 import reaper.android.app.api.event.request.FetchNewEventsAndUpdatesApiRequest;
 import reaper.android.app.api.event.request.FinaliseEventApiRequest;
+import reaper.android.app.api.event.request.GetEventSuggestionsApiRequest;
 import reaper.android.app.api.event.request.InviteThroughSMSApiRequest;
 import reaper.android.app.api.event.request.InviteUsersApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
@@ -36,6 +37,7 @@ import reaper.android.app.api.event.response.EventsApiResponse;
 import reaper.android.app.api.event.response.FetchEventApiResponse;
 import reaper.android.app.api.event.response.FetchNewEventsAndUpdatesApiResponse;
 import reaper.android.app.api.event.request.SendInvitaionResponseApiRequest;
+import reaper.android.app.api.event.response.GetEventSuggestionApiResponse;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
@@ -1227,6 +1229,29 @@ public class EventService
             @Override
             public void onNext(Response response) {
 
+            }
+        });
+    }
+
+    public void getEventSuggestions()
+    {
+
+        eventApi.getEventSuggestions(new GetEventSuggestionsApiRequest()).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<GetEventSuggestionApiResponse>() {
+
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(GetEventSuggestionApiResponse getEventSuggestionApiResponse) {
+
+                genericCache.put(CacheKeys.EVENT_SUGGESTIONS, getEventSuggestionApiResponse.getEventSuggestions());
             }
         });
     }

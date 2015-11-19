@@ -772,6 +772,9 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                 }
 
                 if (!isDaySelectorVisible) {
+
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.DAY_UPDATED_WHILE_CREATE_FROM_DETAILS, userService.getActiveUserId());
+
                     showDaySelector();
                 } else {
                     hideDaySelector();
@@ -782,11 +785,17 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                 }
 
                 if (!isTimeSelectorVisible) {
+
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.TIME_UPDATED_WHILE_CREATE_FROM_DETAILS, userService.getActiveUserId());
+
                     showTimeSelector();
                 } else {
                     hideTimeSelector();
                 }
             } else if (v == icon) {
+
+
+
                 displayCategoryChangeDialog();
             }
         }

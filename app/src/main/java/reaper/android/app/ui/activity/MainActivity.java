@@ -53,8 +53,7 @@ import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.chat.ChatHelper;
 import reaper.android.common.communicator.Communicator;
 
-public class pwd
-        MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
     private android.app.FragmentManager fragmentManager;
     private Bus bus;
     private GCMService gcmService;
@@ -101,7 +100,13 @@ public class pwd
         eventCache = CacheManager.getEventCache();
         userCache = CacheManager.getUserCache();
 
-
+        if(genericCache.get(CacheKeys.EVENT_SUGGESTIONS) == null)
+        {
+            Log.d("APP", "event suggestions null in cache");
+            eventService.getEventSuggestions();
+        }else{
+            Log.d("APP", "event suggestions not null in cache");
+        }
 
         String shouldGoToDetailsFragment = getIntent()
                 .getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);

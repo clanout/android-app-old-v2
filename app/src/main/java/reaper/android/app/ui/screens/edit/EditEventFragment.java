@@ -262,6 +262,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         bus.register(this);
 
         CacheManager.getGenericCache().put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EDIT);
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EDIT_EVENT_FRAGMENT);
 
         location.setOnFocusChangeListener(new View.OnFocusChangeListener()
         {

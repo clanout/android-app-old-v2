@@ -28,10 +28,10 @@ public class IntroActivity extends AppIntro {
 
         if (genericCache.get(CacheKeys.IS_FIRST_TIME_USER) == null) {
             // TODO -- Change messages
-            addSlide(AppIntroFragment.newInstance("Discover Clans", "Check out what your local friends are up to", R.drawable.ic_btn_rsvp_going, Color.parseColor("#FFEB3B")));
-            addSlide(AppIntroFragment.newInstance("Make your own clan", "Invite selected friends to your clan or let everyone know", R.drawable.ic_btn_rsvp_maybe, Color.parseColor("#03A9F4")));
-            addSlide(AppIntroFragment.newInstance("Invite Facebook Friends", "Go out with your facebook freinds", R.drawable.ic_btn_rsvp_no, Color.parseColor("#F44336")));
-            addSlide(AppIntroFragment.newInstance("Invite Phone Contacts", "Invite Phone Contacts to your clans", R.drawable.ic_btn_rsvp_going, Color.parseColor("#03A9F4")));
+            addSlide(AppIntroFragment.newInstance("Explore and Join.", "Check out what your friends are planning and join the one that suits your mood. You'll never walk alone.", R.drawable.ic_btn_rsvp_going, Color.parseColor("#FFEB3B")));
+            addSlide(AppIntroFragment.newInstance("Privacy in check", "Make open plans with everyone or keep it secret with your buddies", R.drawable.ic_btn_rsvp_maybe, Color.parseColor("#03A9F4")));
+            addSlide(AppIntroFragment.newInstance("All friends at one place", "Choose friends from a pool of facebook and phonebook contacts everytime you make a plan", R.drawable.ic_btn_rsvp_no, Color.parseColor("#F44336")));
+            addSlide(AppIntroFragment.newInstance("Discuss your plans and clan out", "Suggest a plan, chat with your friends and finalize details. Simple", R.drawable.ic_btn_rsvp_going, Color.parseColor("#03A9F4")));
         } else {
             Intent intent = new Intent(this, FacebookActivity.class);
             startActivity(intent);

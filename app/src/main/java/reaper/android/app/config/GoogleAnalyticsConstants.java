@@ -3,8 +3,7 @@ package reaper.android.app.config;
 /**
  * Created by Aditya on 16-09-2015.
  */
-public class GoogleAnalyticsConstants
-{
+public class GoogleAnalyticsConstants {
     // Screen Names
     public static final String MAIN_ACTIVITY = "MainActivity";
     public static final String FACEBOOK_ACTIVITY = "FacebookActivity";
@@ -20,7 +19,7 @@ public class GoogleAnalyticsConstants
     public static final String INVITE_PHONEBOOK_CONTACTS_FRAGMENT = "InvitePhonebookContactsFragment";
     public static final String EDIT_EVENT_FRAGMENT = "EDIT_EVENT_FRAGMENT";
     public static final String NOTIFICATION_FRAGMENT = "notification_fragment";
-    public static final String CREATE_FRAGMENT = "create_fragment" ;
+    public static final String CREATE_FRAGMENT = "create_fragment";
     public static final String INVITE_THROUGH_SMS_FRAGMENT = "invite_through_sms_fragment";
 
     // Event CATEGORY
@@ -81,4 +80,20 @@ public class GoogleAnalyticsConstants
     public static final String EVENT_DELETED = "event_deleted";
     public static final String EVENT_FINALIZED = "event_finalized";
     public static final String EVENT_EDITED = "event_edited";
+    public static final String CRAETED_EVENT_SUCCESS_FROM_HOME = "created_event_success_from_home";
+    public static final String CRAETED_EVENT_FAILURE_FROM_HOME = "created_event_failure_from_home";
+    public static final String CREATE_EVENT_FAILURE_FROM_DETAILS = "create_event_failure_from_details";
+    public static final String CREATE_EVENT_SUCCESS_FROM_DETAILS = "create_event_success_from_details";
+    public static final String TIME_UPDATED_WHILE_CREATE_FROM_HOME = "time_updated_while_create_from_home";
+    public static final String DAY_UPDATED_WHILE_CREATE_FROM_HOME = "day_updated_while_create_from_home";
+    public static final String TIME_UPDATED_WHILE_CREATE_FROM_DETAILS = "time_updated_while_create_from_details";
+    public static final String DAY_UPDATED_WHILE_CREATE_FROM_DETAILS = "day_updated_while_create_from_details";
+    public static final String RSVP_UPDATE_FAILURE = "rsvp_update_failure";
+    public static final String EVENT_DETAILS_LOCATION_CLICKED = "event_details_location_clicked";
+    public static final String STATUS_DIALOG_OPENED = "status_dialog_opened";
+    public static final String INVITATION_RESPONSE_DIALOG_OPENED = "invitation_response_dialog_opened";
+    public static final String STATUS_TEMPLATE_CHOSEN = "status_template_chosen";
+    public static final String STATUS_UPDATED = "status_updated";
+    public static final String INVITAION_RESPONSE_TEMPLATE_CHOSEN = "invitation_response_template_chosen";
+    public static final String INVITATION_RESPONSE_SENT = "invitation_response_sent";
 }

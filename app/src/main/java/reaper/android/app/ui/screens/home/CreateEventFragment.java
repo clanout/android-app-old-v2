@@ -304,6 +304,8 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
     @Subscribe
     public void onCreateSuccess(EventCreatedTrigger trigger)
     {
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.CRAETED_EVENT_SUCCESS_FROM_HOME, userService.getActiveUserId());
+
         if (isCreateClicked)
         {
             isCreateClicked = false;
@@ -326,6 +328,8 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
     @Subscribe
     public void onCreateFailure(GenericErrorTrigger trigger)
     {
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.CRAETED_EVENT_FAILURE_FROM_HOME, userService.getActiveUserId());
+
         if (isCreateClicked && trigger.getErrorCode() == ErrorCode.EVENT_CREATION_FAILURE)
         {
             isCreateClicked = false;
@@ -592,6 +596,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
 
                 if (!isDaySelectorVisible)
                 {
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.DAY_UPDATED_WHILE_CREATE_FROM_HOME, userService.getActiveUserId());
                     showDaySelector();
                 }
                 else
@@ -608,6 +613,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
 
                 if (!isTimeSelectorVisible)
                 {
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.TIME_UPDATED_WHILE_CREATE_FROM_HOME, userService.getActiveUserId());
                     showTimeSelector();
                 }
                 else

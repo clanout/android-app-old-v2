@@ -28,6 +28,7 @@ import org.joda.time.DateTime;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import reaper.android.BuildConfig;
 import reaper.android.app.cache.core.CacheManager;
@@ -37,6 +38,7 @@ import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.Timestamps;
+import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
@@ -61,6 +63,7 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     // Services
     private LocationService locationService;
     private UserService userService;
+    private EventService eventService;
 
     private GenericCache genericCache;
 
@@ -69,6 +72,8 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
 
     // TODO -- Analytics events -- fetch pending invtes + status
     // TODO -- test fetch pending invites
+
+    private int timesApplicationOpened;
 
     @Override
     public void onCreate()
@@ -100,12 +105,29 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         locationService = new LocationService(bus);
         userService = new UserService(bus);
         genericCache = CacheManager.getGenericCache();
+        eventService = new EventService(bus);
 
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+
+        handleTimesApplicationOpened();
+    }
+
+    private void handleTimesApplicationOpened() {
+
+        try {
+            timesApplicationOpened = Integer.parseInt(genericCache.get(CacheKeys.TIMES_APPLICATION_OPENED));
+        }catch (Exception e)
+        {
+            timesApplicationOpened = 0;
+        }
+
+        timesApplicationOpened++;
+
+        genericCache.put(CacheKeys.TIMES_APPLICATION_OPENED, timesApplicationOpened);
     }
 
     @Subscribe
@@ -171,6 +193,9 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         if(tracker == null)
         {
             tracker = GoogleAnalytics.getInstance(instance).newTracker(AppConstants.GOOGLE_ANALYTICS_TRACKING_KEY);
+            tracker.enableExceptionReporting(true);
+
+
         }
         return tracker;
     }
