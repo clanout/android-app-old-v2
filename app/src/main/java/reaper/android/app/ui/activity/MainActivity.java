@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -230,7 +229,6 @@ public class MainActivity extends AppCompatActivity {
         } else if (activeFragment.equals(BackstackTags.INVITE_USERS_CONTAINER)) {
             bus.post(new BackPressedTrigger(BackstackTags.INVITE_USERS_CONTAINER));
         } else if (activeFragment.equals(BackstackTags.EVENT_DETAILS_CONTAINER)) {
-
             bus.post(new BackPressedTrigger(BackstackTags.EVENT_DETAILS_CONTAINER));
         } else if (activeFragment.equals(BackstackTags.EDIT)) {
             bus.post(new BackPressedTrigger(BackstackTags.EDIT));
