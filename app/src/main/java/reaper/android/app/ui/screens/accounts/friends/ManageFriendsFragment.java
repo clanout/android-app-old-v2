@@ -83,6 +83,8 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     private Drawable whatsappDrawable;
 
     // TODO save selected friends onResume -- invite fragments also
+    // TODO -- change imagebutton
+    // TODO -- Message on top - "Blocked friends cannot invite you or see what clans you have joined."
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -174,7 +176,7 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         }
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.MANAGE_FRIENDS_FRAGMENT);
-        ((MainActivity) getActivity()).getSupportActionBar().setTitle("Block");
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle("Block a Friend");
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.MANAGE_FRIENDS);
         bus.register(this);
@@ -206,7 +208,7 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     private void displayNoFriendsView() {
         recyclerView.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.VISIBLE);
-        inviteWhatsapp.setVisibility(View.VISIBLE);
+        inviteWhatsapp.setVisibility(View.GONE);
 
         noFriendsMessage.setText(R.string.no_facebook_friends);
     }

@@ -112,6 +112,8 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
     private TextWatcher chatWatcher;
 
+    // TODO -- add watermark in background
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -205,7 +207,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.CHAT_FRAGMENT);
-        ((MainActivity) getActivity()).getSupportActionBar().setTitle("Discussion");
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle("Clan Chat");
 
         bus.register(this);
 

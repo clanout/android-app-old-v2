@@ -29,9 +29,9 @@ public class IntroActivity extends AppIntro {
         if (genericCache.get(CacheKeys.IS_FIRST_TIME_USER) == null) {
             // TODO -- Change messages
             addSlide(AppIntroFragment.newInstance("Explore and Join.", "Check out what your friends are planning and join the one that suits your mood. You'll never walk alone.", R.drawable.ic_btn_rsvp_going, Color.parseColor("#FFEB3B")));
-            addSlide(AppIntroFragment.newInstance("Privacy in check", "Make open plans with everyone or keep it secret with your buddies", R.drawable.ic_btn_rsvp_maybe, Color.parseColor("#03A9F4")));
-            addSlide(AppIntroFragment.newInstance("All friends at one place", "Choose friends from a pool of facebook and phonebook contacts everytime you make a plan", R.drawable.ic_btn_rsvp_no, Color.parseColor("#F44336")));
-            addSlide(AppIntroFragment.newInstance("Discuss your plans and clan out", "Suggest a plan, chat with your friends and finalize details. Simple", R.drawable.ic_btn_rsvp_going, Color.parseColor("#03A9F4")));
+            addSlide(AppIntroFragment.newInstance("Privacy in Check", "Make a plan with all your friends or keep it secret with your close ones.", R.drawable.ic_btn_rsvp_maybe, Color.parseColor("#03A9F4")));
+            addSlide(AppIntroFragment.newInstance("All Friends at One Place", "Invite friends from a pool of facebook and phonebook contacts everytime you make a new plan.", R.drawable.ic_btn_rsvp_no, Color.parseColor("#F44336")));
+            addSlide(AppIntroFragment.newInstance("Clan Chat", "Make a plan, discuss it with your friends, finalize details and clan out. Simple.", R.drawable.ic_btn_rsvp_going, Color.parseColor("#03A9F4")));
         } else {
             Intent intent = new Intent(this, FacebookActivity.class);
             startActivity(intent);

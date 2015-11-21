@@ -71,6 +71,8 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
     private GenericCache genericCache;
     private Drawable deleteDrawable;
 
+    // TODO -- put timestamp for each notification
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -163,7 +165,7 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
         this.menu = menu;
 
         menu.findItem(R.id.action_account).setVisible(false);
-        menu.findItem(R.id.action_home).setVisible(true);
+        menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(true);
         menu.findItem(R.id.action_add_phone).setVisible(false);
@@ -172,16 +174,7 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
         menu.findItem(R.id.action_notifications).setVisible(false);
         menu.findItem(R.id.action_status).setVisible(false);
 
-        menu.findItem(R.id.action_home).setIcon(homeDrawable);
         menu.findItem(R.id.action_delete_event).setIcon(deleteDrawable);
-
-        menu.findItem(R.id.action_home).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                FragmentUtils.changeFragment(getActivity().getFragmentManager(), new HomeFragment());
-                return true;
-            }
-        });
 
         menu.findItem(R.id.action_delete_event).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override

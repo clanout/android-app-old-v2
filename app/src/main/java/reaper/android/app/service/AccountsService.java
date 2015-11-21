@@ -71,7 +71,7 @@ public class AccountsService
         generateDrawables();
         List<AccountsListItem> menuList = new ArrayList<>();
         Drawable[] drawables = {friendsDrawable, phoneDrawable, inviteWhatsappDrawable, shareFeedbackDrawable, faqDrawable};
-        String[] titles = {"Block People", "Update Phone Number", "Invite People Through Whatsapp", "Share Feedback", "FAQs"};
+        String[] titles = {"Block a Friend", "Update Phone Number", "Whatsapp Invite", "Help Us Improve", "Help/FAQ"};
 
         for (int i = 0; i < drawables.length && i < titles.length; i++)
         {

@@ -74,6 +74,8 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
 
     private AccountsAdapter accountsAdapter;
 
+    // TODO -- X invited you to join ---- event details screen -- onClick invite icon
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -134,7 +136,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.ACCOUNTS_FRAGMENT);
-        ((MainActivity) getActivity()).getSupportActionBar().setTitle("Accounts");
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle("Account");
 
         bus.register(this);
 
@@ -180,7 +182,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         inflater.inflate(R.menu.action_button, menu);
 
         menu.findItem(R.id.action_account).setVisible(false);
-        menu.findItem(R.id.action_home).setVisible(true);
+        menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
@@ -188,16 +190,6 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         menu.findItem(R.id.action_refresh).setVisible(false);
         menu.findItem(R.id.action_notifications).setVisible(false);
         menu.findItem(R.id.action_status).setVisible(false);
-
-        menu.findItem(R.id.action_home).setIcon(homeDrawable);
-
-        menu.findItem(R.id.action_home).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
-                return true;
-            }
-        });
     }
 
     @Override
@@ -240,6 +232,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setCancelable(true);
+            builder.setTitle("Feedback");
 
             LayoutInflater inflater = getActivity().getLayoutInflater();
             View dialogView = inflater.inflate(R.layout.alert_dialog_share_feedback, null);

@@ -73,6 +73,10 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     private static final String ARG_START_DAY = "arg_start_day";
     private static final String ARG_START_TIME = "arg_start_time";
 
+    // TODO -- put check icon on action bar
+    // TODO -- action bar title -- "Details"
+    // TODO -- change "title" to "plan" in create screen
+
     public static CreateEventDetailsFragment newInstance(String title, EventCategory category,
                                                          Event.Type type, LocalDate startDay, LocalTime startTime) {
         Bundle args = new Bundle();
@@ -221,7 +225,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
             progressDialog.dismiss();
         }
 
-        Snackbar.make(getView(), "Unable to create clan", Snackbar.LENGTH_LONG)
+        Snackbar.make(getView(), "Unable to make your plan", Snackbar.LENGTH_LONG)
                 .show();
     }
 

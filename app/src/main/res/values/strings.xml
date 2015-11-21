@@ -9,7 +9,7 @@
     <string name="location_denied"> Cautious? Once inside, make a secret clan with your friends. Later!</string>
 
 
-    <string name="fetch_pending_invites_title">Invites</string>
+    <string name="fetch_pending_invites_title">Pending Invites</string>
     <string name="fetch_pending_invites_message">To see pending invites, enter your mobile number</string>
     <string name="fetch_pending_invites_positive_button">ENTER</string>
     <string name="fetch_pending_invites_negative_button">CANCEL</string>
@@ -17,17 +17,17 @@
     <!-- Dialog messages -->
     <string name="event_delete_heading">Dismiss Clan</string>
 
-    <string name="event_delete_message">Friends will no longer be able to see it in the feed</string>
-    <string name="even_delete_positive_button">REMOVE</string>
+    <string name="event_delete_message">This will delete all information related to this clan. And it will be removed from everyone's feed.</string>
+    <string name="even_delete_positive_button">DISMISS</string>
     <string name="even_delete_negative_button">CANCEL</string>
 
     <string name="event_lock_heading">Finalize details?</string>
-    <string name="event_lock_message">Once confirmed, friends can\'t edit details</string>
+    <string name="event_lock_message">Your friends can no longer edit details</string>
     <string name="event_lock_negative_button">NOT YET</string>
     <string name="event_lock_positive_button">FINALIZE</string>
 
-    <string name="event_unlock_heading">Allow modifications?</string>
-    <string name="event_unlock_message">Let your friends edit the details</string>
+    <string name="event_unlock_heading">Allow changes?</string>
+    <string name="event_unlock_message">Your friends will be able to edit details now.</string>
     <string name="event_unlock_positive_button">ALLOW</string>
     <string name="event_unlock_negative_button">CANCEL</string>
 
@@ -46,9 +46,9 @@
     <string name="action_home">Home</string>
     <string name="action_edit_event">Edit</string>
     <string name="action_finalize_event">Finalize Details</string>
-    <string name="action_delete_event">Dismiss Clan</string>
+    <string name="action_delete_event">Dismiss Clan?</string>
 
-    <string name="home_no_events"> No active clans at the moment. Start your own </string>
+    <string name="home_no_events"> No active clans at the moment. Make your own.</string>
     <string name="home_events_fetch_error"> Unable to show clans. Swipe to refresh </string>
 
     <!-- Event Details Fragment -->
@@ -69,7 +69,7 @@
     <string name="location_not_found"> Unable to find the desired location. Try a location nearby </string>
     <string name="location_not_available_on_map"> Unable to detect the location on map. Try again </string>
 
-    <string name="no_facebook_friends"> Clanout is exciting with your friends around. Invite them by Whatsapp  </string>
+    <string name="no_facebook_friends"> Nothing to show here :)  </string>
     <string name="no_local_facebook_friends"> Clanout is exciting with your friends around. Invite them by Whatsapp </string>
     <string name="facebook_friends_not_fetched"> Unable to show your facebook friends. Refresh </string>
 
@@ -82,7 +82,7 @@
     <string name="whatsapp_not_installed"> Whatsapp is not installed on this device </string>
 
     <string name="empty_rating"> Show some love </string>
-    <string name="feedback_submitted"> Cheers </string>
+    <string name="feedback_submitted"> Thanks </string>
 
     <string name="chat_messages_not_fetched"> Unable to load conversations. Refresh </string>
     <string name="chat_message_not_sent"> Unable to send message. Resend </string>
@@ -97,7 +97,7 @@
     <string name="event_finalisation_failed"> Currently unable to finalize details. Try again</string>
     <string name="event_unfinalisation_failed"> Currently unable to allow modifications. Try again</string>
 
-    <string name="no_notifications">No notifications</string>
+    <string name="no_notifications">Nothing to show here.</string>
     <string name="notifications_fetch_failure">Unable to load notifications</string>
 
     <string name="event_not_found">Unable to locate this clan</string>

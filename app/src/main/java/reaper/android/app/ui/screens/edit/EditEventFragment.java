@@ -73,6 +73,9 @@ import timber.log.Timber;
 public class EditEventFragment extends BaseFragment implements EditEventView,
         LocationSuggestionAdapter.SuggestionClickListener, TimePickerDialog.OnTimeSetListener
 {
+
+    // TODO -- check icon for "Save"
+
     private static final String ARG_EVENT = "arg_event";
     private static final String ARG_EVENT_DETAILS = "arg_event_details";
 
@@ -600,7 +603,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
     @Override
     public void showLoading()
     {
-        progressDialog = ProgressDialog.show(getActivity(), "Updating Clan", "Please Wait..");
+        progressDialog = ProgressDialog.show(getActivity(), "Updating Details", "Please Wait..");
     }
 
     @Override
