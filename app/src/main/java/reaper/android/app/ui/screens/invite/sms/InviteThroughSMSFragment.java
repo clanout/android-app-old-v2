@@ -68,8 +68,6 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     private EditText search;
     private LinearLayout searchContainer;
 
-    private boolean isPhoneAdded;
-
     private Bus bus;
     private UserService userService;
     private GenericCache genericCache;
@@ -112,7 +110,6 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
-        isPhoneAdded = false;
         inviteWhatsapp.setOnClickListener(this);
         addPhone.setOnClickListener(this);
         genericCache = CacheManager.getGenericCache();
@@ -120,16 +117,6 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         generateDrawables();
         inviteWhatsapp.setImageDrawable(whatsappDrawable);
         addPhone.setImageDrawable(phoneDrawable);
-
-        if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null) {
-            isPhoneAdded = false;
-            displayInvitesLockedView();
-            return;
-        } else {
-            isPhoneAdded = true;
-            displayLoadingView();
-            progressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(getActivity(), R.color.accent), PorterDuff.Mode.SRC_IN);
-        }
 
         phoneContactList = new ArrayList<>();
 
@@ -189,9 +176,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
         bus.register(this);
 
-        if (isPhoneAdded) {
-            userService.fetchAllPhoneContacts(getActivity().getContentResolver());
-        }
+        userService.fetchAllPhoneContacts(getActivity().getContentResolver());
 
         search.addTextChangedListener(searchWatcher);
     }
@@ -384,21 +369,6 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
             } else {
                 Snackbar.make(getView(), R.string.whatsapp_not_installed, Snackbar.LENGTH_LONG).show();
             }
-        }
-    }
-
-    @Subscribe
-    public void onPhoneAdded(PhoneAddedTrigger trigger) {
-        isPhoneAdded = true;
-        displayLoadingView();
-        userService.fetchAllPhoneContacts(getActivity().getContentResolver());
-    }
-
-    @Subscribe
-    public void onPhoneNotAdded(GenericErrorTrigger trigger) {
-        if (trigger.getErrorCode() == ErrorCode.PHONE_ADD_FAILURE) {
-            isPhoneAdded = false;
-            displayInvitesLockedView();
         }
     }
 

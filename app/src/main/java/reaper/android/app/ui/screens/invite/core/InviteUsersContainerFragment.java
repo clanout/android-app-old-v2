@@ -150,24 +150,6 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
                         SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
 
                         viewPager.setCurrentItem(tab.getPosition());
-
-                        switch (tab.getPosition()) {
-                            case 0:
-                                if (genericCache.get(CacheKeys.HAS_SEEN_FACEBOOK_TAB_POP_UP) == null) {
-                                    displayFacebookPopup();
-                                }
-                                break;
-                            case 1:
-                                if (genericCache.get(CacheKeys.HAS_SEEN_ON_APP_TAB_POP_UP) == null) {
-                                    displayOnAppPopup();
-                                }
-                                break;
-                            case 2:
-                                if (genericCache.get(CacheKeys.HAS_SEEN_PHONEBOOK_TAB_POP_UP) == null) {
-                                    displayPhonebookPopup();
-                                }
-                                break;
-                        }
                     }
                 });
             }
@@ -206,59 +188,6 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
         bus.unregister(this);
     }
 
-    private void displayFacebookPopup() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setCancelable(false);
-        builder.setMessage("Find your facebook friends in " + locationService.getUserLocation().getZone() + " present on clanOut");
-
-        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                genericCache.put(CacheKeys.HAS_SEEN_FACEBOOK_TAB_POP_UP, true);
-                dialog.dismiss();
-            }
-        });
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
-
-    private void displayOnAppPopup() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setCancelable(false);
-        builder.setMessage("Your phonebook contacts present on clanOut");
-
-        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                genericCache.put(CacheKeys.HAS_SEEN_ON_APP_TAB_POP_UP, true);
-                dialog.dismiss();
-            }
-        });
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
-
-    private void displayPhonebookPopup() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setCancelable(false);
-        builder.setMessage("All contacts from your phonebook. Send a free SMS to invite them to your clan");
-
-        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                genericCache.put(CacheKeys.HAS_SEEN_PHONEBOOK_TAB_POP_UP, true);
-                dialog.dismiss();
-            }
-        });
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
 
     @Subscribe
     public void onManageFacebookFriendsTriggerReceived(ManageAppFriendsTrigger trigger) {
