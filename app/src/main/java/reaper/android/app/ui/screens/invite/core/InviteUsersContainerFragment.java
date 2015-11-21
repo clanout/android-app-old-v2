@@ -1,21 +1,18 @@
 package reaper.android.app.ui.screens.invite.core;
 
 import android.app.FragmentManager;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.squareup.otto.Bus;
@@ -42,7 +39,6 @@ import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.user.ManageAppFriendsTrigger;
-import reaper.android.app.trigger.user.ManagePhoneContactsTrigger;
 import reaper.android.app.trigger.user.ManageSMSInviteeTrigger;
 import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.core.BaseFragment;
@@ -51,11 +47,10 @@ import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
-import timber.log.Timber;
 
 public class InviteUsersContainerFragment extends BaseFragment implements View.OnClickListener {
     private ViewPager viewPager;
-    private ImageButton done;
+    private Button done;
     private TabLayout tabLayout;
     private Drawable checkDrawable;
     private Toolbar toolbar;
@@ -73,9 +68,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
     private Event event;
     private Boolean fromCreateFragment;
 
-    private List<String> invitedFacebookFriends;
-    private List<String> invitedPhoneContacts;
-    private List<String> invitedUsers;
+    private List<String> invitedAppFriends;
     private List<String> smsInviteePhoneList;
 
     @Override
@@ -89,7 +82,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
         View view = inflater.inflate(R.layout.fragment_invite_friends_container, container, false);
 
         viewPager = (ViewPager) view.findViewById(R.id.vp_invite_friends_container);
-        done = (ImageButton) view.findViewById(R.id.ib_invite_friends_container_done);
+        done = (Button) view.findViewById(R.id.ib_invite_friends_container_done);
         tabLayout = (TabLayout) view.findViewById(R.id.tl_invite_friends_container);
         toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_invite_container);
 
@@ -117,9 +110,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
 
         ((MainActivity) getActivity()).setSupportActionBar(toolbar);
 
-        invitedFacebookFriends = new ArrayList<>();
-        invitedPhoneContacts = new ArrayList<>();
-        invitedUsers = new ArrayList<>();
+        invitedAppFriends = new ArrayList<>();
         smsInviteePhoneList = new ArrayList<>();
 
         generateDrawables();
@@ -134,7 +125,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
 
         InviteUsersPagerAdapter inviteUsersPagerAdapter = new InviteUsersPagerAdapter(getChildFragmentManager(), new ArrayList<EventDetails.Invitee>(), new ArrayList<EventDetails.Attendee>(), event);
         viewPager.setAdapter(inviteUsersPagerAdapter);
-        viewPager.setOffscreenPageLimit(2);
+        viewPager.setOffscreenPageLimit(1);
 
         tabLayout.post(new Runnable() {
             @Override
@@ -156,7 +147,6 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
         });
 
         done.setOnClickListener(this);
-        done.setImageDrawable(checkDrawable);
     }
 
     private void generateDrawables() {
@@ -194,56 +184,41 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
 
         if (trigger.isSelected()) {
 
-            if (!(invitedFacebookFriends.contains(trigger.getId()))) {
+            EventDetails.Invitee invitee = new EventDetails.Invitee();
+            invitee.setId(trigger.getId());
 
-                invitedFacebookFriends.add(trigger.getId());
+            if (!inviteeList.contains(invitee)) {
+
+                if (!(invitedAppFriends.contains(trigger.getId()))) {
+
+                    invitedAppFriends.add(trigger.getId());
+                }
             }
         } else {
 
-            if (invitedFacebookFriends.contains(trigger.getId())) {
+            if (invitedAppFriends.contains(trigger.getId())) {
 
-                invitedFacebookFriends.remove(trigger.getId());
+                invitedAppFriends.remove(trigger.getId());
             }
         }
 
-        tabLayout.getTabAt(0).setText("FACEBOOK \n" + invitedFacebookFriends.size());
-    }
-
-    @Subscribe
-    public void onManagePhoneContactsTriggerReceived(ManagePhoneContactsTrigger trigger) {
-
-        if (trigger.isSelected()) {
-
-            if (!(invitedPhoneContacts.contains(trigger.getId()))) {
-
-                invitedPhoneContacts.add(trigger.getId());
-            }
+        if (invitedAppFriends.size() == 0) {
+            tabLayout.getTabAt(0).setText("ON APP");
         } else {
-
-            if (invitedPhoneContacts.contains(trigger.getId())) {
-
-                invitedPhoneContacts.remove(trigger.getId());
-            }
+            tabLayout.getTabAt(0).setText("ON APP \n" + invitedAppFriends.size());
         }
-
-        tabLayout.getTabAt(1).setText("ON APP \n" + invitedPhoneContacts.size());
     }
 
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.ib_invite_friends_container_done) {
 
-            SoftKeyboardHandler.hideKeyboard(getActivity(),getView());
+            SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
 
-            invitedUsers = new ArrayList<>();
-            invitedUsers.addAll(invitedFacebookFriends);
-            invitedUsers.addAll(invitedPhoneContacts);
+            if (invitedAppFriends.size() != 0) {
+                eventService.inviteUsers(event.getId(), invitedAppFriends);
 
-            if (invitedUsers.size() != 0) {
-                eventService.inviteUsers(event.getId(), invitedUsers);
-
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.FACEBOOK_FRIENDS_INVITED, "user - " + userService.getActiveUserId() + " event - " + event.getId() + " invitee count - " + invitedFacebookFriends.size());
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.PHONE_CONTACTS_INVITED, "user - " + userService.getActiveUserId() + " event - " + event.getId() + " invitee count - " + invitedPhoneContacts.size());
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.FACEBOOK_FRIENDS_INVITED, "user - " + userService.getActiveUserId() + " event - " + event.getId() + " invitee count - " + invitedAppFriends.size());
             }
 
             if (smsInviteePhoneList.size() != 0) {
@@ -305,6 +280,10 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
             }
         }
 
-        tabLayout.getTabAt(2).setText("PHONEBOOK \n" + smsInviteePhoneList.size());
+        if (smsInviteePhoneList.size() == 0) {
+            tabLayout.getTabAt(1).setText("PHONEBOOK");
+        } else {
+            tabLayout.getTabAt(1).setText("PHONEBOOK \n" + smsInviteePhoneList.size());
+        }
     }
 }

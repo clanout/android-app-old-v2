@@ -339,6 +339,9 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                     AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.PHONE_NUMBER_UPDATED, userService.getActiveUserId());
 
                     userService.updatePhoneNumber(parsedPhone);
+
+
+
                     InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     inputManager.hideSoftInputFromWindow(dialogView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 

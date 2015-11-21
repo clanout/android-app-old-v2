@@ -15,7 +15,7 @@ public class GoogleAnalyticsConstants {
     public static final String CHAT_FRAGMENT = "ChatFragment";
     public static final String MANAGE_FRIENDS_FRAGMENT = "ManageFriendsFragment";
     public static final String INVITE_USERS_CONTAINER_FRAGMENT = "InviteUsersContainerFragment";
-    public static final String INVITE_FACEBOOK_FRIENDS_FRAGMENT = "InviteFacebookFriendsFragment";
+    public static final String INVITE_FACEBOOK_FRIENDS_FRAGMENT = "InviteAppFriendsFragment";
     public static final String INVITE_PHONEBOOK_CONTACTS_FRAGMENT = "InvitePhonebookContactsFragment";
     public static final String EDIT_EVENT_FRAGMENT = "EDIT_EVENT_FRAGMENT";
     public static final String NOTIFICATION_FRAGMENT = "notification_fragment";

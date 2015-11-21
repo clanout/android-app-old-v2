@@ -2,26 +2,15 @@ package reaper.android.app.ui.screens.invite.core;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
-import android.support.v4.content.ContextCompat;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ImageSpan;
-import android.util.Log;
-
-import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import java.util.ArrayList;
 
-import reaper.android.R;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
-import reaper.android.app.root.Reaper;
-import reaper.android.app.ui.screens.invite.facebook.InviteFacebookFriendsFragment;
-import reaper.android.app.ui.screens.invite.phone.InvitePhoneContactsFragment;
+import reaper.android.app.ui.screens.invite.app_friends.InviteAppFriendsFragment;
 import reaper.android.app.ui.screens.invite.sms.InviteThroughSMSFragment;
 
 public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
@@ -54,14 +43,10 @@ public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
         switch (position)
         {
             case 0:
-                InviteFacebookFriendsFragment fragment = new InviteFacebookFriendsFragment();
+                InviteAppFriendsFragment fragment = new InviteAppFriendsFragment();
                 fragment.setArguments(bundle);
                 return fragment;
             case 1:
-                InvitePhoneContactsFragment contactsFragment = new InvitePhoneContactsFragment();
-                contactsFragment.setArguments(bundle);
-                return contactsFragment;
-            case 2:
                 InviteThroughSMSFragment inviteThroughSMSFragment = new InviteThroughSMSFragment();
                 return inviteThroughSMSFragment;
         }
@@ -71,7 +56,7 @@ public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
     @Override
     public int getCount()
     {
-        return 3;
+        return 2;
     }
 
     @Override
@@ -80,10 +65,8 @@ public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
         switch (position)
         {
             case 0:
-                return "Facebook";
+                return "App Friends";
             case 1:
-                return "On App";
-            case 2:
                 return "Phonebook";
         }
         return null;

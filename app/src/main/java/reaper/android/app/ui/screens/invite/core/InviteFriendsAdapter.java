@@ -40,18 +40,16 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
     private Context context;
     private List<EventDetails.Invitee> invitees;
     private List<Friend> friends;
-    private boolean isFacebookAdapter;
     private Bus bus;
     private Event event;
-    private Drawable personDrawable;
+    private Drawable personDrawable, goingDrawable, blockedDrawable;
     private ArrayList<EventDetails.Attendee> attendeeList;
 
-    public InviteFriendsAdapter(Context context, List<EventDetails.Invitee> invitees, List<Friend> friends, boolean isFacebookAdapter, Bus bus, Event event, ArrayList<EventDetails.Attendee> attendeeList) {
+    public InviteFriendsAdapter(Context context, List<EventDetails.Invitee> invitees, List<Friend> friends, Bus bus, Event event, ArrayList<EventDetails.Attendee> attendeeList) {
         inflater = LayoutInflater.from(context);
         this.invitees = invitees;
         this.friends = friends;
         this.context = context;
-        this.isFacebookAdapter = isFacebookAdapter;
         this.bus = bus;
         this.event = event;
         this.attendeeList = attendeeList;
@@ -63,6 +61,18 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
         personDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
                 .setColor(ContextCompat.getColor(context, R.color.light_grey))
+                .setSizeDp(24)
+                .build();
+
+        goingDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.CHECKBOX_MARKED_CIRCLE_OUTLINE)
+                .setColor(ContextCompat.getColor(context, R.color.green))
+                .setSizeDp(24)
+                .build();
+
+        blockedDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.BLOCK_HELPER)
+                .setColor(Color.RED)
                 .setSizeDp(24)
                 .build();
     }
@@ -78,19 +88,15 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
     public void onBindViewHolder(InviteFriendsViewHolder holder, final int position) {
         final Friend current = friends.get(position);
 
-        if (isFacebookAdapter) {
-            holder.userPic.setVisibility(View.VISIBLE);
 
-            Picasso.with(context)
-                    .load(AppConstants.FACEBOOK_END_POINT + current.getId() + "/picture?width=500")
-                    .placeholder(personDrawable)
-                    .transform(new CircleTransform())
-                    .into(holder.userPic);
+        holder.userPic.setVisibility(View.VISIBLE);
 
+        Picasso.with(context)
+                .load(AppConstants.FACEBOOK_END_POINT + current.getId() + "/picture?width=500")
+                .placeholder(personDrawable)
+                .transform(new CircleTransform())
+                .into(holder.userPic);
 
-        } else {
-            holder.userPic.setVisibility(View.GONE);
-        }
 
         holder.username.setText(current.getName());
 
@@ -100,13 +106,13 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
         if (event.getOrganizerId().equals(current.getId())) {
 
             holder.checkBox.setVisibility(View.GONE);
-            holder.alreadyInvited.setText("Going");
+            holder.alreadyInvited.setImageDrawable(goingDrawable);
             holder.alreadyInvited.setVisibility(View.VISIBLE);
         } else {
 
             if (current.isBlocked()) {
                 holder.checkBox.setVisibility(View.GONE);
-                holder.alreadyInvited.setText("Blocked");
+                holder.alreadyInvited.setImageDrawable(blockedDrawable);
                 holder.alreadyInvited.setVisibility(View.VISIBLE);
             } else {
                 EventDetails.Attendee attendee = new EventDetails.Attendee();
@@ -114,14 +120,17 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
 
                 if (attendeeList.contains(attendee)) {
                     holder.checkBox.setVisibility(View.GONE);
-                    holder.alreadyInvited.setText("Going");
+                    holder.alreadyInvited.setImageDrawable(goingDrawable);
                     holder.alreadyInvited.setVisibility(View.VISIBLE);
                 } else {
 
                     if (invitees.contains(invitee)) {
-                        holder.checkBox.setVisibility(View.GONE);
-                        holder.alreadyInvited.setText("Invited");
-                        holder.alreadyInvited.setVisibility(View.VISIBLE);
+                        holder.checkBox.setVisibility(View.VISIBLE);
+                        holder.checkBox.setChecked(true);
+                        holder.checkBox.setEnabled(false);
+                        holder.checkBox.setClickable(false);
+                        //holder.alreadyInvited.setText("Invited");
+                        holder.alreadyInvited.setVisibility(View.GONE);
                     } else {
                         holder.alreadyInvited.setVisibility(View.GONE);
                         holder.checkBox.setVisibility(View.VISIBLE);
@@ -140,8 +149,8 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
 
     class InviteFriendsViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView userPic;
-        TextView username, alreadyInvited;
+        ImageView userPic, alreadyInvited;
+        TextView username;
         CheckBox checkBox;
 
         public InviteFriendsViewHolder(View itemView) {
@@ -149,7 +158,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
 
             username = (TextView) itemView.findViewById(R.id.tv_list_item_invite_friends_user_name);
             userPic = (ImageView) itemView.findViewById(R.id.iv_list_item_invite_friends_user_pic);
-            alreadyInvited = (TextView) itemView.findViewById(R.id.tv_list_item_invite_friends_already_invited);
+            alreadyInvited = (ImageView) itemView.findViewById(R.id.iv_list_item_invite_friends_already_invited);
             checkBox = (CheckBox) itemView.findViewById(R.id.cb_list_item_invite_friends);
 
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -158,11 +167,8 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
 
                     friends.get(getAdapterPosition()).setIsChecked(isChecked);
 
-                    if (isFacebookAdapter) {
-                        bus.post(new ManageAppFriendsTrigger(friends.get(getAdapterPosition()).getId(), isChecked));
-                    } else {
-                        bus.post(new ManagePhoneContactsTrigger(friends.get(getAdapterPosition()).getId(), isChecked));
-                    }
+                    bus.post(new ManageAppFriendsTrigger(friends.get(getAdapterPosition()).getId(), isChecked));
+
                 }
             });
         }

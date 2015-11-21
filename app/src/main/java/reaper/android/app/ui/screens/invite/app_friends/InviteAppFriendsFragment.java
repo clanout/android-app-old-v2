@@ -1,6 +1,7 @@
-package reaper.android.app.ui.screens.invite.facebook;
+package reaper.android.app.ui.screens.invite.app_friends;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -9,11 +10,11 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +37,7 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import reaper.android.R;
@@ -43,6 +45,7 @@ import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BundleKeys;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
@@ -59,14 +62,15 @@ import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.user.AppFriendsFetchedFromNetworkTrigger;
 import reaper.android.app.trigger.user.AppFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
+import reaper.android.app.trigger.user.PhoneContactsFetchedTrigger;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.invite.core.InviteFriendsAdapter;
+import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
-import timber.log.Timber;
 
-public class InviteFacebookFriendsFragment extends BaseFragment implements View.OnClickListener {
+public class InviteAppFriendsFragment extends BaseFragment implements View.OnClickListener {
     private RecyclerView recyclerView;
     private TextView noFriendsMessage;
     private FloatingActionButton inviteWhatsapp;
@@ -94,6 +98,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     private Drawable whatsappDrawable;
 
     private TextWatcher searchWatcher;
+    private Drawable addPhoneDrawable;
 
 
     @Override
@@ -104,7 +109,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_invite_facebook_friends, container, false);
+        View view = inflater.inflate(R.layout.fragment_invite_app_friends, container, false);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_invite_facebook_friends);
         noFriendsMessage = (TextView) view.findViewById(R.id.tv_invite_facebook_friends_no_users);
@@ -145,6 +150,7 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
 
         friendList = new ArrayList<>();
         visibleFriendList = new ArrayList<>();
+
 
         searchWatcher = new TextWatcher() {
 
@@ -211,6 +217,13 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
                 .setColor(ContextCompat.getColor(getActivity(), R.color.white))
                 .setSizeDp(36)
                 .build();
+
+        addPhoneDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE)
+                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
+                .setSizeDp(36)
+                .build();
+
 
         whatsappDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.WHATSAPP)
@@ -314,7 +327,6 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
         menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
-        menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(true);
         menu.findItem(R.id.action_notifications).setVisible(false);
@@ -322,11 +334,19 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
 
         menu.findItem(R.id.action_refresh).setIcon(refreshDrawable);
 
+        if(genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null)
+        {
+            menu.findItem(R.id.action_add_phone).setVisible(true);
+            menu.findItem(R.id.action_add_phone).setIcon(addPhoneDrawable);
+        }else{
+            menu.findItem(R.id.action_add_phone).setVisible(false);
+        }
+
         menu.findItem(R.id.action_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
 
-                SoftKeyboardHandler.hideKeyboard(getActivity(),getView());
+                SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
 
                 AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.INVITE_FACEBOOK_FRIENDS_REFRESH_CLIKCED, userService.getActiveUserId());
 
@@ -335,10 +355,20 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
                 return true;
             }
         });
+
+        menu.findItem(R.id.action_add_phone).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                displayUpdatePhoneDialog();
+
+                return true;
+            }
+        });
     }
 
     private void initRecyclerView() {
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, visibleFriendList, true, bus, event, attendeeList);
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, visibleFriendList, bus, event, attendeeList);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -346,7 +376,17 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
 
     private void refreshRecyclerView() {
 
-        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, visibleFriendList, true, bus, event, attendeeList);
+        visibleFriendList = new ArrayList<Friend>(new LinkedHashSet<Friend>(visibleFriendList));
+
+        Friend friend = new Friend();
+        friend.setId(userService.getActiveUserId());
+
+        if(visibleFriendList.contains(friend))
+        {
+            visibleFriendList.remove(friend);
+        }
+
+        inviteFriendsAdapter = new InviteFriendsAdapter(getActivity(), inviteeList, visibleFriendList, bus, event, attendeeList);
 
         recyclerView.setAdapter(inviteFriendsAdapter);
 
@@ -406,8 +446,15 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
             visibleFriendList.add(friend);
         }
 
-        Collections.sort(visibleFriendList, new FriendsComparator());
-        refreshRecyclerView();
+        if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) != null) {
+
+            userService.getPhoneContacts();
+
+        } else {
+
+            Collections.sort(visibleFriendList, new FriendsComparator());
+            refreshRecyclerView();
+        }
     }
 
     @Subscribe
@@ -420,9 +467,6 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
     @Subscribe
     public void onZonalFriendsFetchedFromNetwork(AppFriendsFetchedFromNetworkTrigger trigger) {
 
-        if (menu != null) {
-            menu.findItem(R.id.action_refresh).setActionView(null);
-        }
         friendList = trigger.getFriends();
 
         visibleFriendList = new ArrayList<>();
@@ -431,8 +475,20 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
             visibleFriendList.add(friend);
         }
 
-        Collections.sort(visibleFriendList, new FriendsComparator());
-        refreshRecyclerView();
+        if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) != null) {
+
+
+            userService.refreshPhoneContacts(getActivity().getContentResolver(), locationService.getUserLocation().getZone());
+        } else {
+
+
+            if (menu != null) {
+                menu.findItem(R.id.action_refresh).setActionView(null);
+            }
+
+            Collections.sort(visibleFriendList, new FriendsComparator());
+            refreshRecyclerView();
+        }
     }
 
     @Subscribe
@@ -445,6 +501,42 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
             displayErrorView();
         }
     }
+
+    @Subscribe
+    public void onPhoneContactsFetched(PhoneContactsFetchedTrigger trigger)
+    {
+        friendList.addAll(trigger.getPhoneContacts());
+
+        visibleFriendList = new ArrayList<>();
+
+        for(Friend friend : friendList)
+        {
+            visibleFriendList.add(friend);
+        }
+
+        Collections.sort(visibleFriendList, new FriendsComparator());
+        refreshRecyclerView();
+
+        if (menu != null)
+        {
+            menu.findItem(R.id.action_refresh).setActionView(null);
+        }
+    }
+
+    @Subscribe
+    public void onPhoneContactsNotFetched(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.PHONE_CONTACTS_FETCH_FAILURE)
+        {
+            displayErrorView();
+
+            if (menu != null)
+            {
+                menu.findItem(R.id.action_refresh).setActionView(null);
+            }
+        }
+    }
+
 
     @Override
     public void onClick(View view) {
@@ -462,5 +554,57 @@ public class InviteFacebookFriendsFragment extends BaseFragment implements View.
                 Snackbar.make(getView(), R.string.whatsapp_not_installed, Snackbar.LENGTH_LONG).show();
             }
         }
+    }
+
+    private void displayUpdatePhoneDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(true);
+
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.alert_dialog_add_phone, null);
+        builder.setView(dialogView);
+
+        final EditText phoneNumber = (EditText) dialogView.findViewById(R.id.et_alert_dialog_add_phone);
+
+        builder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Boolean wantToCloseDialog = false;
+                String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
+                if (parsedPhone == null) {
+                    Toast.makeText(getActivity(), R.string.phone_invalid, Toast.LENGTH_LONG).show();
+                    wantToCloseDialog = false;
+                } else {
+
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.PHONE_NUMBER_UPDATED, userService.getActiveUserId());
+
+                    userService.updatePhoneNumber(parsedPhone);
+
+                    menu.findItem(R.id.action_add_phone).setVisible(false);
+                    displayLoadingView();
+                    facebookService.getFacebookFriends(false);
+
+                    InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputManager.hideSoftInputFromWindow(dialogView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
+                    wantToCloseDialog = true;
+                }
+
+                if (wantToCloseDialog) {
+                    alertDialog.dismiss();
+                }
+            }
+        });
+
     }
 }
