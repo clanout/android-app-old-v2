@@ -25,6 +25,7 @@ import com.squareup.otto.Subscribe;
 import com.squareup.otto.ThreadEnforcer;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -37,6 +38,7 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
@@ -48,6 +50,7 @@ import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshRequestTrigger;
 import reaper.android.common.alarm.AlarmReceiver;
 import reaper.android.common.alarm.DeviceBootReceiver;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 import reaper.android.common.gcm.RegistrationIntentService;
 import timber.log.Timber;
@@ -128,6 +131,8 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         timesApplicationOpened++;
 
         genericCache.put(CacheKeys.TIMES_APPLICATION_OPENED, timesApplicationOpened);
+
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.APP_LAUNCHED, "user - " + userService.getActiveUserId() + " time - " + DateTime.now(DateTimeZone.UTC).toString());
     }
 
     @Subscribe
@@ -174,12 +179,14 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     @Override
     public void onConnectionSuspended(int i)
     {
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.GOOGLE_API_CLIENT_CONNECTION_SUSPENDED, userService.getActiveUserId());
         Log.d("reap3r", "Google API client suspended");
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult)
     {
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.GOOGLE_API_CLIENT_CONNECTION_FAILED, userService.getActiveUserId());
         Timber.v("Has resolution : " + connectionResult.hasResolution());
     }
 
@@ -194,7 +201,6 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         {
             tracker = GoogleAnalytics.getInstance(instance).newTracker(AppConstants.GOOGLE_ANALYTICS_TRACKING_KEY);
             tracker.enableExceptionReporting(true);
-
 
         }
         return tracker;

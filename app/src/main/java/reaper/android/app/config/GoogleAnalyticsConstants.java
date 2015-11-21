@@ -96,4 +96,18 @@ public class GoogleAnalyticsConstants {
     public static final String STATUS_UPDATED = "status_updated";
     public static final String INVITAION_RESPONSE_TEMPLATE_CHOSEN = "invitation_response_template_chosen";
     public static final String INVITATION_RESPONSE_SENT = "invitation_response_sent";
+    public static final String APP_LAUNCHED = "app_launched";
+    public static final String APP_CLOSED = "app_closed";
+    public static final String CHAT_MESSAGE_SENDING_ATTEMPT = "chat_message_sending_attempt";
+    public static final String GOOGLE_API_CLIENT_CONNECTION_FAILED = "google_api_client_connection_failed";
+    public static final String GOOGLE_API_CLIENT_CONNECTION_SUSPENDED = "google_api_client_connection_suspended";
+    public static final String USER_LOCATION_NULL = "user_location_null";
+    public static final String UNABLE_TO_REFRESH_USER_LOCATION = "unable_to_refresh_user_location";
+    public static final String GCM_TOKEN_SENT_TO_SERVER = "gcm_token_sent_to_server";
+    public static final String GCM_TOKEN_REFRESH = "gcm_token_refresh";
+    public static final String FACEBOOK_ACCESS_TOKEN_NULL_LOGIN_RESULT = "facebook_access_token_null_login_result";
+    public static final String ON_ERROR_FACEBOOK_CALLBACK = "on_error_facebook_callback";
+    public static final String ON_CANCEL_FACEBOOK_CALLBACK = "on_cancel_facebook_callback";
+    public static final String FACEBOOK_FRIENDS_NOT_FETCHED = "facebook_friends_not_fetched";
+    public static final String FACEBOOK_PROFILE_NOT_FETCHED = "facebook_profile_not_fetched";
 }

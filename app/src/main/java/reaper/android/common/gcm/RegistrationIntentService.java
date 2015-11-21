@@ -15,8 +15,10 @@ import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.gcm.GcmRegistrationCompleteTrigger;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 import retrofit.client.Response;
 import rx.Subscriber;
@@ -87,6 +89,7 @@ public class RegistrationIntentService extends IntentService
                     {
                         if (response.getStatus() == 200)
                         {
+                            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.GCM_TOKEN_SENT_TO_SERVER, "");
                             genericCache.put(CacheKeys.GCM_TOKEN, token);
                             genericCache.put(CacheKeys.GCM_TOKEN_SENT_TO_SERVER, true);
                         }

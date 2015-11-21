@@ -19,6 +19,7 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ import reaper.android.app.service.EventService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.GCMService;
 import reaper.android.app.service.LocationService;
+import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchForActivityTrigger;
@@ -58,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private Bus bus;
     private GCMService gcmService;
     private EventService eventService;
+    private UserService userService;
     private LocationService locationService;
     private FacebookService facebookService;
 
@@ -91,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
         gcmService = new GCMService(bus);
         eventService = new EventService(bus);
+        userService = new UserService(bus);
         locationService = new LocationService(bus);
         facebookService = new FacebookService(bus);
         fragmentManager = getFragmentManager();
@@ -190,6 +194,8 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
 
         genericCache.put(CacheKeys.IS_APP_IN_FOREGROUND, false);
+
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.APP_CLOSED, "user - " + userService.getActiveUserId() + " time - " + DateTime.now(DateTimeZone.UTC).toString());
     }
 
     @Override
@@ -244,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
                 GooglePlayServicesUtil.getErrorDialog(resultCode, this,
                         PLAY_SERVICES_RESOLUTION_REQUEST).show();
             } else {
+
                 Toast.makeText(this, "This device does not support Google Play Services.", Toast.LENGTH_LONG)
                         .show();
                 finish();

@@ -21,9 +21,11 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Location;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshTrigger;
+import reaper.android.common.analytics.AnalyticsHelper;
 import retrofit.client.Response;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -37,12 +39,14 @@ public class LocationService
     private Bus bus;
     private GenericCache cache;
     private MeApi meApi;
+    private UserService userService;
 
     public LocationService(Bus bus)
     {
         this.bus = bus;
         cache = CacheManager.getGenericCache();
         meApi = ApiManager.getInstance().getApi(MeApi.class);
+        userService = new UserService(bus);
     }
 
     public Location getUserLocation()
@@ -50,6 +54,7 @@ public class LocationService
         Location location = cache.get(CacheKeys.USER_LOCATION, Location.class);
         if (location == null)
         {
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.USER_LOCATION_NULL, userService.getActiveUserId());
             throw new IllegalStateException("User location cannot be null");
         }
         return location;
@@ -80,6 +85,7 @@ public class LocationService
             catch (Exception e)
             {
                 e.printStackTrace();
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.UNABLE_TO_REFRESH_USER_LOCATION, userService.getActiveUserId());
                 Log.d("APP", "Unable to refresh user location (" + e.getMessage() + ")");
                 bus.post(new GenericErrorTrigger(ErrorCode.GOOGLE_API_LOCATION_FETCH_FAILURE, null));
                 return;

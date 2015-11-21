@@ -31,6 +31,7 @@ import reaper.android.app.root.Reaper;
 import reaper.android.app.service.AuthService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.LocationService;
+import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.facebook.FacebookProfileFetchedTrigger;
@@ -53,6 +54,7 @@ public class LauncherActivity extends AppCompatActivity
     private AuthService authService;
     private LocationService locationService;
     private FacebookService facebookService;
+    private UserService userService;
 
     // UI Elements
     private ProgressDialog progressDialog;
@@ -74,6 +76,7 @@ public class LauncherActivity extends AppCompatActivity
         authService = new AuthService(bus);
         locationService = new LocationService(bus);
         facebookService = new FacebookService(bus);
+        userService = new UserService(bus);
 
         cache = CacheManager.getGenericCache();
 
@@ -194,6 +197,7 @@ public class LauncherActivity extends AppCompatActivity
     {
         if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE)
         {
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FACEBOOK_FRIENDS_NOT_FETCHED, userService.getActiveUserId());
             Toast.makeText(this, R.string.problem_contacting_facebook, Toast.LENGTH_LONG).show();
             LoginManager.getInstance().logOut();
             finish();
@@ -205,6 +209,7 @@ public class LauncherActivity extends AppCompatActivity
     {
         if (trigger.getErrorCode() == ErrorCode.FACEBOOK_PROFILE_FETCH_FAILURE)
         {
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FACEBOOK_PROFILE_NOT_FETCHED, userService.getActiveUserId());
             Toast.makeText(this, R.string.problem_contacting_facebook, Toast.LENGTH_LONG).show();
             LoginManager.getInstance().logOut();
             finish();

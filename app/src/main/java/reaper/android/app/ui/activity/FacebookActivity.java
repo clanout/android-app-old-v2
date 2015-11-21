@@ -18,6 +18,7 @@ import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.squareup.otto.Bus;
 
 import java.util.Arrays;
 
@@ -28,7 +29,9 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
+import reaper.android.app.service.UserService;
 import reaper.android.common.analytics.AnalyticsHelper;
+import reaper.android.common.communicator.Communicator;
 
 /**
  * Created by Aditya on 23-08-2015.
@@ -43,6 +46,8 @@ public class FacebookActivity extends AppCompatActivity
     private GenericCache genericCache;
     private EventCache eventCache;
     private UserCache userCache;
+    private UserService userService;
+    private Bus bus;
 
     private static final String PERMISSION_REQUIRED = "Allow access to your basic profile information, email and friend list. This is required to connect you with your facebook friends on clanOut";
     private static final String PERMISSION_REQUIRED_TITLE = "Request for permission";
@@ -60,9 +65,11 @@ public class FacebookActivity extends AppCompatActivity
         facebookLoginButton = (LoginButton) findViewById(R.id.flb_activity_facebook);
         facebookCallbackManager = CallbackManager.Factory.create();
         setUpFacebookCallback();
+        bus = Communicator.getInstance().getBus();
         genericCache = CacheManager.getGenericCache();
         eventCache = CacheManager.getEventCache();
         userCache = CacheManager.getUserCache();
+        userService = new UserService(bus);
 
         facebookLoginButton.setVisibility(View.GONE);
 
@@ -148,6 +155,7 @@ public class FacebookActivity extends AppCompatActivity
                     }
                 } else
                 {
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FACEBOOK_ACCESS_TOKEN_NULL_LOGIN_RESULT, userService.getActiveUserId());
                     Toast.makeText(FacebookActivity.this, R.string.messed_up, Toast.LENGTH_LONG).show();
                     FacebookActivity.this.finish();
                 }
@@ -156,11 +164,13 @@ public class FacebookActivity extends AppCompatActivity
             @Override
             public void onCancel()
             {
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.ON_CANCEL_FACEBOOK_CALLBACK, userService.getActiveUserId());
             }
 
             @Override
             public void onError(FacebookException e)
             {
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.ON_ERROR_FACEBOOK_CALLBACK, userService.getActiveUserId() + " message - " + e.getMessage());
             }
         };
 

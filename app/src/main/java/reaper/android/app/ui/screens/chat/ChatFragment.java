@@ -332,6 +332,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
             }
 
             try {
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.CHAT_MESSAGE_SENDING_ATTEMPT, userService.getActiveUserId());
                 chatService.postMessage(multiUserChat, message, userService.getActiveUserName() + "_" + userService.getActiveUserId(), connection.getPacketReplyTimeout());
             } catch (Exception e) {
 
