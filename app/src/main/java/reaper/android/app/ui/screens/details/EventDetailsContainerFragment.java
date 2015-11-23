@@ -1,5 +1,6 @@
 package reaper.android.app.ui.screens.details;
 
+import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,9 +16,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -26,6 +32,9 @@ import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import angtrim.com.fivestarslibrary.FiveStarsDialog;
+import angtrim.com.fivestarslibrary.NegativeReviewListener;
+import angtrim.com.fivestarslibrary.ReviewListener;
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
@@ -197,6 +206,8 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EVENT_DETAILS_CONTAINER);
 
         bus.register(this);
+
+        handleInAppRating();
     }
 
     @Override
@@ -374,5 +385,108 @@ public class EventDetailsContainerFragment extends BaseFragment implements View.
 
             FragmentUtils.changeFragment(getFragmentManager(), homeFragment);
         }
+    }
+
+    private void handleInAppRating() {
+
+      if(genericCache.get(CacheKeys.HAS_GIVEN_FEEDBACK) == null)
+      {
+          int timesAppOpened;
+
+          try{
+              timesAppOpened = Integer.parseInt(genericCache.get(CacheKeys.TIMES_APPLICATION_OPENED));
+          }catch (Exception e)
+          {
+              timesAppOpened = 0;
+          }
+
+          if(timesAppOpened > 10)
+          {
+
+              double random = Math.random();
+
+              if(random < 0.1) {
+                  displayShareFeedbackDialog();
+              }
+          }
+      }
+    }
+
+    private void displayShareFeedbackDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(true);
+        builder.setTitle("Feedback");
+
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.alert_dialog_share_feedback, null);
+        builder.setView(dialogView);
+
+        final EditText commentMessage = (EditText) dialogView.findViewById(R.id.et_alert_dialog_share_feedback_comment);
+        RadioButton bug = (RadioButton) dialogView.findViewById(R.id.rb_share_feedback_bug);
+        RadioButton newFeature = (RadioButton) dialogView.findViewById(R.id.rb_share_feedback_new_feature);
+        RadioButton suggestion = (RadioButton) dialogView.findViewById(R.id.rb_share_feedback_other);
+        final RadioGroup radioGroup = (RadioGroup) dialogView.findViewById(R.id.rg_share_feedback);
+
+        builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        builder.setNegativeButton("REMIND LATER", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+            }
+        });
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                int type = 0;
+
+                switch (radioGroup.getCheckedRadioButtonId())
+                {
+                    case R.id.rb_share_feedback_bug:
+                        type = 0;
+                        break;
+                    case R.id.rb_share_feedback_new_feature:
+                        type = 1;
+                        break;
+                    case R.id.rb_share_feedback_other:
+                        type = 2;
+                        break;
+                }
+
+                String comment = commentMessage.getText().toString();
+                Boolean wantToCloseDialog = false;
+
+                if (comment == null || comment.isEmpty()) {
+                    Toast.makeText(getActivity(), R.string.empty_rating, Toast.LENGTH_LONG).show();
+                    wantToCloseDialog = false;
+                } else {
+
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.FEEDBACK_SHARED, userService.getActiveUserId());
+
+                    userService.shareFeedback(type, comment);
+
+                    genericCache.put(CacheKeys.HAS_GIVEN_FEEDBACK, true);
+
+                    Toast.makeText(getActivity(), R.string.feedback_submitted, Toast.LENGTH_LONG).show();
+                    wantToCloseDialog = true;
+                }
+
+                if (wantToCloseDialog) {
+                    alertDialog.dismiss();
+                }
+            }
+        });
     }
 }

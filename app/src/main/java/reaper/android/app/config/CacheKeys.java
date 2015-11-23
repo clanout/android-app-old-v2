@@ -32,4 +32,6 @@ public class CacheKeys
     public static final String HAS_SEEN_PHONEBOOK_TAB_POP_UP = "has_seen_phonebook_tab_pop_up";
     public static final String TIMES_APPLICATION_OPENED = "times_application_opened";
     public static final java.lang.String EVENT_SUGGESTIONS = "event_suggestions";
+    public static final java.lang.String HAS_GIVEN_FEEDBACK = "has_given_Feedback";
+    public static final java.lang.String HAS_SEEN_INVITE_POPUP = "has_seen_invite_popup";
 }

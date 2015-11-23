@@ -1,12 +1,14 @@
 package reaper.android.app.ui.screens.invite.core;
 
 import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -205,9 +207,9 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
         }
 
         if (invitedAppFriends.size() == 0) {
-            tabLayout.getTabAt(0).setText("ON APP");
+            tabLayout.getTabAt(0).setText("FRIENDS");
         } else {
-            tabLayout.getTabAt(0).setText("ON APP \n" + invitedAppFriends.size());
+            tabLayout.getTabAt(0).setText("FRIENDS - " + invitedAppFriends.size());
         }
     }
 
@@ -229,8 +231,47 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
                 AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.PHONE_CONTACTS_INVITED_THROUGH_SMS, "user - " + userService.getActiveUserId() + " event - " + event.getId() + " invitee count - " + smsInviteePhoneList.size());
             }
 
-            eventService.fetchEvents(locationService.getUserLocation().getZone());
+
+            if(genericCache.get(CacheKeys.HAS_SEEN_INVITE_POPUP) == null)
+            {
+                if(smsInviteePhoneList.size() == 0)
+                {
+                    eventService.fetchEvents(locationService.getUserLocation().getZone());
+
+                }else{
+
+                    displayInvitePopUp(smsInviteePhoneList.size());
+                }
+            }else{
+
+                eventService.fetchEvents(locationService.getUserLocation().getZone());
+            }
+
         }
+    }
+
+    private void displayInvitePopUp(int smsInviteesSize) {
+
+        AlertDialog.Builder builder =  new AlertDialog.Builder(getActivity());
+
+        if(smsInviteesSize == 1) {
+            builder.setMessage("You have invited " + smsInviteesSize + " friend who is not using clanOut currently. We have sent them a free SMS.");
+        }else{
+            builder.setMessage("You have invited " + smsInviteesSize + " friends who are not using clanOut currently. We have sent them a free SMS.");
+        }
+        builder.setCancelable(false);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                genericCache.put(CacheKeys.HAS_SEEN_INVITE_POPUP, true);
+
+                eventService.fetchEvents(locationService.getUserLocation().getZone());
+            }
+        });
+
+        builder.create().show();
     }
 
     @Subscribe
@@ -285,7 +326,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
         if (smsInviteePhoneList.size() == 0) {
             tabLayout.getTabAt(1).setText("PHONEBOOK");
         } else {
-            tabLayout.getTabAt(1).setText("PHONEBOOK \n" + smsInviteePhoneList.size());
+            tabLayout.getTabAt(1).setText("PHONEBOOK - " + smsInviteePhoneList.size());
         }
     }
 }

@@ -39,6 +39,7 @@ android {
             url 'https://oss.sonatype.org/content/repositories/snapshots'
         }
         mavenCentral()
+        maven { url "https://jitpack.io" }
     }
 }
 
@@ -111,4 +112,8 @@ dependencies {
 
     // Material Date-Time picker
     compile 'com.wdullaer:materialdatetimepicker:1.5.3'
+
+    // in app rating
+    compile 'com.github.Angtrim:Android-Five-Stars-Library:v3.1'
+
 }

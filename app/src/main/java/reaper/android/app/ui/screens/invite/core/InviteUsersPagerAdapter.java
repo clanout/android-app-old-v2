@@ -65,7 +65,7 @@ public class InviteUsersPagerAdapter extends FragmentStatePagerAdapter
         switch (position)
         {
             case 0:
-                return "App Friends";
+                return "Friends";
             case 1:
                 return "Phonebook";
         }

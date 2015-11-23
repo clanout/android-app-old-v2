@@ -17,7 +17,7 @@
     <!-- Dialog messages -->
     <string name="event_delete_heading">Dismiss Clan</string>
 
-    <string name="event_delete_message">This will delete all information related to this clan. And it will be removed from everyone's feed.</string>
+    <string name="event_delete_message">This will delete all information related to this clan. And it will be removed from everyone\'s feed.</string>
     <string name="even_delete_positive_button">DISMISS</string>
     <string name="even_delete_negative_button">CANCEL</string>
 
