@@ -75,6 +75,7 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
 
     // TODO -- Analytics events -- fetch pending invtes + status
     // TODO -- test fetch pending invites
+    // TODO -- invite analytics events
 
     private int timesApplicationOpened;
 
