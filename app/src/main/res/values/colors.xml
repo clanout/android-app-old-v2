@@ -13,7 +13,7 @@
 
     <!-- Miscellaneous -->
     <color name="whity">#FFFFFF</color>
-    <color name="divider">#EEEEEE</color>
+    <color name="divider">#DDEEEEEE</color>
     <color name="divider_light">#FAFAFA</color>
     <color name="cyan">#0097A7</color>
     <color name="green">#4CAF50</color>
@@ -43,8 +43,23 @@
     <color name="eight">#D4E157</color>
     <color name="nine">#42A5F5</color>
 
+    <!-- Category Icons -->
+    <color name="category_icon_one">#3b94d9</color>
+    <color name="category_icon_two">#4a913c</color>
+    <color name="category_icon_three">#e95f28</color>
+    <color name="category_icon_four">#afe356</color>
+    <color name="category_icon_five">#744eaa</color>
+    <color name="category_icon_six">#346a85</color>
+    <color name="category_icon_seven">#be1931</color>
+    <color name="category_icon_eight">#ffac33</color>
+    <color name="category_icon_nine">#8899a6</color>
+
     <!-- RSVP colors -->
     <color name="going">#4CAF50</color>
     <color name="may_be">#FFD54F</color>
+
+    <!-- Text Colors -->
+    <color name="_text_title">#AA000000</color>
+    <color name="_text_subtitle">#AA777777</color>
 
 </resources>

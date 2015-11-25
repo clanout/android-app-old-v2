@@ -1,203 +1,129 @@
-<android.support.v4.view.ViewPager
-    android:id="@+id/vp_list_item_event"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    android:id="@+id/cv_list_item_event"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:cardView="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
-    android:layout_marginLeft="6dp"
-    android:layout_marginRight="6dp"
-    android:layout_marginTop="6dp"
-    android:overScrollMode="never">
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="2dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    cardView:cardElevation="1.5dp"
+    cardView:cardPreventCornerOverlap="true"
+    cardView:cardUseCompatPadding="true">
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/cv_list_item_event"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp">
-
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:background="@color/white">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent">
-
-                <LinearLayout
-                    android:id="@+id/ll_list_item_event_icon_container"
-                    android:layout_width="52dp"
-                    android:layout_height="52dp"
-                    android:layout_gravity="center"
-                    android:layout_margin="16dp">
-
-                    <ImageView
-                        android:id="@+id/iv_list_item_event_icon"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="8dp"
-                         />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginRight="8dp"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/tv_list_item_event_title"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="4dp"
-                        android:layout_weight="1"
-                        android:maxLength="22"
-                        android:maxLines="1"
-                        android:textColor="@color/text_title"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/tv_list_item_event_time_location"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:maxLines="1"
-                    android:textSize="12sp"
-                    android:textColor="@color/text_subtitle"/>
-
-                <TextView
-                    android:id="@+id/tv_list_item_event_attendees"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:textSize="12sp"
-                    android:textStyle="italic"
-                    android:textColor="@color/text_subtitle"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="60dp"
-                android:layout_height="52dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:orientation="vertical"
-                android:layout_gravity="center_vertical"
-                android:gravity="left"
-                >
-
-                <TextView
-                    android:id="@+id/tv_list_item_event_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:textSize="12sp"
-                    android:layout_marginBottom="4dp"
-                    android:textColor="@color/text_subtitle"/>
-
-                <TextView
-                    android:id="@+id/tv_list_item_event_rsvp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:textSize="12sp"
-                    />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </android.support.v7.widget.CardView>
-
-
-    <LinearLayout
-        android:id="@+id/secondaryContentFrameLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:layout_height="80dp"
+        android:background="@color/white"
+        android:padding="16dp">
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center_horizontal|center_vertical">
+            android:id="@+id/llCategoryIconContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:background="@color/category_icon_five"
+            android:gravity="center_vertical|center_horizontal"
+            android:padding="8dp">
 
-            <ImageButton
-                android:id="@+id/btn_list_item_event_going"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:src="@drawable/ic_btn_rsvp_going"
-                android:layout_marginBottom="4dp"/>
+            <ImageView
+                android:id="@+id/ivCategoryIcon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/rsvp_yes"
-                android:textSize="14sp"
-                android:textColor="@color/primary"/>
+            <!--<net.steamcrafted.materialiconlib.MaterialIconView-->
+            <!--android:id="@+id/mivCategory"-->
+            <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:scaleType="center"-->
+            <!--app:materialIcon="martini"-->
+            <!--app:materialIconColor="@color/whity"-->
+            <!--app:materialIconSize="24dp"/>-->
+
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center_horizontal|center_vertical"
-            android:orientation="vertical"
-            >
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="16dp"
+            android:layout_toRightOf="@id/llCategoryIconContainer"
+            android:text="Sex on the Beach"
+            android:textColor="@color/_text_title"
+            android:textSize="18dp"/>
 
-            <ImageButton
-                android:id="@+id/btn_list_item_event_maybe"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:src="@drawable/ic_btn_rsvp_maybe"
-                android:layout_marginBottom="4dp"/>
+        <TextView
+            android:id="@+id/tvFriendsGoing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="16dp"
+            android:layout_toRightOf="@+id/llCategoryIconContainer"
+            android:text="Harsh, Aditya &amp; 4 friends joined"
+            android:textColor="@color/_text_subtitle"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/rsvp_maybe"
-                android:textSize="14sp"
-                android:textColor="@color/primary"/>
-        </LinearLayout>
+        <!--<net.steamcrafted.materialiconlib.MaterialIconView-->
+        <!--android:id="@+id/mivFriends"-->
+        <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_marginLeft="16dp"-->
+        <!--android:layout_toRightOf="@id/llCategoryIconContainer"-->
+        <!--android:scaleType="center"-->
+        <!--app:materialIcon="account_star_variant"-->
+        <!--app:materialIconColor="@color/accent"-->
+        <!--app:materialIconSize="18dp"/>-->
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center_horizontal|center_vertical"
-            android:orientation="vertical">
+        <!--<TextView-->
+        <!--android:id="@+id/tvFriends"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_marginLeft="4dp"-->
+        <!--android:layout_toRightOf="@id/mivFriends"-->
+        <!--android:text="5"-->
+        <!--android:textColor="@color/_text_subtitle"/>-->
 
-            <ImageButton
-                android:id="@+id/btn_list_item_event_not_going"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:src="@drawable/ic_btn_rsvp_no"
-                android:layout_marginBottom="4dp"/>
+        <!--<net.steamcrafted.materialiconlib.MaterialIconView-->
+        <!--android:id="@+id/mivAttendees"-->
+        <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_marginLeft="32dp"-->
+        <!--android:layout_toRightOf="@id/tvFriends"-->
+        <!--android:scaleType="center"-->
+        <!--app:materialIcon="account_multiple"-->
+        <!--app:materialIconColor="@color/accent"-->
+        <!--app:materialIconSize="18dp"/>-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/rsvp_no"
-                android:textSize="14sp"
-                android:textColor="@color/primary"/>
-        </LinearLayout>
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_marginLeft="4dp"-->
+        <!--android:layout_toRightOf="@id/mivAttendees"-->
+        <!--android:text="10"-->
+        <!--android:textColor="@color/_text_subtitle"/>-->
 
-    </LinearLayout>
-</android.support.v4.view.ViewPager>
+        <net.steamcrafted.materialiconlib.MaterialIconView
+            android:id="@+id/mivRsvp"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:scaleType="center"
+            app:materialIcon="checkbox_marked_circle_outline"
+            app:materialIconColor="@color/green"
+            app:materialIconSize="18dp"/>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

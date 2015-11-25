@@ -62,11 +62,11 @@ import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
-import timber.log.Timber;
 
 public class CreateEventDetailsFragment extends BaseFragment implements CreateEventView,
         LocationSuggestionAdapter.SuggestionClickListener,
-        TimePickerDialog.OnTimeSetListener {
+        TimePickerDialog.OnTimeSetListener
+{
     private static final String ARG_TITLE = "arg_title";
     private static final String ARG_CATEGORY = "arg_category";
     private static final String ARG_TYPE = "arg_type";
@@ -78,7 +78,8 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     // TODO -- change "title" to "plan" in create screen
 
     public static CreateEventDetailsFragment newInstance(String title, EventCategory category,
-                                                         Event.Type type, LocalDate startDay, LocalTime startTime) {
+                                                         Event.Type type, LocalDate startDay, LocalTime startTime)
+    {
         Bundle args = new Bundle();
         args.putString(ARG_TITLE, title);
         args.putSerializable(ARG_CATEGORY, category);
@@ -148,18 +149,23 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
 
     /* View Methods */
     @Override
-    public void displaySuggestions(List<Suggestion> suggestions) {
+    public void displaySuggestions(List<Suggestion> suggestions)
+    {
         suggestionList.setAdapter(new LocationSuggestionAdapter(suggestions, this));
 
-        if (suggestions.isEmpty()) {
+        if (suggestions.isEmpty())
+        {
             suggestionContainer.setVisibility(View.GONE);
-        } else {
+        }
+        else
+        {
             suggestionContainer.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
-    public void setLocation(String loc) {
+    public void setLocation(String loc)
+    {
         isLocationUpdating = true;
         location.setText(loc);
         location.setSelection(location.length());
@@ -173,21 +179,27 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     }
 
     @Override
-    public void onSuggestionClicked(Suggestion suggestion) {
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.SUGGESTION_CLICKED_CREATE_DETAILS, userService.getActiveUserId());
+    public void onSuggestionClicked(Suggestion suggestion)
+    {
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.SUGGESTION_CLICKED_CREATE_DETAILS, userService
+                        .getActiveUserId());
 
         presenter.selectSuggestion(suggestion);
     }
 
     @Override
-    public void showLoading() {
+    public void showLoading()
+    {
         progressDialog = ProgressDialog
                 .show(getActivity(), "Creating your clan", "Please wait ...");
     }
 
     @Override
-    public void displayEmptyTitleError() {
-        if (progressDialog != null) {
+    public void displayEmptyTitleError()
+    {
+        if (progressDialog != null)
+        {
             progressDialog.dismiss();
         }
 
@@ -196,8 +208,10 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     }
 
     @Override
-    public void displayInvalidTimeError() {
-        if (progressDialog != null) {
+    public void displayInvalidTimeError()
+    {
+        if (progressDialog != null)
+        {
             progressDialog.dismiss();
         }
 
@@ -206,8 +220,10 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     }
 
     @Override
-    public void navigateToInviteScreen(Event event) {
-        if (progressDialog != null) {
+    public void navigateToInviteScreen(Event event)
+    {
+        if (progressDialog != null)
+        {
             progressDialog.dismiss();
         }
 
@@ -220,8 +236,10 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     }
 
     @Override
-    public void displayError() {
-        if (progressDialog != null) {
+    public void displayError()
+    {
+        if (progressDialog != null)
+        {
             progressDialog.dismiss();
         }
 
@@ -230,21 +248,24 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     }
 
     @Override
-    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
+    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute)
+    {
         startTime = new LocalTime(hourOfDay, minute);
         time.setText(dateTimeUtils.formatTime(startTime));
     }
 
     /* Lifecycle Methods */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         dateTimeUtils = new DateTimeUtils();
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
         View view = inflater.inflate(R.layout.fragment_create_details, container, false);
 
         parent = (ScrollView) view.findViewById(R.id.sv_createEvent);
@@ -281,49 +302,55 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
         super.onActivityCreated(savedInstanceState);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         setHasOptionsMenu(true);
 
-        ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         String inputTitle = getArguments().getString(ARG_TITLE);
-        if (inputTitle != null && !inputTitle.isEmpty()) {
+        if (inputTitle != null && !inputTitle.isEmpty())
+        {
             title.setText(inputTitle);
             title.setSelection(title.getText().length());
         }
 
         type = (Event.Type) getArguments().getSerializable(ARG_TYPE);
-        if (type == null) {
+        if (type == null)
+        {
             type = Event.Type.INVITE_ONLY;
         }
         typeSelector.addTab(typeSelector.newTab().setText(R.string.event_details_type_invite_only));
         typeSelector.addTab(typeSelector.newTab().setText(R.string.event_details_type_public));
 
-        if (type == Event.Type.PUBLIC) {
+        if (type == Event.Type.PUBLIC)
+        {
             typeSelector.getTabAt(0).select();
-        } else {
+        }
+        else
+        {
             typeSelector.getTabAt(1).select();
         }
 
         dayIcon.setImageDrawable(MaterialDrawableBuilder.with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.CALENDAR)
-                .setColor(ContextCompat
-                        .getColor(getActivity(), R.color.primary))
-                .setSizeDp(24).build());
+                                                        .setIcon(MaterialDrawableBuilder.IconValue.CALENDAR)
+                                                        .setColor(ContextCompat
+                                                                .getColor(getActivity(), R.color.primary))
+                                                        .setSizeDp(24).build());
 
         timeIcon.setImageDrawable(MaterialDrawableBuilder.with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.CLOCK)
-                .setColor(ContextCompat
-                        .getColor(getActivity(), R.color.primary))
-                .setSizeDp(24).build());
+                                                         .setIcon(MaterialDrawableBuilder.IconValue.CLOCK)
+                                                         .setColor(ContextCompat
+                                                                 .getColor(getActivity(), R.color.primary))
+                                                         .setSizeDp(24).build());
 
         locationIcon.setImageDrawable(MaterialDrawableBuilder.with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.MAP_MARKER)
-                .setColor(ContextCompat
-                        .getColor(getActivity(), R.color.primary))
-                .setSizeDp(24).build());
+                                                             .setIcon(MaterialDrawableBuilder.IconValue.MAP_MARKER)
+                                                             .setColor(ContextCompat
+                                                                     .getColor(getActivity(), R.color.primary))
+                                                             .setSizeDp(24).build());
 
         clickListener = new ClickListener();
         dayContainer.setOnClickListener(clickListener);
@@ -338,34 +365,43 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
         initRecyclerView();
 
         category = (EventCategory) getArguments().getSerializable(ARG_CATEGORY);
-        if (category == null) {
+        if (category == null)
+        {
             category = EventCategory.GENERAL;
         }
         presenter = new CreateEventPresenterImpl(Communicator.getInstance().getBus(), category);
 
         icon.setImageDrawable(DrawableFactory
-                .get(category, Dimensions.CREATE_EVENT_ICON_SIZE));
-        iconContainer.setBackground(DrawableFactory.randomIconBackground());
+                .get(category, Dimensions.EVENT_ICON_SIZE));
+        iconContainer.setBackground(DrawableFactory.getIconBackground(category));
 
-        locationListener = new TextWatcher() {
+        locationListener = new TextWatcher()
+        {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
 
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
 
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
+            public void afterTextChanged(Editable s)
+            {
                 parent.scrollTo(0, suggestionContainer.getBottom());
 
-                if (!isLocationUpdating) {
-                    if (s.length() == 0) {
+                if (!isLocationUpdating)
+                {
+                    if (s.length() == 0)
+                    {
                         presenter.changeCategory(category);
-                    } else if (s.length() >= 3) {
+                    }
+                    else if (s.length() >= 3)
+                    {
                         presenter.autocomplete(s.toString());
                     }
 
@@ -376,7 +412,8 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     }
 
     @Override
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
 
         title.requestFocus();
@@ -391,10 +428,13 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
         presenter.attachView(this);
         initDayTime();
 
-        location.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        location.setOnFocusChangeListener(new View.OnFocusChangeListener()
+        {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
+            public void onFocusChange(View v, boolean hasFocus)
+            {
+                if (hasFocus)
+                {
                     parent.scrollTo(0, suggestionContainer.getBottom());
                 }
             }
@@ -402,31 +442,39 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
 
         location.addTextChangedListener(locationListener);
 
-        typeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        typeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
+        {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
+            public void onTabSelected(TabLayout.Tab tab)
+            {
                 String selected = tab.getText().toString();
                 if (selected.equalsIgnoreCase(getResources()
-                        .getString(R.string.event_details_type_public))) {
+                        .getString(R.string.event_details_type_public)))
+                {
                     type = Event.Type.PUBLIC;
-                } else {
+                }
+                else
+                {
                     type = Event.Type.INVITE_ONLY;
                 }
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
+            public void onTabUnselected(TabLayout.Tab tab)
+            {
 
             }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
+            public void onTabReselected(TabLayout.Tab tab)
+            {
             }
         });
     }
 
     @Override
-    public void onPause() {
+    public void onPause()
+    {
         super.onPause();
         location.setOnFocusChangeListener(null);
         typeSelector.setOnTabSelectedListener(null);
@@ -435,45 +483,53 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.action_create, menu);
 
         menu.findItem(R.id.action_create)
-                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
+            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+            {
+                @Override
+                public boolean onMenuItemClick(MenuItem item)
+                {
 
-                        SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+                    SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
 
-                        String eventTitle = title.getText().toString();
-                        String eventDescription = description.getText().toString();
-                        DateTime start = DateTimeUtils.getDateTime(startDate, startTime);
-                        DateTime end = DateTimeUtils.getEndTime(start);
+                    String eventTitle = title.getText().toString();
+                    String eventDescription = description.getText().toString();
+                    DateTime start = DateTimeUtils.getDateTime(startDate, startTime);
+                    DateTime end = DateTimeUtils.getEndTime(start);
 
-                        presenter
-                                .create(eventTitle, type, eventDescription, start, end);
+                    presenter
+                            .create(eventTitle, type, eventDescription, start, end);
 
-                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.CREATE_EVENT_CLICKED_FROM_DETAILS, userService.getActiveUserId());
+                    AnalyticsHelper
+                            .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.CREATE_EVENT_CLICKED_FROM_DETAILS, userService
+                                    .getActiveUserId());
 
-                        return true;
-                    }
-                });
+                    return true;
+                }
+            });
     }
 
-    private void initRecyclerView() {
+    private void initRecyclerView()
+    {
         suggestionList.setLayoutManager(new LinearLayoutManager(getActivity()));
         suggestionList.setAdapter(new LocationSuggestionAdapter(new ArrayList<Suggestion>(), this));
 
         suggestionContainer.setVisibility(View.GONE);
     }
 
-    private void initDayTime() {
+    private void initDayTime()
+    {
         day.setText(dateTimeUtils.formatDate(startDate));
         time.setText(dateTimeUtils.formatTime(startTime));
     }
 
-    private void initDaySelector() {
+    private void initDaySelector()
+    {
         daySelectorContainer.setVisibility(View.GONE);
 
         daySelector.setOnTabSelectedListener(null);
@@ -486,17 +542,21 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
         List<String> days = dateTimeUtils.getDayList();
 
         startDate = (LocalDate) getArguments().getSerializable(ARG_START_DAY);
-        if (startDate == null) {
+        if (startDate == null)
+        {
             startDate = dateTimeUtils.getDate(days.get(0));
         }
 
-        for (String day : days) {
+        for (String day : days)
+        {
             daySelector.addTab(daySelector.newTab().setText(day));
         }
 
-        daySelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        daySelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
+        {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
+            public void onTabSelected(TabLayout.Tab tab)
+            {
                 String key = tab.getText().toString();
                 day.setText(key);
                 startDate = dateTimeUtils.getDate(key);
@@ -504,12 +564,14 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
+            public void onTabUnselected(TabLayout.Tab tab)
+            {
 
             }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
+            public void onTabReselected(TabLayout.Tab tab)
+            {
                 String key = tab.getText().toString();
                 day.setText(key);
                 startDate = dateTimeUtils.getDate(key);
@@ -518,7 +580,8 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
         });
     }
 
-    private void initTimeSelector() {
+    private void initTimeSelector()
+    {
         timeSelectorContainer.setVisibility(View.GONE);
 
         timeSelector.setOnTabSelectedListener(null);
@@ -529,21 +592,26 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
         timeSelector.removeAllTabs();
 
         startTime = (LocalTime) getArguments().getSerializable(ARG_START_TIME);
-        if (startTime == null) {
+        if (startTime == null)
+        {
             LocalTime now = LocalTime.now();
             startTime = now.plusHours(1).withField(DateTimeFieldType.minuteOfHour(), 0);
         }
 
         List<String> times = dateTimeUtils.getTimeList();
-        for (String time : times) {
+        for (String time : times)
+        {
             timeSelector.addTab(timeSelector.newTab().setText(time));
         }
 
-        timeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        timeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
+        {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
+            public void onTabSelected(TabLayout.Tab tab)
+            {
                 String key = tab.getText().toString();
-                if (key.equalsIgnoreCase(DateTimeUtils.PICK_YOUR_OWN)) {
+                if (key.equalsIgnoreCase(DateTimeUtils.PICK_YOUR_OWN))
+                {
                     TimePickerDialog dialog = TimePickerDialog
                             .newInstance(CreateEventDetailsFragment.this, startTime
                                     .getHourOfDay(), startTime
@@ -551,7 +619,9 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                     dialog.dismissOnPause(true);
                     dialog.vibrate(false);
                     dialog.show(getFragmentManager(), "TimePicker");
-                } else {
+                }
+                else
+                {
                     startTime = dateTimeUtils.getTime(key);
                     time.setText(dateTimeUtils.formatTime(startTime));
                 }
@@ -560,14 +630,17 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
+            public void onTabUnselected(TabLayout.Tab tab)
+            {
 
             }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
+            public void onTabReselected(TabLayout.Tab tab)
+            {
                 String key = tab.getText().toString();
-                if (key.equalsIgnoreCase(DateTimeUtils.PICK_YOUR_OWN)) {
+                if (key.equalsIgnoreCase(DateTimeUtils.PICK_YOUR_OWN))
+                {
                     TimePickerDialog dialog = TimePickerDialog
                             .newInstance(CreateEventDetailsFragment.this, startTime
                                     .getHourOfDay(), startTime
@@ -575,7 +648,9 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                     dialog.dismissOnPause(true);
                     dialog.vibrate(false);
                     dialog.show(getFragmentManager(), "TimePicker");
-                } else {
+                }
+                else
+                {
                     startTime = dateTimeUtils.getTime(key);
                     time.setText(dateTimeUtils.formatTime(startTime));
                 }
@@ -585,28 +660,35 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
         });
     }
 
-    private void showDaySelector() {
+    private void showDaySelector()
+    {
         VisibilityAnimationUtil.expand(daySelectorContainer, 200);
         isDaySelectorVisible = true;
     }
 
-    private void hideDaySelector() {
+    private void hideDaySelector()
+    {
         VisibilityAnimationUtil.collapse(daySelectorContainer, 200);
         isDaySelectorVisible = false;
     }
 
-    private void showTimeSelector() {
+    private void showTimeSelector()
+    {
         VisibilityAnimationUtil.expand(timeSelectorContainer, 200);
         isTimeSelectorVisible = true;
     }
 
-    private void hideTimeSelector() {
+    private void hideTimeSelector()
+    {
         VisibilityAnimationUtil.collapse(timeSelectorContainer, 200);
         isTimeSelectorVisible = false;
     }
 
-    private void displayCategoryChangeDialog() {
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_CATEGORY_CHANGE_DIALOG_CLICKED_FROM_DETAILS, userService.getActiveUserId());
+    private void displayCategoryChangeDialog()
+    {
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_CATEGORY_CHANGE_DIALOG_CLICKED_FROM_DETAILS, userService
+                        .getActiveUserId());
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
@@ -648,107 +730,125 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
                 .getIconBackground(getActivity(), R.color.primary, 4));
         general.setBackground(DrawableFactory.getIconBackground(getActivity(), R.color.primary, 4));
 
-        cafe.setOnClickListener(new View.OnClickListener() {
+        cafe.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 changeCategory(EventCategory.CAFE);
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.CAFE, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.CAFE, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
         });
 
-        movies.setOnClickListener(new View.OnClickListener() {
+        movies.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 changeCategory(EventCategory.MOVIES);
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.MOVIES, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.MOVIES, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
         });
 
 
-        eatOut.setOnClickListener(new View.OnClickListener() {
+        eatOut.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 changeCategory(EventCategory.EAT_OUT);
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.EAT_OUT, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.EAT_OUT, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
         });
 
 
-        sports.setOnClickListener(new View.OnClickListener() {
+        sports.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 changeCategory(EventCategory.SPORTS);
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.SPORTS, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.SPORTS, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
         });
 
 
-        outdoors.setOnClickListener(new View.OnClickListener() {
+        outdoors.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 changeCategory(EventCategory.OUTDOORS);
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.OUTDOORS, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.OUTDOORS, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
         });
 
 
-        indoors.setOnClickListener(new View.OnClickListener() {
+        indoors.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 changeCategory(EventCategory.INDOORS);
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.INDOORS, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.INDOORS, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
         });
 
 
-        drinks.setOnClickListener(new View.OnClickListener() {
+        drinks.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 changeCategory(EventCategory.DRINKS);
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.DRINKS, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.DRINKS, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
         });
 
 
-        shopping.setOnClickListener(new View.OnClickListener() {
+        shopping.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 changeCategory(EventCategory.SHOPPING);
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.SHOPPING, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.SHOPPING, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
         });
 
 
-        general.setOnClickListener(new View.OnClickListener() {
+        general.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 changeCategory(EventCategory.GENERAL);
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.GENERAL, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.GENERAL, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
 
@@ -759,45 +859,64 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
 
     }
 
-    private void changeCategory(EventCategory category) {
+    private void changeCategory(EventCategory category)
+    {
         this.category = category;
         presenter.changeCategory(category);
     }
 
-    private class ClickListener implements View.OnClickListener {
+    private class ClickListener implements View.OnClickListener
+    {
         @Override
-        public void onClick(View v) {
+        public void onClick(View v)
+        {
 
             SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
 
-            if (v == dayContainer) {
-                if (isTimeSelectorVisible) {
+            if (v == dayContainer)
+            {
+                if (isTimeSelectorVisible)
+                {
                     hideTimeSelector();
                 }
 
-                if (!isDaySelectorVisible) {
+                if (!isDaySelectorVisible)
+                {
 
-                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.DAY_UPDATED_WHILE_CREATE_FROM_DETAILS, userService.getActiveUserId());
+                    AnalyticsHelper
+                            .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.DAY_UPDATED_WHILE_CREATE_FROM_DETAILS, userService
+                                    .getActiveUserId());
 
                     showDaySelector();
-                } else {
+                }
+                else
+                {
                     hideDaySelector();
                 }
-            } else if (v == timeContainer) {
-                if (isDaySelectorVisible) {
+            }
+            else if (v == timeContainer)
+            {
+                if (isDaySelectorVisible)
+                {
                     hideDaySelector();
                 }
 
-                if (!isTimeSelectorVisible) {
+                if (!isTimeSelectorVisible)
+                {
 
-                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.TIME_UPDATED_WHILE_CREATE_FROM_DETAILS, userService.getActiveUserId());
+                    AnalyticsHelper
+                            .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.TIME_UPDATED_WHILE_CREATE_FROM_DETAILS, userService
+                                    .getActiveUserId());
 
                     showTimeSelector();
-                } else {
+                }
+                else
+                {
                     hideTimeSelector();
                 }
-            } else if (v == icon) {
-
+            }
+            else if (v == icon)
+            {
 
 
                 displayCategoryChangeDialog();
@@ -806,10 +925,12 @@ public class CreateEventDetailsFragment extends BaseFragment implements CreateEv
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == android.R.id.home)
+        {
 
-            ((MainActivity)getActivity()).onBackPressed();
+            ((MainActivity) getActivity()).onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }

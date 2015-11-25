@@ -1,4 +1,4 @@
-package reaper.android.app.ui.screens.home;
+package reaper.android.app.ui.screens.home.old;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -706,7 +706,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
 
                 eventCategory = EventCategory.CAFE;
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.CAFE, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.CAFE, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
@@ -720,7 +720,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
 
                 eventCategory = EventCategory.MOVIES;
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.MOVIES, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.MOVIES, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
@@ -735,7 +735,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
 
                 eventCategory = EventCategory.EAT_OUT;
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.EAT_OUT, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.EAT_OUT, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
@@ -750,7 +750,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
 
                 eventCategory = EventCategory.SPORTS;
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.SPORTS, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.SPORTS, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
@@ -765,7 +765,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
 
                 eventCategory = EventCategory.OUTDOORS;
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.OUTDOORS, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.OUTDOORS, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
@@ -780,7 +780,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
 
                 eventCategory = EventCategory.INDOORS;
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.INDOORS, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.INDOORS, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
@@ -795,7 +795,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
 
                 eventCategory = EventCategory.DRINKS;
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.DRINKS, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.DRINKS, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
@@ -809,7 +809,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
             {
                 eventCategory = EventCategory.SHOPPING;
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.SHOPPING, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.SHOPPING, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
             }
@@ -823,7 +823,7 @@ public class CreateEventFragment extends BaseFragment implements TimePickerDialo
             {
                 eventCategory = EventCategory.GENERAL;
                 icon.setImageDrawable(DrawableFactory
-                        .get(EventCategory.GENERAL, Dimensions.CREATE_EVENT_ICON_SIZE));
+                        .get(EventCategory.GENERAL, Dimensions.EVENT_ICON_SIZE));
 
                 alertDialog.dismiss();
 

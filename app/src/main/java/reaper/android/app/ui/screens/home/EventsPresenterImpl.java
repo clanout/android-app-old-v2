@@ -21,7 +21,8 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-public class EventsPresenterImpl implements EventsPresenter {
+public class EventsPresenterImpl implements EventsPresenter
+{
     /* Services */
     private EventService eventService;
     private UserService userService;
@@ -37,14 +38,16 @@ public class EventsPresenterImpl implements EventsPresenter {
     /* Subscriptions */
     private CompositeSubscription subscriptions;
 
-    public EventsPresenterImpl(Bus bus, List<Event> events) {
+    public EventsPresenterImpl(Bus bus, List<Event> events)
+    {
         eventService = new EventService(bus);
         userService = new UserService(bus);
         cache = CacheManager.getGenericCache();
         userLocation = new LocationService(bus).getUserLocation();
         subscriptions = new CompositeSubscription();
 
-        if (events == null) {
+        if (events == null)
+        {
             events = new ArrayList<>();
         }
 
@@ -52,55 +55,69 @@ public class EventsPresenterImpl implements EventsPresenter {
     }
 
     @Override
-    public void attachView(final EventsView view) {
+    public void attachView(final EventsView view)
+    {
         this.view = view;
 
         this.view.showLoading();
 
-        if (events.isEmpty()) {
+        if (events.isEmpty())
+        {
             Subscription subscription = eventService
                     ._fetchEvents(userLocation.getZone())
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Subscriber<List<Event>>() {
+                    .subscribe(new Subscriber<List<Event>>()
+                    {
                         @Override
-                        public void onCompleted() {
+                        public void onCompleted()
+                        {
 
                         }
 
                         @Override
-                        public void onError(Throwable e) {
+                        public void onError(Throwable e)
+                        {
                             view.showError();
                         }
 
                         @Override
-                        public void onNext(List<Event> events) {
+                        public void onNext(List<Event> events)
+                        {
                             EventsPresenterImpl.this.events = events;
 
-                            if (events.isEmpty()) {
+                            if (events.isEmpty())
+                            {
                                 view.showNoEventsMessage();
-                            } else {
+                            }
+                            else
+                            {
                                 view.showEvents(events);
                             }
                         }
                     });
 
             subscriptions.add(subscription);
-        } else {
+        }
+        else
+        {
             view.showEvents(events);
         }
     }
 
     @Override
-    public void detachView() {
+    public void detachView()
+    {
         subscriptions.clear();
         view = null;
     }
 
     @Override
-    public void refreshEvents() {
+    public void refreshEvents()
+    {
         List<String> eventIds = new ArrayList<>();
-        for (Event event : events) {
+        for (Event event : events)
+        {
             eventIds.add(event.getId());
         }
 
@@ -108,24 +125,31 @@ public class EventsPresenterImpl implements EventsPresenter {
                 ._refreshEvents(userLocation.getZone(), eventIds, cache
                         .get(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.class))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Event>>() {
+                .subscribe(new Subscriber<List<Event>>()
+                {
                     @Override
-                    public void onCompleted() {
+                    public void onCompleted()
+                    {
 
                     }
 
                     @Override
-                    public void onError(Throwable e) {
+                    public void onError(Throwable e)
+                    {
                         view.showError();
                     }
 
                     @Override
-                    public void onNext(List<Event> events) {
+                    public void onNext(List<Event> events)
+                    {
                         EventsPresenterImpl.this.events = events;
 
-                        if (events.isEmpty()) {
+                        if (events.isEmpty())
+                        {
                             view.showNoEventsMessage();
-                        } else {
+                        }
+                        else
+                        {
                             view.showEvents(events);
                         }
                     }
@@ -135,50 +159,12 @@ public class EventsPresenterImpl implements EventsPresenter {
     }
 
     @Override
-    public void selectEvent(Event event) {
+    public void selectEvent(Event event)
+    {
         int activePosition = events.indexOf(event);
-        if (activePosition >= 0) {
+        if (activePosition >= 0)
+        {
             view.gotoDetailsView(events, activePosition);
         }
-    }
-
-    @Override
-    public void updateRsvp(final EventsView.EventListItem eventListItem, final Event event, Event.RSVP rsvp) {
-        final Event.RSVP oldRsvp = event.getRsvp();
-        if (oldRsvp == rsvp) {
-            return;
-        }
-
-        if (event.getOrganizerId().equals(userService.getActiveUserId())) {
-            view.showOrganizerCannotUpdateRsvpError();
-            return;
-        }
-
-        event.setRsvp(rsvp);
-        eventListItem.render(event);
-
-        Subscription subscription = eventService
-                ._updateRsvp(event)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Boolean>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        view.showRsvpUpdateError();
-                        event.setRsvp(oldRsvp);
-                        eventListItem.render(event);
-                    }
-
-                    @Override
-                    public void onNext(Boolean aBoolean) {
-
-                    }
-                });
-
-        subscriptions.add(subscription);
     }
 }

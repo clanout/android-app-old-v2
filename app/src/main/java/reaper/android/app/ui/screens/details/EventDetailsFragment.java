@@ -12,7 +12,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -338,7 +337,7 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
                 icon.setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD);
         }
 
-        iconContainer.setBackground(DrawableFactory.randomIconBackground());
+        iconContainer.setBackground(DrawableFactory.getIconBackground(category));
 
         title.setText(event.getTitle());
 

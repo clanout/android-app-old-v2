@@ -11,6 +11,4 @@ public interface EventsPresenter
     void refreshEvents();
 
     void selectEvent(Event event);
-
-    void updateRsvp(EventsView.EventListItem eventListItem, Event event, Event.RSVP rsvp);
 }

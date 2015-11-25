@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">clanOut</string>
 
+    <!-- Screen Titles -->
+    <string name="title_home">ClanOut</string>
+    <string name="title_account">Account</string>
+    <string name="title_notification">Notifications</string>
+    <string name="title_chat">Discussion</string>
+
     <!-- Location -->
     <string name="location_permission_heading">Turn on GPS</string>
     <string name="location_permission_message">Your location helps us connect you with your nearby friends</string>
@@ -37,22 +43,24 @@
     <string name="invitation_response_title">Inform friends of your absence by leaving a message</string>
 
     <!-- RSVP -->
-    <string name="rsvp_yes"> YAY </string>
-    <string name="rsvp_maybe"> MAYBE </string>
-    <string name="rsvp_no"> NAY </string>
+    <string name="rsvp_yes">YAY</string>
+    <string name="rsvp_maybe">MAYBE</string>
+    <string name="rsvp_no">NAY</string>
 
     <!-- Action Bar -->
     <string name="action_account">Account</string>
     <string name="action_home">Home</string>
     <string name="action_edit_event">Edit</string>
     <string name="action_finalize_event">Finalize Details</string>
+    <string name="action_notification">Notifications</string>
+    <string name="action_clear">Clear</string>
     <string name="action_delete_event">Dismiss Clan?</string>
 
     <string name="home_no_events"> No active clans at the moment. Make your own.</string>
     <string name="home_events_fetch_error"> Unable to show clans. Swipe to refresh </string>
 
     <!-- Event Details Fragment -->
-    <string name="event_details_no_description">Say something</string>
+    <string name="event_details_no_description">No Description</string>
     <string name="event_details_no_attendees">This clan is no longer available. Refresh to remove dismissed clans from your feed</string>
     <string name="event_details_no_location">Location undecided</string>
 
@@ -112,4 +120,17 @@
     <string name="facebook_app_id">711701748936592</string>
     <string name="problem_contacting_facebook"> Currently unable to reach facebook. Try again.</string>
     <string name="block_screen_title_message">Blocked friends cannot invite you or see what clans you have joined.</string>
+
+    <!-- Feed - Friends Going -->
+    <string name="label_feed_no_friends">Waiting for friends to join</string>
+    <string name="label_feed_one_friend">%s joined</string>
+    <string name="label_feed_one_friend_default">1 friend joined</string>
+    <string name="label_feed_multiple_friend" formatted="false">%s, %s and %s other friends joined</string>
+    <string name="label_feed_multiple_friend_default">%s friends joined</string>
+    <string name="label_feed_multiple_friend_one_name" formatted="false">%s and %s other friends joined</string>
+    <string name="label_feed_multiple_friend_two_name" formatted="false">%s and %s joined</string>
+
+    <!-- Button -->
+    <string name="label_btn_invite">Invite</string>
+    <string name="label_btn_chat">Chat</string>
 </resources>

@@ -27,19 +27,23 @@ public class EventDetailsPagerAdapter extends FragmentStatePagerAdapter
     @Override
     public Fragment getItem(int position)
     {
-        EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable(BundleKeys.EVENT_DETAILS_FRAGMENT_EVENT, events.get(position));
 
-        if(position == activePosition)
-        {
-            bundle.putBoolean(BundleKeys.POPUP_STATUS_DIALOG, shouldPopupStatusDialog);
-        }else{
-            bundle.putBoolean(BundleKeys.POPUP_STATUS_DIALOG, false);
-        }
+//        EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
+//
+//        if(position == activePosition)
+//        {
+//            bundle.putBoolean(BundleKeys.POPUP_STATUS_DIALOG, shouldPopupStatusDialog);
+//        }else{
+//            bundle.putBoolean(BundleKeys.POPUP_STATUS_DIALOG, false);
+//        }
+//
+//        eventDetailsFragment.setArguments(bundle);
+//        return eventDetailsFragment;
 
-        eventDetailsFragment.setArguments(bundle);
-        return eventDetailsFragment;
+        return reaper.android.app.ui.screens.details.redesign.EventDetailsFragment
+                .newInstance(events.get(position));
     }
 
     @Override

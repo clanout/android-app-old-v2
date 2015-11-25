@@ -1,4 +1,4 @@
-package reaper.android.app.ui.screens.home;
+package reaper.android.app.ui.screens.home.old;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -7,6 +7,7 @@ import android.support.v13.app.FragmentStatePagerAdapter;
 import java.util.List;
 
 import reaper.android.app.model.CreateEventModel;
+import reaper.android.app.ui.screens.home.old.CreateEventFragment;
 
 public class CreateEventPagerAdapter extends FragmentStatePagerAdapter
 {

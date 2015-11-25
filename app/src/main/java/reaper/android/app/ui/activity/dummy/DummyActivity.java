@@ -1,109 +1,91 @@
 package reaper.android.app.ui.activity.dummy;
 
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.TextSwitcher;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.ViewSwitcher;
 
+import com.squareup.picasso.Picasso;
+
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import reaper.android.R;
-import reaper.android.app.model.CreateEventModel;
-import reaper.android.app.model.factory.CreateEventSuggestionFactory;
-import reaper.android.app.ui.util.VisibilityAnimationUtil;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
+import reaper.android.app.config.AppConstants;
+import reaper.android.app.model.Event;
+import reaper.android.app.model.EventDetails;
+import reaper.android.app.ui.util.CircleTransform;
 import timber.log.Timber;
 
 public class DummyActivity extends AppCompatActivity
 {
-    List<CreateEventModel> models = CreateEventSuggestionFactory.getEventSuggestions();
+    Switch sRsvp;
+    TextView tvRsvp;
 
-    TextSwitcher textSwitcher;
+    ImageView ivPic;
 
-    ViewGroup createBox;
-    ViewGroup createOverlay;
+    RecyclerView rvAttendees;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
+    public void onCreate(Bundle savedInstanceState)
     {
+        Timber.v(">>>> HERE");
+
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dummy);
+        setContentView(R.layout.fragment_event_details_);
 
-        textSwitcher = (TextSwitcher) findViewById(R.id.tsDummy);
-        createBox = (ViewGroup) findViewById(R.id.llCreateEventContainer);
-        createOverlay = (ViewGroup) findViewById(R.id.rlCreateOverlay);
+        sRsvp = (Switch) findViewById(R.id.sRsvp);
+        tvRsvp = (TextView) findViewById(R.id.tvRsvp);
+        rvAttendees = (RecyclerView) findViewById(R.id.rvAttendees);
+        ivPic = (ImageView) findViewById(R.id.ivPic);
 
-        textSwitcher.setFactory(new ViewSwitcher.ViewFactory()
-        {
+        tvRsvp.setGravity(View.GONE);
 
-            public View makeView()
-            {
-                TextView myText = new TextView(DummyActivity.this);
-                myText.setTextSize(24);
-                myText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                myText.setGravity(Gravity.CENTER_HORIZONTAL);
-                myText.setTextColor(ContextCompat
-                        .getColor(DummyActivity.this, android.R.color.white));
-                return myText;
-            }
-        });
+        Picasso.with(this)
+               .load(AppConstants.FACEBOOK_END_POINT + "10207377866064846/picture?width=500")
+               .transform(new CircleTransform())
+               .into(ivPic);
 
-        Animation in = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
-        Animation out = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);
+        EventDetails.Attendee attendee = new EventDetails.Attendee();
+        attendee.setName("Harsh Pokharna");
+        attendee.setFriend(true);
+        attendee.setId("977526725631911");
+        attendee.setRsvp(Event.RSVP.YES);
+        attendee.setStatus("Blue hai pani pani!");
+        attendee.setInviter(true);
 
-        // set the animation type of textSwitcher
-        textSwitcher.setInAnimation(in);
-        textSwitcher.setOutAnimation(out);
+        EventDetails.Attendee attendee1 = new EventDetails.Attendee();
+        attendee1.setName("Gaurav Kunwar");
+        attendee1.setFriend(true);
+        attendee1.setId("976303355745864");
+        attendee1.setRsvp(Event.RSVP.YES);
+        attendee1.setStatus("Babe I'm gonna leave you");
+        attendee1.setInviter(false);
 
-        createOverlay.setOnClickListener(new View.OnClickListener()
+        List<EventDetails.Attendee> attendees = Arrays.asList(attendee, attendee1);
+
+        rvAttendees.setLayoutManager(new LinearLayoutManager(this));
+        rvAttendees.setAdapter(new EventAttendeesAdapter(attendees, this));
+
+        sRsvp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
         {
             @Override
-            public void onClick(View v)
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
             {
-                VisibilityAnimationUtil.collapse(createOverlay, 200);
+                if (isChecked)
+                {
+                    tvRsvp.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    tvRsvp.setVisibility(View.GONE);
+                }
             }
         });
-
-        final int[] i = {0};
-        final int size = models.size();
-        Observable.interval(3, TimeUnit.SECONDS)
-                  .observeOn(AndroidSchedulers.mainThread())
-                  .subscribe(new Subscriber<Long>()
-                  {
-                      @Override
-                      public void onCompleted()
-                      {
-                          Timber.v("HERE");
-                      }
-
-                      @Override
-                      public void onError(Throwable e)
-                      {
-                          e.printStackTrace();
-                      }
-
-                      @Override
-                      public void onNext(Long aLong)
-                      {
-                          String title = models.get(i[0]++).getTitle();
-                          Timber.v(title);
-                          textSwitcher.setText(title);
-                          textSwitcher.requestLayout();
-                          if (i[0] == size)
-                          {
-                              i[0] = 0;
-                          }
-                      }
-                  });
     }
 }

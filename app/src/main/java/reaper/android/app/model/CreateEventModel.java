@@ -31,11 +31,11 @@ public class CreateEventModel implements Serializable
 
     public Drawable getIcon()
     {
-        return DrawableFactory.get(category, Dimensions.CREATE_EVENT_ICON_SIZE);
+        return DrawableFactory.get(category, Dimensions.EVENT_ICON_SIZE);
     }
 
     public Drawable getIconBackground(Context context)
     {
-        return DrawableFactory.randomIconBackground();
+        return DrawableFactory.getIconBackground(category);
     }
 }

@@ -14,14 +14,5 @@ public interface EventsView
 
     void showError();
 
-    void showOrganizerCannotUpdateRsvpError();
-
-    void showRsvpUpdateError();
-
     void gotoDetailsView(List<Event> events, int activePosition);
-
-    interface EventListItem
-    {
-        void render(Event event);
-    }
 }

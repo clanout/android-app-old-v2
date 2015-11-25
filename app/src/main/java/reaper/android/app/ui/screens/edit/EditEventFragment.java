@@ -67,7 +67,6 @@ import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
-import timber.log.Timber;
 
 
 public class EditEventFragment extends BaseFragment implements EditEventView,
@@ -204,7 +203,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         setHasOptionsMenu(true);
 
-        ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Event event = (Event) getArguments().getSerializable(ARG_EVENT);
         EventDetails eventDetails = (EventDetails) getArguments()
@@ -303,7 +302,9 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         presenter.setDescription(description.getText().toString());
         presenter.edit();
 
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_EDITED, userService.getActiveUserId());
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_EDITED, userService
+                        .getActiveUserId());
     }
 
     private void initRecyclerView()
@@ -529,10 +530,10 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         initTimeSelector();
         initRecyclerView();
 
+        EventCategory eventCategory = EventCategory.valueOf(event.getCategory());
         icon.setImageDrawable(DrawableFactory
-                .get(EventCategory
-                        .valueOf(event.getCategory()), Dimensions.CREATE_EVENT_ICON_SIZE));
-        iconContainer.setBackground(DrawableFactory.randomIconBackground());
+                .get(eventCategory, Dimensions.EVENT_ICON_SIZE));
+        iconContainer.setBackground(DrawableFactory.getIconBackground(eventCategory));
     }
 
     @Override
@@ -572,7 +573,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         {
             Drawable deleteDrawable = MaterialDrawableBuilder.with(getActivity())
                                                              .setIcon(MaterialDrawableBuilder.IconValue.DELETE)
-                                                             .setColor(ContextCompat.getColor(getActivity(), R.color.whity))
+                                                             .setColor(ContextCompat
+                                                                     .getColor(getActivity(), R.color.whity))
                                                              .setSizeDp(36)
                                                              .build();
             delete.setIcon(deleteDrawable);
@@ -589,7 +591,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         {
             Drawable lockedDrawable = MaterialDrawableBuilder.with(getActivity())
                                                              .setIcon(MaterialDrawableBuilder.IconValue.LOCK)
-                                                             .setColor(ContextCompat.getColor(getActivity(), R.color.whity))
+                                                             .setColor(ContextCompat
+                                                                     .getColor(getActivity(), R.color.whity))
                                                              .setSizeDp(36)
                                                              .build();
 
@@ -613,7 +616,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         {
             Drawable unlockedDrawable = MaterialDrawableBuilder.with(getActivity())
                                                                .setIcon(MaterialDrawableBuilder.IconValue.LOCK_OPEN)
-                                                               .setColor(ContextCompat.getColor(getActivity(), R.color.whity))
+                                                               .setColor(ContextCompat
+                                                                       .getColor(getActivity(), R.color.whity))
                                                                .setSizeDp(36)
                                                                .build();
 
@@ -679,7 +683,9 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
     @Override
     public void onSuggestionClicked(Suggestion suggestion)
     {
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.SUGGESTION_CLICKED_EDIT, userService.getActiveUserId());
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.SUGGESTION_CLICKED_EDIT, userService
+                        .getActiveUserId());
 
         presenter.selectSuggestion(suggestion);
     }
@@ -763,33 +769,36 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         finalize.setVisible(false);
         delete.setVisible(false);
 
-        if(isDeleteOptionVisible)
+        if (isDeleteOptionVisible)
         {
             Drawable deleteDrawable = MaterialDrawableBuilder.with(getActivity())
                                                              .setIcon(MaterialDrawableBuilder.IconValue.DELETE)
-                                                             .setColor(ContextCompat.getColor(getActivity(), R.color.whity))
+                                                             .setColor(ContextCompat
+                                                                     .getColor(getActivity(), R.color.whity))
                                                              .setSizeDp(36)
                                                              .build();
             delete.setIcon(deleteDrawable);
             delete.setVisible(true);
         }
 
-        if(isFinalizeOptionVisible)
+        if (isFinalizeOptionVisible)
         {
             Drawable lockedDrawable = MaterialDrawableBuilder.with(getActivity())
                                                              .setIcon(MaterialDrawableBuilder.IconValue.LOCK)
-                                                             .setColor(ContextCompat.getColor(getActivity(), R.color.whity))
+                                                             .setColor(ContextCompat
+                                                                     .getColor(getActivity(), R.color.whity))
                                                              .setSizeDp(36)
                                                              .build();
 
             finalize.setIcon(lockedDrawable);
             finalize.setVisible(true);
         }
-        else if(isUnfinalizeOptionVisible)
+        else if (isUnfinalizeOptionVisible)
         {
             Drawable unlockedDrawable = MaterialDrawableBuilder.with(getActivity())
                                                                .setIcon(MaterialDrawableBuilder.IconValue.LOCK_OPEN)
-                                                               .setColor(ContextCompat.getColor(getActivity(), R.color.whity))
+                                                               .setColor(ContextCompat
+                                                                       .getColor(getActivity(), R.color.whity))
                                                                .setSizeDp(36)
                                                                .build();
 
@@ -818,7 +827,9 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
                         {
                             presenter.unfinalizeEvent();
 
-                            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_UNFINALIZED, userService.getActiveUserId());
+                            AnalyticsHelper
+                                    .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_UNFINALIZED, userService
+                                            .getActiveUserId());
                         }
                     });
 
@@ -849,7 +860,9 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
                         {
                             presenter.finalizeEvent();
 
-                            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_FINALIZED, userService.getActiveUserId());
+                            AnalyticsHelper
+                                    .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_FINALIZED, userService
+                                            .getActiveUserId());
                         }
                     });
 
@@ -889,7 +902,9 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
                     {
                         presenter.delete();
 
-                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_DELETED, userService.getActiveUserId());
+                        AnalyticsHelper
+                                .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_DELETED, userService
+                                        .getActiveUserId());
                     }
                 });
 
@@ -911,10 +926,12 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == android.R.id.home)
+        {
 
-            ((MainActivity)getActivity()).onBackPressed();
+            ((MainActivity) getActivity()).onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -922,7 +939,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
     @Subscribe
     public void onBackPressedTrigger(BackPressedTrigger trigger)
     {
-        if(trigger.getActiveFragment() == BackstackTags.EDIT)
+        if (trigger.getActiveFragment() == BackstackTags.EDIT)
         {
             presenter.initiateEventDetailsNavigation();
         }
@@ -930,7 +947,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
 
     private void setActionBarTitle(Event event)
     {
-        switch (event.getCategory()) {
+        switch (event.getCategory())
+        {
             case "CAFE":
                 ((MainActivity) getActivity()).getSupportActionBar().setTitle("Cafe");
                 break;

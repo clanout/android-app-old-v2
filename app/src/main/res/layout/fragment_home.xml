@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -11,82 +12,116 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/tb_fragment_home"
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/primary"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+            android:layout_height="?attr/actionBarSize"/>
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/srl_home"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:orientation="vertical">
 
-        <LinearLayout
+        <!-- Create Clan -->
+        <RelativeLayout
+            android:id="@+id/rlCreateOverlay_dummy"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/white"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:background="#77000000"
+            android:padding="16dp">
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rv_home_events"
+            <TextView
+                android:id="@+id/tvSuggestion_dummy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:text="Loose Control"
+                android:textColor="#ffffff"
+                android:textSize="24sp"
+                android:textStyle="bold"/>
+
+            <net.steamcrafted.materialiconlib.MaterialIconView
+                android:id="@+id/mivSuggestionCategory_dummy"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvSuggestion_dummy"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:scaleType="center"
+                app:materialIcon="martini"
+                app:materialIconColor="@color/whity"
+                app:materialIconSize="24dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/mivSuggestionCategory_dummy"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="16dp"
+                android:text="Make a Plan"
+                android:textColor="#ffffff"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+        </RelativeLayout>
+
+        <!-- Main Content -->
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/srlFeed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/background_default"/>
+                android:orientation="vertical">
 
-            <android.support.v4.view.ViewPager
-                android:id="@+id/vp_home_create"
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="160dp"/>
+                <!-- Feed -->
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rvFeed"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/background_default"/>
 
-            <LinearLayout
-                android:id="@+id/ll_home_noEvents"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center_vertical|center_horizontal">
-
+                <!-- No Events -->
                 <TextView
+                    android:id="@+id/tvNoEvents"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
                     android:text="@string/home_no_events"
                     android:textColor="@color/text_title"
-                    android:textSize="14sp"/>
-            </LinearLayout>
+                    android:textSize="18sp"
+                    android:visibility="gone"/>
 
-            <LinearLayout
-                android:id="@+id/ll_home_error"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center_vertical|center_horizontal">
-
+                <!-- Server Error -->
                 <TextView
+                    android:id="@+id/tvServerError"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
                     android:text="@string/home_events_fetch_error"
                     android:textColor="@color/text_title"
-                    android:textSize="14sp"/>
-            </LinearLayout>
+                    android:textSize="18sp"
+                    android:visibility="gone"/>
 
-            <LinearLayout
-                android:id="@+id/ll_home_loading"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center_vertical|center_horizontal">
-
+                <!-- Loading -->
                 <ProgressBar
-                    android:id="@+id/pb_fragment_home"
+                    android:id="@+id/loading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    />
-            </LinearLayout>
+                    android:layout_centerInParent="true"
+                    android:visibility="gone"/>
 
-        </LinearLayout>
-    </android.support.v4.widget.SwipeRefreshLayout>
-</android.support.design.widget.CoordinatorLayout>
+            </RelativeLayout>
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

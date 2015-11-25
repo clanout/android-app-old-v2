@@ -4,21 +4,20 @@ import com.google.gson.Gson;
 
 import org.joda.time.DateTime;
 
-import java.io.Serializable;
-import java.util.Comparator;
+import java.util.List;
 
 import reaper.android.app.api.core.GsonProvider;
 import reaper.android.app.model.core.Model;
 
-public class Event implements Model, Serializable
+public class Event implements Model
 {
-    public static enum Type implements Model, Serializable
+    public static enum Type implements Model
     {
         PUBLIC,
         INVITE_ONLY;
     }
 
-    public static enum RSVP implements Model, Serializable
+    public static enum RSVP implements Model
     {
         YES,
         MAYBE,
@@ -40,6 +39,7 @@ public class Event implements Model, Serializable
     private RSVP rsvp;
     private int friendCount;
     private int inviterCount;
+    private List<String> friends;
 
     private boolean isUpdated;
     private boolean isChatUpdated;
@@ -82,6 +82,16 @@ public class Event implements Model, Serializable
     public void setCategory(String category)
     {
         this.category = category;
+    }
+
+    public List<String> getFriends()
+    {
+        return friends;
+    }
+
+    public void setFriends(List<String> friends)
+    {
+        this.friends = friends;
     }
 
     public Boolean isFinalized()

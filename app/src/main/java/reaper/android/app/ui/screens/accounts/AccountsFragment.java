@@ -50,7 +50,6 @@ import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
-import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
@@ -136,7 +135,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.ACCOUNTS_FRAGMENT);
-        ((MainActivity) getActivity()).getSupportActionBar().setTitle("Account");
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_account);
 
         bus.register(this);
 

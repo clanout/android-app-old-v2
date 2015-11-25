@@ -28,6 +28,7 @@ import reaper.android.app.api.event.request.GetEventSuggestionsApiRequest;
 import reaper.android.app.api.event.request.InviteThroughSMSApiRequest;
 import reaper.android.app.api.event.request.InviteUsersApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
+import reaper.android.app.api.event.request.SendInvitaionResponseApiRequest;
 import reaper.android.app.api.event.request.UpdateStatusApiRequest;
 import reaper.android.app.api.event.response.CreateEventApiResponse;
 import reaper.android.app.api.event.response.EditEventApiResponse;
@@ -36,7 +37,6 @@ import reaper.android.app.api.event.response.EventSuggestionsApiResponse;
 import reaper.android.app.api.event.response.EventsApiResponse;
 import reaper.android.app.api.event.response.FetchEventApiResponse;
 import reaper.android.app.api.event.response.FetchNewEventsAndUpdatesApiResponse;
-import reaper.android.app.api.event.request.SendInvitaionResponseApiRequest;
 import reaper.android.app.api.event.response.GetEventSuggestionApiResponse;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
@@ -47,6 +47,7 @@ import reaper.android.app.config.ExceptionMessages;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventAttendeeComparator;
 import reaper.android.app.model.EventCategory;
+import reaper.android.app.model.EventComparator;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.Suggestion;
@@ -410,18 +411,22 @@ public class EventService
                       }
                   })
                   .observeOn(AndroidSchedulers.mainThread())
-                  .subscribe(new Subscriber<List<String>>() {
+                  .subscribe(new Subscriber<List<String>>()
+                  {
                       @Override
-                      public void onCompleted() {
+                      public void onCompleted()
+                      {
                       }
 
                       @Override
-                      public void onError(Throwable e) {
+                      public void onError(Throwable e)
+                      {
                           bus.post(new GenericErrorTrigger(ErrorCode.EVENT_IDS_FETCH_FAILURE, (Exception) e));
                       }
 
                       @Override
-                      public void onNext(List<String> strings) {
+                      public void onNext(List<String> strings)
+                      {
                           bus.post(new EventIdsFetchedTrigger(strings));
                       }
                   });
@@ -469,19 +474,23 @@ public class EventService
 
         eventDetailsObservable
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<EventDetails>() {
+                .subscribe(new Subscriber<EventDetails>()
+                {
                     @Override
-                    public void onCompleted() {
+                    public void onCompleted()
+                    {
                         long endTime = System.currentTimeMillis();
                     }
 
                     @Override
-                    public void onError(Throwable e) {
+                    public void onError(Throwable e)
+                    {
                         bus.post(new GenericErrorTrigger(ErrorCode.EVENT_DETAILS_FETCH_FAILURE, (Exception) e));
                     }
 
                     @Override
-                    public void onNext(EventDetails eventDetails) {
+                    public void onNext(EventDetails eventDetails)
+                    {
                         Collections.sort(eventDetails
                                 .getAttendees(), new EventAttendeeComparator(userService
                                 .getActiveUserId()));
@@ -738,10 +747,13 @@ public class EventService
                 .getLatitude(), placeLocation.getName(), placeLocation
                 .getZone(), startTime);
 
-        Observable.create(new Observable.OnSubscribe<Event>() {
+        Observable.create(new Observable.OnSubscribe<Event>()
+        {
             @Override
-            public void call(Subscriber<? super Event> subscriber) {
-                try {
+            public void call(Subscriber<? super Event> subscriber)
+            {
+                try
+                {
                     Response response = eventApi.editEvent(request);
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response
                             .getBody().in()));
@@ -749,48 +761,63 @@ public class EventService
                     String line;
                     StringBuilder jsonBuilder = new StringBuilder();
 
-                    while ((line = bufferedReader.readLine()) != null) {
+                    while ((line = bufferedReader.readLine()) != null)
+                    {
                         jsonBuilder.append(line).append("\n");
                     }
 
                     bufferedReader.close();
                     String json = jsonBuilder.toString();
                     Event event = GsonProvider.getGson().fromJson(json, EditEventApiResponse.class)
-                            .getEvent();
+                                              .getEvent();
 
                     subscriber.onNext(event);
 
-                } catch (RetrofitError e) {
-                    if (e.getResponse().getStatus() == 400) {
+                }
+                catch (RetrofitError e)
+                {
+                    if (e.getResponse().getStatus() == 400)
+                    {
                         subscriber.onError(new Throwable(ExceptionMessages.EVENT_LOCKED));
-                    } else {
+                    }
+                    else
+                    {
                         subscriber.onError(new Throwable(ExceptionMessages.BAD_REQUEST));
                     }
 
-                } catch (IOException e) {
+                }
+                catch (IOException e)
+                {
                     subscriber.onError(new Throwable(ExceptionMessages.BAD_REQUEST));
                 }
                 subscriber.onCompleted();
             }
         }).subscribeOn(Schedulers.newThread())
                   .observeOn(AndroidSchedulers.mainThread())
-                  .subscribe(new Subscriber<Event>() {
+                  .subscribe(new Subscriber<Event>()
+                  {
                       @Override
-                      public void onCompleted() {
+                      public void onCompleted()
+                      {
 
                       }
 
                       @Override
-                      public void onError(Throwable e) {
-                          if (e.getMessage().equals(ExceptionMessages.EVENT_LOCKED)) {
+                      public void onError(Throwable e)
+                      {
+                          if (e.getMessage().equals(ExceptionMessages.EVENT_LOCKED))
+                          {
                               bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE_LOCKED, null));
-                          } else {
+                          }
+                          else
+                          {
                               bus.post(new GenericErrorTrigger(ErrorCode.EVENT_EDIT_FAILURE, null));
                           }
                       }
 
                       @Override
-                      public void onNext(Event event) {
+                      public void onNext(Event event)
+                      {
                           bus.post(new EventEditedTrigger(event));
                       }
                   });
@@ -804,23 +831,29 @@ public class EventService
         eventApi.deleteEvent(request)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Response>() {
+                .subscribe(new Subscriber<Response>()
+                {
                     @Override
-                    public void onCompleted() {
+                    public void onCompleted()
+                    {
 
                     }
 
                     @Override
-                    public void onError(Throwable e) {
+                    public void onError(Throwable e)
+                    {
 
                     }
 
                     @Override
-                    public void onNext(Response response) {
-                        if (response.getStatus() == 200) {
+                    public void onNext(Response response)
+                    {
+                        if (response.getStatus() == 200)
+                        {
                             eventCache.deleteCompletely(eventId);
 
-                            if (genericCache.get(CacheKeys.GCM_TOKEN) != null) {
+                            if (genericCache.get(CacheKeys.GCM_TOKEN) != null)
+                            {
                                 gcmService.unsubscribeTopic(genericCache
                                         .get(CacheKeys.GCM_TOKEN), eventId);
                             }
@@ -947,6 +980,16 @@ public class EventService
                             return Observable.just(filteredEvents);
                         }
                     }
+                })
+                .map(new Func1<List<Event>, List<Event>>()
+                {
+                    @Override
+                    public List<Event> call(List<Event> events)
+                    {
+                        Collections.sort(events, new EventComparator.Relevance(genericCache
+                                .get(CacheKeys.USER_ID)));
+                        return events;
+                    }
                 });
     }
 
@@ -1010,11 +1053,23 @@ public class EventService
                         return filteredEvents;
                     }
                 })
-                .doOnNext(new Action1<List<Event>>() {
+                .doOnNext(new Action1<List<Event>>()
+                {
                     @Override
-                    public void call(List<Event> events) {
+                    public void call(List<Event> events)
+                    {
                         genericCache.put(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.now());
                         eventCache.reset(events);
+                    }
+                })
+                .map(new Func1<List<Event>, List<Event>>()
+                {
+                    @Override
+                    public List<Event> call(List<Event> events)
+                    {
+                        Collections.sort(events, new EventComparator.Relevance(genericCache
+                                .get(CacheKeys.USER_ID)));
+                        return events;
                     }
                 })
                 .subscribeOn(Schedulers.newThread());
@@ -1026,16 +1081,21 @@ public class EventService
                 .getRsvp());
 
         return eventApi.updateRsvp(request)
-                       .map(new Func1<Response, Boolean>() {
+                       .map(new Func1<Response, Boolean>()
+                       {
                            @Override
-                           public Boolean call(Response response) {
+                           public Boolean call(Response response)
+                           {
                                return (response.getStatus() == 200);
                            }
                        })
-                       .doOnNext(new Action1<Boolean>() {
+                       .doOnNext(new Action1<Boolean>()
+                       {
                            @Override
-                           public void call(Boolean isSuccess) {
-                               if (isSuccess) {
+                           public void call(Boolean isSuccess)
+                           {
+                               if (isSuccess)
+                               {
                                    eventCache.deleteCompletely(updatedEvent.getId());
                                    eventCache.save(updatedEvent);
                                    handleTopicSubscription(updatedEvent);
@@ -1051,9 +1111,11 @@ public class EventService
                 String.valueOf(latitude),
                 String.valueOf(longitude));
         return eventApi.getEventSuggestions(request)
-                       .map(new Func1<EventSuggestionsApiResponse, List<Suggestion>>() {
+                       .map(new Func1<EventSuggestionsApiResponse, List<Suggestion>>()
+                       {
                            @Override
-                           public List<Suggestion> call(EventSuggestionsApiResponse eventSuggestionsApiResponse) {
+                           public List<Suggestion> call(EventSuggestionsApiResponse eventSuggestionsApiResponse)
+                           {
                                return eventSuggestionsApiResponse.getEventSuggestions();
                            }
                        })
@@ -1068,18 +1130,23 @@ public class EventService
 
         return eventApi
                 .createEvent(request)
-                .map(new Func1<CreateEventApiResponse, Event>() {
+                .map(new Func1<CreateEventApiResponse, Event>()
+                {
                     @Override
-                    public Event call(CreateEventApiResponse createEventApiResponse) {
+                    public Event call(CreateEventApiResponse createEventApiResponse)
+                    {
                         return createEventApiResponse.getEvent();
                     }
                 })
-                .doOnNext(new Action1<Event>() {
+                .doOnNext(new Action1<Event>()
+                {
                     @Override
-                    public void call(Event event) {
+                    public void call(Event event)
+                    {
                         eventCache.save(event);
 
-                        if (genericCache.get(CacheKeys.GCM_TOKEN) != null) {
+                        if (genericCache.get(CacheKeys.GCM_TOKEN) != null)
+                        {
                             gcmService.subscribeTopic(genericCache.get(CacheKeys.GCM_TOKEN), event
                                     .getId());
                         }
@@ -1139,10 +1206,13 @@ public class EventService
                 .getZone(), startTime);
 
         return Observable
-                .create(new Observable.OnSubscribe<Event>() {
+                .create(new Observable.OnSubscribe<Event>()
+                {
                     @Override
-                    public void call(Subscriber<? super Event> subscriber) {
-                        try {
+                    public void call(Subscriber<? super Event> subscriber)
+                    {
+                        try
+                        {
                             Response response = eventApi.editEvent(request);
                             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response
                                     .getBody().in()));
@@ -1150,26 +1220,34 @@ public class EventService
                             String line;
                             StringBuilder jsonBuilder = new StringBuilder();
 
-                            while ((line = bufferedReader.readLine()) != null) {
+                            while ((line = bufferedReader.readLine()) != null)
+                            {
                                 jsonBuilder.append(line).append("\n");
                             }
 
                             bufferedReader.close();
                             String json = jsonBuilder.toString();
                             Event event = GsonProvider.getGson()
-                                    .fromJson(json, EditEventApiResponse.class)
-                                    .getEvent();
+                                                      .fromJson(json, EditEventApiResponse.class)
+                                                      .getEvent();
 
                             subscriber.onNext(event);
 
-                        } catch (RetrofitError e) {
-                            if (e.getResponse().getStatus() == 400) {
+                        }
+                        catch (RetrofitError e)
+                        {
+                            if (e.getResponse().getStatus() == 400)
+                            {
                                 subscriber.onError(new Throwable(ExceptionMessages.EVENT_LOCKED));
-                            } else {
+                            }
+                            else
+                            {
                                 subscriber.onError(new Throwable(ExceptionMessages.BAD_REQUEST));
                             }
 
-                        } catch (IOException e) {
+                        }
+                        catch (IOException e)
+                        {
                             subscriber.onError(new Throwable(ExceptionMessages.BAD_REQUEST));
                         }
                         subscriber.onCompleted();
@@ -1187,47 +1265,59 @@ public class EventService
                 .subscribeOn(Schedulers.newThread());
     }
 
-    public void sendInvitationResponse(String eventId, String message) {
+    public void sendInvitationResponse(String eventId, String message)
+    {
 
         SendInvitaionResponseApiRequest responseApiRequest = new SendInvitaionResponseApiRequest(eventId, message);
 
-        eventApi.sendInvitationResponse(responseApiRequest).subscribeOn(Schedulers.newThread()).subscribe(new Subscriber<Response>() {
+        eventApi.sendInvitationResponse(responseApiRequest).subscribeOn(Schedulers.newThread())
+                .subscribe(new Subscriber<Response>()
+                {
 
-            @Override
-            public void onCompleted() {
+                    @Override
+                    public void onCompleted()
+                    {
 
-            }
+                    }
 
-            @Override
-            public void onError(Throwable e) {
+                    @Override
+                    public void onError(Throwable e)
+                    {
 
-            }
+                    }
 
-            @Override
-            public void onNext(Response response) {
+                    @Override
+                    public void onNext(Response response)
+                    {
 
-            }
-        });
+                    }
+                });
     }
 
-    public void updateStatus(String eventId, String status, boolean shouldNotifyOthers) {
+    public void updateStatus(String eventId, String status, boolean shouldNotifyOthers)
+    {
 
         UpdateStatusApiRequest request = new UpdateStatusApiRequest(eventId, status, shouldNotifyOthers);
 
-        eventApi.updateStatus(request).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<Response>() {
+        eventApi.updateStatus(request).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<Response>()
+        {
 
             @Override
-            public void onCompleted() {
+            public void onCompleted()
+            {
 
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onError(Throwable e)
+            {
 
             }
 
             @Override
-            public void onNext(Response response) {
+            public void onNext(Response response)
+            {
 
             }
         });
@@ -1236,23 +1326,61 @@ public class EventService
     public void getEventSuggestions()
     {
 
-        eventApi.getEventSuggestions(new GetEventSuggestionsApiRequest()).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<GetEventSuggestionApiResponse>() {
+        eventApi.getEventSuggestions(new GetEventSuggestionsApiRequest())
+                .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<GetEventSuggestionApiResponse>()
+                {
 
-            @Override
-            public void onCompleted() {
+                    @Override
+                    public void onCompleted()
+                    {
 
-            }
+                    }
 
-            @Override
-            public void onError(Throwable e) {
+                    @Override
+                    public void onError(Throwable e)
+                    {
 
-            }
+                    }
 
-            @Override
-            public void onNext(GetEventSuggestionApiResponse getEventSuggestionApiResponse) {
+                    @Override
+                    public void onNext(GetEventSuggestionApiResponse getEventSuggestionApiResponse)
+                    {
 
-                genericCache.put(CacheKeys.EVENT_SUGGESTIONS, getEventSuggestionApiResponse.getEventSuggestions());
-            }
-        });
+                        genericCache.put(CacheKeys.EVENT_SUGGESTIONS, getEventSuggestionApiResponse
+                                .getEventSuggestions());
+                    }
+                });
+    }
+
+    public Observable<EventDetails> _fetchEventDetailsFromCache(final String eventId)
+    {
+        return eventCache
+                .getEventDetails(eventId);
+    }
+
+    public Observable<EventDetails> _fetchEventDetailsFromNetwork(final String eventId)
+    {
+        EventDetailsApiRequest eventDetailsApiRequest = new EventDetailsApiRequest(eventId);
+
+        return eventApi
+                .getEventDetails(eventDetailsApiRequest)
+                .map(new Func1<EventDetailsApiResponse, EventDetails>()
+                {
+                    @Override
+                    public EventDetails call(EventDetailsApiResponse eventDetailsApiResponse)
+                    {
+                        return eventDetailsApiResponse.getEventDetails();
+                    }
+                })
+                .doOnNext(new Action1<EventDetails>()
+                {
+                    @Override
+                    public void call(EventDetails eventDetails)
+                    {
+                        eventCache.saveDetails(eventDetails);
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
     }
 }
