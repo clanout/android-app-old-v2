@@ -111,4 +111,5 @@
     <!-- Facebook -->
     <string name="facebook_app_id">711701748936592</string>
     <string name="problem_contacting_facebook"> Currently unable to reach facebook. Try again.</string>
+    <string name="block_screen_title_message">Blocked friends cannot invite you or see what clans you have joined.</string>
 </resources>

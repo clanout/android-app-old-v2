@@ -60,11 +60,9 @@ import reaper.android.common.communicator.Communicator;
 
 public class ManageFriendsFragment extends BaseFragment implements BlockListCommunicator, View.OnClickListener {
     private RecyclerView recyclerView;
-    private TextView noFriendsMessage;
-    private ImageButton done;
-    private FloatingActionButton inviteWhatsapp;
+    private TextView noFriendsMessage, titleMessage;
     private Menu menu;
-    private Drawable refreshDrawable, checkDrawable;
+    private Drawable refreshDrawable;
     private Toolbar toolbar;
     private LinearLayout loading;
     private ProgressBar progressBar;
@@ -73,18 +71,14 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     private UserService userService;
     private FacebookService facebookService;
     private Bus bus;
-    private FragmentManager fragmentManager;
 
     private ArrayList<String> blockList;
     private ArrayList<String> unblockList;
     private ArrayList<Friend> friendList;
 
     private GenericCache genericCache;
-    private Drawable whatsappDrawable;
 
     // TODO save selected friends onResume -- invite fragments also
-    // TODO -- change imagebutton
-    // TODO -- Message on top - "Blocked friends cannot invite you or see what clans you have joined."
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -98,11 +92,10 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
 
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_manage_friends);
         noFriendsMessage = (TextView) view.findViewById(R.id.tv_manage_friends_no_users);
-        done = (ImageButton) view.findViewById(R.id.ib_manage_friends_done);
-        inviteWhatsapp = (FloatingActionButton) view.findViewById(R.id.fib_fragment_manage_friends_invite_people_whatsapp);
         toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_manage_friends);
         loading = (LinearLayout) view.findViewById(R.id.ll_fragment_manage_friends_loading);
         progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_manage_friends);
+        titleMessage = (TextView) view.findViewById(R.id.tvBlockScreenTitleMessage);
 
         return view;
     }
@@ -127,14 +120,8 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         userService = new UserService(bus);
         facebookService = new FacebookService(bus);
         genericCache = CacheManager.getGenericCache();
-        fragmentManager = getActivity().getFragmentManager();
-
-        done.setOnClickListener(this);
-        inviteWhatsapp.setOnClickListener(this);
 
         generateDrawable();
-        done.setImageDrawable(checkDrawable);
-        inviteWhatsapp.setImageDrawable(whatsappDrawable);
 
         initRecyclerView();
     }
@@ -142,18 +129,6 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     private void generateDrawable() {
         refreshDrawable = MaterialDrawableBuilder.with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
-                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
-                .setSizeDp(36)
-                .build();
-
-        checkDrawable = MaterialDrawableBuilder.with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
-                .setColor(ContextCompat.getColor(getActivity(), R.color.primary))
-                .setSizeDp(24)
-                .build();
-
-        whatsappDrawable = MaterialDrawableBuilder.with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.WHATSAPP)
                 .setColor(ContextCompat.getColor(getActivity(), R.color.white))
                 .setSizeDp(36)
                 .build();
@@ -169,12 +144,6 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     public void onResume() {
         super.onResume();
 
-        if (blockList.size() == 0 && unblockList.size() == 0) {
-            done.setVisibility(View.GONE);
-        } else {
-            done.setVisibility(View.VISIBLE);
-        }
-
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.MANAGE_FRIENDS_FRAGMENT);
         ((MainActivity) getActivity()).getSupportActionBar().setTitle("Block a Friend");
 
@@ -186,21 +155,24 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     @Override
     public void onPause() {
         super.onPause();
+
+        userService.sendBlockRequests(blockList, unblockList);
+
         bus.unregister(this);
     }
 
     private void displayBasicView() {
         recyclerView.setVisibility(View.VISIBLE);
         noFriendsMessage.setVisibility(View.GONE);
-        inviteWhatsapp.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
+        titleMessage.setVisibility(View.VISIBLE);
     }
 
     private void displayErrorView() {
         recyclerView.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.VISIBLE);
-        inviteWhatsapp.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
+        titleMessage.setVisibility(View.GONE);
 
         noFriendsMessage.setText(R.string.facebook_friends_not_fetched);
     }
@@ -208,7 +180,8 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     private void displayNoFriendsView() {
         recyclerView.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.VISIBLE);
-        inviteWhatsapp.setVisibility(View.GONE);
+        loading.setVisibility(View.GONE);
+        titleMessage.setVisibility(View.GONE);
 
         noFriendsMessage.setText(R.string.no_facebook_friends);
     }
@@ -217,8 +190,8 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     {
         recyclerView.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.GONE);
-        inviteWhatsapp.setVisibility(View.GONE);
         loading.setVisibility(View.VISIBLE);
+        titleMessage.setVisibility(View.GONE);
     }
 
     @Override
@@ -366,31 +339,10 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.ib_manage_friends_done) {
-            userService.sendBlockRequests(blockList, unblockList);
-            FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
-        } else if (view.getId() == R.id.fib_fragment_manage_friends_invite_people_whatsapp) {
-            boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
-            if (isWhatsappInstalled) {
-
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.WHATSAPP_INVITE_CLICKED_MANAGE_FRIENDS_FRAGMENT, userService.getActiveUserId());
-
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, userService.getActiveUserName() + AppConstants.WHATSAPP_INVITATION_MESSAGE + AppConstants.APP_LINK);
-                sendIntent.setType("text/plain");
-                sendIntent.setPackage("com.whatsapp");
-                startActivity(sendIntent);
-            } else {
-                Snackbar.make(getView(), R.string.whatsapp_not_installed, Snackbar.LENGTH_LONG).show();
-            }
-        }
     }
 
     @Override
     public void toggleBlock(String id, boolean isNowBlocked) {
-
-        done.setVisibility(View.VISIBLE);
 
         if (isNowBlocked) {
             if (!(blockList.contains(id))) {

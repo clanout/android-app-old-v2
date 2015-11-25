@@ -101,6 +101,8 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
     private Drawable addPhoneDrawable;
 
 
+    // TODO -- Please select a valid time -- in place of "Start time can't be before current time
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -32,6 +32,20 @@
             android:layout_height="48dp" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tvBlockScreenTitleMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:textColor="@color/text_subtitle"
+        android:gravity="center_horizontal"
+        android:textStyle="italic"
+        android:textSize="11sp"
+        android:text="@string/block_screen_title_message"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -61,26 +75,6 @@
                 android:layout_marginBottom="10dp"
                 android:textColor="@color/text_title"
                 android:textSize="14sp" />
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fib_fragment_manage_friends_invite_people_whatsapp"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_marginBottom="10dp" />
-
         </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <ImageButton
-            android:id="@+id/ib_manage_friends_done"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@color/white" />
-
     </LinearLayout>
 </LinearLayout>
