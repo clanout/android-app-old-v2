@@ -4,7 +4,6 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -49,7 +48,6 @@ import reaper.android.app.trigger.facebook.FacebookCoverPicFetchedTrigger;
 import reaper.android.app.ui.activity.MainActivity;
 import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
-import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
@@ -99,7 +97,6 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         super.onActivityCreated(savedInstanceState);
 
         ((MainActivity) getActivity()).setSupportActionBar(toolbar);
-        ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         fragmentManager = getActivity().getFragmentManager();
         bus = Communicator.getInstance().getBus();
@@ -181,7 +178,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         inflater.inflate(R.menu.action_button, menu);
 
         menu.findItem(R.id.action_account).setVisible(false);
-        menu.findItem(R.id.action_home).setVisible(false);
+        menu.findItem(R.id.action_home).setVisible(true);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
         menu.findItem(R.id.action_add_phone).setVisible(false);
@@ -189,15 +186,19 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         menu.findItem(R.id.action_refresh).setVisible(false);
         menu.findItem(R.id.action_notifications).setVisible(false);
         menu.findItem(R.id.action_status).setVisible(false);
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
+        menu.findItem(R.id.action_home).setIcon(homeDrawable);
 
-            ((MainActivity)getActivity()).onBackPressed();
-        }
-        return super.onOptionsItemSelected(item);
+        menu.findItem(R.id.action_home)
+                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+                {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item)
+                    {
+                        AccountsFragment.this.getActivity().onBackPressed();
+                        return true;
+                    }
+                });
     }
 
     @Override
