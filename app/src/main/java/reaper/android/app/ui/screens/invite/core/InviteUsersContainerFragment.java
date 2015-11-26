@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -56,6 +57,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
     private TabLayout tabLayout;
     private Drawable checkDrawable;
     private Toolbar toolbar;
+    private TextView friendsTabTitle, friendsTabFriendsCount, smsTabTitle, smsTabFriendsCount;
 
     //    private InviteUsersPagerAdapter inviteUsersPagerAdapter;
     private FragmentManager fragmentManager;
@@ -136,6 +138,21 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
             public void run() {
                 tabLayout.setupWithViewPager(viewPager);
 
+                tabLayout.getTabAt(0).setCustomView(R.layout.tab_invite_friends);
+                tabLayout.getTabAt(1).setCustomView(R.layout.tab_invite_friends);
+
+                friendsTabTitle = (TextView) tabLayout.getTabAt(0).getCustomView().findViewById(R.id.tabTitle);
+                friendsTabFriendsCount = (TextView) tabLayout.getTabAt(0).getCustomView().findViewById(R.id.tabFriendsCount);
+
+                smsTabTitle = (TextView) tabLayout.getTabAt(1).getCustomView().findViewById(R.id.tabTitle);
+                smsTabFriendsCount = (TextView) tabLayout.getTabAt(1).getCustomView().findViewById(R.id.tabFriendsCount);
+
+                friendsTabTitle.setText("FRIENDS");
+                smsTabTitle.setText("PHONEBOOK");
+
+                friendsTabFriendsCount.setVisibility(View.GONE);
+                smsTabFriendsCount.setVisibility(View.GONE);
+
                 tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
 
                     @Override
@@ -145,6 +162,19 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
                         SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
 
                         viewPager.setCurrentItem(tab.getPosition());
+
+                        switch (tab.getPosition())
+                        {
+                            case 0:
+                                friendsTabTitle.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
+                                smsTabTitle.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_title));
+
+                                break;
+                            case 1:
+                                smsTabTitle.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
+                                friendsTabTitle.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_title ));
+                                break;
+                        }
                     }
                 });
             }
@@ -207,9 +237,12 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
         }
 
         if (invitedAppFriends.size() == 0) {
-            tabLayout.getTabAt(0).setText("FRIENDS");
+            friendsTabTitle.setText("FRIENDS");
+            friendsTabFriendsCount.setVisibility(View.GONE);
         } else {
-            tabLayout.getTabAt(0).setText("FRIENDS - " + invitedAppFriends.size());
+            friendsTabTitle.setText("FRIENDS");
+            friendsTabFriendsCount.setVisibility(View.VISIBLE);
+            friendsTabFriendsCount.setText(" " + invitedAppFriends.size());
         }
     }
 
@@ -324,9 +357,12 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
         }
 
         if (smsInviteePhoneList.size() == 0) {
-            tabLayout.getTabAt(1).setText("PHONEBOOK");
+            smsTabTitle.setText("PHONEBOOK");
+            smsTabFriendsCount.setVisibility(View.GONE);
         } else {
-            tabLayout.getTabAt(1).setText("PHONEBOOK - " + smsInviteePhoneList.size());
+            smsTabTitle.setText("PHONEBOOK");
+            smsTabFriendsCount.setVisibility(View.VISIBLE);
+            smsTabFriendsCount.setText(" " + smsInviteePhoneList.size());
         }
     }
 }

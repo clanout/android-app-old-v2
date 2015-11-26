@@ -1,24 +1,22 @@
 package reaper.android.app.ui.screens.accounts.friends;
 
-import android.app.FragmentManager;
-import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -36,7 +34,6 @@ import java.util.Collections;
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
@@ -44,7 +41,6 @@ import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Friend;
 import reaper.android.app.model.FriendsComparator;
-import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
@@ -52,20 +48,19 @@ import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.user.AllAppFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.ui.activity.MainActivity;
-import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
-import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 public class ManageFriendsFragment extends BaseFragment implements BlockListCommunicator, View.OnClickListener {
     private RecyclerView recyclerView;
-    private TextView noFriendsMessage, titleMessage;
+    private TextView noFriendsMessage;
     private Menu menu;
     private Drawable refreshDrawable;
     private Toolbar toolbar;
-    private LinearLayout loading;
+    private LinearLayout loading, infoContainer, searchContainer;
     private ProgressBar progressBar;
+    private EditText search;
 
     private ManageFriendsAdapter manageFriendsAdapter;
     private UserService userService;
@@ -75,8 +70,11 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     private ArrayList<String> blockList;
     private ArrayList<String> unblockList;
     private ArrayList<Friend> friendList;
+    private ArrayList<Friend> visibleFriendList;
 
     private GenericCache genericCache;
+
+    private TextWatcher searchWatcher;
 
     // TODO save selected friends onResume -- invite fragments also
 
@@ -95,7 +93,9 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_manage_friends);
         loading = (LinearLayout) view.findViewById(R.id.ll_fragment_manage_friends_loading);
         progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_manage_friends);
-        titleMessage = (TextView) view.findViewById(R.id.tvBlockScreenTitleMessage);
+        infoContainer = (LinearLayout) view.findViewById(R.id.llBlockScreenInfoContainer);
+        searchContainer = (LinearLayout) view.findViewById(R.id.ll_fragment_manage_friends_search);
+        search = (EditText) view.findViewById(R.id.et_fragment_manage_friends_search);
 
         return view;
     }
@@ -115,11 +115,53 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         blockList = new ArrayList<>();
         unblockList = new ArrayList<>();
         friendList = new ArrayList<>();
+        visibleFriendList = new ArrayList<>();
 
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
         facebookService = new FacebookService(bus);
         genericCache = CacheManager.getGenericCache();
+
+        searchWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                if (s.length() >= 1) {
+                    visibleFriendList = new ArrayList<>();
+                    for (Friend friend : friendList) {
+                        if (friend.getName().toLowerCase().contains(s.toString().toLowerCase())) {
+                            visibleFriendList.add(friend);
+                        }
+                    }
+
+                    if (visibleFriendList.size() == 0) {
+                        displayNoFriendsView();
+                    } else {
+                        Collections.sort(visibleFriendList, new FriendsComparator());
+                        refreshRecyclerView();
+                    }
+                } else if (s.length() == 0) {
+                    visibleFriendList = new ArrayList<>();
+
+                    for (Friend friend : friendList) {
+                        visibleFriendList.add(friend);
+                    }
+
+                    Collections.sort(visibleFriendList, new FriendsComparator());
+                    refreshRecyclerView();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        };
 
         generateDrawable();
 
@@ -150,6 +192,8 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.MANAGE_FRIENDS);
         bus.register(this);
         userService.getAllAppFriends();
+
+        search.addTextChangedListener(searchWatcher);
     }
 
     @Override
@@ -159,20 +203,24 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         userService.sendBlockRequests(blockList, unblockList);
 
         bus.unregister(this);
+
+        search.removeTextChangedListener(searchWatcher);
     }
 
     private void displayBasicView() {
         recyclerView.setVisibility(View.VISIBLE);
         noFriendsMessage.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
-        titleMessage.setVisibility(View.VISIBLE);
+        infoContainer.setVisibility(View.VISIBLE);
+        searchContainer.setVisibility(View.VISIBLE);
     }
 
     private void displayErrorView() {
         recyclerView.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.VISIBLE);
         loading.setVisibility(View.GONE);
-        titleMessage.setVisibility(View.GONE);
+        infoContainer.setVisibility(View.GONE);
+        searchContainer.setVisibility(View.GONE);
 
         noFriendsMessage.setText(R.string.facebook_friends_not_fetched);
     }
@@ -181,7 +229,8 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         recyclerView.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.VISIBLE);
         loading.setVisibility(View.GONE);
-        titleMessage.setVisibility(View.GONE);
+        infoContainer.setVisibility(View.GONE);
+        searchContainer.setVisibility(View.VISIBLE);
 
         noFriendsMessage.setText(R.string.no_facebook_friends);
     }
@@ -191,7 +240,8 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         recyclerView.setVisibility(View.GONE);
         noFriendsMessage.setVisibility(View.GONE);
         loading.setVisibility(View.VISIBLE);
-        titleMessage.setVisibility(View.GONE);
+        infoContainer.setVisibility(View.GONE);
+        searchContainer.setVisibility(View.GONE);
     }
 
     @Override
@@ -235,19 +285,19 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     }
 
     private void initRecyclerView() {
-        manageFriendsAdapter = new ManageFriendsAdapter(getActivity(), friendList, this);
+        manageFriendsAdapter = new ManageFriendsAdapter(getActivity(), visibleFriendList, this);
 
         recyclerView.setAdapter(manageFriendsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     private void refreshRecyclerView() {
-        Collections.sort(friendList, new FriendsComparator());
-        manageFriendsAdapter = new ManageFriendsAdapter(getActivity(), friendList, this);
+        Collections.sort(visibleFriendList, new FriendsComparator());
+        manageFriendsAdapter = new ManageFriendsAdapter(getActivity(), visibleFriendList, this);
 
         recyclerView.setAdapter(manageFriendsAdapter);
 
-        if (friendList.size() == 0) {
+        if (visibleFriendList.size() == 0) {
             displayNoFriendsView();
 
         } else {
@@ -312,6 +362,14 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
                 }
 
                 friendList = (ArrayList<Friend>) trigger.getFriends();
+
+                visibleFriendList = new ArrayList<>();
+
+                for(Friend friend : friendList)
+                {
+                    visibleFriendList.add(friend);
+                }
+
                 refreshRecyclerView();
             }
         };

@@ -16,7 +16,7 @@
 
        <RadioButton
            android:id="@+id/rb_share_feedback_bug"
-           android:layout_width="wrap_content"
+           android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:text="Report a bug"
            android:textSize="14sp"
@@ -24,7 +24,7 @@
 
        <RadioButton
            android:id="@+id/rb_share_feedback_new_feature"
-           android:layout_width="wrap_content"
+           android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:text="Suggest new feature"
            android:textSize="14sp"
@@ -32,7 +32,7 @@
 
        <RadioButton
            android:id="@+id/rb_share_feedback_other"
-           android:layout_width="wrap_content"
+           android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:text="Other"
            android:textSize="14sp"

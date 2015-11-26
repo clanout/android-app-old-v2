@@ -10,6 +10,7 @@
     <!-- Background -->
     <color name="background_default">#FAFAFA</color>
     <color name="background_bar">#E0E0E0</color>
+    <color name="dark_grey">#D0D0D0</color>
 
     <!-- Miscellaneous -->
     <color name="whity">#FFFFFF</color>
