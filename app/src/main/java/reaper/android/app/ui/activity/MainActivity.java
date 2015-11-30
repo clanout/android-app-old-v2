@@ -45,6 +45,7 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchForActivityTrigger;
 import reaper.android.app.trigger.gcm.GcmRegistrationCompleteTrigger;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
+import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
@@ -118,7 +119,9 @@ public class MainActivity extends AppCompatActivity {
                 shouldPopUpStatusDialog = false;
             }
 
+
             eventService.fetchEventsForActivity(locationService.getUserLocation().getZone());
+
         } else {
             String lastNotificationReceived = genericCache
                     .get(Timestamps.NOTIFICATION_RECEIVED_TIMESTAMP);
@@ -289,13 +292,25 @@ public class MainActivity extends AppCompatActivity {
             activePosition = eventList.indexOf(activeEvent);
         }
 
-        EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, (ArrayList<Event>) eventList);
-        bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
-        bundle.putBoolean(BundleKeys.POPUP_STATUS_DIALOG, shouldPopUpStatusDialog);
-        eventDetailsContainerFragment.setArguments(bundle);
-        FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment);
+        if (getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT).equals("yes")) {
+
+            ChatFragment chatFragment = new ChatFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_ID, eventId);
+            bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_NAME, eventList.get(activePosition).getTitle());
+            chatFragment.setArguments(bundle);
+            FragmentUtils.changeFragment(getFragmentManager(), chatFragment);
+
+        } else {
+
+            EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, (ArrayList<Event>) eventList);
+            bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
+            bundle.putBoolean(BundleKeys.POPUP_STATUS_DIALOG, shouldPopUpStatusDialog);
+            eventDetailsContainerFragment.setArguments(bundle);
+            FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment);
+        }
     }
 
     @Subscribe

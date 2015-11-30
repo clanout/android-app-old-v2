@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import net.steamcrafted.materialiconlib.MaterialIconView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
@@ -105,6 +106,12 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
 
             // Friends Attending
             List<String> friends = event.getFriends();
+
+            if(friends == null)
+            {
+                friends = new ArrayList<>();
+            }
+
             if (event.getFriendCount() == 0)
             {
                 tvFriendsGoing.setText(R.string.label_feed_no_friends);

@@ -118,6 +118,8 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
 
         invitedAppFriends = new ArrayList<>();
         smsInviteePhoneList = new ArrayList<>();
+        inviteeList = new ArrayList<>();
+        attendeeList = new ArrayList<>();
 
         generateDrawables();
 

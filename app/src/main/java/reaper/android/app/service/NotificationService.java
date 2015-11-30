@@ -117,7 +117,7 @@ public class NotificationService {
                         bus.post(new NewNotificationReceivedTrigger());
 
                     } else {
-                        buildNotification(notification, true);
+                        buildNotification(notification, true, false);
                     }
                 }
 
@@ -145,7 +145,7 @@ public class NotificationService {
                         bus.post(new NewNotificationReceivedTrigger());
 
                     } else {
-                        buildNotification(notification, true);
+                        buildNotification(notification, true, true);
                     }
                 }
 
@@ -170,7 +170,7 @@ public class NotificationService {
                     bus.post(new NewNotificationReceivedTrigger());
 
                 } else {
-                    buildNotification(notification, true);
+                    buildNotification(notification, true, false);
                 }
             }
 
@@ -225,7 +225,7 @@ public class NotificationService {
                                 bus.post(new NewNotificationReceivedTrigger());
 
                             } else {
-                                buildNotification(notification, true);
+                                buildNotification(notification, true, false);
                             }
                         }
 
@@ -262,7 +262,7 @@ public class NotificationService {
                         bus.post(new NewNotificationReceivedTrigger());
 
                     } else {
-                        buildNotification(notification, false);
+                        buildNotification(notification, false, false);
                     }
                 }
 
@@ -317,7 +317,7 @@ public class NotificationService {
                                             bus.post(new NewNotificationReceivedTrigger());
 
                                         } else {
-                                            buildNotification(notification, true);
+                                            buildNotification(notification, true, false);
                                         }
                                     }
 
@@ -354,7 +354,7 @@ public class NotificationService {
                                 bus.post(new NewNotificationReceivedTrigger());
 
                             } else {
-                                buildNotification(notification, true);
+                                buildNotification(notification, true, false);
                             }
                         }
 
@@ -388,7 +388,7 @@ public class NotificationService {
                                             bus.post(new NewNotificationReceivedTrigger());
 
                                         } else {
-                                            buildNotification(notification, true);
+                                            buildNotification(notification, true, false);
                                         }
                                     }
 
@@ -431,7 +431,7 @@ public class NotificationService {
                                         if (ifAppRunningInForeground()) {
                                             bus.post(new NewNotificationReceivedTrigger());
                                         } else {
-                                            buildNotification(notification, true);
+                                            buildNotification(notification, true, false);
                                         }
                                     }
 
@@ -623,7 +623,7 @@ public class NotificationService {
         });
     }
 
-    private void buildNotification(Notification notification, boolean shouldGoToDetailsFragment) {
+    private void buildNotification(Notification notification, boolean shouldGoToDetailsFragment, boolean shouldGoToChatFragment) {
         Intent intent = new Intent(Reaper.getReaperContext(), LauncherActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
@@ -634,6 +634,14 @@ public class NotificationService {
             intent.putExtra("event_id", notification.getEventId());
         } else {
             intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "no");
+        }
+
+        if(shouldGoToChatFragment)
+        {
+            intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, "yes");
+            intent.putExtra(BundleKeys.EVENT_NAME, notification.getArgs().get("event_name"));
+        }else{
+            intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, "no");
         }
 
         intent.putExtra("randomRequestCode", requestCode);

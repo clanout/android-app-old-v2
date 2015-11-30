@@ -24,4 +24,6 @@ public class BundleKeys
 
     public static final String EVENT_SUGGESTION = "event_suggestion";
     public static final String POPUP_STATUS_DIALOG = "popup_status_dialog";
+    public static final String SHOULD_GO_TO_CHAT_FRAGMENT = "should_go_to_chat_fragment";
+    public static final String EVENT_NAME = "event_name";
 }

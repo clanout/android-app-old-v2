@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -99,7 +100,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
     private int loadHistoryClickCount = 1;
 
     private MessageListener messageListener;
-    private Drawable sendDrawable;
     private Toolbar toolbar;
 
     private long loadHistoryLastClickedTime = 0;
@@ -148,16 +148,24 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
         Bundle bundle = getArguments();
         if (bundle == null) {
+
+            Log.d("APP", "error -- bundle  null");
+
             renderNoSessionView();
         }
 
         eventId = (String) bundle.get(BundleKeys.CHAT_FRAGMENT_EVENT_ID);
         if (eventId == null || eventId.isEmpty()) {
+
+            Log.d("APP", "error -- eventId  null");
             renderNoSessionView();
         }
 
         eventName = (String) bundle.get(BundleKeys.CHAT_FRAGMENT_EVENT_NAME);
         if (eventName == null) {
+
+            Log.d("APP", "error -- eventName  null");
+
             renderNoSessionView();
         }
 
@@ -208,6 +216,8 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         try {
             ChatHelper.getXmppConnection();
         } catch (Exception e) {
+
+            Log.d("APP", "error -- exception getXmppConnection" + e.getMessage());
 
             AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_GET_XMPP_CONNECTION, userService.getActiveUserId());
 

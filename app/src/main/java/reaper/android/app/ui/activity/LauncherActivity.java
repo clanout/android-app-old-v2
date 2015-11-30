@@ -282,6 +282,17 @@ public class LauncherActivity extends AppCompatActivity
                     intent.putExtra(BundleKeys.POPUP_STATUS_DIALOG, false);
                 }
 
+                String shouldGoToChatFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT);
+
+                if(shouldGoToChatFragment == null)
+                {
+                    shouldGoToChatFragment = "no";
+                    intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, shouldGoToChatFragment);
+                }else{
+
+                   intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, shouldGoToChatFragment);
+                }
+
             } else
             {
                 intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
