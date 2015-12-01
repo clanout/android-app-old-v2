@@ -1355,8 +1355,7 @@ public class EventService
 
     public Observable<EventDetails> _fetchEventDetailsFromCache(final String eventId)
     {
-        return eventCache
-                .getEventDetails(eventId);
+        return eventCache.getEventDetails(eventId);
     }
 
     public Observable<EventDetails> _fetchEventDetailsFromNetwork(final String eventId)

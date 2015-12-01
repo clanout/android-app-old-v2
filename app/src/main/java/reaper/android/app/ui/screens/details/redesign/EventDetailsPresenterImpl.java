@@ -4,9 +4,12 @@ import com.squareup.otto.Bus;
 
 import org.joda.time.DateTime;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventAttendeeComparator;
@@ -24,13 +27,17 @@ import timber.log.Timber;
 
 public class EventDetailsPresenterImpl implements EventDetailsPresenter
 {
+    private static final int DISPLAY_LAST_MINUTE_DIALOG = 1;
+
     /* View */
     private EventDetailsView view;
 
     /* Service */
+    private EventCache eventCache;
     private EventService eventService;
 
     /* Data */
+    private int flag;
     private Event event;
     private String userId;
     private String userName;
@@ -42,10 +49,12 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     /* Subscriptions */
     private CompositeSubscription subscriptions;
 
-    public EventDetailsPresenterImpl(Bus bus, Event event)
+    public EventDetailsPresenterImpl(Bus bus, Event event, int flag)
     {
+        this.flag = flag;
         this.event = event;
         eventService = new EventService(bus);
+        eventCache = CacheManager.getEventCache();
         subscriptions = new CompositeSubscription();
 
         UserService userService = new UserService(bus);
@@ -79,6 +88,38 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     public void chat()
     {
         view.navigateToChatScreen(event.getId(), event.getTitle());
+    }
+
+    @Override
+    public void setStatus(String status)
+    {
+        Timber.v(">>>> qwerty1234 : " + status);
+        this.status = status;
+        view.displayStatusMessage(statusType, status);
+
+        switch (statusType)
+        {
+            case StatusType.INVITED:
+                AnalyticsHelper
+                        .sendEvents(GoogleAnalyticsConstants.GENERAL,
+                                GoogleAnalyticsConstants.INVITATION_RESPONSE_SENT,
+                                userId);
+                eventService.sendInvitationResponse(event.getId(), status);
+                break;
+
+            case StatusType.EMPTY:
+            case StatusType.NORMAL:
+            case StatusType.LAST_MINUTE_EMPTY:
+            case StatusType.LAST_MINUTE:
+                boolean shouldNotifyFriends = (statusType == StatusType.LAST_MINUTE_EMPTY
+                        || statusType == StatusType.LAST_MINUTE);
+                eventService.updateStatus(event.getId(), status, shouldNotifyFriends);
+
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL,
+                        GoogleAnalyticsConstants.STATUS_UPDATED, userId);
+
+                break;
+        }
     }
 
     @Override
@@ -180,7 +221,37 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     @Override
     public void onStatusClicked()
     {
-        Timber.v(">>>> STATUS CLICKED");
+        switch (statusType)
+        {
+            case StatusType.NONE:
+                // Not Going; No Invitation
+                break;
+
+            case StatusType.INVITED:
+                // Not Going; Invited
+                view.displayInvitationResponseDialog(event.getId(), userId);
+                break;
+
+            case StatusType.EMPTY:
+                // Going; Status empty; Add status
+                view.displayUpdateStatusDialog(event.getId(), userId, status, false);
+                break;
+
+            case StatusType.NORMAL:
+                // Going; Status already provided; Update
+                view.displayUpdateStatusDialog(event.getId(), userId, status, false);
+                break;
+
+            case StatusType.LAST_MINUTE_EMPTY:
+                // Going; Status Empty; Add last minute info
+                view.displayUpdateStatusDialog(event.getId(), userId, status, true);
+                break;
+
+            case StatusType.LAST_MINUTE:
+                // Going; Status already provided; Update last minute info
+                view.displayUpdateStatusDialog(event.getId(), userId, status, true);
+                break;
+        }
     }
 
     @Override
@@ -283,6 +354,31 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
                             public void onNext(EventDetails eventDetails)
                             {
                                 displayDetails(eventDetails);
+
+                                List<String> friends = new ArrayList<>();
+                                int friendCount = 0;
+                                for (EventDetails.Attendee attendee : eventDetails.getAttendees())
+                                {
+                                    if (attendee.isFriend())
+                                    {
+                                        friendCount++;
+
+                                        try
+                                        {
+                                            String name = attendee.getName();
+                                            String[] tokens = name.split(" ");
+                                            friends.add(tokens[0]);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                        }
+                                    }
+                                }
+
+                                event.setFriendCount(friendCount);
+                                event.setFriends(friends);
+
+                                eventCache.save(event);
                             }
                         });
 
@@ -313,6 +409,15 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
         view.displayDescription(eventDetails.getDescription());
         view.displayStatusMessage(statusType, status);
         view.displayAttendeeList(attendees);
+
+
+        if (flag == DISPLAY_LAST_MINUTE_DIALOG)
+        {
+            if (statusType == StatusType.LAST_MINUTE || statusType == StatusType.LAST_MINUTE_EMPTY)
+            {
+                view.displayUpdateStatusDialog(event.getId(), userId, status, true);
+            }
+        }
     }
 
     private void processStatusType()

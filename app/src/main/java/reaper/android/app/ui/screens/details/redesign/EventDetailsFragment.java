@@ -1,5 +1,6 @@
 package reaper.android.app.ui.screens.details.redesign;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -7,19 +8,24 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
@@ -58,6 +64,10 @@ import timber.log.Timber;
 public class EventDetailsFragment extends BaseFragment implements EventDetailsView
 {
     private static final String ARG_EVENT = "arg_event";
+    private static final String ARG_LAST_MINUTE_DIALOG = "arg_last_minute_dialog";
+
+    private static final int FLAG_DEFAULT = 0;
+    public static final int FLAG_LAST_MINUTE_STATUS = 1;
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat
             .forPattern("hh:mm a, dd MMM");
@@ -77,7 +87,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     TextView tvName;
     TextView tvStatus;
     TextView tvRsvp;
-    Switch sRsvp;
+    SwitchCompat sRsvp;
 
     ProgressBar loading;
     RecyclerView rvAttendees;
@@ -99,6 +109,18 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     {
         Bundle args = new Bundle();
         args.putSerializable(ARG_EVENT, event);
+        args.putInt(ARG_LAST_MINUTE_DIALOG, FLAG_DEFAULT);
+
+        EventDetailsFragment fragment = new EventDetailsFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static EventDetailsFragment newInstance(Event event, int flag)
+    {
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_EVENT, event);
+        args.putInt(ARG_LAST_MINUTE_DIALOG, flag);
 
         EventDetailsFragment fragment = new EventDetailsFragment();
         fragment.setArguments(args);
@@ -112,8 +134,13 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
         setHasOptionsMenu(true);
 
         Event event;
+        int flag;
+
         try
         {
+            flag = getArguments().getInt(ARG_LAST_MINUTE_DIALOG, FLAG_DEFAULT);
+            getArguments().remove(ARG_LAST_MINUTE_DIALOG);
+
             event = (Event) getArguments().getSerializable(ARG_EVENT);
             if (event == null)
             {
@@ -125,7 +152,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
             throw new IllegalStateException("Event cannot be null");
         }
 
-        presenter = new EventDetailsPresenterImpl(bus, event);
+        presenter = new EventDetailsPresenterImpl(bus, event, flag);
     }
 
     @Nullable
@@ -148,7 +175,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
         tvName = (TextView) view.findViewById(R.id.tvName);
         tvStatus = (TextView) view.findViewById(R.id.tvStatus);
         tvRsvp = (TextView) view.findViewById(R.id.tvRsvp);
-        sRsvp = (Switch) view.findViewById(R.id.sRsvp);
+        sRsvp = (SwitchCompat) view.findViewById(R.id.sRsvp);
 
         loading = (ProgressBar) view.findViewById(R.id.loading);
         rvAttendees = (RecyclerView) view.findViewById(R.id.rvAttendees);
@@ -338,6 +365,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     @Override
     public void displayStatusMessage(int statusType, String status)
     {
+        Timber.v(">>>> qwerty : " + status);
         switch (statusType)
         {
             case StatusType.NONE:
@@ -383,6 +411,159 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     }
 
     @Override
+    public void displayInvitationResponseDialog(final String eventId, final String userId)
+    {
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL,
+                GoogleAnalyticsConstants.INVITATION_RESPONSE_DIALOG_OPENED,
+                userService.getActiveUserId());
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(true);
+
+        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+        View dialogView = layoutInflater.inflate(R.layout.alert_dialog_invitation_response, null);
+        builder.setView(dialogView);
+
+        final EditText message = (EditText) dialogView
+                .findViewById(R.id.et_alert_dialog_invitation_response_message);
+        ListView list = (ListView) dialogView
+                .findViewById(R.id.lv_alert_dialog_invitation_response);
+
+        final List<String> responseList = new ArrayList<>();
+        responseList.add("Not in a mood");
+        responseList.add("Busy with other plans");
+        responseList.add("Thanks. Can't make it this time");
+        responseList.add("Staying in bed. Waiting for aliens to pick me up");
+
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_list_view_dialog, responseList);
+
+        list.setAdapter(statusAdapter);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK,
+                        GoogleAnalyticsConstants.INVITAION_RESPONSE_TEMPLATE_CHOSEN,
+                        "user:" + userId + ";template:" + responseList.get(position));
+
+                message.setText(responseList.get(position));
+            }
+        });
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+
+                if (message.getText().toString() != null || !(message.getText().toString()
+                                                                     .isEmpty()))
+                {
+                    presenter.setStatus(message.getText().toString());
+
+                    Snackbar
+                            .make(getView(), R.string.invitation_response_sent, Snackbar.LENGTH_LONG)
+                            .show();
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    @Override
+    public void displayUpdateStatusDialog(String eventId, final String userId, String oldStatus, boolean isLastMinute)
+    {
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL,
+                GoogleAnalyticsConstants.STATUS_DIALOG_OPENED,
+                userId);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(true);
+
+        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+        View dialogView = layoutInflater.inflate(R.layout.alert_dialog_status, null);
+        builder.setView(dialogView);
+
+        final EditText status = (EditText) dialogView
+                .findViewById(R.id.et_alert_dialog_status_message);
+        ListView list = (ListView) dialogView.findViewById(R.id.lv_alert_dialog_status);
+        TextView title = (TextView) dialogView.findViewById(R.id.tv_alert_dialog_status_title);
+
+        final List<String> statusList = new ArrayList<>();
+        statusList.add("On my way");
+        statusList.add("Running late");
+        statusList.add("Sorry, changed my mind");
+        statusList.add("Yippie-kai yay!");
+
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(getActivity(),
+                R.layout.list_item_list_view_dialog, statusList);
+        list.setAdapter(statusAdapter);
+
+        if (isLastMinute)
+        {
+            list.setVisibility(View.VISIBLE);
+            title.setText(R.string.event_status_dialog_title);
+        }
+        else
+        {
+            list.setVisibility(View.GONE);
+            title.setText(R.string.event_status_dialog_title_alternate);
+        }
+
+        if (oldStatus == null || oldStatus.isEmpty())
+        {
+            status.setHint(R.string.default_event_status);
+        }
+        else
+        {
+            status.setText(oldStatus);
+        }
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+
+                AnalyticsHelper
+                        .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK,
+                                GoogleAnalyticsConstants.STATUS_TEMPLATE_CHOSEN,
+                                "user:" + userId + ";template:" + statusList.get(position));
+
+                status.setText(statusList.get(position));
+            }
+        });
+
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                presenter.setStatus(status.getText().toString());
+                dialog.dismiss();
+            }
+        });
+
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener()
+        {
+            @Override
+            public void onCancel(DialogInterface dialog)
+            {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    @Override
     public void displayDescription(String description)
     {
         if (description != null && !description.isEmpty())
@@ -420,7 +601,8 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
         bundle.putSerializable(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT, event);
         bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, false);
         inviteUsersContainerFragment.setArguments(bundle);
-        FragmentUtils.changeFragment(getActivity().getFragmentManager(), inviteUsersContainerFragment);
+        FragmentUtils
+                .changeFragment(getActivity().getFragmentManager(), inviteUsersContainerFragment);
     }
 
     @Override

@@ -21,6 +21,10 @@ public interface EventDetailsView
 
     void displayStatusMessage(int statusType, String status);
 
+    void displayInvitationResponseDialog(String eventId, String userId);
+
+    void displayUpdateStatusDialog(String eventId, String userId, String oldStatus, boolean isLastMinute);
+
     void displayAttendeeList(List<EventDetails.Attendee> attendees);
 
     void showAttendeeLoading();

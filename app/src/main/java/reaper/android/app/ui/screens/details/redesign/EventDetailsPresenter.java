@@ -16,5 +16,7 @@ public interface EventDetailsPresenter
 
     void chat();
 
+    void setStatus(String status);
+
     void requestEditActionState();
 }

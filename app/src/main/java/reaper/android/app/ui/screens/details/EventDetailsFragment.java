@@ -428,7 +428,8 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
     private void displayStatusDialog() {
 
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.STATUS_DIALOG_OPENED, userService.getActiveUserId());
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL,
+                GoogleAnalyticsConstants.STATUS_DIALOG_OPENED, userService.getActiveUserId());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);

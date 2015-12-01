@@ -8,10 +8,6 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.squareup.otto.Bus;
 
 import org.joda.time.DateTime;
 
@@ -24,11 +20,7 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.model.Event;
-import reaper.android.app.root.Reaper;
-import reaper.android.app.service.AccountsService;
-import reaper.android.app.service.NotificationService;
 import reaper.android.app.ui.activity.LauncherActivity;
-import reaper.android.common.communicator.Communicator;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -36,39 +28,48 @@ import rx.schedulers.Schedulers;
 /**
  * Created by harsh on 31/10/15.
  */
-public class AlarmReceiver extends BroadcastReceiver {
+public class AlarmReceiver extends BroadcastReceiver
+{
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(Context context, Intent intent)
+    {
 
-        if (!ifAppRunningInForeground()) {
+        if (!ifAppRunningInForeground())
+        {
             fetchEvents(context);
         }
     }
 
-    private void fetchEvents(final Context context) {
+    private void fetchEvents(final Context context)
+    {
         EventCache eventCache = CacheManager.getEventCache();
 
-        eventCache.getEvents().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<List<Event>>() {
+        eventCache.getEvents().subscribeOn(Schedulers.newThread())
+                  .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<List<Event>>()
+        {
             @Override
-            public void onCompleted() {
+            public void onCompleted()
+            {
 
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onError(Throwable e)
+            {
 
             }
 
             @Override
-            public void onNext(List<Event> events) {
+            public void onNext(List<Event> events)
+            {
 
-                for (Event event : events) {
+                for (Event event : events)
+                {
 
                     // TODO -- change condition
 
-                    if ((event.getStartTime().getMillis() - DateTime.now().getMillis() > 1)) {
-
+                    if (event.getStartTime().isBefore(DateTime.now().plusHours(1))){
                         buildNotification(event, context);
                     }
                 }
@@ -76,7 +77,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         });
     }
 
-    private void buildNotification(Event event, Context context) {
+    private void buildNotification(Event event, Context context)
+    {
 
         Intent intent = new Intent(context, LauncherActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -96,7 +98,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.mipmap.logo1)
                 .setContentTitle(event.getTitle())
-                .setContentText(context.getResources().getString(R.string.reminder_notification_message))
+                .setContentText(context.getResources()
+                                       .getString(R.string.reminder_notification_message))
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
@@ -108,13 +111,17 @@ public class AlarmReceiver extends BroadcastReceiver {
         notificationManager.notify((int) (Math.random() * 1000), notificationBuilder.build());
     }
 
-    private boolean ifAppRunningInForeground() {
+    private boolean ifAppRunningInForeground()
+    {
 
         GenericCache genericCache = CacheManager.getGenericCache();
 
-        if (genericCache.get(CacheKeys.IS_APP_IN_FOREGROUND).equalsIgnoreCase("true")) {
+        if (genericCache.get(CacheKeys.IS_APP_IN_FOREGROUND).equalsIgnoreCase("true"))
+        {
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
