@@ -146,7 +146,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
         public void render(Notification notification) {
             notificationMessage.setText(notification.getMessage());
-            notificationIconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.primary, 4));
+            notificationIconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.primary_light, 4));
 
             switch (notification.getType()) {
                 case Notification.CHAT:
@@ -161,42 +161,31 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 //                            .into(notificationIcon);
 
                     notificationIcon.setImageDrawable(friendAddedDrawable);
-                    notificationIconContainer.setBackground(DrawableFactory.getIconBackground(EventCategory.OUTDOORS));
                     break;
 
                 case Notification.EVENT_UPDATED:
 
                     notificationIcon.setImageDrawable(eventUpdatedDrawable);
-                    notificationIconContainer.setBackground(DrawableFactory.getIconBackground(EventCategory.INDOORS));
                     break;
                 case Notification.EVENT_REMOVED:
 
                     notificationIcon.setImageDrawable(eventRemovedDrawable);
-                    notificationIconContainer.setBackground(DrawableFactory.getIconBackground(EventCategory.DRINKS));
                     break;
                 case Notification.RSVP:
 
                     notificationIcon.setImageDrawable(rsvpDrawable);
-                    notificationIconContainer.setBackground(DrawableFactory.getIconBackground(EventCategory.EAT_OUT));
-
                     break;
                 case Notification.EVENT_INVITATION:
 
                     notificationIcon.setImageDrawable(eventInvitationDrawable);
-                    notificationIconContainer.setBackground(DrawableFactory.getIconBackground(EventCategory.SHOPPING));
-
                     break;
                 case Notification.EVENT_CREATED:
 
                     notificationIcon.setImageDrawable(eventCreatedDrawable);
-                    notificationIconContainer.setBackground(DrawableFactory.getIconBackground(EventCategory.SPORTS));
-
                     break;
                 case Notification.STATUS:
 
                     notificationIcon.setImageDrawable(statusDrawable);
-                    notificationIconContainer.setBackground(DrawableFactory.getIconBackground(EventCategory.MOVIES));
-
                     break;
             }
         }
