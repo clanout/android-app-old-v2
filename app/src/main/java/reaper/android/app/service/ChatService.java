@@ -5,6 +5,7 @@ import com.squareup.otto.Bus;
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MUCNotJoinedException;
 import org.jivesoftware.smackx.muc.MultiUserChat;
@@ -37,7 +38,7 @@ public class ChatService
         chat.join(nickName, null, history, timeout);
     }
 
-    public void postMessage(MultiUserChat chat, String chatMessage, String nickName, long timeout) throws SmackException.NotConnectedException, XMPPException.XMPPErrorException, SmackException.NoResponseException
+    public void postMessage(MultiUserChat chat, Message chatMessage, String nickName, long timeout) throws SmackException.NotConnectedException, XMPPException.XMPPErrorException, SmackException.NoResponseException
     {
         DiscussionHistory history = new DiscussionHistory();
         history.setMaxStanzas(0);

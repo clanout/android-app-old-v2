@@ -34,4 +34,6 @@ public class CacheKeys
     public static final java.lang.String EVENT_SUGGESTIONS = "event_suggestions";
     public static final java.lang.String HAS_GIVEN_FEEDBACK = "has_given_Feedback";
     public static final java.lang.String HAS_SEEN_INVITE_POPUP = "has_seen_invite_popup";
+    public static final String ON_RESUME_CALLED = "on_resume_called";
+    public static final String READ_CONTACT_PERMISSION_DENIED = "read_contact_permission_denied";
 }

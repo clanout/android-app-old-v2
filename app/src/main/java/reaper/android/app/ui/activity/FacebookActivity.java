@@ -1,8 +1,11 @@
 package reaper.android.app.ui.activity;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -18,6 +21,12 @@ import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.squareup.otto.Bus;
 
 import java.util.Arrays;
@@ -48,6 +57,8 @@ public class FacebookActivity extends AppCompatActivity
     private UserCache userCache;
     private UserService userService;
     private Bus bus;
+
+    private boolean backFromSettingsPage;
 
     private static final String PERMISSION_REQUIRED = "Allow access to your basic profile information, email and friend list. This is required to connect you with your facebook friends on clanOut";
     private static final String PERMISSION_REQUIRED_TITLE = "Request for permission";
@@ -96,6 +107,12 @@ public class FacebookActivity extends AppCompatActivity
         super.onResume();
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.FACEBOOK_ACTIVITY);
+
+        if(backFromSettingsPage)
+        {
+            goToLauncherActivity();
+        }
+
     }
 
     @Override
@@ -106,9 +123,8 @@ public class FacebookActivity extends AppCompatActivity
 
     private void goToLauncherActivity()
     {
-        Intent intent = new Intent(this, LauncherActivity.class);
-        startActivity(intent);
-        finish();
+        facebookLoginButton.setVisibility(View.GONE);
+        handleLocationPermission();
     }
 
     private void setUpFacebookLoginButton()
@@ -191,11 +207,9 @@ public class FacebookActivity extends AppCompatActivity
                 LoginManager.getInstance().logInWithReadPermissions(FacebookActivity.this, Arrays.asList("email", "user_friends"));
             }
         });
-        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener()
-        {
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
+            public void onClick(DialogInterface dialog, int which) {
                 Toast.makeText(FacebookActivity.this, R.string.location_denied, Toast.LENGTH_LONG).show();
                 AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.FACEBOOK_PERMISSION_DENIED, null);
                 FacebookActivity.this.finish();
@@ -213,4 +227,133 @@ public class FacebookActivity extends AppCompatActivity
 
         facebookCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
+
+    private void handleLocationPermission() {
+
+        Log.d("APP", "inside handleLocationPermission");
+
+        try {
+            Dexter.checkPermission(new PermissionListener() {
+                @Override
+                public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+
+                    Log.d("APP", "inside handleLocationPermission ---- permission granted");
+
+                    Intent intent = new Intent(FacebookActivity.this, LauncherActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+
+                @Override
+                public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+
+                    Log.d("APP", "inside handleLocationPermission ---- permission denied");
+                    if (permissionDeniedResponse.isPermanentlyDenied()) {
+
+
+                        displayLocationRequiredDialogPermanentlyDeclinedCase();
+
+                    } else {
+
+                        displayLocationRequiredDialog();
+                    }
+                }
+
+                @Override
+                public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+
+                    Log.d("APP", "inside handleLocationPermission ---- permission rationale shown");
+                    permissionToken.continuePermissionRequest();
+                }
+            }, Manifest.permission.ACCESS_FINE_LOCATION);
+        }catch (Exception e)
+        {
+            Log.d("APP", "Exception in Dexter --- while asking for location permission");
+        }
+    }
+
+    private void displayLocationRequiredDialogPermanentlyDeclinedCase() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        builder.setTitle(R.string.location_required_title);
+        builder.setMessage(R.string.location_required_message);
+        builder.setPositiveButton("TAKE ME TO SETTINGS", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+                goToSettings();
+            }
+        });
+        builder.setNegativeButton("EXIT", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                Toast.makeText(FacebookActivity.this, R.string.location_denied, Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
+
+        builder.create().show();
+    }
+
+    private void goToSettings() {
+
+        backFromSettingsPage = true;
+
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        startActivity(intent);
+    }
+
+    private void displayLocationRequiredDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        builder.setTitle(R.string.location_required_title);
+        builder.setMessage(R.string.location_required_message);
+        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+
+                try {
+                    Dexter.checkPermission(new PermissionListener() {
+                        @Override
+                        public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+
+
+                            Intent intent = new Intent(FacebookActivity.this, LauncherActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+
+                        @Override
+                        public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+
+                            Toast.makeText(FacebookActivity.this, R.string.location_denied, Toast.LENGTH_LONG).show();
+                            finish();
+                        }
+
+                        @Override
+                        public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+
+                            permissionToken.continuePermissionRequest();
+                        }
+                    }, Manifest.permission.ACCESS_FINE_LOCATION);
+                }catch (Exception e)
+                {
+
+                }
+            }
+        });
+
+
+        builder.create().show();
+    }
+
 }

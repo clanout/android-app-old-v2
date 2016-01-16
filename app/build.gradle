@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId "reaper.android"
-        minSdkVersion 19
+        minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -115,5 +115,8 @@ dependencies {
 
     // in app rating
     compile 'com.github.Angtrim:Android-Five-Stars-Library:v3.1'
+
+    // Permissions
+    compile 'com.karumi:dexter:2.1.2'
 
 }

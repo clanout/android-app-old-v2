@@ -46,16 +46,6 @@
         android:orientation="vertical"
         android:background="#ECEFF1">
 
-        <Button
-            android:id="@+id/b_chat_fragment_load_history"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#BDBDBD"
-            android:text="Load Previous Messages"
-            android:textColor="@color/text_title"
-            android:alpha="0.5"
-            style="@style/Base.Widget.AppCompat.Button.Small"/>
-
         <ListView
             android:id="@+id/lv_chat_fragment"
             android:layout_width="match_parent"
@@ -88,6 +78,7 @@
             android:autoText="true"
             android:textSize="16sp"
             android:hint="Write a Message"
+            android:maxLines="5"
             android:textColor="@color/text_title"
             android:layout_gravity="bottom"
             android:background="@android:color/transparent"/>

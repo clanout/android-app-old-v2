@@ -20,6 +20,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.karumi.dexter.Dexter;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.ThreadEnforcer;
@@ -93,6 +94,8 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         instance = this;
 
         FacebookSdk.sdkInitialize(this);
+
+        Dexter.initialize(this);
 
         if (BuildConfig.DEBUG)
         {

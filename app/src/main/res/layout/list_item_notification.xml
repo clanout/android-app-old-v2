@@ -10,20 +10,31 @@
     android:paddingRight="16dp"
     android:paddingTop="8dp">
 
-    <ImageView
-        android:id="@+id/iv_list_item_notifications"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+    <LinearLayout
+        android:id="@+id/llNotificationIconContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="16dp"/>
+        android:background="@color/category_icon_five"
+        android:gravity="center_vertical|center_horizontal"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/iv_list_item_notifications"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/tv_list_item_notifications"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/iv_list_item_notifications"
+        android:layout_marginLeft="16dp"
+        android:layout_toRightOf="@+id/llNotificationIconContainer"
         android:maxLines="2"/>
 
 </RelativeLayout>

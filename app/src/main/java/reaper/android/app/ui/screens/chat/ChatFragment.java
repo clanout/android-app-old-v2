@@ -19,7 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -29,6 +29,7 @@ import android.widget.TextView;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 import net.steamcrafted.materialiconlib.MaterialIconView;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
@@ -77,8 +78,8 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
     private ListView listView;
     private TextView noSessionMessage;
     private LinearLayout mainContent, loading;
-    private Button loadHistory;
     private ProgressBar progressBar;
+    private MenuItem loadHistory;
 
     private ChatAdapter chatAdapter;
     private List<ChatMessage> chatMessageList;
@@ -106,12 +107,13 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
     private TextWatcher chatWatcher;
 
+    private String stanzaId;
+
     // TODO -- add watermark in background
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -124,7 +126,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         noSessionMessage = (TextView) view.findViewById(R.id.tv_fragment_chat_no_session);
         mainContent = (LinearLayout) view.findViewById(R.id.ll_fragment_chat_main_content);
         loading = (LinearLayout) view.findViewById(R.id.ll_fragment_chat_loading);
-        loadHistory = (Button) view.findViewById(R.id.b_chat_fragment_load_history);
         toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_chat);
         progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_chat);
 
@@ -136,13 +137,13 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         super.onActivityCreated(savedInstanceState);
 
         ((MainActivity) getActivity()).setSupportActionBar(toolbar);
+        setHasOptionsMenu(true);
         ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         renderLoadingView();
         progressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(getActivity(), R.color.accent), PorterDuff.Mode.SRC_IN);
 
         send.setOnClickListener(this);
-        loadHistory.setOnClickListener(this);
 
         send.setColor(ContextCompat.getColor(getActivity(), R.color.light_grey));
 
@@ -180,6 +181,8 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
         isMessageSent = false;
 
+        chatMessageList = new ArrayList<>();
+
         chatWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -189,10 +192,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                if(s.length() > 0)
-                {
+                if (s.length() > 0) {
                     send.setColor(ContextCompat.getColor(getActivity(), R.color.accent));
-                }else {
+                } else {
                     send.setColor(ContextCompat.getColor(getActivity(), R.color.light_grey));
                 }
             }
@@ -202,6 +204,40 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
             }
         };
+
+
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+                Log.d("APP", "list size --- " + chatMessageList.size() + " click count --- " + loadHistoryClickCount);
+
+                if (chatMessageList.size() >= 20 * loadHistoryClickCount) {
+                    Log.d("APP", "1st condition successful");
+                    if (firstVisibleItem == 0) {
+                        Log.d("APP", "2nd condition successful ---- first visible item ---- " + firstVisibleItem);
+                        loadHistory.setVisible(true);
+
+                        Log.d("APP", "both success --- " + loadHistory.toString() + " title --- " + loadHistory.getTitle());
+                    } else {
+                        Log.d("APP", "2nd condition not successful ---- first visible item ---- " + firstVisibleItem);
+                        loadHistory.setVisible(false);
+                    }
+                } else {
+
+                    if (loadHistory != null) {
+                        loadHistory.setVisible(false);
+                    }
+
+                    Log.d("APP", "1st condition not successful ---- first visible item ---- " + firstVisibleItem);
+                }
+            }
+        });
     }
 
     @Override
@@ -239,7 +275,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
     private void renderChatView() {
         mainContent.setVisibility(View.VISIBLE);
-        loadHistory.setVisibility(View.GONE);
         noSessionMessage.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
     }
@@ -251,7 +286,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
     private void renderLoadingView() {
         mainContent.setVisibility(View.GONE);
-        loadHistory.setVisibility(View.GONE);
         noSessionMessage.setVisibility(View.GONE);
         loading.setVisibility(View.VISIBLE);
     }
@@ -261,17 +295,44 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         super.onCreateOptionsMenu(menu, inflater);
 
         menu.clear();
-        inflater.inflate(R.menu.action_button, menu);
+        inflater.inflate(R.menu.action_chat, menu);
 
-        menu.findItem(R.id.action_account).setVisible(false);
-        menu.findItem(R.id.action_home).setVisible(false);
-        menu.findItem(R.id.action_finalize_event).setVisible(false);
-        menu.findItem(R.id.action_delete_event).setVisible(false);
-        menu.findItem(R.id.action_add_phone).setVisible(false);
-        menu.findItem(R.id.action_edit_event).setVisible(false);
-        menu.findItem(R.id.action_refresh).setVisible(false);
-        menu.findItem(R.id.action_notifications).setVisible(false);
-        menu.findItem(R.id.action_status).setVisible(false);
+        loadHistory = menu.findItem(R.id.action_load_history_chat);
+        loadHistory.setVisible(false);
+
+        Log.d("APP", "onCreateOptionsMenu --- " + loadHistory.toString() + " title --- " + loadHistory.getTitle());
+
+        loadHistory.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                if ((SystemClock.elapsedRealtime() - loadHistoryLastClickedTime) < 1000) {
+                    return true;
+                }
+
+                loadHistoryLastClickedTime = SystemClock.elapsedRealtime();
+                item.setEnabled(false);
+
+                loadHistoryClickCount++;
+
+                chatMessageList = new ArrayList<>();
+                chatAdapter.clear();
+
+                int maxStanzas = 20 * loadHistoryClickCount;
+
+                try {
+                    chatService.fetchHistory(multiUserChat, userService.getActiveUserName() + "_" + userService.getActiveUserId(), userService.getActiveUserId(), connection.getPacketReplyTimeout(), maxStanzas);
+                } catch (Exception e) {
+
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_LOAD_CHAT_HISTORY, userService.getActiveUserId());
+
+                    renderNoSessionView();
+                }
+                item.setEnabled(true);
+
+                return true;
+            }
+        });
     }
 
     @Override
@@ -301,11 +362,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (chatMessageList.size() >= 20 * loadHistoryClickCount) {
-                    loadHistory.setVisibility(View.VISIBLE);
-                } else {
-                    loadHistory.setVisibility(View.GONE);
-                }
+
                 chatAdapter.add(message);
                 chatAdapter.notifyDataSetChanged();
                 scroll();
@@ -332,14 +389,39 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
     public void onClick(View v) {
         if (v.getId() == R.id.ib_fragment_chat_send) {
 
+            Log.d("APP", "start--- " + System.currentTimeMillis() +"");
+
             String message = typeMessage.getText().toString();
             if (TextUtils.isEmpty(message)) {
                 return;
             }
 
+
             try {
+
+                StringBuilder stringBuilder = new StringBuilder(userService.getActiveUserId());
+                stringBuilder.append(eventId);
+                stringBuilder.append(System.currentTimeMillis());
+
+                stanzaId = stringBuilder.toString();
+                ChatMessage chatMessage = new ChatMessage();
+                chatMessage.setMessage(message);
+                chatMessage.setSenderId(userService.getActiveUserId());
+                chatMessage.setMe(true);
+                chatMessage.setSenderName(userService.getActiveUserName());
+                chatMessage.setId(stanzaId);
+                displayMessage(chatMessage);
+                Log.d("APP", "end -- " + System.currentTimeMillis() + "");
+
                 AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.CHAT_MESSAGE_SENDING_ATTEMPT, userService.getActiveUserId());
-                chatService.postMessage(multiUserChat, message, userService.getActiveUserName() + "_" + userService.getActiveUserId(), connection.getPacketReplyTimeout());
+                Message messagePacket = new Message();
+                messagePacket.setBody(message);
+                messagePacket.setStanzaId(stanzaId);
+
+
+                chatMessageList.add(chatMessage);
+
+                chatService.postMessage(multiUserChat, messagePacket, userService.getActiveUserName() + "_" + userService.getActiveUserId(), connection.getPacketReplyTimeout());
             } catch (Exception e) {
 
                 AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_SEND_CHAT_MESSAGE, userService.getActiveUserId());
@@ -353,31 +435,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
             typeMessage.setText("");
 
-        } else if (v.getId() == R.id.b_chat_fragment_load_history) {
-
-            if ((SystemClock.elapsedRealtime() - loadHistoryLastClickedTime) < 1000) {
-                return;
-            }
-
-            loadHistoryLastClickedTime = SystemClock.elapsedRealtime();
-            loadHistory.setEnabled(false);
-
-            loadHistoryClickCount++;
-
-            chatMessageList = new ArrayList<>();
-            chatAdapter.clear();
-
-            int maxStanzas = 20 * loadHistoryClickCount;
-
-            try {
-                chatService.fetchHistory(multiUserChat, userService.getActiveUserName() + "_" + userService.getActiveUserId(), userService.getActiveUserId(), connection.getPacketReplyTimeout(), maxStanzas);
-            } catch (Exception e) {
-
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_LOAD_CHAT_HISTORY, userService.getActiveUserId());
-
-                renderNoSessionView();
-            }
-            loadHistory.setEnabled(true);
         }
     }
 
@@ -437,8 +494,10 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
                             }
 
-                            chatMessageList.add(newMessage);
-                            displayMessage(newMessage);
+                            if (!(newMessage.getId().equals(stanzaId))) {
+                                chatMessageList.add(newMessage);
+                                displayMessage(newMessage);
+                            }
 
                         }
                     };
@@ -492,7 +551,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
 
-            ((MainActivity)getActivity()).onBackPressed();
+            ((MainActivity) getActivity()).onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }

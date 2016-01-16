@@ -1,15 +1,14 @@
 package reaper.android.app.ui.screens.notifications;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -18,9 +17,10 @@ import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import java.util.List;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import reaper.android.R;
+import reaper.android.app.model.EventCategory;
 import reaper.android.app.ui.util.CircleTransform;
+import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.common.notification.Notification;
 
 /**
@@ -33,6 +33,12 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     private NotificationClickCommunicator communicator;
     private Drawable personDrawable;
     private Drawable rsvpDrawable;
+    private Drawable friendAddedDrawable;
+    private Drawable eventUpdatedDrawable;
+    private Drawable eventRemovedDrawable;
+    private Drawable eventInvitationDrawable;
+    private Drawable eventCreatedDrawable;
+    private Drawable statusDrawable;
 
     public NotificationsAdapter(Context context, List<Notification> notifications) {
         this.context = context;
@@ -43,19 +49,55 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     private void generateDrawables() {
         chatDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE)
-                .setColor(ContextCompat.getColor(context, R.color.light_grey))
+                .setColor(ContextCompat.getColor(context, R.color.white))
                 .setSizeDp(24)
                 .build();
 
         personDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
-                .setColor(ContextCompat.getColor(context, R.color.light_grey))
+                .setColor(ContextCompat.getColor(context, R.color.white))
                 .setSizeDp(24)
                 .build();
 
         rsvpDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_MULTIPLE_PLUS)
-                .setColor(ContextCompat.getColor(context, R.color.light_grey))
+                .setColor(ContextCompat.getColor(context, R.color.white))
+                .setSizeDp(24)
+                .build();
+
+        friendAddedDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_PLUS)
+                .setColor(ContextCompat.getColor(context, R.color.white))
+                .setSizeDp(24)
+                .build();
+
+        eventUpdatedDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.TABLE_EDIT)
+                .setColor(ContextCompat.getColor(context, R.color.white))
+                .setSizeDp(24)
+                .build();
+
+        eventRemovedDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.CALENDAR_REMOVE)
+                .setColor(ContextCompat.getColor(context, R.color.white))
+                .setSizeDp(24)
+                .build();
+
+        eventInvitationDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.EMAIL)
+                .setColor(ContextCompat.getColor(context, R.color.white))
+                .setSizeDp(24)
+                .build();
+
+        eventCreatedDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.CALENDAR_PLUS)
+                .setColor(ContextCompat.getColor(context, R.color.white))
+                .setSizeDp(24)
+                .build();
+
+        statusDrawable = MaterialDrawableBuilder.with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE_TEXT)
+                .setColor(ContextCompat.getColor(context, R.color.white))
                 .setSizeDp(24)
                 .build();
     }
@@ -83,6 +125,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     }
 
     public class NotificationsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private LinearLayout notificationIconContainer;
         private ImageView notificationIcon;
         private TextView notificationMessage;
 
@@ -90,6 +133,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             super(itemView);
             notificationIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_notifications);
             notificationMessage = (TextView) itemView.findViewById(R.id.tv_list_item_notifications);
+            notificationIconContainer = (LinearLayout) itemView.findViewById(R.id.llNotificationIconContainer);
             itemView.setOnClickListener(this);
         }
 
@@ -102,6 +146,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
         public void render(Notification notification) {
             notificationMessage.setText(notification.getMessage());
+            notificationIconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.primary, 4));
 
             switch (notification.getType()) {
                 case Notification.CHAT:
@@ -109,60 +154,49 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                     break;
                 case Notification.NEW_FRIEND_ADDED:
 
-                    Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?width=500")
-                            .placeholder(personDrawable)
-                            .transform(new CircleTransform())
-                            .into(notificationIcon);
+//                    Picasso.with(context)
+//                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?width=500")
+//                            .placeholder(personDrawable)
+//                            .transform(new CircleTransform())
+//                            .into(notificationIcon);
+
+                    notificationIcon.setImageDrawable(friendAddedDrawable);
+                    notificationIconContainer.setBackground(DrawableFactory.getIconBackground(EventCategory.OUTDOORS));
                     break;
+
                 case Notification.EVENT_UPDATED:
 
-                    Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?width=500")
-                            .placeholder(personDrawable)
-                            .transform(new CircleTransform())
-                            .into(notificationIcon);
+                    notificationIcon.setImageDrawable(eventUpdatedDrawable);
+                    notificationIconContainer.setBackground(DrawableFactory.getIconBackground(EventCategory.INDOORS));
                     break;
                 case Notification.EVENT_REMOVED:
 
-                    Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?width=500")
-                            .placeholder(personDrawable)
-                            .transform(new CircleTransform())
-                            .into(notificationIcon);
+                    notificationIcon.setImageDrawable(eventRemovedDrawable);
+                    notificationIconContainer.setBackground(DrawableFactory.getIconBackground(EventCategory.DRINKS));
                     break;
                 case Notification.RSVP:
 
-                    Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?width=500")
-                            .placeholder(personDrawable)
-                            .transform(new CircleTransform())
-                            .into(notificationIcon);
+                    notificationIcon.setImageDrawable(rsvpDrawable);
+                    notificationIconContainer.setBackground(DrawableFactory.getIconBackground(EventCategory.EAT_OUT));
 
                     break;
                 case Notification.EVENT_INVITATION:
 
-                    Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?width=500")
-                            .placeholder(personDrawable)
-                            .transform(new CircleTransform())
-                            .into(notificationIcon);
+                    notificationIcon.setImageDrawable(eventInvitationDrawable);
+                    notificationIconContainer.setBackground(DrawableFactory.getIconBackground(EventCategory.SHOPPING));
+
                     break;
                 case Notification.EVENT_CREATED:
 
-                    Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?width=500")
-                            .placeholder(personDrawable)
-                            .transform(new CircleTransform())
-                            .into(notificationIcon);
+                    notificationIcon.setImageDrawable(eventCreatedDrawable);
+                    notificationIconContainer.setBackground(DrawableFactory.getIconBackground(EventCategory.SPORTS));
+
                     break;
                 case Notification.STATUS:
 
-                    Picasso.with(context)
-                            .load("https://graph.facebook.com/v2.4/" + notification.getUserId() + "/picture?width=500")
-                            .placeholder(personDrawable)
-                            .transform(new CircleTransform())
-                            .into(notificationIcon);
+                    notificationIcon.setImageDrawable(statusDrawable);
+                    notificationIconContainer.setBackground(DrawableFactory.getIconBackground(EventCategory.MOVIES));
+
                     break;
             }
         }

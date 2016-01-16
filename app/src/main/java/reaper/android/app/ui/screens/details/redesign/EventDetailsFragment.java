@@ -1,10 +1,14 @@
 package reaper.android.app.ui.screens.details.redesign;
 
 import android.content.DialogInterface;
+import android.Manifest;
+import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -12,6 +16,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +33,12 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.squareup.otto.Bus;
 import com.squareup.picasso.Picasso;
 
@@ -40,14 +51,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BundleKeys;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
@@ -104,6 +119,9 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     /* Services */
     Bus bus;
     UserService userService;
+    GenericCache genericCache;
+
+    private Event event;
 
     public static EventDetailsFragment newInstance(Event event)
     {
@@ -194,28 +212,28 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
 
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
+        genericCache = CacheManager.getGenericCache();
 
         initRecyclerView();
 
-        btnInvite.setOnClickListener(new View.OnClickListener()
-        {
+        btnInvite.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
-                if (presenter != null)
-                {
-                    presenter.invite();
+            public void onClick(View v) {
+
+                if (presenter != null) {
+                    if (genericCache.get(CacheKeys.READ_CONTACT_PERMISSION_DENIED) == null) {
+                        handleReadContactsPermission();
+                    } else {
+                        presenter.invite();
+                    }
                 }
             }
         });
 
-        btnChat.setOnClickListener(new View.OnClickListener()
-        {
+        btnChat.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
-                if (presenter != null)
-                {
+            public void onClick(View v) {
+                if (presenter != null) {
                     presenter.chat();
                 }
             }
@@ -337,13 +355,10 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
             VisibilityAnimationUtil.collapse(llEventActionsContainer, 200);
         }
 
-        sRsvp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
+        sRsvp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                if (presenter != null)
-                {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (presenter != null) {
                     presenter.toggleRsvp();
                 }
             }
@@ -400,11 +415,9 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                 break;
         }
 
-        rlMeContainer.setOnClickListener(new View.OnClickListener()
-        {
+        rlMeContainer.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 presenter.onStatusClicked();
             }
         });
@@ -603,6 +616,11 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
         inviteUsersContainerFragment.setArguments(bundle);
         FragmentUtils
                 .changeFragment(getActivity().getFragmentManager(), inviteUsersContainerFragment);
+
+        FragmentTransaction fragmentTransaction = getActivity().getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fl_main, inviteUsersContainerFragment, inviteUsersContainerFragment.getClass().getSimpleName());
+        fragmentTransaction.commitAllowingStateLoss();
+        getActivity().getFragmentManager().executePendingTransactions();
     }
 
     @Override
@@ -648,13 +666,10 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     {
         super.onPrepareOptionsMenu(menu);
 
-        edit.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
+        edit.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item)
-            {
-                if (presenter != null)
-                {
+            public boolean onMenuItemClick(MenuItem item) {
+                if (presenter != null) {
                     presenter.onEdit();
                 }
 
@@ -682,5 +697,113 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                 .setColor(ContextCompat.getColor(getActivity(), R.color.whity))
                 .setSizeDp(36)
                 .build());
+    }
+
+    private void handleReadContactsPermission() {
+
+        try {
+            Dexter.checkPermission(new PermissionListener() {
+                @Override
+                public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+
+                    navigateToInviteScreen(event);
+                }
+
+                @Override
+                public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+
+                    if (permissionDeniedResponse.isPermanentlyDenied()) {
+
+                        displayContactsPermissionRequiredDialogPermanentlyDeclinedCase();
+                    } else {
+
+                        displayContactsPermissionRequiredDialog();
+                    }
+                }
+
+                @Override
+                public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+
+                    permissionToken.continuePermissionRequest();
+                }
+            }, Manifest.permission.READ_CONTACTS);
+        }catch (Exception e)
+        {
+
+        }
+    }
+
+    private void displayContactsPermissionRequiredDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
+        builder.setMessage(R.string.read_contacts_permission_required_message);
+        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+                try {
+                    Dexter.checkPermission(new PermissionListener() {
+                        @Override
+                        public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+
+                            navigateToInviteScreen(event);
+                        }
+
+                        @Override
+                        public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+
+                            genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
+                            navigateToInviteScreen(event);
+                        }
+
+                        @Override
+                        public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+
+                            permissionToken.continuePermissionRequest();
+                        }
+                    }, Manifest.permission.READ_CONTACTS);
+                }catch (Exception e)
+                {
+
+                }
+            }
+        });
+
+        builder.create().show();
+    }
+
+    private void displayContactsPermissionRequiredDialogPermanentlyDeclinedCase() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
+        builder.setMessage(R.string.read_contacts_permission_required_message);
+        builder.setPositiveButton("TAKE ME TO SETTINGS", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+                goToSettings();
+            }
+        });
+        builder.setNegativeButton("EXIT", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
+                navigateToInviteScreen(event);
+            }
+        });
+
+        builder.create().show();
+    }
+
+
+    private void goToSettings() {
+
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
+        intent.setData(uri);
+        startActivity(intent);
     }
 }

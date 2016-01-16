@@ -1,11 +1,14 @@
 package reaper.android.app.ui.screens.invite.sms;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -15,6 +18,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,7 +29,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -44,6 +55,7 @@ import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.PhoneContact;
 import reaper.android.app.model.PhoneContactComparator;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
@@ -60,7 +72,7 @@ import reaper.android.common.communicator.Communicator;
 public class InviteThroughSMSFragment extends BaseFragment implements View.OnClickListener {
 
     private RecyclerView recyclerView;
-    private TextView noContactsMessage, invitesLockedMessage;
+    private TextView noContactsMessage, invitesLockedMessage, givePermission;
     private LinearLayout lockedContent, mainContent, loading;
     private FloatingActionButton addPhone, inviteWhatsapp;
     private Drawable whatsappDrawable;
@@ -91,6 +103,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_invite_through_sms);
         noContactsMessage = (TextView) view.findViewById(R.id.tv_invite_through_sms_no_users);
+        givePermission = (TextView) view.findViewById(R.id.tvGivePermission);
         invitesLockedMessage = (TextView) view.findViewById(R.id.tv_fragment_invte_through_sms_locked);
         addPhone = (FloatingActionButton) view.findViewById(R.id.fib_fragment_invite_through_sms_add_phone);
         inviteWhatsapp = (FloatingActionButton) view.findViewById(R.id.fib_fragment_invite_through_sms_invite_people_whatsapp);
@@ -112,6 +125,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         userService = new UserService(bus);
         inviteWhatsapp.setOnClickListener(this);
         addPhone.setOnClickListener(this);
+        givePermission.setOnClickListener(this);
         genericCache = CacheManager.getGenericCache();
 
         generateDrawables();
@@ -176,9 +190,9 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
         bus.register(this);
 
-        userService.fetchAllPhoneContacts(getActivity().getContentResolver());
-
         search.addTextChangedListener(searchWatcher);
+
+        userService.fetchAllPhoneContacts(getActivity().getContentResolver());
     }
 
     private void generateDrawables() {
@@ -204,7 +218,9 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     @Override
     public void onPause() {
         super.onPause();
+
         bus.unregister(this);
+
 
         search.removeTextChangedListener(searchWatcher);
     }
@@ -231,6 +247,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         noContactsMessage.setText(R.string.no_local_phone_contacts);
         noContactsMessage.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.VISIBLE);
+        givePermission.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
         lockedContent.setVisibility(View.GONE);
         mainContent.setVisibility(View.VISIBLE);
@@ -241,6 +258,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     private void displayNoSearchResultsView() {
         noContactsMessage.setText(R.string.no_search_results_phonebook);
         noContactsMessage.setVisibility(View.VISIBLE);
+        givePermission.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
         lockedContent.setVisibility(View.GONE);
@@ -254,6 +272,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         recyclerView.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.GONE);
         noContactsMessage.setVisibility(View.GONE);
+        givePermission.setVisibility(View.GONE);
         lockedContent.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
         searchContainer.setVisibility(View.VISIBLE);
@@ -268,6 +287,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         inviteWhatsapp.setVisibility(View.GONE);
         noContactsMessage.setVisibility(View.VISIBLE);
         noContactsMessage.setText(R.string.phone_contacts_not_fetched);
+        givePermission.setVisibility(View.VISIBLE);
         lockedContent.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
         searchContainer.setVisibility(View.GONE);
@@ -369,6 +389,33 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
             } else {
                 Snackbar.make(getView(), R.string.whatsapp_not_installed, Snackbar.LENGTH_LONG).show();
             }
+        } else if(view.getId() == R.id.tvGivePermission)
+        {
+//            Dexter.checkPermission(new PermissionListener() {
+//                @Override
+//                public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+//
+//                    displayLoadingView();
+//                    userService.fetchAllPhoneContacts(getActivity().getContentResolver());
+//                }
+//
+//                @Override
+//                public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+//
+//                    if(permissionDeniedResponse.isPermanentlyDenied())
+//                    {
+//                        goToSettings();
+//                    }
+//                }
+//
+//                @Override
+//                public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+//
+//                    permissionToken.continuePermissionRequest();
+//                }
+//            }, Manifest.permission.READ_CONTACTS);
+
+            goToSettings();
         }
     }
 
@@ -414,4 +461,12 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         }
     }
 
+    private void goToSettings() {
+
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
+        intent.setData(uri);
+        startActivity(intent);
+    }
 }

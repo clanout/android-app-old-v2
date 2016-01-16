@@ -104,6 +104,13 @@
                 android:textColor="@color/text_title"
                 android:textSize="14sp" />
 
+            <TextView
+                android:id="@+id/tvGivePermission"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Give Permission"
+                android:textColor="@color/accent"/>
+
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fib_fragment_invite_through_sms_invite_people_whatsapp"
                 android:layout_width="64dp"
