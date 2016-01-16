@@ -1,186 +1,231 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<android.support.design.widget.CoordinatorLayout
     android:id="@+id/createContainer"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:cardView="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="16dp"
-    android:background="@color/white"
     android:orientation="vertical">
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/tilTitleContainer"
+    <android.support.v7.widget.CardView
+        android:id="@+id/cv_createEvent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp">
+        android:layout_margin="16dp"
+        cardView:cardElevation="4dp"
+        cardView:cardPreventCornerOverlap="true"
+        cardView:cardUseCompatPadding="true">
 
-        <EditText
-            android:id="@+id/etTitle"
+        <View
+            android:id="@+id/focus_thief"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Title"
-            android:maxLines="1"/>
-    </android.support.design.widget.TextInputLayout>
-
-    <RelativeLayout
-        android:id="@+id/llCategoryIconContainer"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:layout_below="@id/tilTitleContainer"
-        android:layout_marginLeft="16dp"
-        android:background="@color/category_icon_one">
-
-        <ImageView
-            android:id="@+id/ivCategoryIcon"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_centerInParent="true"/>
+            android:layout_height="0.1dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"/>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:background="#77000000"
-            android:padding="4dp">
+            android:background="@color/white"
+            android:orientation="vertical">
 
-            <TextView
+            <RelativeLayout
+                android:id="@+id/createBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <net.steamcrafted.materialiconlib.MaterialIconView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/btnClose"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_margin="4dp"
+                    android:scaleType="center"
+                    app:materialIcon="close"
+                    app:materialIconColor="@color/_text_subtitle"
+                    app:materialIconSize="24dp"/>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/tilTitleContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="8dp">
+
+                    <EditText
+                        android:id="@+id/etTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Title"
+                        android:maxLines="1"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <RelativeLayout
+                    android:id="@+id/llCategoryIconContainer"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_below="@id/tilTitleContainer"
+                    android:layout_marginLeft="16dp"
+                    android:background="@color/category_icon_one">
+
+                    <ImageView
+                        android:id="@+id/ivCategoryIcon"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_centerInParent="true"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:background="#77000000"
+                        android:padding="4dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Change"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/llTypeContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tilTitleContainer"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_toRightOf="@id/llCategoryIconContainer"
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:id="@+id/cbType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="-6dp"
+                        android:text="This is a secret plan"
+                        android:textColor="@color/_text_subtitle"/>
+
+                    <net.steamcrafted.materialiconlib.MaterialIconView
+                        android:id="@+id/mivInfo"
+                        xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginTop="8dp"
+                        android:scaleType="center"
+                        app:materialIcon="information_outline"
+                        app:materialIconColor="@color/_text_subtitle"
+                        app:materialIconSize="18dp"/>
+
+                </LinearLayout>
+
+                <net.steamcrafted.materialiconlib.MaterialIconView
+                    android:id="@+id/mivTime"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/llTypeContainer"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_toRightOf="@id/llCategoryIconContainer"
+                    android:scaleType="center"
+                    app:materialIcon="clock"
+                    app:materialIconColor="@color/accent"
+                    app:materialIconSize="18dp"/>
+
+                <TextView
+                    android:id="@+id/tvTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/llTypeContainer"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_toRightOf="@id/mivTime"
+                    android:text="7:00 PM"
+                    android:textColor="@color/accent"/>
+
+                <net.steamcrafted.materialiconlib.MaterialIconView
+                    android:id="@+id/mivDay"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/llTypeContainer"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_toRightOf="@id/tvTime"
+                    android:scaleType="center"
+                    app:materialIcon="calendar"
+                    app:materialIconColor="@color/accent"
+                    app:materialIconSize="18dp"/>
+
+                <TextView
+                    android:id="@+id/tvDay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/llTypeContainer"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_toRightOf="@id/mivDay"
+                    android:text="TODAY"
+                    android:textColor="@color/accent"/>
+
+                <View
+                    android:id="@+id/divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/llCategoryIconContainer"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/divider"/>
+
+            </RelativeLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Change"
-                android:textColor="@color/white"
-                android:textSize="12sp"/>
+                android:layout_below="@+id/divider"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
 
+                <net.steamcrafted.materialiconlib.MaterialIconView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_toRightOf="@id/tvTime"
+                    android:scaleType="center"
+                    app:materialIcon="chevron_down"
+                    app:materialIconColor="@color/_text_subtitle"
+                    app:materialIconSize="18dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:text="Add More Details"
+                    android:textColor="@color/_text_subtitle"/>
+
+            </LinearLayout>
         </LinearLayout>
-
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/rgType"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tilTitleContainer"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_toRightOf="@id/llCategoryIconContainer"
-        android:orientation="horizontal">
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="-6dp"
-            android:text="This is a secret plan"
-            android:textColor="@color/_text_subtitle"/>
-
-        <net.steamcrafted.materialiconlib.MaterialIconView
-            android:id="@+id/mivInfo"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp"
-            android:scaleType="center"
-            app:materialIcon="information_outline"
-            app:materialIconColor="@color/_text_subtitle"
-            app:materialIconSize="18dp"/>
-
-    </LinearLayout>
-
-    <net.steamcrafted.materialiconlib.MaterialIconView
-        android:id="@+id/mivTime"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/rgType"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_toRightOf="@id/llCategoryIconContainer"
-        android:scaleType="center"
-        app:materialIcon="clock"
-        app:materialIconColor="@color/accent"
-        app:materialIconSize="18dp"/>
-
-    <TextView
-        android:id="@+id/tvTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/rgType"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_toRightOf="@id/mivTime"
-        android:text="7:00 PM"
-        android:textColor="@color/accent"/>
-
-    <net.steamcrafted.materialiconlib.MaterialIconView
-        android:id="@+id/mivDay"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/rgType"
-        android:layout_marginLeft="32dp"
-        android:layout_marginTop="16dp"
-        android:layout_toRightOf="@id/tvTime"
-        android:scaleType="center"
-        app:materialIcon="calendar"
-        app:materialIconColor="@color/accent"
-        app:materialIconSize="18dp"/>
-
-    <TextView
-        android:id="@+id/tvDay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/rgType"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_toRightOf="@id/mivDay"
-        android:text="TODAY"
-        android:textColor="@color/accent"/>
-
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@id/llCategoryIconContainer"
-        android:layout_marginTop="8dp"
-        android:background="@color/divider"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/divider"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:orientation="horizontal">
-
-        <net.steamcrafted.materialiconlib.MaterialIconView
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_toRightOf="@id/tvTime"
-            android:scaleType="center"
-            app:materialIcon="chevron_down"
-            app:materialIconColor="@color/_text_subtitle"
-            app:materialIconSize="18dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="4dp"
-            android:text="More Info"
-            android:textColor="@color/_text_subtitle"/>
-
-    </LinearLayout>
+    </android.support.v7.widget.CardView>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_normal"
+        android:id="@+id/fabCreate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_marginRight="24dp"
         android:src="@drawable/com_facebook_button_like_icon_selected"
-        app:fabSize="normal"/>
+        app:fabSize="mini"
+        app:layout_anchor="@id/createBox"
+        app:layout_anchorGravity="bottom|right|end"/>
 
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

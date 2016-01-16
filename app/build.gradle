@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId "reaper.android"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -118,5 +118,8 @@ dependencies {
 
     // Permissions
     compile 'com.karumi:dexter:2.1.2'
+
+    // Day Picker
+    compile 'com.github.hotchemi:stringpicker:0.0.2'
 
 }
