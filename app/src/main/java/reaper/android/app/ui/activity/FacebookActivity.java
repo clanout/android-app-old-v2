@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
@@ -232,43 +233,49 @@ public class FacebookActivity extends AppCompatActivity
 
         Log.d("APP", "inside handleLocationPermission");
 
-        try {
-            Dexter.checkPermission(new PermissionListener() {
-                @Override
-                public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            try {
+                Dexter.checkPermission(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
 
-                    Log.d("APP", "inside handleLocationPermission ---- permission granted");
+                        Log.d("APP", "inside handleLocationPermission ---- permission granted");
 
-                    Intent intent = new Intent(FacebookActivity.this, LauncherActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-
-                @Override
-                public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-
-                    Log.d("APP", "inside handleLocationPermission ---- permission denied");
-                    if (permissionDeniedResponse.isPermanentlyDenied()) {
-
-
-                        displayLocationRequiredDialogPermanentlyDeclinedCase();
-
-                    } else {
-
-                        displayLocationRequiredDialog();
+                        Intent intent = new Intent(FacebookActivity.this, LauncherActivity.class);
+                        startActivity(intent);
+                        finish();
                     }
-                }
 
-                @Override
-                public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
 
-                    Log.d("APP", "inside handleLocationPermission ---- permission rationale shown");
-                    permissionToken.continuePermissionRequest();
-                }
-            }, Manifest.permission.ACCESS_FINE_LOCATION);
-        }catch (Exception e)
-        {
-            Log.d("APP", "Exception in Dexter --- while asking for location permission");
+                        Log.d("APP", "inside handleLocationPermission ---- permission denied");
+                        if (permissionDeniedResponse.isPermanentlyDenied()) {
+
+
+                            displayLocationRequiredDialogPermanentlyDeclinedCase();
+
+                        } else {
+
+                            displayLocationRequiredDialog();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+
+                        Log.d("APP", "inside handleLocationPermission ---- permission rationale shown");
+                        permissionToken.continuePermissionRequest();
+                    }
+                }, Manifest.permission.ACCESS_FINE_LOCATION);
+            } catch (Exception e) {
+                Log.d("APP", "Exception in Dexter --- while asking for location permission");
+            }
+        }else{
+
+            Intent intent = new Intent(FacebookActivity.this, LauncherActivity.class);
+            startActivity(intent);
+            finish();
         }
     }
 
@@ -316,44 +323,54 @@ public class FacebookActivity extends AppCompatActivity
         builder.setTitle(R.string.location_required_title);
         builder.setMessage(R.string.location_required_message);
         builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
 
-                dialog.dismiss();
+                        dialog.dismiss();
 
-                try {
-                    Dexter.checkPermission(new PermissionListener() {
-                        @Override
-                        public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            try {
+                                Dexter.checkPermission(new PermissionListener() {
+                                    @Override
+                                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
 
+
+                                        Intent intent = new Intent(FacebookActivity.this, LauncherActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+
+                                        Toast.makeText(FacebookActivity.this, R.string.location_denied, Toast.LENGTH_LONG).show();
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+
+                                        permissionToken.continuePermissionRequest();
+                                    }
+                                }, Manifest.permission.ACCESS_FINE_LOCATION);
+                            } catch (Exception e) {
+
+                            }
+                        } else {
 
                             Intent intent = new Intent(FacebookActivity.this, LauncherActivity.class);
                             startActivity(intent);
                             finish();
                         }
-
-                        @Override
-                        public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-
-                            Toast.makeText(FacebookActivity.this, R.string.location_denied, Toast.LENGTH_LONG).show();
-                            finish();
-                        }
-
-                        @Override
-                        public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-
-                            permissionToken.continuePermissionRequest();
-                        }
-                    }, Manifest.permission.ACCESS_FINE_LOCATION);
-                }catch (Exception e)
-                {
-
+                    }
                 }
-            }
-        });
+
+        );
 
 
-        builder.create().show();
+            builder.create().
+
+            show();
+        }
+
     }
-
-}
