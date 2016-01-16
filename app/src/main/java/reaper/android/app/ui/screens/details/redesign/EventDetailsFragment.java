@@ -614,8 +614,8 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
         bundle.putSerializable(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT, event);
         bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, false);
         inviteUsersContainerFragment.setArguments(bundle);
-        FragmentUtils
-                .changeFragment(getActivity().getFragmentManager(), inviteUsersContainerFragment);
+//        FragmentUtils
+//                .changeFragment(getActivity().getFragmentManager(), inviteUsersContainerFragment);
 
         FragmentTransaction fragmentTransaction = getActivity().getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fl_main, inviteUsersContainerFragment, inviteUsersContainerFragment.getClass().getSimpleName());
