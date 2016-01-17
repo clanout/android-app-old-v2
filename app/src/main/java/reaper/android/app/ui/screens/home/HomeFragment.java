@@ -63,6 +63,7 @@ import reaper.android.app.trigger.notifications.NewNotificationReceivedTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationsAvailableTrigger;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
+import reaper.android.app.ui.screens.create.CreateEventDetailsFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.create.CreateEventPresenter;
 import reaper.android.app.ui.screens.home.create.CreateEventPresenterImpl;
@@ -103,6 +104,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
     TextView tvTime;
     TextView tvDay;
     FloatingActionButton fabCreate;
+    TextView tvMoreDetails;
     ProgressDialog createProgressDialog;
 
     /* Presenter */
@@ -169,6 +171,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
         tvDay = (TextView) view.findViewById(R.id.tvDay);
         fabCreate = (FloatingActionButton) view.findViewById(R.id.fabCreate);
 
+        tvMoreDetails = (TextView) view.findViewById(R.id.tvMoreDetails);
+
         return view;
     }
 
@@ -201,6 +205,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
         dayList = dateTimeUtil.getDayList();
         selectedDay = 0;
+        tvDay.setText(dayList.get(selectedDay));
 
         startTime = LocalTime.now().plusHours(1).withMinuteOfHour(0);
         tvTime.setText(dateTimeUtil.formatTime(startTime));
@@ -270,6 +275,21 @@ public class HomeFragment extends BaseFragment implements EventsView,
                         cbType.isChecked(),
                         DateTimeUtil.getDateTime(dateTimeUtil
                                 .getDate(dayList.get(selectedDay)), startTime));
+            }
+        });
+
+        tvMoreDetails.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                FragmentUtils.changeFragment(getFragmentManager(),
+                        CreateEventDetailsFragment.newInstance(
+                                etTitle.getText().toString(),
+                                selectedCategory,
+                                cbType.isChecked(),
+                                dayList.get(selectedDay),
+                                startTime));
             }
         });
     }
