@@ -1,6 +1,5 @@
 package reaper.android.app.ui.screens.details.redesign;
 
-import android.content.DialogInterface;
 import android.Manifest;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
@@ -63,11 +62,10 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
-import reaper.android.app.root.Reaper;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
-import reaper.android.app.ui.screens.edit.EditEventFragment;
+import reaper.android.app.ui.screens.edit.EditEventFragment_;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.DrawableFactory;
@@ -596,7 +594,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
 
     @Override
     public void navigateToEditScreen(Event event, EventDetails eventDetails) {
-        FragmentUtils.changeFragment(getActivity().getFragmentManager(), EditEventFragment
+        FragmentUtils.changeFragment(getActivity().getFragmentManager(), EditEventFragment_
                 .newInstance(event, eventDetails));
     }
 

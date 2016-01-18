@@ -104,7 +104,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
     TextView tvTime;
     TextView tvDay;
     FloatingActionButton fabCreate;
-    TextView tvMoreDetails;
+    View llMoreDetails;
     ProgressDialog createProgressDialog;
 
     /* Presenter */
@@ -171,7 +171,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
         tvDay = (TextView) view.findViewById(R.id.tvDay);
         fabCreate = (FloatingActionButton) view.findViewById(R.id.fabCreate);
 
-        tvMoreDetails = (TextView) view.findViewById(R.id.tvMoreDetails);
+        llMoreDetails = view.findViewById(R.id.llMoreDetails);
 
         return view;
     }
@@ -278,7 +278,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
             }
         });
 
-        tvMoreDetails.setOnClickListener(new View.OnClickListener()
+        llMoreDetails.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)

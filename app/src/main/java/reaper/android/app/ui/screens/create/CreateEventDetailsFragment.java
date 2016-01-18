@@ -356,6 +356,8 @@ public class CreateEventDetailsFragment extends BaseFragment
         rvLocationSuggestions.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvLocationSuggestions
                 .setAdapter(new LocationSuggestionAdapter(new ArrayList<Suggestion>(), this));
+
+        rvLocationSuggestions.setVisibility(View.GONE);
     }
 
     @Override

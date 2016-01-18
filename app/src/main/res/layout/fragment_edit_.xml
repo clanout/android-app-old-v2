@@ -3,7 +3,7 @@
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="@color/white"
+              android:background="@color/background_default"
               android:orientation="vertical">
 
     <android.support.design.widget.AppBarLayout
@@ -12,7 +12,7 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/tb_createEvent"
+            android:id="@+id/tb_editEvent"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/primary"
@@ -22,13 +22,13 @@
 
 
     <ScrollView
-        android:id="@+id/sv_createEvent"
+        android:id="@+id/sv_editEvent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <View
@@ -40,110 +40,75 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp">
-
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/tilTitleContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true">
-
-                    <EditText
-                        android:id="@+id/etTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Title"
-                        android:maxLines="1"/>
-                </android.support.design.widget.TextInputLayout>
+                android:layout_height="wrap_content">
 
                 <LinearLayout
-                    android:id="@+id/llIconAndType"
-                    android:layout_width="match_parent"
+                    android:id="@+id/llCategoryIconContainer"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/tilTitleContainer"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/category_icon_five"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:padding="8dp">
 
-                    <RelativeLayout
-                        android:id="@+id/llCategoryIconContainer"
-                        android:layout_width="72dp"
-                        android:layout_height="72dp"
-                        android:background="@color/category_icon_one">
+                    <ImageView
+                        android:id="@+id/ivCategoryIcon"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"/>
 
-                        <ImageView
-                            android:id="@+id/ivCategoryIcon"
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
-                            android:layout_centerInParent="true"/>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentBottom="true"
-                            android:background="#77000000"
-                            android:padding="4dp">
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="Change"
-                                android:textColor="@color/white"
-                                android:textSize="12sp"/>
-
-                        </LinearLayout>
-
-                    </RelativeLayout>
-
-                    <LinearLayout
-                        android:id="@+id/llTypeContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:orientation="horizontal">
-
-                        <CheckBox
-                            android:id="@+id/cbType"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="-6dp"
-                            android:text="This is a secret plan"
-                            android:textColor="@color/_text_subtitle"/>
-
-                        <net.steamcrafted.materialiconlib.MaterialIconView
-                            android:id="@+id/mivInfo"
-                            xmlns:app="http://schemas.android.com/apk/res-auto"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="16dp"
-                            android:layout_marginTop="8dp"
-                            android:scaleType="center"
-                            app:materialIcon="information_outline"
-                            app:materialIconColor="@color/_text_subtitle"
-                            app:materialIconSize="18dp"/>
-
-                    </LinearLayout>
                 </LinearLayout>
 
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/tilDescContainer"
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:maxLength="24"
+                    android:maxLines="2"
+                    android:text="Sex on the Beach"
+                    android:textColor="@color/_text_title"
+                    android:textSize="24sp"/>
+
+                <TextView
+                    android:id="@+id/tvType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvTitle"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="4dp"
+                    android:text="Open"
+                    android:textColor="@color/_text_subtitle"
+                    android:textSize="16sp"/>
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider"/>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/tilDescContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/llIconAndType"
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="4dp">
+
+                <EditText
+                    android:id="@+id/etDesc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/llIconAndType"
-                    android:layout_marginTop="8dp">
-
-                    <EditText
-                        android:id="@+id/etDesc"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Description"
-                        android:maxLines="2"/>
-                </android.support.design.widget.TextInputLayout>
-            </RelativeLayout>
+                    android:hint="Description"
+                    android:maxLines="2"/>
+            </android.support.design.widget.TextInputLayout>
 
             <View
                 android:layout_width="match_parent"
@@ -251,6 +216,7 @@
                     android:layout_marginRight="8dp"
                     android:layout_marginTop="16dp"/>
             </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

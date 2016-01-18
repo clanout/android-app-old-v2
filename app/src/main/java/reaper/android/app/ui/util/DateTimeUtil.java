@@ -99,11 +99,11 @@ public class DateTimeUtil
         }
         else if (date.isBefore(today))
         {
-            return date.toString(PREV_DAY_FORMATTER).toUpperCase();
+            return date.toString(PREV_DAY_FORMATTER);
         }
         else
         {
-            return date.toString(DAY_FORMATTER).toUpperCase();
+            return date.toString(DAY_FORMATTER);
         }
     }
 

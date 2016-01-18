@@ -10,6 +10,9 @@ import android.widget.TextView;
 
 import net.steamcrafted.materialiconlib.MaterialIconView;
 
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,6 +68,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         TextView tvTitle;
         TextView tvFriendsGoing;
         MaterialIconView mivRsvp;
+        View llToday;
 
         public EventViewHolder(View itemView)
         {
@@ -75,6 +79,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
             tvFriendsGoing = (TextView) itemView.findViewById(R.id.tvFriendsGoing);
             mivRsvp = (MaterialIconView) itemView.findViewById(R.id.mivRsvp);
+            llToday = itemView.findViewById(R.id.llToday);
 
             itemView.setOnClickListener(new View.OnClickListener()
             {
@@ -107,7 +112,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             // Friends Attending
             List<String> friends = event.getFriends();
 
-            if(friends == null)
+            if (friends == null)
             {
                 friends = new ArrayList<>();
             }
@@ -168,6 +173,19 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             else
             {
                 mivRsvp.setVisibility(View.GONE);
+            }
+
+            // Time
+            DateTime startTime = event.getStartTime();
+            LocalDate today = LocalDate.now();
+            LocalDate startDate = startTime.toLocalDate();
+            if (startDate.equals(today))
+            {
+                llToday.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                llToday.setVisibility(View.GONE);
             }
         }
     }

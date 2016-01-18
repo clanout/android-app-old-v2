@@ -19,6 +19,28 @@
         android:padding="16dp">
 
         <LinearLayout
+            android:id="@+id/llToday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:alpha="0.7"
+            android:background="@drawable/bg_rounded_rect">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginTop="2dp"
+                android:text="Today"
+                android:textColor="@color/white"
+                android:textSize="10sp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/llCategoryIconContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -55,7 +77,7 @@
             android:layout_toRightOf="@id/llCategoryIconContainer"
             android:text="Sex on the Beach"
             android:textColor="@color/_text_title"
-            android:textSize="18dp"/>
+            android:textSize="18sp"/>
 
         <TextView
             android:id="@+id/tvFriendsGoing"
