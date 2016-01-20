@@ -109,7 +109,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
     private String stanzaId;
 
-    // TODO -- add watermark in background
+    // TODO -- add watermark in background (chat, notification, no internet)
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -150,22 +150,17 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         Bundle bundle = getArguments();
         if (bundle == null) {
 
-            Log.d("APP", "error -- bundle  null");
-
             renderNoSessionView();
         }
 
         eventId = (String) bundle.get(BundleKeys.CHAT_FRAGMENT_EVENT_ID);
         if (eventId == null || eventId.isEmpty()) {
 
-            Log.d("APP", "error -- eventId  null");
             renderNoSessionView();
         }
 
         eventName = (String) bundle.get(BundleKeys.CHAT_FRAGMENT_EVENT_NAME);
         if (eventName == null) {
-
-            Log.d("APP", "error -- eventName  null");
 
             renderNoSessionView();
         }

@@ -5,7 +5,7 @@
     <string name="title_home">ClanOut</string>
     <string name="title_account">Account</string>
     <string name="title_notification">Notifications</string>
-    <string name="title_chat">Discussion</string>
+    <string name="title_chat">Clan Chat</string>
 
     <!-- Location -->
     <string name="location_permission_heading">Turn on GPS</string>
@@ -81,11 +81,11 @@
     <string name="no_local_facebook_friends"> Clanout is exciting with your friends around. Invite them by Whatsapp </string>
     <string name="facebook_friends_not_fetched"> Unable to show your facebook friends. Refresh </string>
 
-    <string name="no_search_results_facebook">No results found. Try searching in your phonebook contacts!</string>
-    <string name="no_search_results_phonebook">No results found. Try searching in your On-App friends!</string>
+    <string name="no_search_results_facebook">No matches found.</string>
+    <string name="no_search_results_phonebook">No matches found.</string>
 
     <string name="phone_contacts_not_fetched"> ClanOut requires your permissions to access phonebook contacts. Once permitted, you can invite friends from phonebook to your plans. We do not store your phonebook information.</string>
-    <string name="no_local_phone_contacts"> Clanout is exciting with your friends around. Invite them by Whatsapp </string>
+    <string name="no_local_phone_contacts"> You have no friends present on Clanout. Invite friends from your phonebook.</string>
 
     <string name="whatsapp_not_installed"> Whatsapp is not installed on this device </string>
 
@@ -134,6 +134,11 @@
     <string name="label_btn_invite">Invite</string>
     <string name="label_btn_chat">Chat</string>
     <string name="location_required_title">Location Required</string>
-    <string name="location_required_message">ClanOut helps you make plans and join clans with friends in your city. We cannot roceed to provide you the ClanOut experience without knowing your location. </string>
+    <string name="location_required_message">ClanOut helps you make plans and join clans with friends in your city. We cannot proceed to provide you the ClanOut experience without knowing your location. </string>
     <string name="read_contacts_permission_required_message">You\'ll not be able to invite friends from your phonebook to your plans. We do not store your phonebook information.</string>
+    <string name="open_type_definition">Everyone can see your plan. You can still send personal invites.</string>
+    <string name="secret_type_definition">Only people you have invited can see your plan</string>
+    <string name="add_phone_title">Enter number to enable invitations from friends who have your contact number</string>
+    <string name="invite_app_friends_title">All your %s friends present on Clanout</string>
+    <string name="invite_phonebook_title">A free SMS will be sent for the invite</string>
 </resources>

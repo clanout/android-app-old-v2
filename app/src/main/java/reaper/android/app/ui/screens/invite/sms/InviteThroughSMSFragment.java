@@ -246,7 +246,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     private void displayNoContactsView() {
         noContactsMessage.setText(R.string.no_local_phone_contacts);
         noContactsMessage.setVisibility(View.VISIBLE);
-        inviteWhatsapp.setVisibility(View.VISIBLE);
+        inviteWhatsapp.setVisibility(View.GONE);
         givePermission.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
         lockedContent.setVisibility(View.GONE);

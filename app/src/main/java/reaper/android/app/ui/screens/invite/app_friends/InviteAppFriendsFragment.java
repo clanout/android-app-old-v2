@@ -72,7 +72,7 @@ import reaper.android.common.communicator.Communicator;
 
 public class InviteAppFriendsFragment extends BaseFragment implements View.OnClickListener {
     private RecyclerView recyclerView;
-    private TextView noFriendsMessage;
+    private TextView noFriendsMessage, tabTitle;
     private FloatingActionButton inviteWhatsapp;
     private Menu menu;
     private Drawable refreshDrawable;
@@ -120,6 +120,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
         progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_invite_facebook_friends);
         search = (EditText) view.findViewById(R.id.et_fragment_invite_facebook_friends_search);
         searchContainer = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_facebook_friends_search);
+        tabTitle = (TextView) view.findViewById(R.id.tv_invite_app_friends_title);
 
         return view;
     }
@@ -152,7 +153,6 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
 
         friendList = new ArrayList<>();
         visibleFriendList = new ArrayList<>();
-
 
         searchWatcher = new TextWatcher() {
 
@@ -207,6 +207,8 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
         fragmentManager = getActivity().getFragmentManager();
 
         generateDrawables();
+
+        tabTitle.setText(getResources().getString(R.string.invite_app_friends_title, locationService.getUserLocation().getZone()));
 
         inviteWhatsapp.setImageDrawable(whatsappDrawable);
 
@@ -288,7 +290,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
         recyclerView.setVisibility(View.GONE);
         searchContainer.setVisibility(View.VISIBLE);
         noFriendsMessage.setVisibility(View.VISIBLE);
-        inviteWhatsapp.setVisibility(View.VISIBLE);
+        inviteWhatsapp.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
 
         noFriendsMessage.setText(R.string.no_local_facebook_friends);

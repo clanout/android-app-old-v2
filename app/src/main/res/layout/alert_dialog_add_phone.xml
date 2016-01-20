@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:gravity="center_horizontal"
-        android:text="Join your phonebook friends on the app"
+        android:text="@string/add_phone_title"
         android:textColor="@color/text_title"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
