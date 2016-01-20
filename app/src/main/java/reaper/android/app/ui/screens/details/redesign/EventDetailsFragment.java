@@ -146,7 +146,6 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        Event event;
         int flag;
 
         try {
@@ -648,6 +647,8 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
 
+                Log.d("APP", "Marshmallow --- 1 ");
+
                 Dexter.checkPermission(new PermissionListener() {
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
@@ -697,15 +698,20 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     try {
 
+                        Log.d("APP", "Marshmallow ---- 2");
+
                         Dexter.checkPermission(new PermissionListener() {
                             @Override
                             public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
 
+                                Log.d("APP", "2 ---- permission granted");
                                 navigateToInviteScreen(event);
                             }
 
                             @Override
                             public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+
+                                Log.d("APP", "2 ---- permission denied");
 
                                 genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
                                 navigateToInviteScreen(event);

@@ -48,6 +48,7 @@ import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
+import reaper.android.app.ui.screens.notifications.NotificationFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.alarm.AlarmReceiver;
 import reaper.android.common.alarm.DeviceBootReceiver;
@@ -112,7 +113,16 @@ public class MainActivity extends AppCompatActivity {
                 .getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);
         eventId = getIntent().getStringExtra("event_id");
 
-        if (shouldGoToDetailsFragment.equals("yes") && eventId != null) {
+        String shouldGoToNotificationsFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_NOTIFICATION_FRAGMENT);
+
+        if(shouldGoToNotificationsFragment != null)
+        {
+            if(shouldGoToNotificationsFragment.equals("yes"))
+            {
+                FragmentUtils
+                        .changeFragment(getFragmentManager(), new NotificationFragment());
+            }
+        }else if (shouldGoToDetailsFragment.equals("yes") && eventId != null) {
             if (getIntent().getBooleanExtra(BundleKeys.POPUP_STATUS_DIALOG, false)) {
                 shouldPopUpStatusDialog = true;
             } else {

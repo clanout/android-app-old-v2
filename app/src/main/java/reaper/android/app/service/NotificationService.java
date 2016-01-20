@@ -623,44 +623,166 @@ public class NotificationService {
         });
     }
 
-    private void buildNotification(Notification notification, boolean shouldGoToDetailsFragment, boolean shouldGoToChatFragment) {
-        Intent intent = new Intent(Reaper.getReaperContext(), LauncherActivity.class);
+    private void buildNotification(final Notification notification, final boolean shouldGoToDetailsFragment, final boolean shouldGoToChatFragment) {
+        final Intent intent = new Intent(Reaper.getReaperContext(), LauncherActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        int requestCode = ("someString" + System.currentTimeMillis()).hashCode();
+        final int requestCode = ("someString" + System.currentTimeMillis()).hashCode();
 
-        if (shouldGoToDetailsFragment) {
-            intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "yes");
-            intent.putExtra("event_id", notification.getEventId());
-        } else {
-            intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "no");
-        }
+        notificationCache.getAll()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new Subscriber<List<Notification>>() {
+                    @Override
+                    public void onCompleted() {
 
-        if(shouldGoToChatFragment)
-        {
-            intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, "yes");
-            intent.putExtra(BundleKeys.EVENT_NAME, notification.getArgs().get("event_name"));
-        }else{
-            intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, "no");
-        }
+                    }
 
-        intent.putExtra("randomRequestCode", requestCode);
+                    @Override
+                    public void onError(Throwable e) {
 
-        PendingIntent pendingIntent = PendingIntent
-                .getActivity(Reaper.getReaperContext(), requestCode, intent, PendingIntent.FLAG_ONE_SHOT);
+                        Log.d("APP", "onError build noti --- notificationCache.getAll()");
+                    }
 
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(Reaper.getReaperContext())
-                .setSmallIcon(R.mipmap.logo1)
-                .setContentTitle(notification.getTitle())
-                .setContentText(notification.getMessage())
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
+                    @Override
+                    public void onNext(List<Notification> notifications) {
 
-        NotificationManager notificationManager =
-                (NotificationManager) Reaper.getReaperContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                        Log.d("APP", "onNext build noti --- notificationCache.getAll()" + notifications.size());
 
-        notificationManager.notify((int) (Math.random() * 1000), notificationBuilder.build());
+
+                        if (notifications.size() == 0) {
+
+                        } else if (notifications.size() == 1) {
+
+                            // if only one notification
+
+                            if (shouldGoToDetailsFragment) {
+
+
+                                intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "yes");
+                                intent.putExtra("event_id", notification.getEventId());
+                            } else {
+
+
+                                intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "no");
+                            }
+
+                            if (shouldGoToChatFragment) {
+                                intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, "yes");
+                                intent.putExtra(BundleKeys.EVENT_NAME, notification.getArgs().get("event_name"));
+                            } else {
+                                intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, "no");
+                            }
+
+                        } else if (notifications.size() > 1) {
+
+                            // more than one notification
+
+                            intent.putExtra(BundleKeys.SHOULD_GO_TO_NOTIFICATION_FRAGMENT, "yes");
+                        }
+
+
+                        intent.putExtra("randomRequestCode", requestCode);
+
+                        PendingIntent pendingIntent = PendingIntent
+                                .getActivity(Reaper.getReaperContext(), requestCode, intent, PendingIntent.FLAG_ONE_SHOT);
+
+                        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(Reaper.getReaperContext())
+                                .setSmallIcon(R.mipmap.logo_red)
+                                .setAutoCancel(true)
+                                .setSound(defaultSoundUri)
+                                .setContentIntent(pendingIntent);
+
+                        // Set Title and message for merged view
+
+                        if (notifications.size() == 1) {
+                            notificationBuilder.setContentTitle(notification.getTitle());
+                            notificationBuilder.setContentText(notification.getMessage());
+                        } else if (notifications.size() > 1) {
+
+                            notificationBuilder.setContentTitle("Clanout");
+
+                            int chatCount = 0;
+                            int updateCount = 0;
+                            int invitationCount = 0;
+
+                            for (Notification noti : notifications) {
+
+                                if (noti.getType() == Notification.CHAT) {
+                                    chatCount++;
+                                } else if (noti.getType() == Notification.EVENT_INVITATION) {
+                                    invitationCount++;
+                                } else if (noti.getType() == Notification.EVENT_UPDATED || notification.getType() == Notification.EVENT_REMOVED) {
+                                    updateCount++;
+                                }
+                            }
+
+                            String message = "You have ";
+
+                            if (invitationCount != 0) {
+                                message = message + invitationCount + " invitations";
+                            }
+
+                            if (updateCount != 0) {
+                                message = message + updateCount + " updates";
+                            }
+
+                            if (chatCount != 0) {
+                                message = message + chatCount + " chats";
+                            }
+
+                            if (chatCount == 0 && updateCount == 0 && invitationCount == 0) {
+                                message = "You have " + notifications.size() + " new notifications";
+                            }
+
+                            notificationBuilder.setContentText(message);
+
+
+                            // Set Expanded View
+
+//                            NotificationCompat.InboxStyle inboxStyle =
+//                                    new NotificationCompat.InboxStyle();
+//
+//                            inboxStyle.setBigContentTitle("Clanout");
+//
+//                            for (Notification noti : notifications) {
+//                                if (noti.getType() == Notification.CHAT || noti.getType() == Notification.EVENT_INVITATION || noti.getType() == Notification.EVENT_UPDATED || noti.getType() == Notification.EVENT_REMOVED) {
+//                                    inboxStyle.addLine(noti.getMessage());
+//                                }
+//                            }
+//
+//                            notificationBuilder.setStyle(inboxStyle);
+
+                            StringBuilder bigTextMessage = new StringBuilder();
+
+                            for (Notification noti : notifications) {
+                                if (noti.getType() == Notification.CHAT || noti.getType() == Notification.EVENT_INVITATION || noti.getType() == Notification.EVENT_UPDATED || noti.getType() == Notification.EVENT_REMOVED) {
+
+                                    bigTextMessage.append(noti.getMessage());
+                                    bigTextMessage.append("\n");
+                                }
+                            }
+
+                            if (bigTextMessage.toString().isEmpty()) {
+                                for (Notification noti : notifications) {
+
+                                    bigTextMessage.append(noti.getMessage());
+                                    bigTextMessage.append("\n");
+
+                                }
+                            }
+
+                            notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(bigTextMessage.toString()));
+                        }
+
+                        NotificationManager notificationManager =
+                                (NotificationManager) Reaper.getReaperContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+//                notificationManager.notify((int) (Math.random() * 1000), notificationBuilder.build());
+
+                        notificationManager.notify(1, notificationBuilder.build());
+                    }
+                });
     }
 }

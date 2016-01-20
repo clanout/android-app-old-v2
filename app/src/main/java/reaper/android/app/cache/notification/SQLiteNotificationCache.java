@@ -302,4 +302,24 @@ public class SQLiteNotificationCache implements NotificationCache
                 })
                 .subscribeOn(Schedulers.io());
     }
+
+    @Override
+    public void clearAll() {
+
+        synchronized (TAG)
+        {
+            Timber.v("NotificationCache.remove() on thread = " + Thread
+                    .currentThread()
+                    .getName());
+
+            SQLiteDatabase db = databaseManager.openConnection();
+
+            SQLiteStatement statement = db
+                    .compileStatement(SQLiteCacheContract.Notification.SQL_DELETE);
+            statement.execute();
+            statement.close();
+
+            databaseManager.closeConnection();
+        }
+    }
 }

@@ -33,6 +33,7 @@ import com.squareup.otto.Subscribe;
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.cache.notification.NotificationCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
@@ -65,6 +66,7 @@ public class LauncherActivity extends AppCompatActivity {
     private FacebookService facebookService;
     private UserService userService;
     private GenericCache genericCache;
+    private NotificationCache notificationCache;
 
     // UI Elements
     private ProgressDialog progressDialog;
@@ -86,6 +88,7 @@ public class LauncherActivity extends AppCompatActivity {
         locationService = new LocationService(bus);
         facebookService = new FacebookService(bus);
         userService = new UserService(bus);
+        notificationCache = CacheManager.getNotificationCache();
 
         cache = CacheManager.getGenericCache();
 
@@ -215,39 +218,55 @@ public class LauncherActivity extends AppCompatActivity {
     public void gotoMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
 
-        String shouldGoToDetailsFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);
-        if (shouldGoToDetailsFragment == null) {
-            shouldGoToDetailsFragment = "no";
-            intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
+        String shouldGoToNotificationFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_NOTIFICATION_FRAGMENT);
 
-        } else {
-            if (shouldGoToDetailsFragment.equals("yes")) {
-                String eventId = getIntent().getStringExtra("event_id");
+        if(shouldGoToNotificationFragment != null)
+        {
+            if(shouldGoToNotificationFragment.equals("yes"))
+            {
+                intent.putExtra(BundleKeys.SHOULD_GO_TO_NOTIFICATION_FRAGMENT, "yes");
+                startActivity(intent);
+                finish();
+            }
+        }else {
+
+            String shouldGoToDetailsFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);
+            if (shouldGoToDetailsFragment == null) {
+                shouldGoToDetailsFragment = "no";
                 intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
-                intent.putExtra("event_id", eventId);
-
-                if (getIntent().getBooleanExtra(BundleKeys.POPUP_STATUS_DIALOG, false)) {
-                    intent.putExtra(BundleKeys.POPUP_STATUS_DIALOG, true);
-                } else {
-                    intent.putExtra(BundleKeys.POPUP_STATUS_DIALOG, false);
-                }
-
-                String shouldGoToChatFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT);
-
-                if (shouldGoToChatFragment == null) {
-                    shouldGoToChatFragment = "no";
-                    intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, shouldGoToChatFragment);
-                } else {
-
-                    intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, shouldGoToChatFragment);
-                }
 
             } else {
-                intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
+                if (shouldGoToDetailsFragment.equals("yes")) {
+
+                    notificationCache.clearAll();
+
+                    String eventId = getIntent().getStringExtra("event_id");
+                    intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
+                    intent.putExtra("event_id", eventId);
+
+                    if (getIntent().getBooleanExtra(BundleKeys.POPUP_STATUS_DIALOG, false)) {
+                        intent.putExtra(BundleKeys.POPUP_STATUS_DIALOG, true);
+                    } else {
+                        intent.putExtra(BundleKeys.POPUP_STATUS_DIALOG, false);
+                    }
+
+                    String shouldGoToChatFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT);
+
+                    if (shouldGoToChatFragment == null) {
+                        shouldGoToChatFragment = "no";
+                        intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, shouldGoToChatFragment);
+                    } else {
+
+                        intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, shouldGoToChatFragment);
+                    }
+
+                } else {
+                    intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
+                }
             }
+            startActivity(intent);
+            finish();
         }
-        startActivity(intent);
-        finish();
     }
 
     private void proceed() {

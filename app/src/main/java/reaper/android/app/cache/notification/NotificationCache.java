@@ -18,4 +18,6 @@ public interface NotificationCache
     Observable<Object> clear(int notificationId);
 
     Observable<Boolean> isAvaliable();
+
+    void clearAll();
 }
