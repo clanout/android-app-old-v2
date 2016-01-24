@@ -2,10 +2,11 @@
 <resources>
     <!-- Theme -->
     <color name="primary">#E53B4A</color>
-    <color name="primary_dark">#B72F3B</color>
-    <color name="primary_light">#ea646e</color>
+    <color name="primary_dark">#B22E3A</color>
+    <color name="primary_light">#E9828B</color>
     <color name="white">#FFFFFF</color>
-    <color name="accent">#0097a7</color>
+    <color name="accent">#09982A</color>
+    <!--<color name="accent">#0097a7</color>-->
     <color name="accent_secondary">#EF9A9B</color>
 
     <!-- Background -->
@@ -14,7 +15,6 @@
     <color name="dark_grey">#D0D0D0</color>
 
     <!-- Miscellaneous -->
-    <color name="whity">#FFFFFF</color>
     <color name="divider">#DDEEEEEE</color>
     <color name="divider_light">#FAFAFA</color>
     <color name="cyan">#0097A7</color>
@@ -25,25 +25,14 @@
     <color name="light_grey">#EEEEEE</color>
 
     <!-- App Intro Background -->
-    <color name="purple_app_inro">#9C27B0</color>
-    <color name="green_app_inro">#4CAF50</color>
-    <color name="blue_app_inro">#03A9F4</color>
-    <color name="red_app_inro">#F44336</color>
+    <color name="intro_1">#E64351</color>
+    <color name="intro_2">#729945</color>
+    <color name="intro_3">#C1272D</color>
+    <color name="intro_4">#3B5998</color>
 
     <!-- Fonts -->
-    <color name="text_title">#212121</color>
-    <color name="text_subtitle">#616161</color>
-
-    <!-- Category Icons -->
-    <color name="one">#EF5350</color>
-    <color name="two">#FF7043</color>
-    <color name="three">#AB47BC</color>
-    <color name="four">#8D6E63</color>
-    <color name="five">#66BB6A</color>
-    <color name="six">#78909C</color>
-    <color name="seven">#EC407A</color>
-    <color name="eight">#D4E157</color>
-    <color name="nine">#42A5F5</color>
+    <color name="text_title">#AA000000</color>
+    <color name="text_subtitle">#AA777777</color>
 
     <!-- Category Icons -->
     <color name="category_icon_one">#3b94d9</color>
@@ -58,10 +47,5 @@
 
     <!-- RSVP colors -->
     <color name="going">#4CAF50</color>
-    <color name="may_be">#FFD54F</color>
-
-    <!-- Text Colors -->
-    <color name="_text_title">#AA000000</color>
-    <color name="_text_subtitle">#AA777777</color>
 
 </resources>

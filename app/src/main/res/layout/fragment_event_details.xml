@@ -8,7 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/whity"
+        android:background="@color/white"
         android:orientation="vertical"
         android:paddingBottom="8dp">
 
@@ -54,19 +54,19 @@
                 android:layout_width="52dp"
                 android:layout_height="52dp"
                 android:layout_marginRight="16dp"
-                android:gravity="center_vertical|center_horizontal"
-                android:background="@color/purple_app_inro">
+                android:background="@color/white"
+                android:gravity="center_vertical|center_horizontal">
 
                 <net.steamcrafted.materialiconlib.MaterialIconView
                     android:id="@+id/miv_event_details_icon"
                     xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
+                    android:layout_gravity="center"
                     android:scaleType="center"
                     app:materialIcon="food"
-                    app:materialIconColor="@color/whity"
-                    app:materialIconSize="36dp"
-                    android:layout_gravity="center" />
+                    app:materialIconColor="@color/white"
+                    app:materialIconSize="36dp"/>
 
             </LinearLayout>
         </LinearLayout>
@@ -104,9 +104,9 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:maxLines="1"
-                android:textSize="14sp"
                 android:text="Arbor Brewing Company"
-                android:textColor="@color/text_subtitle"/>
+                android:textColor="@color/text_subtitle"
+                android:textSize="14sp"/>
         </LinearLayout>
 
         <View
@@ -143,9 +143,9 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:maxLines="1"
-                android:textSize="14sp"
                 android:text="7:00 PM, Today"
-                android:textColor="@color/text_subtitle"/>
+                android:textColor="@color/text_subtitle"
+                android:textSize="14sp"/>
         </LinearLayout>
 
         <View
@@ -182,10 +182,10 @@
                 android:layout_marginRight="16dp"
                 android:layout_weight="1"
                 android:clickable="true"
-                android:text="This a sample description"
                 android:maxLines="3"
-                android:textSize="14sp"
-                android:textColor="@color/text_subtitle"/>
+                android:text="This a sample description"
+                android:textColor="@color/text_subtitle"
+                android:textSize="14sp"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -208,8 +208,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textSize="8dp"
             android:textColor="@color/text_subtitle"
+            android:textSize="8dp"
             />
 
     </LinearLayout>

@@ -41,7 +41,7 @@
                         android:layout_height="36dp"
                         android:scaleType="center"
                         app:materialIcon="coffee"
-                        app:materialIconColor="@color/whity"
+                        app:materialIconColor="@color/white"
                         app:materialIconSize="36dp" />
 
                 </LinearLayout>
@@ -107,7 +107,7 @@
                         android:layout_height="36dp"
                         android:scaleType="center"
                         app:materialIcon="shopping"
-                        app:materialIconColor="@color/whity"
+                        app:materialIconColor="@color/white"
                         app:materialIconSize="36dp" />
 
                 </LinearLayout>
@@ -148,7 +148,7 @@
                         android:layout_height="36dp"
                         android:scaleType="center"
                         app:materialIcon="tennis"
-                        app:materialIconColor="@color/whity"
+                        app:materialIconColor="@color/white"
                         app:materialIconSize="36dp" />
 
                 </LinearLayout>
@@ -181,7 +181,7 @@
                         android:layout_height="36dp"
                         android:scaleType="center"
                         app:materialIcon="food"
-                        app:materialIconColor="@color/whity"
+                        app:materialIconColor="@color/white"
                         app:materialIconSize="36dp" />
 
                 </LinearLayout>
@@ -214,7 +214,7 @@
                         android:layout_height="36dp"
                         android:scaleType="center"
                         app:materialIcon="xbox_controller"
-                        app:materialIconColor="@color/whity"
+                        app:materialIconColor="@color/white"
                         app:materialIconSize="36dp" />
 
                 </LinearLayout>
@@ -257,7 +257,7 @@
                         android:layout_height="36dp"
                         android:scaleType="center"
                         app:materialIcon="martini"
-                        app:materialIconColor="@color/whity"
+                        app:materialIconColor="@color/white"
                         app:materialIconSize="36dp" />
 
                 </LinearLayout>
@@ -290,7 +290,7 @@
                         android:layout_height="36dp"
                         android:scaleType="center"
                         app:materialIcon="bike"
-                        app:materialIconColor="@color/whity"
+                        app:materialIconColor="@color/white"
                         app:materialIconSize="36dp" />
 
                 </LinearLayout>
@@ -323,7 +323,7 @@
                         android:layout_height="36dp"
                         android:scaleType="center"
                         app:materialIcon="bulletin_board"
-                        app:materialIconColor="@color/whity"
+                        app:materialIconColor="@color/white"
                         app:materialIconSize="36dp" />
 
                 </LinearLayout>

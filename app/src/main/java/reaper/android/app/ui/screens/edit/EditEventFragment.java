@@ -3,11 +3,11 @@ package reaper.android.app.ui.screens.edit;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -35,13 +35,12 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import hotchemi.stringpicker.StringPicker;
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.config.BackstackTags;
@@ -52,7 +51,9 @@ import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
+import reaper.android.app.model.Location;
 import reaper.android.app.model.Suggestion;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.ui.activity.MainActivity;
@@ -60,23 +61,55 @@ import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.create.LocationSuggestionAdapter;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
-import reaper.android.app.ui.util.DateTimeUtils;
+import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
-import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
+import timber.log.Timber;
 
-
-public class EditEventFragment extends BaseFragment implements EditEventView,
-        LocationSuggestionAdapter.SuggestionClickListener, TimePickerDialog.OnTimeSetListener
+public class EditEventFragment extends BaseFragment implements EditEventView, LocationSuggestionAdapter.SuggestionClickListener
 {
-
-    // TODO -- check icon for "Save"
-
     private static final String ARG_EVENT = "arg_event";
     private static final String ARG_EVENT_DETAILS = "arg_event_details";
+
+    EditEventPresenter presenter;
+
+    Bus bus;
+    UserService userService;
+
+    /* UI Elements */
+    ScrollView parent;
+    Toolbar toolbar;
+    View llCategoryIconContainer;
+    ImageView ivCategoryIcon;
+    TextView tvTitle;
+    TextView tvType;
+    EditText etDesc;
+    TextView tvTime;
+    TextView tvDay;
+    EditText etLocation;
+    RecyclerView rvLocationSuggestions;
+
+    ProgressDialog progressDialog;
+
+    boolean isFinalizeOptionVisible;
+    boolean isUnfinalizeOptionVisible;
+    MenuItem finalize;
+
+    boolean isDeleteOptionVisible;
+    MenuItem delete;
+
+    /* Data */
+    DateTimeUtil dateTimeUtil;
+
+    List<String> dayList;
+    int selectedDay;
+    LocalTime startTime;
+    boolean isFinalized;
+
+    boolean isLocationUpdating;
 
     public static EditEventFragment newInstance(Event event, EventDetails eventDetails)
     {
@@ -90,108 +123,44 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         return fragment;
     }
 
-    /* UI Elements */
-    ScrollView parent;
-    Toolbar toolbar;
-
-    TextView title;
-    TextView type;
-    EditText description;
-
-    ImageView icon;
-    View iconContainer;
-
-    TextView time;
-    ImageView timeIcon;
-    View timeContainer;
-
-    TextView day;
-    ImageView dayIcon;
-    View dayContainer;
-
-    View daySelectorContainer;
-    TabLayout daySelector;
-    boolean isDaySelectorVisible;
-
-    View timeSelectorContainer;
-    TabLayout timeSelector;
-    boolean isTimeSelectorVisible;
-
-    EditText location;
-    TextWatcher locationListener;
-    ImageView locationIcon;
-    boolean isLocationUpdating;
-
-    RecyclerView suggestionList;
-    View suggestionContainer;
-
-    ProgressDialog progressDialog;
-
-    boolean isFinalizeOptionVisible;
-    boolean isUnfinalizeOptionVisible;
-    MenuItem finalize;
-
-    boolean isDeleteOptionVisible;
-    MenuItem delete;
-
-    /* Data */
-    DateTimeUtils dateTimeUtils;
-    boolean isFinalized;
-    LocalDate startDate;
-    LocalTime startTime;
-
-    ClickListener clickListener;
-
-    EditEventPresenter presenter;
-
-    Bus bus;
-    UserService userService;
-
-    /* Lifecycle Methods */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        dateTimeUtils = new DateTimeUtils();
 
         bus = Communicator.getInstance().getBus();
+        userService = new UserService(bus);
+
+        Event event = (Event) getArguments().getSerializable(ARG_EVENT);
+        EventDetails eventDetails = (EventDetails) getArguments()
+                .getSerializable(ARG_EVENT_DETAILS);
+        if (event == null || eventDetails == null)
+        {
+            throw new IllegalStateException("event or details cannot be null");
+        }
+
+        setActionBarTitle(event);
+
+        presenter = new EditEventPresenterImpl(bus, event, eventDetails);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.fragment_edit, container, false);
+        View view = inflater.inflate(R.layout.fragment_edit_, container, false);
 
         parent = (ScrollView) view.findViewById(R.id.sv_editEvent);
         toolbar = (Toolbar) view.findViewById(R.id.tb_editEvent);
-
-        title = (TextView) view.findViewById(R.id.tv_editEvent_title);
-        description = (EditText) view.findViewById(R.id.et_editEvent_description);
-
-        icon = (ImageView) view.findViewById(R.id.iv_editEvent_icon);
-        iconContainer = view.findViewById(R.id.ll_create_event_iconContainer);
-
-        type = (TextView) view.findViewById(R.id.tv_editEvent_type);
-
-        day = (TextView) view.findViewById(R.id.tv_editEvent_day);
-        dayIcon = (ImageView) view.findViewById(R.id.iv_dayIcon);
-        dayContainer = view.findViewById(R.id.ll_editEvent_dayContainer);
-
-        time = (TextView) view.findViewById(R.id.tv_editEvent_time);
-        timeIcon = (ImageView) view.findViewById(R.id.iv_timeIcon);
-        timeContainer = view.findViewById(R.id.ll_editEvent_timeContainer);
-
-        daySelector = (TabLayout) view.findViewById(R.id.tl_editEvent_daySelector);
-        daySelectorContainer = view.findViewById(R.id.ll_editEvent_daySelectorContainer);
-        timeSelector = (TabLayout) view.findViewById(R.id.tl_editEvent_timeSelector);
-        timeSelectorContainer = view.findViewById(R.id.ll_editEvent_timeSelectorContainer);
-
-        suggestionList = (RecyclerView) view.findViewById(R.id.rv_editEvent_locationSuggestions);
-        suggestionContainer = view.findViewById(R.id.ll_editEvent_locationContainer);
-
-        location = (EditText) view.findViewById(R.id.et_editEvent_location);
-        locationIcon = (ImageView) view.findViewById(R.id.iv_editEvent_locationIcon);
+        tvTitle = (TextView) view.findViewById(R.id.tvTitle);
+        tvType = (TextView) view.findViewById(R.id.tvType);
+        llCategoryIconContainer = view.findViewById(R.id.llCategoryIconContainer);
+        ivCategoryIcon = (ImageView) view.findViewById(R.id.ivCategoryIcon);
+        etDesc = (EditText) view.findViewById(R.id.etDesc);
+        tvTime = (TextView) view.findViewById(R.id.tvTime);
+        tvDay = (TextView) view.findViewById(R.id.tvDay);
+        etLocation = (EditText) view.findViewById(R.id.etLocation);
+        rvLocationSuggestions = (RecyclerView) view.findViewById(R.id.rvLocationSuggestions);
 
         return view;
     }
@@ -200,27 +169,37 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setHasOptionsMenu(true);
 
-        ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        initRecyclerView();
+    }
 
-        Event event = (Event) getArguments().getSerializable(ARG_EVENT);
-        EventDetails eventDetails = (EventDetails) getArguments()
-                .getSerializable(ARG_EVENT_DETAILS);
-        if (event == null || eventDetails == null)
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        bus.register(this);
+
+        CacheManager.getGenericCache().put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EDIT);
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EDIT_EVENT_FRAGMENT);
+
+        etLocation.setOnFocusChangeListener(new View.OnFocusChangeListener()
         {
-            throw new IllegalStateException("event/event_details is null");
-        }
+            @Override
+            public void onFocusChange(View v, boolean hasFocus)
+            {
+                if (hasFocus)
+                {
+                    parent.scrollTo(0, rvLocationSuggestions.getBottom());
+                }
+            }
+        });
 
-        presenter = new EditEventPresenterImpl(bus, event, eventDetails);
-
-        bus = Communicator.getInstance().getBus();
-        userService = new UserService(bus);
-
-        setActionBarTitle(event);
-
-        locationListener = new TextWatcher()
+        etLocation.addTextChangedListener(new TextWatcher()
         {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after)
@@ -237,7 +216,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
             @Override
             public void afterTextChanged(Editable s)
             {
-                parent.scrollTo(0, suggestionContainer.getBottom());
+                parent.scrollTo(0, rvLocationSuggestions.getBottom());
 
                 if (!isLocationUpdating)
                 {
@@ -253,36 +232,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
                     presenter.setLocationName(s.toString());
                 }
             }
-        };
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-
-        bus.register(this);
-
-        CacheManager.getGenericCache().put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EDIT);
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EDIT_EVENT_FRAGMENT);
-
-        location.setOnFocusChangeListener(new View.OnFocusChangeListener()
-        {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus)
-            {
-                if (hasFocus)
-                {
-                    parent.scrollTo(0, suggestionContainer.getBottom());
-                }
-            }
         });
-
-        location.addTextChangedListener(locationListener);
-
-        isFinalizeOptionVisible = false;
-        isUnfinalizeOptionVisible = false;
-        isDeleteOptionVisible = false;
 
         presenter.attachView(this);
     }
@@ -291,279 +241,161 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
     public void onPause()
     {
         super.onPause();
-        bus.unregister(this);
-        location.setOnFocusChangeListener(null);
-        location.removeTextChangedListener(locationListener);
+
+        etLocation.setOnFocusChangeListener(null);
+        etLocation.addTextChangedListener(null);
+
         presenter.detachView();
-    }
 
-    private void edit()
-    {
-        presenter.setDescription(description.getText().toString());
-        presenter.edit();
-
-        AnalyticsHelper
-                .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_EDITED, userService
-                        .getActiveUserId());
+        bus.unregister(this);
     }
 
     private void initRecyclerView()
     {
-        suggestionList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        suggestionList.setAdapter(new LocationSuggestionAdapter(new ArrayList<Suggestion>(), this));
+        rvLocationSuggestions.setLayoutManager(new LinearLayoutManager(getActivity()));
+        rvLocationSuggestions
+                .setAdapter(new LocationSuggestionAdapter(new ArrayList<Suggestion>(), this));
 
-        suggestionContainer.setVisibility(View.GONE);
+        rvLocationSuggestions.setVisibility(View.GONE);
     }
 
-    private void initDayTime()
+    private void displayDayPicker()
     {
-        day.setText(dateTimeUtils.formatDate(startDate));
-        time.setText(dateTimeUtils.formatTime(startTime));
-    }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
 
-    private void initDaySelector()
-    {
-        daySelectorContainer.setVisibility(View.GONE);
+        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+        View dialogView = layoutInflater.inflate(R.layout.dialog_day_picker, null);
+        builder.setView(dialogView);
 
-        daySelector.setOnTabSelectedListener(null);
-        daySelector.setTabMode(TabLayout.MODE_SCROLLABLE);
-        daySelector.setTabGravity(TabLayout.GRAVITY_FILL);
-        daySelector
-                .setSelectedTabIndicatorColor(ContextCompat.getColor(getActivity(), R.color.white));
-        daySelector.removeAllTabs();
+        final StringPicker stringPicker = (StringPicker) dialogView
+                .findViewById(R.id.dayPicker);
+        stringPicker.setValues(dayList);
+        stringPicker.setCurrent(selectedDay);
 
-        List<String> days = dateTimeUtils.getDayList();
 
-        for (String day : days)
-        {
-            daySelector.addTab(daySelector.newTab().setText(day));
-        }
-
-        daySelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
         {
             @Override
-            public void onTabSelected(TabLayout.Tab tab)
+            public void onClick(DialogInterface dialog, int which)
             {
-                String key = tab.getText().toString();
-                day.setText(key);
-                startDate = dateTimeUtils.getDate(key);
-                hideDaySelector();
-
-                DateTime start = DateTimeUtils.getDateTime(startDate, startTime);
-                presenter.updateTime(start);
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab)
-            {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab)
-            {
-                String key = tab.getText().toString();
-                day.setText(key);
-                startDate = dateTimeUtils.getDate(key);
-                hideDaySelector();
-
-                DateTime start = DateTimeUtils.getDateTime(startDate, startTime);
-                presenter.updateTime(start);
+                tvDay.setText(stringPicker.getCurrentValue());
+                selectedDay = stringPicker.getCurrent();
+                Timber.d("Selected Day = " + selectedDay);
+                dialog.dismiss();
             }
         });
-    }
 
-    private void initTimeSelector()
-    {
-        timeSelectorContainer.setVisibility(View.GONE);
-
-        timeSelector.setOnTabSelectedListener(null);
-        timeSelector.setTabMode(TabLayout.MODE_SCROLLABLE);
-        timeSelector.setTabGravity(TabLayout.GRAVITY_FILL);
-        timeSelector
-                .setSelectedTabIndicatorColor(ContextCompat.getColor(getActivity(), R.color.white));
-        timeSelector.removeAllTabs();
-
-        List<String> times = dateTimeUtils.getTimeList();
-        for (String time : times)
-        {
-            timeSelector.addTab(timeSelector.newTab().setText(time));
-        }
-
-        timeSelector.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
         {
             @Override
-            public void onTabSelected(TabLayout.Tab tab)
+            public void onClick(DialogInterface dialog, int which)
             {
-                String key = tab.getText().toString();
-                if (key.equalsIgnoreCase(DateTimeUtils.PICK_YOUR_OWN))
-                {
-                    TimePickerDialog dialog = TimePickerDialog
-                            .newInstance(EditEventFragment.this, startTime
-                                    .getHourOfDay(), startTime
-                                    .getMinuteOfHour(), false);
-                    dialog.dismissOnPause(true);
-                    dialog.vibrate(false);
-                    dialog.show(getFragmentManager(), "TimePicker");
-                }
-                else
-                {
-                    startTime = dateTimeUtils.getTime(key);
-                    time.setText(dateTimeUtils.formatTime(startTime));
-
-                    DateTime start = DateTimeUtils.getDateTime(startDate, startTime);
-                    presenter.updateTime(start);
-                }
-
-                hideTimeSelector();
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab)
-            {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab)
-            {
-                String key = tab.getText().toString();
-                if (key.equalsIgnoreCase(DateTimeUtils.PICK_YOUR_OWN))
-                {
-                    TimePickerDialog dialog = TimePickerDialog
-                            .newInstance(EditEventFragment.this, startTime
-                                    .getHourOfDay(), startTime
-                                    .getMinuteOfHour(), false);
-                    dialog.dismissOnPause(true);
-                    dialog.vibrate(false);
-                    dialog.show(getFragmentManager(), "TimePicker");
-                }
-                else
-                {
-                    startTime = dateTimeUtils.getTime(key);
-                    time.setText(dateTimeUtils.formatTime(startTime));
-
-                    DateTime start = DateTimeUtils.getDateTime(startDate, startTime);
-                    presenter.updateTime(start);
-                }
-
-                hideTimeSelector();
+                dialog.dismiss();
             }
         });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
-    private void showDaySelector()
-    {
-        VisibilityAnimationUtil.expand(daySelectorContainer, 200);
-        isDaySelectorVisible = true;
-    }
-
-    private void hideDaySelector()
-    {
-        VisibilityAnimationUtil.collapse(daySelectorContainer, 200);
-        isDaySelectorVisible = false;
-    }
-
-    private void showTimeSelector()
-    {
-        VisibilityAnimationUtil.expand(timeSelectorContainer, 200);
-        isTimeSelectorVisible = true;
-    }
-
-    private void hideTimeSelector()
-    {
-        VisibilityAnimationUtil.collapse(timeSelectorContainer, 200);
-        isTimeSelectorVisible = false;
-    }
-
+    /* View Methods */
     @Override
     public void init(Event event, String description)
     {
         isFinalized = event.isFinalized();
 
-        startDate = event.getStartTime().toLocalDate();
+        dateTimeUtil = new DateTimeUtil();
+
+        // Title
+        tvTitle.setText(event.getTitle());
+
+        // Type
+        if (event.getType() == Event.Type.INVITE_ONLY)
+        {
+            tvType.setText(R.string.event_details_type_invite_only);
+        }
+        else
+        {
+            tvType.setText(R.string.event_details_type_public);
+        }
+
+        //Description
+        if (description != null)
+        {
+            etDesc.setText(description);
+        }
+
+
+        // Start Time
         startTime = event.getStartTime().toLocalTime();
-        initDayTime();
+        tvTime.setText(dateTimeUtil.formatTime(startTime));
 
-        title.setText(event.getTitle());
-        this.description.setText(description);
+        // Start Day
+        tvDay.setText(dateTimeUtil.formatDate(event.getStartTime().toLocalDate()));
 
-        String locationName = event.getLocation().getName();
-        if (locationName != null)
+        dayList = dateTimeUtil.getDayList();
+        selectedDay = -1;
+
+        // Location
+        Location location = event.getLocation();
+        if (location != null)
         {
-            setLocation(locationName);
+            String locationName = location.getName();
+            if (locationName != null)
+            {
+                etLocation.setText(locationName);
+            }
         }
 
 
-        if (event.getType() == Event.Type.PUBLIC)
+        // Category
+        EventCategory category = EventCategory.valueOf(event.getCategory());
+        ivCategoryIcon.setImageDrawable(DrawableFactory
+                .get(category, Dimensions.EVENT_ICON_SIZE));
+        llCategoryIconContainer
+                .setBackground(DrawableFactory.getIconBackground(category));
+
+        tvTime.setOnClickListener(new View.OnClickListener()
         {
-            type.setText(R.string.event_details_type_public);
-        }
-        else
+            @Override
+            public void onClick(View v)
+            {
+                TimePickerDialog dialog = TimePickerDialog
+                        .newInstance(
+                                new TimePickerDialog.OnTimeSetListener()
+                                {
+                                    @Override
+                                    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute)
+                                    {
+                                        startTime = new LocalTime(hourOfDay, minute);
+                                        tvTime.setText(dateTimeUtil.formatTime(startTime));
+                                    }
+                                },
+                                startTime.getHourOfDay(),
+                                startTime.getMinuteOfHour(),
+                                false);
+
+                dialog.dismissOnPause(true);
+                dialog.vibrate(false);
+                dialog.show(getFragmentManager(), "TimePicker");
+            }
+        });
+
+        tvDay.setOnClickListener(new View.OnClickListener()
         {
-            type.setText(R.string.event_details_type_invite_only);
-        }
-
-        dayIcon.setImageDrawable(MaterialDrawableBuilder.with(getActivity())
-                                                        .setIcon(MaterialDrawableBuilder.IconValue.CALENDAR)
-                                                        .setColor(ContextCompat
-                                                                .getColor(getActivity(), R.color.primary))
-                                                        .setSizeDp(24).build());
-
-        timeIcon.setImageDrawable(MaterialDrawableBuilder.with(getActivity())
-                                                         .setIcon(MaterialDrawableBuilder.IconValue.CLOCK)
-                                                         .setColor(ContextCompat
-                                                                 .getColor(getActivity(), R.color.primary))
-                                                         .setSizeDp(24).build());
-
-        locationIcon.setImageDrawable(MaterialDrawableBuilder.with(getActivity())
-                                                             .setIcon(MaterialDrawableBuilder.IconValue.MAP_MARKER)
-                                                             .setColor(ContextCompat
-                                                                     .getColor(getActivity(), R.color.primary))
-                                                             .setSizeDp(24).build());
-
-        clickListener = new ClickListener();
-        dayContainer.setOnClickListener(clickListener);
-        timeContainer.setOnClickListener(clickListener);
-
-        initDaySelector();
-        initTimeSelector();
-        initRecyclerView();
-
-        EventCategory eventCategory = EventCategory.valueOf(event.getCategory());
-        icon.setImageDrawable(DrawableFactory
-                .get(eventCategory, Dimensions.EVENT_ICON_SIZE));
-        iconContainer.setBackground(DrawableFactory.getIconBackground(eventCategory));
+            @Override
+            public void onClick(View v)
+            {
+                displayDayPicker();
+            }
+        });
     }
 
     @Override
-    public void displaySuggestions(List<Suggestion> suggestions)
+    public void showLoading()
     {
-        suggestionList.setAdapter(new LocationSuggestionAdapter(suggestions, this));
-
-        if (suggestions.isEmpty())
-        {
-            suggestionContainer.setVisibility(View.GONE);
-        }
-        else
-        {
-            suggestionContainer.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void setLocation(String locationName)
-    {
-        isLocationUpdating = true;
-        location.setText(locationName);
-        location.setSelection(location.length());
-        isLocationUpdating = false;
-
-        InputMethodManager imm = (InputMethodManager) getActivity()
-                .getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(title.getWindowToken(), 0);
-
-        presenter.fetchSuggestions();
+        progressDialog = ProgressDialog.show(getActivity(), "Updating Clan", "Please Wait..");
     }
 
     @Override
@@ -574,7 +406,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
             Drawable deleteDrawable = MaterialDrawableBuilder.with(getActivity())
                                                              .setIcon(MaterialDrawableBuilder.IconValue.DELETE)
                                                              .setColor(ContextCompat
-                                                                     .getColor(getActivity(), R.color.whity))
+                                                                     .getColor(getActivity(), R.color.white))
                                                              .setSizeDp(36)
                                                              .build();
             delete.setIcon(deleteDrawable);
@@ -592,7 +424,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
             Drawable lockedDrawable = MaterialDrawableBuilder.with(getActivity())
                                                              .setIcon(MaterialDrawableBuilder.IconValue.LOCK)
                                                              .setColor(ContextCompat
-                                                                     .getColor(getActivity(), R.color.whity))
+                                                                     .getColor(getActivity(), R.color.white))
                                                              .setSizeDp(36)
                                                              .build();
 
@@ -604,12 +436,6 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
     }
 
     @Override
-    public void showLoading()
-    {
-        progressDialog = ProgressDialog.show(getActivity(), "Updating Details", "Please Wait..");
-    }
-
-    @Override
     public void displayUnfinalizationOption()
     {
         if (finalize != null && !isUnfinalizeOptionVisible)
@@ -617,7 +443,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
             Drawable unlockedDrawable = MaterialDrawableBuilder.with(getActivity())
                                                                .setIcon(MaterialDrawableBuilder.IconValue.LOCK_OPEN)
                                                                .setColor(ContextCompat
-                                                                       .getColor(getActivity(), R.color.whity))
+                                                                       .getColor(getActivity(), R.color.white))
                                                                .setSizeDp(36)
                                                                .build();
 
@@ -628,6 +454,35 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         isUnfinalizeOptionVisible = true;
     }
 
+    @Override
+    public void displaySuggestions(List<Suggestion> suggestions)
+    {
+        rvLocationSuggestions.setAdapter(new LocationSuggestionAdapter(suggestions, this));
+
+        if (suggestions.isEmpty())
+        {
+            rvLocationSuggestions.setVisibility(View.GONE);
+        }
+        else
+        {
+            rvLocationSuggestions.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void setLocation(String locationName)
+    {
+        isLocationUpdating = true;
+        etLocation.setText(locationName);
+        etLocation.setSelection(etLocation.length());
+        isLocationUpdating = false;
+
+        InputMethodManager imm = (InputMethodManager) getActivity()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(tvTitle.getWindowToken(), 0);
+
+        presenter.fetchSuggestions();
+    }
 
     @Override
     public void displayEventLockedError()
@@ -681,73 +536,19 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
     }
 
     @Override
-    public void onSuggestionClicked(Suggestion suggestion)
-    {
-        AnalyticsHelper
-                .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.SUGGESTION_CLICKED_EDIT, userService
-                        .getActiveUserId());
-
-        presenter.selectSuggestion(suggestion);
-    }
-
-    @Override
-    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute)
-    {
-        startTime = new LocalTime(hourOfDay, minute);
-        time.setText(dateTimeUtils.formatTime(startTime));
-
-        DateTime start = DateTimeUtils.getDateTime(startDate, startTime);
-        presenter.updateTime(start);
-    }
-
-    private class ClickListener implements View.OnClickListener
-    {
-        @Override
-        public void onClick(View v)
-        {
-
-            SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
-
-            if (v == dayContainer)
-            {
-                if (isTimeSelectorVisible)
-                {
-                    hideTimeSelector();
-                }
-
-                if (!isDaySelectorVisible)
-                {
-                    showDaySelector();
-                }
-                else
-                {
-                    hideDaySelector();
-                }
-            }
-            else if (v == timeContainer)
-            {
-                if (isDaySelectorVisible)
-                {
-                    hideDaySelector();
-                }
-
-                if (!isTimeSelectorVisible)
-                {
-                    showTimeSelector();
-                }
-                else
-                {
-                    hideTimeSelector();
-                }
-            }
-        }
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.action_edit, menu);
+
+        Drawable drawable = MaterialDrawableBuilder
+                .with(Reaper.getReaperContext())
+                .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
+                .setColor(Color.WHITE)
+                .build();
+
+        menu.findItem(R.id.action_edit)
+            .setIcon(drawable);
 
         menu.findItem(R.id.action_edit)
             .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
@@ -774,7 +575,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
             Drawable deleteDrawable = MaterialDrawableBuilder.with(getActivity())
                                                              .setIcon(MaterialDrawableBuilder.IconValue.DELETE)
                                                              .setColor(ContextCompat
-                                                                     .getColor(getActivity(), R.color.whity))
+                                                                     .getColor(getActivity(), R.color.white))
                                                              .setSizeDp(36)
                                                              .build();
             delete.setIcon(deleteDrawable);
@@ -786,7 +587,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
             Drawable lockedDrawable = MaterialDrawableBuilder.with(getActivity())
                                                              .setIcon(MaterialDrawableBuilder.IconValue.LOCK)
                                                              .setColor(ContextCompat
-                                                                     .getColor(getActivity(), R.color.whity))
+                                                                     .getColor(getActivity(), R.color.white))
                                                              .setSizeDp(36)
                                                              .build();
 
@@ -798,7 +599,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
             Drawable unlockedDrawable = MaterialDrawableBuilder.with(getActivity())
                                                                .setIcon(MaterialDrawableBuilder.IconValue.LOCK_OPEN)
                                                                .setColor(ContextCompat
-                                                                       .getColor(getActivity(), R.color.whity))
+                                                                       .getColor(getActivity(), R.color.white))
                                                                .setSizeDp(36)
                                                                .build();
 
@@ -925,24 +726,24 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         });
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
+    private void edit()
     {
-        if (item.getItemId() == android.R.id.home)
-        {
+        presenter.setDescription(etDesc.getText().toString());
+        presenter.edit();
 
-            ((MainActivity) getActivity()).onBackPressed();
-        }
-        return super.onOptionsItemSelected(item);
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_EDITED, userService
+                        .getActiveUserId());
     }
 
-    @Subscribe
-    public void onBackPressedTrigger(BackPressedTrigger trigger)
+    @Override
+    public void onSuggestionClicked(Suggestion suggestion)
     {
-        if (trigger.getActiveFragment() == BackstackTags.EDIT)
-        {
-            presenter.initiateEventDetailsNavigation();
-        }
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.SUGGESTION_CLICKED_EDIT, userService
+                        .getActiveUserId());
+
+        presenter.selectSuggestion(suggestion);
     }
 
     private void setActionBarTitle(Event event)
@@ -976,6 +777,25 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
             case "GENERAL":
                 ((MainActivity) getActivity()).getSupportActionBar().setTitle("General");
                 break;
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == android.R.id.home)
+        {
+            getActivity().onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Subscribe
+    public void onBackPressedTrigger(BackPressedTrigger trigger)
+    {
+        if (trigger.getActiveFragment() == BackstackTags.EDIT)
+        {
+            presenter.initiateEventDetailsNavigation();
         }
     }
 }

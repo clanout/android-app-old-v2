@@ -21,7 +21,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginBottom="16dp"
             android:layout_marginLeft="16dp"
-            android:background="@color/one"
+            android:background="@color/category_icon_one"
             android:gravity="center"
             android:padding="8dp">
 
@@ -51,7 +51,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:maxLines="1"
-            android:textColor="@color/_text_title"
+            android:textColor="@color/text_title"
             android:textSize="24sp"/>
 
         <TextView
@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvTitle"
             android:layout_marginTop="4dp"
-            android:textColor="@color/_text_subtitle"/>
+            android:textColor="@color/text_subtitle"/>
 
         <LinearLayout
             android:id="@+id/llDescription"
@@ -191,7 +191,7 @@
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@id/ivPic"
             android:maxLines="1"
-            android:textColor="@color/_text_title"
+            android:textColor="@color/text_title"
             android:textSize="16sp"/>
 
         <net.steamcrafted.materialiconlib.MaterialIconView
@@ -216,7 +216,7 @@
             android:layout_marginTop="8dp"
             android:layout_toRightOf="@id/mivEditStatus"
             android:maxLines="1"
-            android:textColor="@color/_text_subtitle"/>
+            android:textColor="@color/text_subtitle"/>
 
         <LinearLayout
             android:layout_width="wrap_content"

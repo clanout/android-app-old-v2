@@ -57,7 +57,6 @@ import reaper.android.app.service.UserService;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.DateTimeUtil;
-import reaper.android.app.ui.util.DateTimeUtils;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
@@ -167,6 +166,7 @@ public class CreateEventDetailsFragment extends BaseFragment
         super.onActivityCreated(savedInstanceState);
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setHasOptionsMenu(true);
 
         initView();
@@ -685,9 +685,9 @@ public class CreateEventDetailsFragment extends BaseFragment
 
                     String eventTitle = etTitle.getText().toString();
                     String eventDescription = etDesc.getText().toString();
-                    DateTime start = DateTimeUtils
+                    DateTime start = dateTimeUtil
                             .getDateTime(dateTimeUtil.getDate(dayList.get(selectedDay)), startTime);
-                    DateTime end = DateTimeUtils.getEndTime(start);
+                    DateTime end = dateTimeUtil.getEndTime(start);
 
                     Event.Type type = cbType
                             .isChecked() ? Event.Type.INVITE_ONLY : Event.Type.PUBLIC;
@@ -702,5 +702,15 @@ public class CreateEventDetailsFragment extends BaseFragment
                     return true;
                 }
             });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == android.R.id.home)
+        {
+            getActivity().onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

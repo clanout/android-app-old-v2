@@ -22,7 +22,7 @@
         android:layout_toRightOf="@id/ivPic"
         android:maxLines="1"
         android:text="John Doe"
-        android:textColor="@color/_text_title"
+        android:textColor="@color/text_title"
         android:textSize="16sp"/>
 
     <TextView
@@ -34,7 +34,7 @@
         android:layout_toRightOf="@id/ivPic"
         android:maxLines="1"
         android:text="Some status"
-        android:textColor="@color/_text_subtitle"/>
+        android:textColor="@color/text_subtitle"/>
 
     <net.steamcrafted.materialiconlib.MaterialIconView
         android:id="@+id/mivInvite"

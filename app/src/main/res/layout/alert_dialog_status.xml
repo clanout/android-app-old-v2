@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:text="@string/event_status_dialog_title"
-        android:textColor="@color/_text_title"
+        android:textColor="@color/text_title"
         android:textSize="18sp"/>
 
     <EditText

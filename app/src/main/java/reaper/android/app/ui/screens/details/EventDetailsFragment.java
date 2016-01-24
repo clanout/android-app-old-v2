@@ -1,17 +1,22 @@
 package reaper.android.app.ui.screens.details;
 
-import android.app.FragmentManager;
+import android.Manifest;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,534 +25,426 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.squareup.otto.Bus;
-import com.squareup.otto.Subscribe;
+import com.squareup.picasso.Picasso;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
-import net.steamcrafted.materialiconlib.MaterialIconView;
 
-import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
-import reaper.android.app.cache.event.EventCache;
+import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BundleKeys;
+import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GoogleAnalyticsConstants;
-import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Event;
-import reaper.android.app.model.EventAttendeeComparator;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
-import reaper.android.app.service.EventService;
+import reaper.android.app.model.Location;
 import reaper.android.app.service.UserService;
-import reaper.android.app.trigger.event.ChangeAttendeeListTrigger;
-import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
-import reaper.android.app.trigger.event.EventDetailsFetchedFromNetworkTrigger;
-import reaper.android.app.trigger.event.EventRsvpNotChangedTrigger;
+import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
+import reaper.android.app.ui.screens.edit.EditEventFragment;
+import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
+import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
-import reaper.android.app.ui.util.event.EventUtils;
-import reaper.android.app.ui.util.event.EventUtilsConstants;
+import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
+import timber.log.Timber;
 
-public class EventDetailsFragment extends BaseFragment implements View.OnClickListener, AttendeeClickCommunicator {
-    private FragmentManager fragmentManager;
-    private Bus bus;
+public class EventDetailsFragment extends BaseFragment implements EventDetailsView
+{
+    private static final String ARG_EVENT = "arg_event";
+    private static final String ARG_LAST_MINUTE_DIALOG = "arg_last_minute_dialog";
 
-    // Services
-    private UserService userService;
-    private EventService eventService;
-    private EventCache eventCache;
+    private static final int FLAG_DEFAULT = 0;
+    public static final int FLAG_LAST_MINUTE_STATUS = 1;
 
-    // Data
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat
+            .forPattern("hh:mm a");
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat
+            .forPattern("dd MMM");
+
+    /* UI Elements */
+    View llCategoryIconContainer;
+    ImageView ivCategoryIcon;
+    TextView tvTitle;
+    TextView tvType;
+    TextView tvDescription;
+    TextView tvTime;
+    TextView tvLocation;
+    View mivGoogleMap;
+
+    View rlMeContainer;
+    ImageView ivPic;
+    TextView tvName;
+    TextView tvStatus;
+    TextView tvRsvp;
+    SwitchCompat sRsvp;
+
+    ProgressBar loading;
+    RecyclerView rvAttendees;
+
+    View llEventActionsContainer;
+    Button btnInvite;
+    Button btnChat;
+
+    MenuItem edit;
+
+    /* Presenter */
+    EventDetailsPresenter presenter;
+
+    /* Services */
+    Bus bus;
+    UserService userService;
+    GenericCache genericCache;
+
     private Event event;
-    private EventDetails eventDetails;
 
-    // UI Elements
-    private MaterialIconView icon;
-    private LinearLayout iconContainer;
-    private TextView title, type, description, location, dateTime;
-    private RecyclerView attendeeList;
-    private TextView noAttendeeMessage, refreshDetailsTextView;
-    private ProgressBar refreshDetailsProgressBar;
-    private Drawable pencilDrawable;
+    public static EventDetailsFragment newInstance(Event event)
+    {
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_EVENT, event);
+        args.putInt(ARG_LAST_MINUTE_DIALOG, FLAG_DEFAULT);
 
-    private EventAttendeesAdapter eventAttendeesAdapter;
+        EventDetailsFragment fragment = new EventDetailsFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
-    private boolean areEventDetailsFetched;
-    private List<EventDetails.Attendee> attendees;
-    private Drawable statusDrawable;
+    public static EventDetailsFragment newInstance(Event event, int flag)
+    {
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_EVENT, event);
+        args.putInt(ARG_LAST_MINUTE_DIALOG, flag);
 
-    private boolean shouldPopupStatusDialog;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+        EventDetailsFragment fragment = new EventDetailsFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_event_details, container, false);
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
-        icon = (MaterialIconView) view.findViewById(R.id.miv_event_details_icon);
-        title = (TextView) view.findViewById(R.id.tv_event_details_title);
-        type = (TextView) view.findViewById(R.id.tv_event_details_type);
-        description = (TextView) view.findViewById(R.id.tv_event_details_description);
-        location = (TextView) view.findViewById(R.id.tv_event_details_location);
-        dateTime = (TextView) view.findViewById(R.id.tv_event_details_date_time);
-        attendeeList = (RecyclerView) view.findViewById(R.id.rv_event_details_attendees);
-        noAttendeeMessage = (TextView) view.findViewById(R.id.tv_event_details_no_attendees);
-        refreshDetailsProgressBar = (ProgressBar) view.findViewById(R.id.pb_event_details_refresh_details);
-        refreshDetailsTextView = (TextView) view.findViewById(R.id.tv_event_details_refresh_details);
-        iconContainer = (LinearLayout) view.findViewById(R.id.ll_event_details_icon_container);
+        int flag;
+
+        try
+        {
+            flag = getArguments().getInt(ARG_LAST_MINUTE_DIALOG, FLAG_DEFAULT);
+            getArguments().remove(ARG_LAST_MINUTE_DIALOG);
+
+            event = (Event) getArguments().getSerializable(ARG_EVENT);
+            if (event == null)
+            {
+                throw new NullPointerException();
+            }
+        }
+        catch (Exception e)
+        {
+            throw new IllegalStateException("Event cannot be null");
+        }
+
+        presenter = new EventDetailsPresenterImpl(bus, event, flag);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        View view = inflater.inflate(R.layout.fragment_event_details_, container, false);
+
+        llCategoryIconContainer = view.findViewById(R.id.llCategoryIconContainer);
+        ivCategoryIcon = (ImageView) view.findViewById(R.id.ivCategoryIcon);
+        tvTitle = (TextView) view.findViewById(R.id.tvTitle);
+        tvType = (TextView) view.findViewById(R.id.tvType);
+        tvDescription = (TextView) view.findViewById(R.id.tvDescription);
+        tvTime = (TextView) view.findViewById(R.id.tvTime);
+        tvLocation = (TextView) view.findViewById(R.id.tvLocation);
+        mivGoogleMap = view.findViewById(R.id.mivGoogleMap);
+
+        rlMeContainer = view.findViewById(R.id.rlMeContainer);
+        ivPic = (ImageView) view.findViewById(R.id.ivPic);
+        tvName = (TextView) view.findViewById(R.id.tvName);
+        tvStatus = (TextView) view.findViewById(R.id.tvStatus);
+        tvRsvp = (TextView) view.findViewById(R.id.tvRsvp);
+        sRsvp = (SwitchCompat) view.findViewById(R.id.sRsvp);
+
+        loading = (ProgressBar) view.findViewById(R.id.loading);
+        rvAttendees = (RecyclerView) view.findViewById(R.id.rvAttendees);
+
+        llEventActionsContainer = view.findViewById(R.id.llEventActionsContainer);
+        btnInvite = (Button) view.findViewById(R.id.btnInvite);
+        btnChat = (Button) view.findViewById(R.id.btnChat);
 
         return view;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
         super.onActivityCreated(savedInstanceState);
 
-        Bundle bundle = getArguments();
-        event = (Event) bundle.get(BundleKeys.EVENT_DETAILS_FRAGMENT_EVENT);
-
-        shouldPopupStatusDialog = bundle.getBoolean(BundleKeys.POPUP_STATUS_DIALOG);
-
-        if (event == null) {
-            throw new IllegalStateException("Event cannot be null while creating EventDetailsFragment instance");
-        }
-
         bus = Communicator.getInstance().getBus();
-        fragmentManager = getActivity().getFragmentManager();
         userService = new UserService(bus);
-        eventService = new EventService(bus);
+        genericCache = CacheManager.getGenericCache();
 
-        location.setOnClickListener(this);
-        description.setOnClickListener(this);
-        dateTime.setOnClickListener(this);
-
-        eventCache = CacheManager.getEventCache();
-
-        generateDrawables();
-
-        renderEventSummary();
         initRecyclerView();
-    }
 
-    private void generateDrawables() {
-        pencilDrawable = MaterialDrawableBuilder.with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.PENCIL)
-                .setColor(ContextCompat.getColor(getActivity(), R.color.whity))
-                .setSizeDp(36)
-                .build();
-
-        statusDrawable = MaterialDrawableBuilder.with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.COMMENT_ALERT)
-                .setColor(ContextCompat.getColor(getActivity(), R.color.whity))
-                .setSizeDp(36)
-                .build();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EVENT_DETAILS_FRAGMENT);
-
-        areEventDetailsFetched = false;
-        bus.register(this);
-        eventCache.markSeen(event.getId());
-        eventService.fetchEventDetails(event.getId());
-
-        eventService.fetchEventDetailsFromNetwork(event.getId());
-        refreshDetailsProgressBar.setVisibility(View.VISIBLE);
-        refreshDetailsTextView.setVisibility(View.VISIBLE);
-        refreshDetailsTextView.setText(R.string.refreshing_attendee_list);
-
-        if(shouldPopupStatusDialog)
+        btnInvite.setOnClickListener(new View.OnClickListener()
         {
-            displayStatusDialog();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        bus.unregister(this);
-    }
-
-    @Subscribe
-    public void onEventDetailsFetchedFromNetwork(EventDetailsFetchedFromNetworkTrigger trigger) {
-        if (trigger.getEventDetails().getId().equals(event.getId())) {
-
-            eventDetails = trigger.getEventDetails();
-
-            if (eventDetails.getDescription() == null || eventDetails.getDescription().isEmpty()) {
-                description.setText(R.string.event_details_no_description);
-            } else {
-                description.setText(eventDetails.getDescription());
-            }
-
-            refreshRecyclerView();
-
-            areEventDetailsFetched = true;
-
-            refreshDetailsProgressBar.setVisibility(View.GONE);
-            refreshDetailsTextView.setVisibility(View.GONE);
-
-            int numberOfFriendsGoing = 0;
-            List<EventDetails.Attendee> attendeeList = trigger.getEventDetails().getAttendees();
-            for (EventDetails.Attendee attendee : attendeeList) {
-                if (attendee.isFriend()) {
-                    numberOfFriendsGoing++;
-                }
-            }
-
-            event.setFriendCount(numberOfFriendsGoing);
-            eventCache.save(event);
-
-        }
-    }
-
-    @Subscribe
-    public void onEventDetailsFetchTrigger(EventDetailsFetchTrigger trigger) {
-        if (trigger.getEventDetails().getId().equals(event.getId())) {
-            eventDetails = trigger.getEventDetails();
-
-            if (eventDetails.getDescription() == null || eventDetails.getDescription().isEmpty()) {
-                description.setText(R.string.event_details_no_description);
-            } else {
-                description.setText(eventDetails.getDescription());
-            }
-
-            refreshRecyclerView();
-
-            areEventDetailsFetched = true;
-        }
-    }
-
-    private void initRecyclerView() {
-        attendeeList.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-        eventAttendeesAdapter = new EventAttendeesAdapter(new ArrayList<EventDetails.Attendee>(), getActivity());
-        eventAttendeesAdapter.setAttendeeClickCommunicator(this);
-        attendeeList.setAdapter(eventAttendeesAdapter);
-    }
-
-    private void refreshRecyclerView() {
-        if (eventDetails == null) {
-            return;
-        }
-
-        if (eventDetails.getAttendees().size() == 0) {
-            setNoAttendeeView();
-        } else {
-            setNormalView();
-        }
-
-        EventDetails.Attendee attendee = new EventDetails.Attendee();
-        attendee.setId(userService.getActiveUserId());
-
-        String userStatus = "";
-
-        if (eventDetails.getAttendees().contains(attendee)) {
-
-            int index = eventDetails.getAttendees().indexOf(attendee);
-            userStatus = eventDetails.getAttendees().get(index).getStatus();
-
-            eventDetails.getAttendees().remove(attendee);
-        }
-
-        attendee.setName(userService.getActiveUserName());
-        attendee.setFriend(false);
-        attendee.setInviter(false);
-        attendee.setRsvp(event.getRsvp());
-        attendee.setStatus(userStatus);
-
-        if (!(event.getRsvp() == Event.RSVP.NO)) {
-            eventDetails.getAttendees().add(attendee);
-        }
-
-        attendees = eventDetails.getAttendees();
-
-        Collections.sort(attendees, new EventAttendeeComparator(userService.getActiveUserId()));
-        eventAttendeesAdapter = new EventAttendeesAdapter(eventDetails.getAttendees(), getActivity());
-        eventAttendeesAdapter.setAttendeeClickCommunicator(this);
-        attendeeList.setAdapter(eventAttendeesAdapter);
-    }
-
-    private void setNormalView() {
-        attendeeList.setVisibility(View.VISIBLE);
-        noAttendeeMessage.setVisibility(View.GONE);
-    }
-
-    private void setNoAttendeeView() {
-        noAttendeeMessage.setText(R.string.event_details_no_attendees);
-        noAttendeeMessage.setVisibility(View.VISIBLE);
-        attendeeList.setVisibility(View.GONE);
-    }
-
-    private void renderEventSummary() {
-        EventCategory category = EventCategory.valueOf(event.getCategory());
-        switch (category) {
-            case GENERAL:
-                icon.setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD);
-                break;
-            case EAT_OUT:
-                icon.setIcon(MaterialDrawableBuilder.IconValue.FOOD);
-                break;
-            case DRINKS:
-                icon.setIcon(MaterialDrawableBuilder.IconValue.MARTINI);
-                break;
-            case CAFE:
-                icon.setIcon(MaterialDrawableBuilder.IconValue.COFFEE);
-                break;
-            case MOVIES:
-                icon.setIcon(MaterialDrawableBuilder.IconValue.THEATER);
-                break;
-            case OUTDOORS:
-                icon.setIcon(MaterialDrawableBuilder.IconValue.BIKE);
-                break;
-            case SPORTS:
-                icon.setIcon(MaterialDrawableBuilder.IconValue.TENNIS);
-                break;
-            case INDOORS:
-                icon.setIcon(MaterialDrawableBuilder.IconValue.XBOX_CONTROLLER);
-                break;
-            case SHOPPING:
-                icon.setIcon(MaterialDrawableBuilder.IconValue.SHOPPING);
-                break;
-            default:
-                icon.setIcon(MaterialDrawableBuilder.IconValue.BULLETIN_BOARD);
-        }
-
-        iconContainer.setBackground(DrawableFactory.getIconBackground(category));
-
-        title.setText(event.getTitle());
-
-        if (event.getLocation().getName() == null || event.getLocation().getName().isEmpty()) {
-            location.setText(R.string.event_details_no_location);
-            location.setOnClickListener(null);
-        } else {
-            location.setText(event.getLocation().getName());
-        }
-
-        DateTime start = event.getStartTime();
-        DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("dd MMM");
-        DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("hh:mm a");
-
-        dateTime.setText(start.toString(timeFormatter) + " (" + start.toString(dateFormatter) + ")");
-
-        if (event.getType() == Event.Type.PUBLIC) {
-            type.setText(R.string.event_details_type_public);
-        } else {
-            type.setText(R.string.event_details_type_invite_only);
-        }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        menu.clear();
-        inflater.inflate(R.menu.action_button, menu);
-
-        menu.findItem(R.id.action_account).setVisible(false);
-        menu.findItem(R.id.action_home).setVisible(false);
-        menu.findItem(R.id.action_finalize_event).setVisible(false);
-        menu.findItem(R.id.action_delete_event).setVisible(false);
-        menu.findItem(R.id.action_add_phone).setVisible(false);
-        menu.findItem(R.id.action_refresh).setVisible(false);
-        menu.findItem(R.id.action_edit_event).setVisible(true);
-        menu.findItem(R.id.action_notifications).setVisible(false);
-        menu.findItem(R.id.action_status).setVisible(true);
-
-        menu.findItem(R.id.action_edit_event).setIcon(pencilDrawable);
-        menu.findItem(R.id.action_status).setIcon(statusDrawable);
-
-        menu.findItem(R.id.action_status).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item) {
+            public void onClick(View v)
+            {
 
-                if (event.getRsvp() == Event.RSVP.NO) {
-                    displayInvitationResponseAlertDialog();
-                } else {
-                    displayStatusDialog();
-                }
-                return true;
-            }
-        });
-
-        menu.findItem(R.id.action_edit_event)
-                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if (EventUtils.canEdit(event, userService
-                                .getActiveUserId()) == EventUtilsConstants.CAN_EDIT) {
-                            if (areEventDetailsFetched) {
-//                        EditEventFragment editEventFragment = new EditEventFragment();
-//                        Bundle bundle = new Bundle();
-//                        bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT, event);
-//                        bundle.putSerializable(BundleKeys.EDIT_EVENT_FRAGMENT_EVENT_DETAILS, eventDetails);
-//                        editEventFragment.setArguments(bundle);
-//                        FragmentUtils.changeFragment(fragmentManager, editEventFragment);
-                                FragmentUtils
-                                        .changeFragment(fragmentManager, reaper.android.app.ui.screens.edit.EditEventFragment
-                                                .newInstance(event, eventDetails));
-                            }
-                        } else if (EventUtils.canEdit(event, userService
-                                .getActiveUserId()) == EventUtilsConstants.CANNOT_EDIT_LOCKED) {
-                            Snackbar.make(getView(), R.string.cannot_edit_event_locked, Snackbar.LENGTH_LONG)
-                                    .show();
-
-                        } else if (EventUtils.canEdit(event, userService
-                                .getActiveUserId()) == EventUtilsConstants.CANNOT_EDIT_NOT_GOING) {
-                            Snackbar.make(getView(), R.string.cannot_edit_event_not_going, Snackbar.LENGTH_LONG)
-                                    .show();
-                        }
-                        return true;
-                    }
-                });
-    }
-
-    private void displayStatusDialog() {
-
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL,
-                GoogleAnalyticsConstants.STATUS_DIALOG_OPENED, userService.getActiveUserId());
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setCancelable(true);
-
-        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
-        View dialogView = layoutInflater.inflate(R.layout.alert_dialog_status, null);
-        builder.setView(dialogView);
-
-        final EditText status = (EditText) dialogView.findViewById(R.id.et_alert_dialog_status_message);
-        ListView list = (ListView) dialogView.findViewById(R.id.lv_alert_dialog_status);
-        TextView title = (TextView) dialogView.findViewById(R.id.tv_alert_dialog_status_title);
-
-        final List<String> statusList = new ArrayList<>();
-        statusList.add("On my way");
-        statusList.add("Running late");
-        statusList.add("Sorry, changed my mind");
-        statusList.add("Yippie-kai yay!");
-
-        ArrayAdapter<String> statusAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_list_view_dialog, statusList);
-
-        list.setAdapter(statusAdapter);
-
-        if ((event.getStartTime().getMillis() - DateTime.now().getMillis() < Timestamps.STATUS_UPDATE_NOTIFICATION_WINDOW) || (DateTime.now().getMillis() > event.getStartTime().getMillis())) {
-            list.setVisibility(View.VISIBLE);
-            title.setText(R.string.event_status_dialog_title);
-        } else {
-            list.setVisibility(View.GONE);
-            title.setText(R.string.event_status_dialog_title_alternate);
-        }
-
-        if(shouldPopupStatusDialog)
-        {
-            list.setVisibility(View.VISIBLE);
-            title.setText(R.string.event_status_dialog_title);
-        }else{
-            list.setVisibility(View.GONE);
-            title.setText(R.string.event_status_dialog_title_alternate);
-        }
-
-        EventDetails.Attendee attendee = new EventDetails.Attendee();
-        attendee.setId(userService.getActiveUserId());
-
-        if (eventDetails != null) {
-
-            if (eventDetails.getAttendees() != null) {
-                if (eventDetails.getAttendees().contains(attendee)) {
-                    int index = eventDetails.getAttendees().indexOf(attendee);
-
-                    if (eventDetails.getAttendees().get(index).getStatus() == null || eventDetails.getAttendees().get(index).getStatus().isEmpty()) {
-
-                        status.setHint(R.string.default_event_status);
-                    } else {
-                        status.setText(eventDetails.getAttendees().get(index).getStatus());
-                    }
-                }
-            }
-        }
-
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.STATUS_TEMPLATE_CHOSEN, userService.getActiveUserId() + " template - " + position);
-                status.setText(statusList.get(position));
-            }
-        });
-
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                shouldPopupStatusDialog = false;
-
-                EventDetails.Attendee attendee1 = new EventDetails.Attendee();
-                attendee1.setId(userService.getActiveUserId());
-
-                if (eventDetails.getAttendees().contains(attendee1)) {
-                    int index = eventDetails.getAttendees().indexOf(attendee1);
-
-                    eventDetails.getAttendees().get(index).setStatus(status.getText().toString());
-                    eventCache.saveDetails(eventDetails);
-                    refreshRecyclerView();
-                }
-
-                boolean shouldNotifyOthers = false;
-
-                if ((event.getStartTime().getMillis() - DateTime.now().getMillis() < Timestamps.STATUS_UPDATE_NOTIFICATION_WINDOW) || (DateTime.now().getMillis() > event.getStartTime().getMillis())) {
-                    shouldNotifyOthers = true;
-                }
-
-                if(!status.getText().toString().isEmpty())
+                if (presenter != null)
                 {
-                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.STATUS_UPDATED, userService.getActiveUserId());
+                    if (genericCache.get(CacheKeys.READ_CONTACT_PERMISSION_DENIED) == null)
+                    {
+                        handleReadContactsPermission();
+                    }
+                    else
+                    {
+                        presenter.invite();
+                    }
                 }
-
-                eventService.updateStatus(event.getId(), status.getText().toString(), shouldNotifyOthers);
-                dialog.dismiss();
             }
         });
 
-        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+        btnChat.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onCancel(DialogInterface dialog) {
-
-                shouldPopupStatusDialog = false;
+            public void onClick(View v)
+            {
+                if (presenter != null)
+                {
+                    presenter.chat();
+                }
             }
         });
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
     }
 
-    private void displayInvitationResponseAlertDialog() {
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        presenter.attachView(this);
+        Timber.v(tvTitle.getText().toString() + " : onResume");
+    }
 
-        // TODO -- change chat message
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        presenter.detachView();
+    }
 
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.INVITATION_RESPONSE_DIALOG_OPENED, userService.getActiveUserId());
+    /* View Methods */
+    @Override
+    public void displayEventSummary(Event event)
+    {
+        tvTitle.setText(event.getTitle());
+
+        EventCategory eventCategory = EventCategory.valueOf(event.getCategory());
+        llCategoryIconContainer.setBackground(DrawableFactory.getIconBackground(eventCategory));
+        ivCategoryIcon.setImageDrawable(DrawableFactory
+                .get(eventCategory, Dimensions.EVENT_DETAILS_ICON_SIZE));
+
+        switch (event.getType())
+        {
+            case INVITE_ONLY:
+                tvType.setText(R.string.event_details_type_invite_only);
+                break;
+
+            case PUBLIC:
+                tvType.setText(R.string.event_details_type_public);
+                break;
+        }
+
+        tvTime.setText(event.getStartTime().toString(TIME_FORMATTER).toUpperCase() + ", " + event
+                .getStartTime().toString(DATE_FORMATTER));
+
+        final Location location = event.getLocation();
+        if (location.getName() == null || location.getName().isEmpty())
+        {
+            tvLocation.setText(R.string.event_details_no_location);
+        }
+        else
+        {
+            tvLocation.setText(location.getName());
+        }
+
+        if (location.getLatitude() != null && location.getLongitude() != null)
+        {
+            mivGoogleMap.setVisibility(View.VISIBLE);
+            mivGoogleMap.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    AnalyticsHelper.sendEvents(
+                            GoogleAnalyticsConstants.BUTTON_CLICK,
+                            GoogleAnalyticsConstants.EVENT_DETAILS_LOCATION_CLICKED,
+                            userService.getActiveUserId());
+
+                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                            Uri.parse("http://maps.google.com/maps?daddr="
+                                    + location.getLatitude() + "," + location.getLongitude()));
+                    startActivity(intent);
+                }
+            });
+        }
+        else
+        {
+            mivGoogleMap.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void displayUserSummary(String userId, String name)
+    {
+        tvName.setText(name);
+
+        Drawable placeHolder =
+                MaterialDrawableBuilder
+                        .with(getActivity())
+                        .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
+                        .setColor(ContextCompat.getColor(getActivity(), R.color.light_grey))
+                        .setSizeDp(24)
+                        .build();
+
+        Picasso.with(getActivity())
+               .load(AppConstants.FACEBOOK_END_POINT + userId + "/picture?width=500")
+               .placeholder(placeHolder)
+               .transform(new CircleTransform())
+               .into(ivPic);
+    }
+
+    @Override
+    public void displayRsvp(boolean isGoing)
+    {
+        sRsvp.setOnCheckedChangeListener(null);
+
+        sRsvp.setChecked(isGoing);
+
+        if (isGoing)
+        {
+            tvRsvp.setText(R.string.rsvp_yes);
+            tvRsvp.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
+            VisibilityAnimationUtil.expand(llEventActionsContainer, 200);
+        }
+        else
+        {
+            tvRsvp.setText(R.string.rsvp_no);
+            tvRsvp.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_subtitle));
+            VisibilityAnimationUtil.collapse(llEventActionsContainer, 200);
+        }
+
+        sRsvp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                if (presenter != null)
+                {
+                    presenter.toggleRsvp();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void displayRsvpError()
+    {
+        Snackbar.make(getView(), R.string.message_rsvp_update_failure, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void disableRsvp()
+    {
+        sRsvp.setEnabled(false);
+    }
+
+    @Override
+    public void displayStatusMessage(int statusType, String status)
+    {
+        Timber.v(">>>> qwerty : " + status);
+        switch (statusType)
+        {
+            case StatusType.NONE:
+                tvStatus.setText("");
+                break;
+
+            case StatusType.INVITED:
+                tvStatus.setText("Not Joining? Inform friends");
+                tvStatus.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
+                break;
+
+            case StatusType.EMPTY:
+                tvStatus.setText("** No Status **");
+                tvStatus.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
+                break;
+
+            case StatusType.NORMAL:
+                tvStatus.setText(status);
+                tvStatus.setTextColor(ContextCompat
+                        .getColor(getActivity(), R.color.text_subtitle));
+                break;
+
+            case StatusType.LAST_MINUTE_EMPTY:
+                tvStatus.setText("Inform friends of your last minute ...");
+                tvStatus.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
+                break;
+
+            case StatusType.LAST_MINUTE:
+                tvStatus.setText(status);
+                tvStatus.setTextColor(ContextCompat
+                        .getColor(getActivity(), R.color.text_subtitle));
+                break;
+        }
+
+        rlMeContainer.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                presenter.onStatusClicked();
+            }
+        });
+    }
+
+    @Override
+    public void displayInvitationResponseDialog(final String eventId, final String userId)
+    {
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL,
+                GoogleAnalyticsConstants.INVITATION_RESPONSE_DIALOG_OPENED,
+                userService.getActiveUserId());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
@@ -556,8 +453,10 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
         View dialogView = layoutInflater.inflate(R.layout.alert_dialog_invitation_response, null);
         builder.setView(dialogView);
 
-        final EditText message = (EditText) dialogView.findViewById(R.id.et_alert_dialog_invitation_response_message);
-        ListView list = (ListView) dialogView.findViewById(R.id.lv_alert_dialog_invitation_response);
+        final EditText message = (EditText) dialogView
+                .findViewById(R.id.et_alert_dialog_invitation_response_message);
+        ListView list = (ListView) dialogView
+                .findViewById(R.id.lv_alert_dialog_invitation_response);
 
         final List<String> responseList = new ArrayList<>();
         responseList.add("Not in a mood");
@@ -569,25 +468,33 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
 
         list.setAdapter(statusAdapter);
 
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK,
+                        GoogleAnalyticsConstants.INVITAION_RESPONSE_TEMPLATE_CHOSEN,
+                        "user:" + userId + ";template:" + responseList.get(position));
 
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.INVITAION_RESPONSE_TEMPLATE_CHOSEN, userService.getActiveUserId() + " template - " + position);
                 message.setText(responseList.get(position));
             }
         });
 
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
 
-                if (message.getText().toString() != null || !(message.getText().toString().isEmpty())) {
+                if (message.getText().toString() != null || !(message.getText().toString()
+                                                                     .isEmpty()))
+                {
+                    presenter.setStatus(message.getText().toString());
 
-                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.INVITATION_RESPONSE_SENT, userService.getActiveUserId());
-
-                    eventService.sendInvitationResponse(event.getId(), message.getText().toString());
-                    Toast.makeText(getActivity(), R.string.invitation_response_sent, Toast.LENGTH_LONG).show();
+                    Snackbar
+                            .make(getView(), R.string.invitation_response_sent, Snackbar.LENGTH_LONG)
+                            .show();
                     dialog.dismiss();
                 }
             }
@@ -598,101 +505,391 @@ public class EventDetailsFragment extends BaseFragment implements View.OnClickLi
     }
 
     @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.tv_event_details_location) {
+    public void displayUpdateStatusDialog(String eventId, final String userId, String oldStatus, boolean isLastMinute)
+    {
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL,
+                GoogleAnalyticsConstants.STATUS_DIALOG_OPENED,
+                userId);
 
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_DETAILS_LOCATION_CLICKED, userService.getActiveUserId());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(true);
 
-            if (event.getLocation().getLatitude() != null && event.getLocation().getLongitude() != null) {
-                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                        Uri.parse("http://maps.google.com/maps?daddr=" + event.getLocation().getLatitude() + "," + event.getLocation().getLongitude()));
-                startActivity(intent);
-            } else {
-                Snackbar.make(getView(), R.string.location_not_available_on_map, Snackbar.LENGTH_LONG).show();
-            }
-        } else if (view.getId() == R.id.tv_event_details_description) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.Base_Theme_AppCompat_Light_Dialog_Alert);
+        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+        View dialogView = layoutInflater.inflate(R.layout.alert_dialog_status, null);
+        builder.setView(dialogView);
 
-            if (description.getText().toString().isEmpty()) {
-                builder.setMessage(description.getText().toString());
-            } else {
-                builder.setMessage(description.getText().toString());
-            }
+        final EditText status = (EditText) dialogView
+                .findViewById(R.id.et_alert_dialog_status_message);
+        ListView list = (ListView) dialogView.findViewById(R.id.lv_alert_dialog_status);
+        TextView title = (TextView) dialogView.findViewById(R.id.tv_alert_dialog_status_title);
 
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            });
+        final List<String> statusList = new ArrayList<>();
+        statusList.add("On my way");
+        statusList.add("Running late");
+        statusList.add("Sorry, changed my mind");
+        statusList.add("Yippie-kai yay!");
 
-            builder.create().show();
-        } else if (view.getId() == R.id.tv_event_details_date_time) {
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(getActivity(),
+                R.layout.list_item_list_view_dialog, statusList);
+        list.setAdapter(statusAdapter);
+
+        if (isLastMinute)
+        {
+            list.setVisibility(View.VISIBLE);
+            title.setText(R.string.event_status_dialog_title);
         }
+        else
+        {
+            list.setVisibility(View.GONE);
+            title.setText(R.string.event_status_dialog_title_alternate);
+        }
+
+        if (oldStatus == null || oldStatus.isEmpty())
+        {
+            status.setHint(R.string.default_event_status);
+        }
+        else
+        {
+            status.setText(oldStatus);
+        }
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+
+                AnalyticsHelper
+                        .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK,
+                                GoogleAnalyticsConstants.STATUS_TEMPLATE_CHOSEN,
+                                "user:" + userId + ";template:" + statusList.get(position));
+
+                status.setText(statusList.get(position));
+            }
+        });
+
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                presenter.setStatus(status.getText().toString());
+                dialog.dismiss();
+            }
+        });
+
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener()
+        {
+            @Override
+            public void onCancel(DialogInterface dialog)
+            {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
-    @Subscribe
-    public void onRsvpChanged(ChangeAttendeeListTrigger trigger) {
-        if (event.getId().equals(trigger.getEventId())) {
-            EventDetails.Attendee attendee = new EventDetails.Attendee();
-            attendee.setId(userService.getActiveUserId());
-
-            if (trigger.getRsvp() == Event.RSVP.YES) {
-                if (eventDetails != null) {
-                    event.setRsvp(Event.RSVP.YES);
-
-                    if (eventDetails.getAttendees().contains(attendee)) {
-                        eventDetails.getAttendees().remove(attendee);
-                    }
-
-                    attendee.setRsvp(Event.RSVP.YES);
-                    attendee.setName(userService.getActiveUserName());
-                    attendee.setFriend(false);
-                    attendee.setInviter(false);
-
-                    eventDetails.getAttendees().add(attendee);
-                    refreshRecyclerView();
-                }
-            } else if (trigger.getRsvp() == Event.RSVP.MAYBE) {
-                if (eventDetails != null) {
-                    event.setRsvp(Event.RSVP.MAYBE);
-
-                    if (eventDetails.getAttendees().contains(attendee)) {
-                        eventDetails.getAttendees().remove(attendee);
-                    }
-
-                    attendee.setRsvp(Event.RSVP.MAYBE);
-                    attendee.setName(userService.getActiveUserName());
-                    attendee.setFriend(false);
-                    attendee.setInviter(false);
-
-                    eventDetails.getAttendees().add(attendee);
-                    refreshRecyclerView();
-                }
-
-            } else if (trigger.getRsvp() == Event.RSVP.NO) {
-                if (eventDetails != null) {
-                    event.setRsvp(Event.RSVP.NO);
-
-                    attendee.setRsvp(Event.RSVP.NO);
-                    if (eventDetails.getAttendees().contains(attendee)) {
-                        eventDetails.getAttendees().remove(attendee);
-                        refreshRecyclerView();
-                    }
-                }
-            }
+    @Override
+    public void displayDescription(String description)
+    {
+        if (description != null && !description.isEmpty())
+        {
+            tvDescription.setText(description);
         }
-    }
-
-    @Subscribe
-    public void onRsvpNotChanged(EventRsvpNotChangedTrigger trigger) {
-        if (trigger.getEventId().equals(event.getId())) {
-            event.setRsvp(trigger.getOldRsvp());
+        else
+        {
+            tvDescription.setText(R.string.event_details_no_description);
         }
     }
 
     @Override
-    public void onAttendeeClicked(String name) {
-        Toast.makeText(getActivity(), name + " invited you", Toast.LENGTH_LONG).show();
+    public void displayAttendeeList(List<EventDetails.Attendee> attendees)
+    {
+        rvAttendees.setAdapter(new EventAttendeesAdapter(attendees, getActivity()));
+    }
+
+    @Override
+    public void showAttendeeLoading()
+    {
+        loading.setVisibility(View.VISIBLE);
+    }
+
+    public void hideAttendeeLoading()
+    {
+        loading.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void navigateToInviteScreen(Event event)
+    {
+        Log.d("APP", "inside navigate to invite screen -- start");
+
+        if (event == null)
+        {
+            Log.d("APP", "inside navigate to invite screen -- event null");
+        }
+
+        InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT, event);
+        bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, false);
+        inviteUsersContainerFragment.setArguments(bundle);
+//        FragmentUtils
+//                .changeFragment(getActivity().getFragmentManager(), inviteUsersContainerFragment);
+
+        FragmentTransaction fragmentTransaction = getActivity().getFragmentManager()
+                                                               .beginTransaction();
+        fragmentTransaction
+                .replace(R.id.fl_main, inviteUsersContainerFragment, inviteUsersContainerFragment
+                        .getClass().getSimpleName());
+        fragmentTransaction.commitAllowingStateLoss();
+        getActivity().getFragmentManager().executePendingTransactions();
+
+        Log.d("APP", "inside navigate to invite screen -- end");
+    }
+
+    @Override
+    public void navigateToChatScreen(String eventId, String eventTitle)
+    {
+        ChatFragment chatFragment = new ChatFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_ID, eventId);
+        bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_NAME, eventTitle);
+        chatFragment.setArguments(bundle);
+        FragmentUtils.changeFragment(getActivity().getFragmentManager(), chatFragment);
+    }
+
+    @Override
+    public void setEditActionState(boolean isVisible)
+    {
+        edit.setVisible(isVisible);
+    }
+
+    @Override
+    public void displayEventFinalizedMessage()
+    {
+        Snackbar.make(getView(), R.string.cannot_edit_event_locked, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void navigateToEditScreen(Event event, EventDetails eventDetails)
+    {
+        FragmentUtils.changeFragment(getActivity().getFragmentManager(), EditEventFragment
+                .newInstance(event, eventDetails));
+    }
+
+    /* Helper Methods */
+    private void initRecyclerView()
+    {
+        rvAttendees.setLayoutManager(new LinearLayoutManager(getActivity()));
+        rvAttendees
+                .setAdapter(new EventAttendeesAdapter(new ArrayList<EventDetails.Attendee>(), getActivity()));
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu)
+    {
+        super.onPrepareOptionsMenu(menu);
+
+        edit.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                if (presenter != null)
+                {
+                    presenter.onEdit();
+                }
+
+                return true;
+            }
+        });
+
+        presenter.requestEditActionState();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        menu.clear();
+        inflater.inflate(R.menu.action_details, menu);
+
+        edit = menu.findItem(R.id.action_edit);
+
+        edit.setVisible(false);
+        edit.setIcon(MaterialDrawableBuilder
+                .with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.PENCIL)
+                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
+                .setSizeDp(36)
+                .build());
+    }
+
+    private void handleReadContactsPermission()
+    {
+
+        Log.d("APP", "inside handle Read contacts");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        {
+            try
+            {
+
+                Log.d("APP", "Marshmallow --- 1 ");
+
+                Dexter.checkPermission(new PermissionListener()
+                {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse)
+                    {
+
+                        Log.d("APP", "inside handle Read contacts --- permission granted");
+                        navigateToInviteScreen(event);
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse)
+                    {
+
+                        Log.d("APP", "inside handle Read contacts --- permission denied");
+
+                        if (permissionDeniedResponse.isPermanentlyDenied())
+                        {
+
+                            displayContactsPermissionRequiredDialogPermanentlyDeclinedCase();
+                        }
+                        else
+                        {
+
+                            displayContactsPermissionRequiredDialog();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken)
+                    {
+
+                        permissionToken.continuePermissionRequest();
+                    }
+                }, Manifest.permission.READ_CONTACTS);
+            }
+            catch (Exception e)
+            {
+                Log.d("APP", "inside handle Read contacts --- exception");
+            }
+        }
+        else
+        {
+
+            presenter.invite();
+        }
+    }
+
+    private void displayContactsPermissionRequiredDialog()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
+        builder.setMessage(R.string.read_contacts_permission_required_message);
+        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+
+                dialog.dismiss();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                {
+                    try
+                    {
+
+                        Log.d("APP", "Marshmallow ---- 2");
+
+                        Dexter.checkPermission(new PermissionListener()
+                        {
+                            @Override
+                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse)
+                            {
+
+                                Log.d("APP", "2 ---- permission granted");
+                                navigateToInviteScreen(event);
+                            }
+
+                            @Override
+                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse)
+                            {
+
+                                Log.d("APP", "2 ---- permission denied");
+
+                                genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
+                                navigateToInviteScreen(event);
+                            }
+
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken)
+                            {
+
+                                permissionToken.continuePermissionRequest();
+                            }
+                        }, Manifest.permission.READ_CONTACTS);
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+                }
+                else
+                {
+
+                    presenter.invite();
+                }
+            }
+        });
+
+        builder.create().show();
+    }
+
+    private void displayContactsPermissionRequiredDialogPermanentlyDeclinedCase()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
+        builder.setMessage(R.string.read_contacts_permission_required_message);
+        builder.setPositiveButton("TAKE ME TO SETTINGS", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+
+                dialog.dismiss();
+                goToSettings();
+            }
+        });
+        builder.setNegativeButton("EXIT", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+
+                genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
+                navigateToInviteScreen(event);
+            }
+        });
+
+        builder.create().show();
+    }
+
+
+    private void goToSettings()
+    {
+
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
+        intent.setData(uri);
+        startActivity(intent);
     }
 }

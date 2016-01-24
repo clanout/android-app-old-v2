@@ -1,4 +1,4 @@
-package reaper.android.app.ui.screens.details.redesign;
+package reaper.android.app.ui.screens.details;
 
 import java.util.List;
 

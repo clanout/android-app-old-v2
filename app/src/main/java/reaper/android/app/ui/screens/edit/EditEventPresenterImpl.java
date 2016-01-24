@@ -18,7 +18,7 @@ import reaper.android.app.service.EventService;
 import reaper.android.app.service.GoogleService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
-import reaper.android.app.ui.util.DateTimeUtils;
+import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.event.EventUtils;
 import retrofit.client.Response;
 import rx.Observable;
@@ -460,7 +460,7 @@ public class EditEventPresenterImpl implements EditEventPresenter
         if (isTimeUpdated)
         {
             startTime = updatedStartTime;
-            endTime = DateTimeUtils.getEndTime(startTime);
+            endTime = DateTimeUtil.getEndTime(startTime);
         }
 
         Location location = new Location();

@@ -12,7 +12,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="Pick Day"
-        android:textColor="@color/_text_title"
+        android:textColor="@color/text_title"
         android:textSize="18sp"
         android:textStyle="bold"/>
 

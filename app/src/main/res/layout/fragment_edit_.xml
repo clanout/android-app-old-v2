@@ -71,7 +71,7 @@
                     android:maxLength="24"
                     android:maxLines="2"
                     android:text="Sex on the Beach"
-                    android:textColor="@color/_text_title"
+                    android:textColor="@color/text_title"
                     android:textSize="24sp"/>
 
                 <TextView
@@ -82,7 +82,7 @@
                     android:layout_marginLeft="16dp"
                     android:layout_marginTop="4dp"
                     android:text="Open"
-                    android:textColor="@color/_text_subtitle"
+                    android:textColor="@color/text_subtitle"
                     android:textSize="16sp"/>
 
             </RelativeLayout>

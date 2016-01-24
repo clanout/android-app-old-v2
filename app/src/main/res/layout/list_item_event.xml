@@ -76,7 +76,7 @@
             android:layout_marginLeft="16dp"
             android:layout_toRightOf="@id/llCategoryIconContainer"
             android:text="Sex on the Beach"
-            android:textColor="@color/_text_title"
+            android:textColor="@color/text_title"
             android:textSize="18sp"/>
 
         <TextView
@@ -87,7 +87,7 @@
             android:layout_marginLeft="16dp"
             android:layout_toRightOf="@+id/llCategoryIconContainer"
             android:text="Harsh, Aditya &amp; 4 friends joined"
-            android:textColor="@color/_text_subtitle"/>
+            android:textColor="@color/text_subtitle"/>
 
         <!--<net.steamcrafted.materialiconlib.MaterialIconView-->
         <!--android:id="@+id/mivFriends"-->

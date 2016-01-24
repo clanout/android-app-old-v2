@@ -1,8 +1,25 @@
 <resources>
-    <string name="app_name">clanOut</string>
+    <string name="app_name">Clanout</string>
+
+    <!-- Intro Screens -->
+    <string name="intro_title_1">Explore and Join</string>
+    <string name="intro_description_1">Check out what your friends are planning and join the one
+        that suits your mood. You\'ll never walk alone.</string>
+
+    <string name="intro_title_2">Privacy in Check</string>
+    <string name="intro_description_2">Make a plan with all your friends or keep it secret with
+        your close ones.</string>
+
+    <string name="intro_title_3">All Friends at One Place</string>
+    <string name="intro_description_3">Invite friends from a pool of facebook and phonebook
+        contacts every time you make a new plan.</string>
+
+    <string name="intro_title_4">Clan Chat</string>
+    <string name="intro_description_4">Make a plan, discuss it with your friends, finalize
+        details and clan out. Simple.</string>
 
     <!-- Screen Titles -->
-    <string name="title_home">ClanOut</string>
+    <string name="title_home">Clanout</string>
     <string name="title_account">Account</string>
     <string name="title_notification">Notifications</string>
     <string name="title_chat">Clan Chat</string>

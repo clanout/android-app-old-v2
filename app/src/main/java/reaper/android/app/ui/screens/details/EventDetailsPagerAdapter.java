@@ -42,7 +42,7 @@ public class EventDetailsPagerAdapter extends FragmentStatePagerAdapter
 //        eventDetailsFragment.setArguments(bundle);
 //        return eventDetailsFragment;
 
-        return reaper.android.app.ui.screens.details.redesign.EventDetailsFragment
+        return EventDetailsFragment
                 .newInstance(events.get(position));
     }
 
