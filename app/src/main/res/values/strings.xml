@@ -79,7 +79,7 @@
     <!-- Event Details Fragment -->
     <string name="event_details_no_description">No Description</string>
     <string name="event_details_no_attendees">This clan is no longer available. Refresh to remove dismissed clans from your feed</string>
-    <string name="event_details_no_location">Location undecided</string>
+    <string name="event_details_no_location">To be decided</string>
 
     <string name="event_details_type_public">Open</string>
     <string name="event_details_type_invite_only">Secret</string>
@@ -158,4 +158,14 @@
     <string name="add_phone_title">Enter number to enable invitations from friends who have your contact number</string>
     <string name="invite_app_friends_title">All your %s friends present on Clanout</string>
     <string name="invite_phonebook_title">A free SMS will be sent for the invite</string>
+
+    <string name="label_title">Plan</string>
+
+    <!-- Create -->
+    <string name="message_no_title">Please enter a clan name</string>
+
+    <!-- Status Labels -->
+    <string name="label_invited_not_going">Leave a message</string>
+    <string name="label_status">Your clan status</string>
+    <string name="label_status_last_moment">Last moment status</string>
 </resources>

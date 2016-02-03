@@ -1,7 +1,5 @@
 package reaper.android.app.service;
 
-import android.util.Log;
-
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -10,9 +8,6 @@ import com.squareup.otto.Bus;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +20,6 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.facebook.FacebookCoverPicFetchedTrigger;
 import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.facebook.FacebookProfileFetchedTrigger;
-import retrofit.client.Response;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -52,50 +46,59 @@ public class FacebookService
 
     public void getUserCoverPic()
     {
-        facebookApi.getCoverPic().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<FacebookCoverPicResponse>() {
-            @Override
-            public void onCompleted() {
+        facebookApi.getCoverPic().subscribeOn(Schedulers.newThread())
+                   .observeOn(AndroidSchedulers.mainThread())
+                   .subscribe(new Subscriber<FacebookCoverPicResponse>()
+                   {
+                       @Override
+                       public void onCompleted()
+                       {
 
-            }
+                       }
 
-            @Override
-            public void onError(Throwable e) {
+                       @Override
+                       public void onError(Throwable e)
+                       {
 
-            }
+                       }
 
-            @Override
-            public void onNext(FacebookCoverPicResponse response) {
+                       @Override
+                       public void onNext(FacebookCoverPicResponse response)
+                       {
 
-                bus.post(new FacebookCoverPicFetchedTrigger(response.getCover().getSource()));
-            }
-        });
+                           bus.post(new FacebookCoverPicFetchedTrigger(response.getCover()
+                                                                               .getSource()));
+                       }
+                   });
     }
 
 
     public void getUserFacebookProfile()
     {
         facebookApi.getProfile()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<FacebookProfileResponse>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
-                    }
+                   .subscribeOn(Schedulers.newThread())
+                   .observeOn(AndroidSchedulers.mainThread())
+                   .subscribe(new Subscriber<FacebookProfileResponse>()
+                   {
+                       @Override
+                       public void onCompleted()
+                       {
+                       }
 
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                        bus.post(new GenericErrorTrigger(ErrorCode.FACEBOOK_PROFILE_FETCH_FAILURE, (Exception) e));
-                    }
+                       @Override
+                       public void onError(Throwable e)
+                       {
+                           bus.post(new GenericErrorTrigger(ErrorCode.FACEBOOK_PROFILE_FETCH_FAILURE, (Exception) e));
+                       }
 
-                    @Override
-                    public void onNext(FacebookProfileResponse response)
-                    {
-                        bus.post(new FacebookProfileFetchedTrigger(response.getId(), response.getFirstname(), response.getLastname(), response.getGender(), response.getEmail()));
-                    }
-                });
+                       @Override
+                       public void onNext(FacebookProfileResponse response)
+                       {
+                           bus.post(new FacebookProfileFetchedTrigger(response.getId(), response
+                                   .getFirstname(), response.getLastname(), response
+                                   .getGender(), response.getEmail()));
+                       }
+                   });
     }
 
     public void getFacebookFriends(final boolean isPolling)
@@ -105,7 +108,8 @@ public class FacebookService
                               @Override
                               public void call(final Subscriber<? super List<String>> subscriber)
                               {
-                                  GraphRequest graphRequest = GraphRequest.newMyFriendsRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONArrayCallback()
+                                  GraphRequest graphRequest = GraphRequest.newMyFriendsRequest(AccessToken
+                                                  .getCurrentAccessToken(), new GraphRequest.GraphJSONArrayCallback()
                                           {
                                               @Override
                                               public void onCompleted(JSONArray jsonArray, GraphResponse graphResponse)
@@ -127,8 +131,10 @@ public class FacebookService
                                                       }
 
                                                       JSONObject jsonObjectSummary = jsonObject.getJSONObject("summary");
-                                                      totalFriends = Integer.parseInt(jsonObjectSummary.getString("total_count"));
-                                                  } catch (Exception e)
+                                                      totalFriends = Integer
+                                                              .parseInt(jsonObjectSummary.getString("total_count"));
+                                                  }
+                                                  catch (Exception e)
                                                   {
                                                       subscriber.onNext(null);
                                                       subscriber.onCompleted();
@@ -140,7 +146,8 @@ public class FacebookService
 
                                                   for (int i = 0; i < count; i++)
                                                   {
-                                                      GraphRequest nextPageRequest = response.getRequestForPagedResults(GraphResponse.PagingDirection.NEXT);
+                                                      GraphRequest nextPageRequest = response
+                                                              .getRequestForPagedResults(GraphResponse.PagingDirection.NEXT);
                                                       if (nextPageRequest != null)
                                                       {
                                                           nextPageRequest.setCallback(new GraphRequest.Callback()
@@ -153,7 +160,8 @@ public class FacebookService
 
                                                                   try
                                                                   {
-                                                                      JSONArray jsonArrayData = responseObject.getJSONArray("data");
+                                                                      JSONArray jsonArrayData = responseObject
+                                                                              .getJSONArray("data");
                                                                       JSONObject dataObject;
                                                                       for (int j = 0; j < jsonArrayData.length(); j++)
                                                                       {
@@ -161,7 +169,8 @@ public class FacebookService
                                                                           dataObject = (JSONObject) jsonArrayData.get(j);
                                                                           friendsIdList.add(dataObject.getString("id"));
                                                                       }
-                                                                  } catch (Exception e)
+                                                                  }
+                                                                  catch (Exception e)
                                                                   {
                                                                       subscriber.onNext(null);
                                                                       subscriber.onCompleted();
@@ -173,7 +182,8 @@ public class FacebookService
                                                           });
 
                                                           nextPageRequest.executeAndWait();
-                                                      } else
+                                                      }
+                                                      else
                                                       {
                                                           break;
                                                       }
@@ -194,30 +204,30 @@ public class FacebookService
                           }
 
         )
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<String>>()
-                           {
-                               @Override
-                               public void onCompleted()
-                               {
+                  .subscribeOn(Schedulers.newThread())
+                  .observeOn(AndroidSchedulers.mainThread())
+                  .subscribe(new Subscriber<List<String>>()
+                             {
+                                 @Override
+                                 public void onCompleted()
+                                 {
 
-                               }
+                                 }
 
-                               @Override
-                               public void onError(Throwable e)
-                               {
-                                   bus.post(new GenericErrorTrigger(ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE, (Exception) e));
-                               }
+                                 @Override
+                                 public void onError(Throwable e)
+                                 {
+                                     bus.post(new GenericErrorTrigger(ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE, (Exception) e));
+                                 }
 
-                               @Override
-                               public void onNext(List<String> strings)
-                               {
-                                    bus.post(new FacebookFriendsIdFetchedTrigger(strings, isPolling));
-                               }
-                           }
+                                 @Override
+                                 public void onNext(List<String> strings)
+                                 {
+                                     bus.post(new FacebookFriendsIdFetchedTrigger(strings, isPolling));
+                                 }
+                             }
 
-                );
+                  );
     }
 }
 

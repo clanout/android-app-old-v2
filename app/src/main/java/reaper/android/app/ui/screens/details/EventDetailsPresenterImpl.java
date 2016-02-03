@@ -95,6 +95,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     {
         Timber.v(">>>> qwerty1234 : " + status);
         this.status = status;
+        processStatusType();
         view.displayStatusMessage(statusType, status);
 
         switch (statusType)
@@ -387,7 +388,10 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
 
     private void displayDetails(EventDetails eventDetails)
     {
+        Timber.v(">>>> DISPLAY DETAILS : " + event.getTitle() + " : " + eventDetails.getDescription());
+
         this.eventDetails = eventDetails;
+        view.displayDescription(eventDetails.getDescription());
 
         List<EventDetails.Attendee> attendees = eventDetails.getAttendees();
 
@@ -406,7 +410,6 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
 
         Collections.sort(attendees, new EventAttendeeComparator(userId));
 
-        view.displayDescription(eventDetails.getDescription());
         view.displayStatusMessage(statusType, status);
         view.displayAttendeeList(attendees);
 

@@ -262,8 +262,8 @@ public class CreateEventDetailsFragment extends BaseFragment
         if (startTime == null)
         {
             startTime = LocalTime.now().plusHours(1).withMinuteOfHour(0);
-            tvTime.setText(dateTimeUtil.formatTime(startTime));
         }
+        tvTime.setText(dateTimeUtil.formatTime(startTime));
 
         // Start Day
         dayList = dateTimeUtil.getDayList();

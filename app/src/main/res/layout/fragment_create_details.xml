@@ -77,7 +77,7 @@
                                     android:id="@+id/et_createEvent_title"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:hint="Title"/>
+                                    android:hint="@string/label_title"/>
                             </android.support.design.widget.TextInputLayout>
 
                         </LinearLayout>

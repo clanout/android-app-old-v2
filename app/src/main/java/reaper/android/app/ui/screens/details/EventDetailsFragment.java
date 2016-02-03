@@ -349,6 +349,9 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     @Override
     public void displayRsvp(boolean isGoing)
     {
+        tvRsvp.setVisibility(View.VISIBLE);
+        sRsvp.setVisibility(View.VISIBLE);
+
         sRsvp.setOnCheckedChangeListener(null);
 
         sRsvp.setChecked(isGoing);
@@ -388,7 +391,8 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     @Override
     public void disableRsvp()
     {
-        sRsvp.setEnabled(false);
+        tvRsvp.setVisibility(View.GONE);
+        sRsvp.setVisibility(View.GONE);
     }
 
     @Override
@@ -402,12 +406,12 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                 break;
 
             case StatusType.INVITED:
-                tvStatus.setText("Not Joining? Inform friends");
+                tvStatus.setText(R.string.label_invited_not_going);
                 tvStatus.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
                 break;
 
             case StatusType.EMPTY:
-                tvStatus.setText("** No Status **");
+                tvStatus.setText(R.string.label_status);
                 tvStatus.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
                 break;
 
@@ -418,7 +422,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                 break;
 
             case StatusType.LAST_MINUTE_EMPTY:
-                tvStatus.setText("Inform friends of your last minute ...");
+                tvStatus.setText(R.string.label_status_last_moment);
                 tvStatus.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
                 break;
 
