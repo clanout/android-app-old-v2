@@ -165,8 +165,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
 
                         viewPager.setCurrentItem(tab.getPosition());
 
-                        switch (tab.getPosition())
-                        {
+                        switch (tab.getPosition()) {
                             case 0:
                                 friendsTabTitle.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
                                 smsTabTitle.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_title));
@@ -174,7 +173,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
                                 break;
                             case 1:
                                 smsTabTitle.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
-                                friendsTabTitle.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_title ));
+                                friendsTabTitle.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_title));
                                 break;
                         }
                     }
@@ -267,17 +266,15 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
             }
 
 
-            if(genericCache.get(CacheKeys.HAS_SEEN_INVITE_POPUP) == null)
-            {
-                if(smsInviteePhoneList.size() == 0)
-                {
+            if (genericCache.get(CacheKeys.HAS_SEEN_INVITE_POPUP) == null) {
+                if (smsInviteePhoneList.size() == 0) {
                     eventService.fetchEvents(locationService.getUserLocation().getZone());
 
-                }else{
+                } else {
 
                     displayInvitePopUp(smsInviteePhoneList.size());
                 }
-            }else{
+            } else {
 
                 eventService.fetchEvents(locationService.getUserLocation().getZone());
             }
@@ -287,13 +284,20 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
 
     private void displayInvitePopUp(int smsInviteesSize) {
 
-        AlertDialog.Builder builder =  new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        if(smsInviteesSize == 1) {
-            builder.setMessage("You have invited " + smsInviteesSize + " friend who is not using clanOut currently. We have sent them a free SMS.");
-        }else{
-            builder.setMessage("You have invited " + smsInviteesSize + " friends who are not using clanOut currently. We have sent them a free SMS.");
+//        if(smsInviteesSize == 1) {
+//            builder.setMessage("You have invited " + smsInviteesSize + " friend who is not using clanOut currently. We have sent them a free SMS.");
+//        }else{
+//            builder.setMessage("You have invited " + smsInviteesSize + " friends who are not using clanOut currently. We have sent them a free SMS.");
+//        }
+
+        int invitedFriendCount = smsInviteePhoneList.size() + invitedAppFriends.size();
+
+        if (invitedFriendCount != 0) {
+            builder.setMessage(R.string.friends_invited_message);
         }
+
         builder.setCancelable(false);
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {

@@ -109,6 +109,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
     LocalTime startTime;
     boolean isFinalized;
 
+    Event event;
+
     boolean isLocationUpdating;
 
     public static EditEventFragment newInstance(Event event, EventDetails eventDetails)
@@ -131,15 +133,13 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
 
-        Event event = (Event) getArguments().getSerializable(ARG_EVENT);
+        event = (Event) getArguments().getSerializable(ARG_EVENT);
         EventDetails eventDetails = (EventDetails) getArguments()
                 .getSerializable(ARG_EVENT_DETAILS);
         if (event == null || eventDetails == null)
         {
             throw new IllegalStateException("event or details cannot be null");
         }
-
-        setActionBarTitle(event);
 
         presenter = new EditEventPresenterImpl(bus, event, eventDetails);
     }
@@ -173,6 +173,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setHasOptionsMenu(true);
+
+        setActionBarTitle(event);
 
         initRecyclerView();
     }

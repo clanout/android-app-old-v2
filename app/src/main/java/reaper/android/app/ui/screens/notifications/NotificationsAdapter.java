@@ -49,56 +49,56 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     private void generateDrawables() {
         chatDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE)
-                .setColor(ContextCompat.getColor(context, R.color.white))
-                .setSizeDp(24)
+                .setColor(ContextCompat.getColor(context, R.color.light_grey))
+                .setSizeDp(32)
                 .build();
 
         personDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
-                .setColor(ContextCompat.getColor(context, R.color.white))
-                .setSizeDp(24)
+                .setColor(ContextCompat.getColor(context, R.color.light_grey))
+                .setSizeDp(32)
                 .build();
 
         rsvpDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_MULTIPLE_PLUS)
-                .setColor(ContextCompat.getColor(context, R.color.white))
-                .setSizeDp(24)
+                .setColor(ContextCompat.getColor(context, R.color.light_grey))
+                .setSizeDp(32)
                 .build();
 
         friendAddedDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_PLUS)
-                .setColor(ContextCompat.getColor(context, R.color.white))
-                .setSizeDp(24)
+                .setColor(ContextCompat.getColor(context, R.color.light_grey))
+                .setSizeDp(32)
                 .build();
 
         eventUpdatedDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.TABLE_EDIT)
-                .setColor(ContextCompat.getColor(context, R.color.white))
-                .setSizeDp(24)
+                .setColor(ContextCompat.getColor(context, R.color.light_grey))
+                .setSizeDp(32)
                 .build();
 
         eventRemovedDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.CALENDAR_REMOVE)
-                .setColor(ContextCompat.getColor(context, R.color.white))
-                .setSizeDp(24)
+                .setColor(ContextCompat.getColor(context, R.color.light_grey))
+                .setSizeDp(32)
                 .build();
 
         eventInvitationDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.EMAIL)
-                .setColor(ContextCompat.getColor(context, R.color.white))
-                .setSizeDp(24)
+                .setColor(ContextCompat.getColor(context, R.color.light_grey))
+                .setSizeDp(32)
                 .build();
 
         eventCreatedDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.CALENDAR_PLUS)
-                .setColor(ContextCompat.getColor(context, R.color.white))
-                .setSizeDp(24)
+                .setColor(ContextCompat.getColor(context, R.color.light_grey))
+                .setSizeDp(32)
                 .build();
 
         statusDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE_TEXT)
-                .setColor(ContextCompat.getColor(context, R.color.white))
-                .setSizeDp(24)
+                .setColor(ContextCompat.getColor(context, R.color.light_grey))
+                .setSizeDp(32)
                 .build();
     }
 
@@ -125,7 +125,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     }
 
     public class NotificationsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private LinearLayout notificationIconContainer;
+//        private LinearLayout notificationIconContainer;
         private ImageView notificationIcon;
         private TextView notificationMessage;
 
@@ -133,7 +133,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             super(itemView);
             notificationIcon = (ImageView) itemView.findViewById(R.id.iv_list_item_notifications);
             notificationMessage = (TextView) itemView.findViewById(R.id.tv_list_item_notifications);
-            notificationIconContainer = (LinearLayout) itemView.findViewById(R.id.llNotificationIconContainer);
+//            notificationIconContainer = (LinearLayout) itemView.findViewById(R.id.llNotificationIconContainer);
             itemView.setOnClickListener(this);
         }
 
@@ -146,7 +146,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
         public void render(Notification notification) {
             notificationMessage.setText(notification.getMessage());
-            notificationIconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.primary_light, 4));
+//            notificationIconContainer.setBackground(DrawableFactory.getIconBackground(context, R.color.primary_light, 4));
 
             switch (notification.getType()) {
                 case Notification.CHAT:

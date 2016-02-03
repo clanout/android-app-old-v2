@@ -24,7 +24,7 @@ public class AccountsService
         {
             friendsDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
                     .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_MINUS)
-                    .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.accent))
+                    .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.primary))
                     .setSizeDp(24)
                     .build();
         }
@@ -33,7 +33,7 @@ public class AccountsService
         {
             phoneDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
                     .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE_ANDROID)
-                    .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.accent))
+                    .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.primary))
                     .setSizeDp(24)
                     .build();
         }
@@ -42,7 +42,7 @@ public class AccountsService
         {
             inviteWhatsappDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
                     .setIcon(MaterialDrawableBuilder.IconValue.WHATSAPP)
-                    .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.accent))
+                    .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.primary))
                     .setSizeDp(24)
                     .build();
         }
@@ -51,7 +51,7 @@ public class AccountsService
         {
             shareFeedbackDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
                     .setIcon(MaterialDrawableBuilder.IconValue.OWL)
-                    .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.accent))
+                    .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.primary))
                     .setSizeDp(24)
                     .build();
         }
@@ -60,7 +60,7 @@ public class AccountsService
         {
             faqDrawable = MaterialDrawableBuilder.with(Reaper.getReaperContext())
                     .setIcon(MaterialDrawableBuilder.IconValue.HELP)
-                    .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.accent))
+                    .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.primary))
                     .setSizeDp(24)
                     .build();
         }

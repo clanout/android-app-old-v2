@@ -158,6 +158,7 @@
     <string name="add_phone_title">Enter number to enable invitations from friends who have your contact number</string>
     <string name="invite_app_friends_title">All your %s friends present on Clanout</string>
     <string name="invite_phonebook_title">A free SMS will be sent for the invite</string>
+    <string name="friends_invited_message">Invitations Sent</string>
 
     <string name="label_title">Plan</string>
 

@@ -114,6 +114,11 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
                 notificationList.remove(viewHolder.getAdapterPosition());
                 notificationRecyclerView.getAdapter()
                         .notifyItemRemoved(viewHolder.getAdapterPosition());
+
+                if(notificationList.size() == 0)
+                {
+                    displayNoNotificationsView();
+                }
             }
         };
 
