@@ -166,7 +166,7 @@
     <string name="message_no_title">Please enter a clan name</string>
 
     <!-- Status Labels -->
-    <string name="label_invited_not_going">Leave a message</string>
+    <string name="label_invited_not_going">Inform friends of your absence</string>
     <string name="label_status">Your clan status</string>
     <string name="label_status_last_moment">Last moment status</string>
 </resources>

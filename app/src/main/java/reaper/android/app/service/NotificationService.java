@@ -721,19 +721,73 @@ public class NotificationService {
                             String message = "You have ";
 
                             if (invitationCount != 0) {
-                                message = message + invitationCount + " invitations";
+
+                                if(updateCount == 0 && chatCount == 0) {
+
+                                    if(invitationCount == 1) {
+                                        message = message + invitationCount + " invitation";
+                                    }else{
+                                        message = message + invitationCount + " invitations";
+                                    }
+                                }else{
+
+                                    if(updateCount == 0 || chatCount == 0)
+                                    {
+                                        if(invitationCount == 1) {
+                                            message = message + invitationCount + " invitation and ";
+                                        }else{
+                                            message = message + invitationCount + " invitations and ";
+                                        }
+                                    }else {
+
+                                        if(invitationCount == 1) {
+                                            message = message + invitationCount + " invitation, ";
+                                        }else{
+                                            message = message + invitationCount + " invitations, ";
+                                        }
+                                    }
+                                }
                             }
 
                             if (updateCount != 0) {
-                                message = message + updateCount + " updates";
+
+                                if(chatCount == 0)
+                                {
+                                    if(updateCount == 1) {
+                                        message = message + updateCount + " clan update";
+                                    }else{
+                                        message = message + updateCount + " clan updates";
+                                    }
+                                }else{
+
+                                    if(updateCount == 1) {
+                                        message = message + updateCount + " clan update and ";
+                                    }else{
+
+                                        message = message + updateCount + " clan updates and ";
+                                    }
+                                }
                             }
 
                             if (chatCount != 0) {
-                                message = message + chatCount + " chats";
+
+                                if(chatCount == 1) {
+                                    message = message + chatCount + " conversation";
+                                }else{
+                                    message = message + chatCount + " conversations";
+                                }
                             }
 
                             if (chatCount == 0 && updateCount == 0 && invitationCount == 0) {
-                                message = "You have " + notifications.size() + " new notifications";
+
+                                if(notifications.size() == 1)
+                                {
+                                    message = "You have " + notifications.size() + " new notification";
+
+                                }else {
+
+                                    message = "You have " + notifications.size() + " new notifications";
+                                }
                             }
 
                             notificationBuilder.setContentText(message);
@@ -759,7 +813,7 @@ public class NotificationService {
                             for (Notification noti : notifications) {
                                 if (noti.getType() == Notification.CHAT || noti.getType() == Notification.EVENT_INVITATION || noti.getType() == Notification.EVENT_UPDATED || noti.getType() == Notification.EVENT_REMOVED) {
 
-                                    bigTextMessage.append(noti.getMessage());
+                                    bigTextMessage.append("\u25CF" + " " + noti.getMessage());
                                     bigTextMessage.append("\n");
                                 }
                             }
@@ -767,7 +821,7 @@ public class NotificationService {
                             if (bigTextMessage.toString().isEmpty()) {
                                 for (Notification noti : notifications) {
 
-                                    bigTextMessage.append(noti.getMessage());
+                                    bigTextMessage.append("\u25CF" + " " + noti.getMessage());
                                     bigTextMessage.append("\n");
 
                                 }

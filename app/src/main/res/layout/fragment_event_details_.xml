@@ -276,6 +276,7 @@
             android:layout_weight="1"
             android:background="@drawable/btn_event_actions"
             android:text="@string/label_btn_invite"
+            android:textStyle="bold"
             android:textAlignment="center"
             android:textColor="@drawable/button_text_color"/>
 
@@ -286,6 +287,7 @@
             android:layout_weight="1"
             android:background="@drawable/btn_event_actions"
             android:text="@string/label_btn_chat"
+            android:textStyle="bold"
             android:textAlignment="center"
             android:textColor="@drawable/button_text_color"/>
 

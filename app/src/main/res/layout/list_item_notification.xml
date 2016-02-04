@@ -21,8 +21,8 @@
 
         <ImageView
             android:id="@+id/iv_list_item_notifications"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="center"
             android:padding="8dp"/>
 

@@ -86,7 +86,7 @@ public class NotificationHelper
     }
 
     private static String newChatMessageReceivedMessage(Map<String, String> args) {
-        return "New chat message";
+        return "New conversation in " + args.get("event_name");
     }
 
     private static String newFriendJoinedAppMessage(Map<String, String> args)
@@ -111,7 +111,7 @@ public class NotificationHelper
 
     private static String getEventUpdatedMessage(Map<String, String> args)
     {
-        return args.get("user_name") + " updated " + args.get("event_name");
+        return "New updates in " + args.get("event_name");
     }
 
     private static String getEventRemovedMessage(Map<String, String> args)
@@ -121,12 +121,12 @@ public class NotificationHelper
 
     private static String getRSVPChangeMessage(Map<String, String> args)
     {
-        return "New friends joined";
+        return "New friends joined " + args.get("event_name");
     }
 
     private static String getEventInvitationMessage(Map<String, String> args)
     {
-        return args.get("user_name") + " calling you for " + args.get("event_name");
+        return args.get("user_name") + " invited you to " + args.get("event_name");
     }
 
     public static int getIcon(int type)

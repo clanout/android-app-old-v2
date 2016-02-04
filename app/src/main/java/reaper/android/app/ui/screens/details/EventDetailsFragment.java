@@ -75,8 +75,7 @@ import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 import timber.log.Timber;
 
-public class EventDetailsFragment extends BaseFragment implements EventDetailsView
-{
+public class EventDetailsFragment extends BaseFragment implements EventDetailsView {
     private static final String ARG_EVENT = "arg_event";
     private static final String ARG_LAST_MINUTE_DIALOG = "arg_last_minute_dialog";
 
@@ -125,8 +124,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
 
     private Event event;
 
-    public static EventDetailsFragment newInstance(Event event)
-    {
+    public static EventDetailsFragment newInstance(Event event) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_EVENT, event);
         args.putInt(ARG_LAST_MINUTE_DIALOG, FLAG_DEFAULT);
@@ -136,8 +134,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
         return fragment;
     }
 
-    public static EventDetailsFragment newInstance(Event event, int flag)
-    {
+    public static EventDetailsFragment newInstance(Event event, int flag) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_EVENT, event);
         args.putInt(ARG_LAST_MINUTE_DIALOG, flag);
@@ -148,26 +145,21 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
         int flag;
 
-        try
-        {
+        try {
             flag = getArguments().getInt(ARG_LAST_MINUTE_DIALOG, FLAG_DEFAULT);
             getArguments().remove(ARG_LAST_MINUTE_DIALOG);
 
             event = (Event) getArguments().getSerializable(ARG_EVENT);
-            if (event == null)
-            {
+            if (event == null) {
                 throw new NullPointerException();
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new IllegalStateException("Event cannot be null");
         }
 
@@ -176,8 +168,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_details_, container, false);
 
         llCategoryIconContainer = view.findViewById(R.id.llCategoryIconContainer);
@@ -207,8 +198,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         bus = Communicator.getInstance().getBus();
@@ -217,33 +207,24 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
 
         initRecyclerView();
 
-        btnInvite.setOnClickListener(new View.OnClickListener()
-        {
+        btnInvite.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
 
-                if (presenter != null)
-                {
-                    if (genericCache.get(CacheKeys.READ_CONTACT_PERMISSION_DENIED) == null)
-                    {
+                if (presenter != null) {
+                    if (genericCache.get(CacheKeys.READ_CONTACT_PERMISSION_DENIED) == null) {
                         handleReadContactsPermission();
-                    }
-                    else
-                    {
+                    } else {
                         presenter.invite();
                     }
                 }
             }
         });
 
-        btnChat.setOnClickListener(new View.OnClickListener()
-        {
+        btnChat.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
-                if (presenter != null)
-                {
+            public void onClick(View v) {
+                if (presenter != null) {
                     presenter.chat();
                 }
             }
@@ -251,24 +232,21 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
         presenter.attachView(this);
         Timber.v(tvTitle.getText().toString() + " : onResume");
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
         presenter.detachView();
     }
 
     /* View Methods */
     @Override
-    public void displayEventSummary(Event event)
-    {
+    public void displayEventSummary(Event event) {
         tvTitle.setText(event.getTitle());
 
         EventCategory eventCategory = EventCategory.valueOf(event.getCategory());
@@ -276,8 +254,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
         ivCategoryIcon.setImageDrawable(DrawableFactory
                 .get(eventCategory, Dimensions.EVENT_DETAILS_ICON_SIZE));
 
-        switch (event.getType())
-        {
+        switch (event.getType()) {
             case INVITE_ONLY:
                 tvType.setText(R.string.event_details_type_invite_only);
                 break;
@@ -291,23 +268,17 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                 .getStartTime().toString(DATE_FORMATTER));
 
         final Location location = event.getLocation();
-        if (location.getName() == null || location.getName().isEmpty())
-        {
+        if (location.getName() == null || location.getName().isEmpty()) {
             tvLocation.setText(R.string.event_details_no_location);
-        }
-        else
-        {
+        } else {
             tvLocation.setText(location.getName());
         }
 
-        if (location.getLatitude() != null && location.getLongitude() != null)
-        {
+        if (location.getLatitude() != null && location.getLongitude() != null) {
             mivGoogleMap.setVisibility(View.VISIBLE);
-            mivGoogleMap.setOnClickListener(new View.OnClickListener()
-            {
+            mivGoogleMap.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v)
-                {
+                public void onClick(View v) {
                     AnalyticsHelper.sendEvents(
                             GoogleAnalyticsConstants.BUTTON_CLICK,
                             GoogleAnalyticsConstants.EVENT_DETAILS_LOCATION_CLICKED,
@@ -319,16 +290,13 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                     startActivity(intent);
                 }
             });
-        }
-        else
-        {
+        } else {
             mivGoogleMap.setVisibility(View.GONE);
         }
     }
 
     @Override
-    public void displayUserSummary(String userId, String name)
-    {
+    public void displayUserSummary(String userId, String name) {
         tvName.setText(name);
 
         Drawable placeHolder =
@@ -340,15 +308,14 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                         .build();
 
         Picasso.with(getActivity())
-               .load(AppConstants.FACEBOOK_END_POINT + userId + "/picture?width=500")
-               .placeholder(placeHolder)
-               .transform(new CircleTransform())
-               .into(ivPic);
+                .load(AppConstants.FACEBOOK_END_POINT + userId + "/picture?width=500")
+                .placeholder(placeHolder)
+                .transform(new CircleTransform())
+                .into(ivPic);
     }
 
     @Override
-    public void displayRsvp(boolean isGoing)
-    {
+    public void displayRsvp(boolean isGoing) {
         tvRsvp.setVisibility(View.VISIBLE);
         sRsvp.setVisibility(View.VISIBLE);
 
@@ -356,26 +323,20 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
 
         sRsvp.setChecked(isGoing);
 
-        if (isGoing)
-        {
+        if (isGoing) {
             tvRsvp.setText(R.string.rsvp_yes);
             tvRsvp.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
             VisibilityAnimationUtil.expand(llEventActionsContainer, 200);
-        }
-        else
-        {
+        } else {
             tvRsvp.setText(R.string.rsvp_no);
             tvRsvp.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_subtitle));
             VisibilityAnimationUtil.collapse(llEventActionsContainer, 200);
         }
 
-        sRsvp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
+        sRsvp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                if (presenter != null)
-                {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (presenter != null) {
                     presenter.toggleRsvp();
                 }
             }
@@ -383,24 +344,20 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     }
 
     @Override
-    public void displayRsvpError()
-    {
+    public void displayRsvpError() {
         Snackbar.make(getView(), R.string.message_rsvp_update_failure, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
-    public void disableRsvp()
-    {
+    public void disableRsvp() {
         tvRsvp.setVisibility(View.GONE);
         sRsvp.setVisibility(View.GONE);
     }
 
     @Override
-    public void displayStatusMessage(int statusType, String status)
-    {
+    public void displayStatusMessage(int statusType, String status) {
         Timber.v(">>>> qwerty : " + status);
-        switch (statusType)
-        {
+        switch (statusType) {
             case StatusType.NONE:
                 tvStatus.setText("");
                 break;
@@ -433,19 +390,16 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                 break;
         }
 
-        rlMeContainer.setOnClickListener(new View.OnClickListener()
-        {
+        rlMeContainer.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 presenter.onStatusClicked();
             }
         });
     }
 
     @Override
-    public void displayInvitationResponseDialog(final String eventId, final String userId)
-    {
+    public void displayInvitationResponseDialog(final String eventId, final String userId) {
         AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL,
                 GoogleAnalyticsConstants.INVITATION_RESPONSE_DIALOG_OPENED,
                 userService.getActiveUserId());
@@ -472,11 +426,9 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
 
         list.setAdapter(statusAdapter);
 
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK,
                         GoogleAnalyticsConstants.INVITAION_RESPONSE_TEMPLATE_CHOSEN,
                         "user:" + userId + ";template:" + responseList.get(position));
@@ -485,21 +437,19 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
             }
         });
 
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
-        {
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
+            public void onClick(DialogInterface dialog, int which) {
 
-                if (message.getText().toString() != null || !(message.getText().toString()
-                                                                     .isEmpty()))
-                {
-                    presenter.setStatus(message.getText().toString());
+                if (message.getText().toString() != null) {
+                    if (!message.getText().toString().isEmpty()) {
+                        presenter.setStatus(message.getText().toString());
 
-                    Snackbar
-                            .make(getView(), R.string.invitation_response_sent, Snackbar.LENGTH_LONG)
-                            .show();
-                    dialog.dismiss();
+                        Snackbar
+                                .make(getView(), R.string.invitation_response_sent, Snackbar.LENGTH_LONG)
+                                .show();
+                        dialog.dismiss();
+                    }
                 }
             }
         });
@@ -509,8 +459,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     }
 
     @Override
-    public void displayUpdateStatusDialog(String eventId, final String userId, String oldStatus, boolean isLastMinute)
-    {
+    public void displayUpdateStatusDialog(String eventId, final String userId, String oldStatus, boolean isLastMinute) {
         AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL,
                 GoogleAnalyticsConstants.STATUS_DIALOG_OPENED,
                 userId);
@@ -537,31 +486,23 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                 R.layout.list_item_list_view_dialog, statusList);
         list.setAdapter(statusAdapter);
 
-        if (isLastMinute)
-        {
+        if (isLastMinute) {
             list.setVisibility(View.VISIBLE);
             title.setText(R.string.event_status_dialog_title);
-        }
-        else
-        {
+        } else {
             list.setVisibility(View.GONE);
             title.setText(R.string.event_status_dialog_title_alternate);
         }
 
-        if (oldStatus == null || oldStatus.isEmpty())
-        {
+        if (oldStatus == null || oldStatus.isEmpty()) {
             status.setHint(R.string.default_event_status);
-        }
-        else
-        {
+        } else {
             status.setText(oldStatus);
         }
 
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 AnalyticsHelper
                         .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK,
@@ -573,21 +514,17 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
         });
 
 
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
-        {
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
+            public void onClick(DialogInterface dialog, int which) {
                 presenter.setStatus(status.getText().toString());
                 dialog.dismiss();
             }
         });
 
-        builder.setOnCancelListener(new DialogInterface.OnCancelListener()
-        {
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
-            public void onCancel(DialogInterface dialog)
-            {
+            public void onCancel(DialogInterface dialog) {
                 dialog.dismiss();
             }
         });
@@ -597,42 +534,33 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     }
 
     @Override
-    public void displayDescription(String description)
-    {
-        if (description != null && !description.isEmpty())
-        {
+    public void displayDescription(String description) {
+        if (description != null && !description.isEmpty()) {
             tvDescription.setText(description);
-        }
-        else
-        {
+        } else {
             tvDescription.setText(R.string.event_details_no_description);
         }
     }
 
     @Override
-    public void displayAttendeeList(List<EventDetails.Attendee> attendees)
-    {
+    public void displayAttendeeList(List<EventDetails.Attendee> attendees) {
         rvAttendees.setAdapter(new EventAttendeesAdapter(attendees, getActivity()));
     }
 
     @Override
-    public void showAttendeeLoading()
-    {
+    public void showAttendeeLoading() {
         loading.setVisibility(View.VISIBLE);
     }
 
-    public void hideAttendeeLoading()
-    {
+    public void hideAttendeeLoading() {
         loading.setVisibility(View.GONE);
     }
 
     @Override
-    public void navigateToInviteScreen(Event event)
-    {
+    public void navigateToInviteScreen(Event event) {
         Log.d("APP", "inside navigate to invite screen -- start");
 
-        if (event == null)
-        {
+        if (event == null) {
             Log.d("APP", "inside navigate to invite screen -- event null");
         }
 
@@ -645,7 +573,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
 //                .changeFragment(getActivity().getFragmentManager(), inviteUsersContainerFragment);
 
         FragmentTransaction fragmentTransaction = getActivity().getFragmentManager()
-                                                               .beginTransaction();
+                .beginTransaction();
         fragmentTransaction
                 .replace(R.id.fl_main, inviteUsersContainerFragment, inviteUsersContainerFragment
                         .getClass().getSimpleName());
@@ -656,8 +584,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     }
 
     @Override
-    public void navigateToChatScreen(String eventId, String eventTitle)
-    {
+    public void navigateToChatScreen(String eventId, String eventTitle) {
         ChatFragment chatFragment = new ChatFragment();
         Bundle bundle = new Bundle();
         bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_ID, eventId);
@@ -667,44 +594,36 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     }
 
     @Override
-    public void setEditActionState(boolean isVisible)
-    {
+    public void setEditActionState(boolean isVisible) {
         edit.setVisible(isVisible);
     }
 
     @Override
-    public void displayEventFinalizedMessage()
-    {
+    public void displayEventFinalizedMessage() {
         Snackbar.make(getView(), R.string.cannot_edit_event_locked, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
-    public void navigateToEditScreen(Event event, EventDetails eventDetails)
-    {
+    public void navigateToEditScreen(Event event, EventDetails eventDetails) {
         FragmentUtils.changeFragment(getActivity().getFragmentManager(), EditEventFragment
                 .newInstance(event, eventDetails));
     }
 
     /* Helper Methods */
-    private void initRecyclerView()
-    {
+    private void initRecyclerView() {
         rvAttendees.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvAttendees
                 .setAdapter(new EventAttendeesAdapter(new ArrayList<EventDetails.Attendee>(), getActivity()));
     }
 
     @Override
-    public void onPrepareOptionsMenu(Menu menu)
-    {
+    public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-        edit.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
+        edit.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item)
-            {
-                if (presenter != null)
-                {
+            public boolean onMenuItemClick(MenuItem item) {
+                if (presenter != null) {
                     presenter.onEdit();
                 }
 
@@ -716,8 +635,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
         menu.clear();
@@ -734,98 +652,76 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                 .build());
     }
 
-    private void handleReadContactsPermission()
-    {
+    private void handleReadContactsPermission() {
 
         Log.d("APP", "inside handle Read contacts");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
-            try
-            {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            try {
 
                 Log.d("APP", "Marshmallow --- 1 ");
 
-                Dexter.checkPermission(new PermissionListener()
-                {
+                Dexter.checkPermission(new PermissionListener() {
                     @Override
-                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse)
-                    {
+                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
 
                         Log.d("APP", "inside handle Read contacts --- permission granted");
                         navigateToInviteScreen(event);
                     }
 
                     @Override
-                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse)
-                    {
+                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
 
                         Log.d("APP", "inside handle Read contacts --- permission denied");
 
-                        if (permissionDeniedResponse.isPermanentlyDenied())
-                        {
+                        if (permissionDeniedResponse.isPermanentlyDenied()) {
 
                             displayContactsPermissionRequiredDialogPermanentlyDeclinedCase();
-                        }
-                        else
-                        {
+                        } else {
 
                             displayContactsPermissionRequiredDialog();
                         }
                     }
 
                     @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken)
-                    {
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
 
                         permissionToken.continuePermissionRequest();
                     }
                 }, Manifest.permission.READ_CONTACTS);
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 Log.d("APP", "inside handle Read contacts --- exception");
             }
-        }
-        else
-        {
+        } else {
 
             presenter.invite();
         }
     }
 
-    private void displayContactsPermissionRequiredDialog()
-    {
+    private void displayContactsPermissionRequiredDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(false);
         builder.setMessage(R.string.read_contacts_permission_required_message);
-        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener()
-        {
+        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
+            public void onClick(DialogInterface dialog, int which) {
 
                 dialog.dismiss();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                {
-                    try
-                    {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    try {
 
                         Log.d("APP", "Marshmallow ---- 2");
 
-                        Dexter.checkPermission(new PermissionListener()
-                        {
+                        Dexter.checkPermission(new PermissionListener() {
                             @Override
-                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse)
-                            {
+                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
 
                                 Log.d("APP", "2 ---- permission granted");
                                 navigateToInviteScreen(event);
                             }
 
                             @Override
-                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse)
-                            {
+                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
 
                                 Log.d("APP", "2 ---- permission denied");
 
@@ -834,20 +730,15 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                             }
 
                             @Override
-                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken)
-                            {
+                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
 
                                 permissionToken.continuePermissionRequest();
                             }
                         }, Manifest.permission.READ_CONTACTS);
-                    }
-                    catch (Exception e)
-                    {
+                    } catch (Exception e) {
 
                     }
-                }
-                else
-                {
+                } else {
 
                     presenter.invite();
                 }
@@ -857,26 +748,21 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
         builder.create().show();
     }
 
-    private void displayContactsPermissionRequiredDialogPermanentlyDeclinedCase()
-    {
+    private void displayContactsPermissionRequiredDialogPermanentlyDeclinedCase() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(false);
         builder.setMessage(R.string.read_contacts_permission_required_message);
-        builder.setPositiveButton("TAKE ME TO SETTINGS", new DialogInterface.OnClickListener()
-        {
+        builder.setPositiveButton("TAKE ME TO SETTINGS", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
+            public void onClick(DialogInterface dialog, int which) {
 
                 dialog.dismiss();
                 goToSettings();
             }
         });
-        builder.setNegativeButton("EXIT", new DialogInterface.OnClickListener()
-        {
+        builder.setNegativeButton("EXIT", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
+            public void onClick(DialogInterface dialog, int which) {
 
                 genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
                 navigateToInviteScreen(event);
@@ -887,8 +773,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     }
 
 
-    private void goToSettings()
-    {
+    private void goToSettings() {
 
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);

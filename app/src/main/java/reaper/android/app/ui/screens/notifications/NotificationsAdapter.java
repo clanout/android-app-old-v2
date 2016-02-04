@@ -50,55 +50,55 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         chatDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE)
                 .setColor(ContextCompat.getColor(context, R.color.light_grey))
-                .setSizeDp(32)
+                .setSizeDp(48)
                 .build();
 
         personDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
                 .setColor(ContextCompat.getColor(context, R.color.light_grey))
-                .setSizeDp(32)
+                .setSizeDp(48)
                 .build();
 
         rsvpDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_MULTIPLE_PLUS)
                 .setColor(ContextCompat.getColor(context, R.color.light_grey))
-                .setSizeDp(32)
+                .setSizeDp(48)
                 .build();
 
         friendAddedDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_PLUS)
                 .setColor(ContextCompat.getColor(context, R.color.light_grey))
-                .setSizeDp(32)
+                .setSizeDp(48)
                 .build();
 
         eventUpdatedDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.TABLE_EDIT)
                 .setColor(ContextCompat.getColor(context, R.color.light_grey))
-                .setSizeDp(32)
+                .setSizeDp(48)
                 .build();
 
         eventRemovedDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.CALENDAR_REMOVE)
                 .setColor(ContextCompat.getColor(context, R.color.light_grey))
-                .setSizeDp(32)
+                .setSizeDp(48)
                 .build();
 
         eventInvitationDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.EMAIL)
                 .setColor(ContextCompat.getColor(context, R.color.light_grey))
-                .setSizeDp(32)
+                .setSizeDp(48)
                 .build();
 
         eventCreatedDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.CALENDAR_PLUS)
                 .setColor(ContextCompat.getColor(context, R.color.light_grey))
-                .setSizeDp(32)
+                .setSizeDp(48)
                 .build();
 
         statusDrawable = MaterialDrawableBuilder.with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE_TEXT)
                 .setColor(ContextCompat.getColor(context, R.color.light_grey))
-                .setSizeDp(32)
+                .setSizeDp(48)
                 .build();
     }
 

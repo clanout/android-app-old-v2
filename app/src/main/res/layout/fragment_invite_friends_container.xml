@@ -38,6 +38,7 @@
         android:background="@color/white"
         android:textColor="@drawable/button_text_color"
         android:textSize="14sp"
-        android:text="Invite"/>
+        android:text="Invite"
+        android:textStyle="bold"/>
 
 </LinearLayout>
