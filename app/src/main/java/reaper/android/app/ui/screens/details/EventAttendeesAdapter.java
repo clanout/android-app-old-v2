@@ -2,6 +2,7 @@ package reaper.android.app.ui.screens.details;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -74,7 +75,7 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
         TextView tvStatus;
         View mivInvite;
 
-        public EventDetailsViewHolder(View itemView)
+        public EventDetailsViewHolder(final View itemView)
         {
             super(itemView);
 
@@ -90,7 +91,9 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
                 {
                     EventDetails.Attendee attendee = attendees.get(getAdapterPosition());
                     if (attendee.isInviter())
-                    {}
+                    {
+
+                    }
                 }
             });
         }

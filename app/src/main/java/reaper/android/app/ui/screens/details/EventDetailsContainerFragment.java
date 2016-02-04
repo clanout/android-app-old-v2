@@ -3,6 +3,7 @@ package reaper.android.app.ui.screens.details;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -346,7 +347,7 @@ public class EventDetailsContainerFragment extends BaseFragment
 
                            if (comment == null || comment.isEmpty())
                            {
-                               Toast.makeText(getActivity(), R.string.empty_rating, Toast.LENGTH_LONG)
+                               Snackbar.make(getView(), R.string.empty_rating, Snackbar.LENGTH_SHORT)
                                     .show();
                                wantToCloseDialog = false;
                            }
@@ -361,7 +362,7 @@ public class EventDetailsContainerFragment extends BaseFragment
 
                                genericCache.put(CacheKeys.HAS_GIVEN_FEEDBACK, true);
 
-                               Toast.makeText(getActivity(), R.string.feedback_submitted, Toast.LENGTH_LONG)
+                               Snackbar.make(getView(), R.string.feedback_submitted, Snackbar.LENGTH_SHORT)
                                     .show();
                                wantToCloseDialog = true;
                            }

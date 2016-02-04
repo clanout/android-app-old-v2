@@ -109,8 +109,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
 
     private String stanzaId;
 
-    // TODO -- add watermark in background (chat, notification, no internet)
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

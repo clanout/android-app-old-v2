@@ -277,14 +277,14 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                     Boolean wantToCloseDialog = false;
 
                     if (comment == null || comment.isEmpty()) {
-                        Toast.makeText(getActivity(), R.string.empty_rating, Toast.LENGTH_LONG).show();
+                        Snackbar.make(getView(), R.string.empty_rating, Snackbar.LENGTH_SHORT).show();
                         wantToCloseDialog = false;
                     } else {
 
                         AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.FEEDBACK_SHARED, userService.getActiveUserId());
 
                         userService.shareFeedback(type, comment);
-                        Toast.makeText(getActivity(), R.string.feedback_submitted, Toast.LENGTH_LONG).show();
+                        Snackbar.make(getView(), R.string.feedback_submitted, Snackbar.LENGTH_SHORT).show();
                         wantToCloseDialog = true;
                     }
 
@@ -325,7 +325,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                 Boolean wantToCloseDialog = false;
                 String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
                 if (parsedPhone == null) {
-                    Toast.makeText(getActivity(), R.string.phone_invalid, Toast.LENGTH_LONG).show();
+                    Snackbar.make(getView(), R.string.phone_invalid, Toast.LENGTH_LONG).show();
                     wantToCloseDialog = false;
                 } else {
 

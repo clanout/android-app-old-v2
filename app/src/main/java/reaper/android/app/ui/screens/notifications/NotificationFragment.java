@@ -64,8 +64,6 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
     private List<Notification> notificationList;
     private GenericCache genericCache;
 
-    // TODO -- put timestamp for each notification
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

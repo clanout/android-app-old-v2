@@ -100,9 +100,6 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
     private TextWatcher searchWatcher;
     private Drawable addPhoneDrawable;
 
-
-    // TODO -- Please select a valid time -- in place of "Start time can't be before current time
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -586,7 +583,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
                 Boolean wantToCloseDialog = false;
                 String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
                 if (parsedPhone == null) {
-                    Toast.makeText(getActivity(), R.string.phone_invalid, Toast.LENGTH_LONG).show();
+                    Snackbar.make(getView(), R.string.phone_invalid, Snackbar.LENGTH_LONG).show();
                     wantToCloseDialog = false;
                 } else {
 
