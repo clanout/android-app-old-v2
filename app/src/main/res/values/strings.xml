@@ -73,7 +73,7 @@
     <string name="action_clear">Clear</string>
     <string name="action_delete_event">Dismiss Clan?</string>
 
-    <string name="home_no_events"> No active clans at the moment. Make your own.</string>
+    <string name="home_no_events">No active clans</string>
     <string name="home_events_fetch_error"> Unable to show clans. Swipe to refresh </string>
 
     <!-- Event Details Fragment -->

@@ -2,28 +2,67 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/bg_login">
+    android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/ivIcon"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="72dp"
-        android:src="@mipmap/logo_red"/>
-
-    <TextView
-        android:id="@+id/tvName"
+        android:id="@+id/ivLogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/ivIcon"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:text="@string/app_name"
-        android:textColor="@color/white"
-        android:textSize="24sp"
-        android:textStyle="bold"/>
+        android:layout_margin="16dp"
+        android:src="@mipmap/logo_red"/>
+
+    <ImageSwitcher
+        android:id="@+id/isIntro"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_below="@+id/ivLogo"
+        android:layout_margin="16dp">
+    </ImageSwitcher>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/isIntro"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/ivIntro1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:src="@drawable/intro_dot_selected"/>
+
+        <ImageView
+            android:id="@+id/ivIntro2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:src="@drawable/intro_dot"/>
+
+        <ImageView
+            android:id="@+id/ivIntro3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:src="@drawable/intro_dot"/>
+
+        <ImageView
+            android:id="@+id/ivIntro4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:src="@drawable/intro_dot"/>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@+id/flb_activity_facebook"
+        android:background="@color/divider"/>
 
     <com.facebook.login.widget.LoginButton
         android:id="@+id/flb_activity_facebook"
@@ -31,7 +70,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="32dp"
-        android:padding="32dp"/>
+        android:layout_margin="32dp"/>
 
 </RelativeLayout>

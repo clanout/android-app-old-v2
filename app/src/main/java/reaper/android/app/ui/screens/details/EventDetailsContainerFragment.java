@@ -20,6 +20,10 @@ import android.widget.Toast;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 import reaper.android.R;
@@ -38,6 +42,7 @@ import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
+import reaper.android.common.chat.ChatHelper;
 import reaper.android.common.communicator.Communicator;
 
 public class EventDetailsContainerFragment extends BaseFragment
@@ -131,6 +136,22 @@ public class EventDetailsContainerFragment extends BaseFragment
 
             }
         });
+
+        initXmppConnection();
+    }
+
+    private void initXmppConnection()
+    {
+        try
+        {
+            if (ChatHelper.getXmppConnection() == null)
+            {
+                ChatHelper.init(userService.getActiveUserId());
+            }
+        }
+        catch (IOException | XMPPException | SmackException ignored)
+        {
+        }
     }
 
     @Override

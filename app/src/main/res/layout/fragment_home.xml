@@ -87,14 +87,16 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:background="@color/background_default">
 
                 <!-- Feed -->
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/rvFeed"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/background_default"/>
+                    android:background="@color/background_default"
+                    android:visibility="gone"/>
 
                 <!-- No Events -->
                 <TextView
@@ -104,9 +106,8 @@
                     android:layout_centerInParent="true"
                     android:gravity="center"
                     android:text="@string/home_no_events"
-                    android:textColor="@color/text_title"
-                    android:textSize="18sp"
-                    android:visibility="gone"/>
+                    android:textColor="@color/text_subtitle"
+                    android:textSize="18sp"/>
 
                 <!-- Server Error -->
                 <TextView
