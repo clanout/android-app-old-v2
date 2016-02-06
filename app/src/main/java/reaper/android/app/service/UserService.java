@@ -124,6 +124,9 @@ public class UserService {
 
                     @Override
                     public void onError(Throwable e) {
+
+                        Log.d("APP", "onError ---- " + e.getMessage());
+
                         bus.post(new GenericErrorTrigger(ErrorCode.APP_FRIENDS_FETCH_FROM_NETWORK_FAILURE, (Exception) e));
                     }
 

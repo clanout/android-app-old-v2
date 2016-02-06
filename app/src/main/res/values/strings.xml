@@ -96,7 +96,7 @@
 
     <string name="no_facebook_friends"> Nothing to show here :)  </string>
     <string name="no_local_facebook_friends"> Clanout is exciting with your friends around. Invite them by Whatsapp </string>
-    <string name="facebook_friends_not_fetched"> Unable to show your facebook friends. Refresh </string>
+    <string name="facebook_friends_not_fetched"> Unable to show your friends. Refresh </string>
 
     <string name="no_search_results_facebook">No matches found.</string>
     <string name="no_search_results_phonebook">No matches found.</string>

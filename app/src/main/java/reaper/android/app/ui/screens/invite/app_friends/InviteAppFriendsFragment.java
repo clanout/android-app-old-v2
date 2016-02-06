@@ -1,8 +1,10 @@
 package reaper.android.app.ui.screens.invite.app_friends;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -80,6 +83,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
     private ProgressBar progressBar;
     private EditText search;
     private LinearLayout searchContainer;
+    private View divider;
 
     private InviteFriendsAdapter inviteFriendsAdapter;
     private UserService userService;
@@ -118,6 +122,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
         search = (EditText) view.findViewById(R.id.et_fragment_invite_facebook_friends_search);
         searchContainer = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_facebook_friends_search);
         tabTitle = (TextView) view.findViewById(R.id.tv_invite_app_friends_title);
+        divider = view.findViewById(R.id.v_divider_invite_app_friends);
 
         return view;
     }
@@ -273,6 +278,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
         noFriendsMessage.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
         loading.setVisibility(View.VISIBLE);
+        divider.setVisibility(View.GONE);
     }
 
     private void displayBasicView() {
@@ -281,6 +287,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
         noFriendsMessage.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
+        divider.setVisibility(View.VISIBLE);
     }
 
     private void displayNoFriendsView() {
@@ -289,6 +296,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
         noFriendsMessage.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
+        divider.setVisibility(View.VISIBLE);
 
         noFriendsMessage.setText(R.string.no_local_facebook_friends);
     }
@@ -299,6 +307,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
         noFriendsMessage.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
+        divider.setVisibility(View.VISIBLE);
 
         noFriendsMessage.setText(R.string.no_search_results_facebook);
     }
@@ -311,6 +320,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
         noFriendsMessage.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
+        divider.setVisibility(View.GONE);
 
         noFriendsMessage.setText(R.string.facebook_friends_not_fetched);
     }
@@ -335,11 +345,10 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
 
         menu.findItem(R.id.action_refresh).setIcon(refreshDrawable);
 
-        if(genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null)
-        {
+        if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null) {
             menu.findItem(R.id.action_add_phone).setVisible(true);
             menu.findItem(R.id.action_add_phone).setIcon(addPhoneDrawable);
-        }else{
+        } else {
             menu.findItem(R.id.action_add_phone).setVisible(false);
         }
 
@@ -382,8 +391,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
         Friend friend = new Friend();
         friend.setId(userService.getActiveUserId());
 
-        if(visibleFriendList.contains(friend))
-        {
+        if (visibleFriendList.contains(friend)) {
             visibleFriendList.remove(friend);
         }
 
@@ -402,6 +410,9 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
     @Subscribe
     public void onFacebookFriendsUpdatedOnServer(FacebookFriendsUpdatedOnServerTrigger trigger) {
         if (!trigger.isPolling()) {
+
+            Log.d("APP", "Facebook friends updated on server");
+
             userService.getAppFriendsFromNetwork(locationService.getUserLocation().getZone());
             genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now());
         }
@@ -410,6 +421,8 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
     @Subscribe
     public void onFacebookFriendsNotUpdatedOnServer(GenericErrorTrigger trigger) {
         if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE) {
+
+            Log.d("APP", "Facebook friends not updated on server");
 
             if (menu != null) {
                 menu.findItem(R.id.action_refresh).setActionView(null);
@@ -421,6 +434,9 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
     @Subscribe
     public void onFacebookFriendsIdFetched(FacebookFriendsIdFetchedTrigger trigger) {
         if (!trigger.isPolling()) {
+
+            Log.d("APP", "Facebook friends id fetched");
+
             userService.updateFacebookFriends(trigger.getFriendsIdList(), trigger.isPolling());
         }
     }
@@ -428,6 +444,8 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
     @Subscribe
     public void onFacebookFriendsIdNotFetched(GenericErrorTrigger trigger) {
         if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE) {
+
+            Log.d("APP", "Facebook friends id not fetched");
 
             if (menu != null) {
                 menu.findItem(R.id.action_refresh).setActionView(null);
@@ -438,6 +456,8 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
 
     @Subscribe
     public void onZonalAppFriendsFetched(AppFriendsFetchedTrigger trigger) {
+
+        Log.d("APP", "zonal app friends fetched");
 
         friendList = trigger.getFriends();
 
@@ -461,12 +481,17 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
     @Subscribe
     public void onZonalAppFriendsNotFetched(GenericErrorTrigger trigger) {
         if (trigger.getErrorCode() == ErrorCode.USER_APP_FRIENDS_FETCH_FAILURE) {
+
+            Log.d("APP", "zonal app friends not fetched");
+
             displayErrorView();
         }
     }
 
     @Subscribe
     public void onZonalFriendsFetchedFromNetwork(AppFriendsFetchedFromNetworkTrigger trigger) {
+
+        Log.d("APP", "zonal friends fetched from network");
 
         friendList = trigger.getFriends();
 
@@ -476,12 +501,18 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
             visibleFriendList.add(friend);
         }
 
-        if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) != null) {
+        Log.d("APP", "checking permission");
 
+        PackageManager pm = getActivity().getPackageManager();
+        if (pm.checkPermission(Manifest.permission.READ_CONTACTS, getActivity().getPackageName()) == PackageManager.PERMISSION_GRANTED) {
+
+            Log.d("APP", "checking permission --- true");
 
             userService.refreshPhoneContacts(getActivity().getContentResolver(), locationService.getUserLocation().getZone());
+
         } else {
 
+            Log.d("APP", "checking permission --- false");
 
             if (menu != null) {
                 menu.findItem(R.id.action_refresh).setActionView(null);
@@ -489,12 +520,16 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
 
             Collections.sort(visibleFriendList, new FriendsComparator());
             refreshRecyclerView();
+
         }
     }
 
     @Subscribe
     public void onZonalFriendsNotFetchedFromNetwork(GenericErrorTrigger trigger) {
         if (trigger.getErrorCode() == ErrorCode.APP_FRIENDS_FETCH_FROM_NETWORK_FAILURE) {
+
+            Log.d("APP", "zonal friends not fetched from network");
+
             if (menu != null) {
                 menu.findItem(R.id.action_refresh).setActionView(null);
             }
@@ -504,37 +539,38 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
     }
 
     @Subscribe
-    public void onPhoneContactsFetched(PhoneContactsFetchedTrigger trigger)
-    {
+    public void onPhoneContactsFetched(PhoneContactsFetchedTrigger trigger) {
+        Log.d("APP", "phone contacts fetched");
+
+
         friendList.addAll(trigger.getPhoneContacts());
 
         visibleFriendList = new ArrayList<>();
 
-        for(Friend friend : friendList)
-        {
+        for (Friend friend : friendList) {
             visibleFriendList.add(friend);
         }
 
         Collections.sort(visibleFriendList, new FriendsComparator());
         refreshRecyclerView();
 
-        if (menu != null)
-        {
+        if (menu != null) {
             menu.findItem(R.id.action_refresh).setActionView(null);
         }
     }
 
     @Subscribe
-    public void onPhoneContactsNotFetched(GenericErrorTrigger trigger)
-    {
-        if (trigger.getErrorCode() == ErrorCode.PHONE_CONTACTS_FETCH_FAILURE)
-        {
-            displayErrorView();
+    public void onPhoneContactsNotFetched(GenericErrorTrigger trigger) {
+        if (trigger.getErrorCode() == ErrorCode.PHONE_CONTACTS_FETCH_FAILURE) {
+//            displayErrorView();
+            Log.d("APP", "phone contacts not fetched");
 
-            if (menu != null)
-            {
+            if (menu != null) {
                 menu.findItem(R.id.action_refresh).setActionView(null);
             }
+
+            Collections.sort(visibleFriendList, new FriendsComparator());
+            refreshRecyclerView();
         }
     }
 
@@ -555,6 +591,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
                 Snackbar.make(getView(), R.string.whatsapp_not_installed, Snackbar.LENGTH_LONG).show();
             }
         }
+
     }
 
     private void displayUpdatePhoneDialog() {

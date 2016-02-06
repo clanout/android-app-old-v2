@@ -10,6 +10,7 @@ import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +19,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -39,11 +41,13 @@ import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
+import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.PhoneContact;
 import reaper.android.app.model.PhoneContactComparator;
 import reaper.android.app.service.AccountsService;
+import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.AllPhoneContactsForSMSFetchedTrigger;
@@ -65,6 +69,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     private ProgressBar progressBar;
     private EditText search;
     private LinearLayout searchContainer;
+    private View divider;
 
     private Bus bus;
     private UserService userService;
@@ -76,6 +81,8 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     private InviteThroughSMSAdapter inviteThroughSMSAdapter;
 
     private TextWatcher searchWatcher;
+    private Drawable addPhoneDrawable;
+    private Menu menu;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,6 +106,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_invite_through_sms);
         search = (EditText) view.findViewById(R.id.et_fragment_invite_through_sms_search);
         searchContainer = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_through_sms_search);
+        divider = view.findViewById(R.id.v_divider_invite_sms);
 
         return view;
     }
@@ -194,6 +202,12 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
                 .setColor(getResources().getColor(R.color.white))
                 .setSizeDp(36)
                 .build();
+
+        addPhoneDrawable = MaterialDrawableBuilder.with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE)
+                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
+                .setSizeDp(36)
+                .build();
     }
 
     @Override
@@ -239,6 +253,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         mainContent.setVisibility(View.VISIBLE);
         loading.setVisibility(View.GONE);
         searchContainer.setVisibility(View.VISIBLE);
+        divider.setVisibility(View.VISIBLE);
     }
 
     private void displayNoSearchResultsView() {
@@ -251,6 +266,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         mainContent.setVisibility(View.VISIBLE);
         loading.setVisibility(View.GONE);
         searchContainer.setVisibility(View.VISIBLE);
+        divider.setVisibility(View.VISIBLE);
     }
 
     private void displayBasicView() {
@@ -262,6 +278,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         lockedContent.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
         searchContainer.setVisibility(View.VISIBLE);
+        divider.setVisibility(View.VISIBLE);
     }
 
     private void displayErrorView() {
@@ -277,6 +294,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         lockedContent.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
         searchContainer.setVisibility(View.GONE);
+        divider.setVisibility(View.GONE);
     }
 
     private void displayLoadingView() {
@@ -287,6 +305,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         lockedContent.setVisibility(View.GONE);
         loading.setVisibility(View.VISIBLE);
         searchContainer.setVisibility(View.GONE);
+        divider.setVisibility(View.GONE);
     }
 
     @Override
@@ -296,15 +315,34 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         menu.clear();
         inflater.inflate(R.menu.action_button, menu);
 
+        this.menu = menu;
+
         menu.findItem(R.id.action_account).setVisible(false);
         menu.findItem(R.id.action_home).setVisible(false);
         menu.findItem(R.id.action_finalize_event).setVisible(false);
         menu.findItem(R.id.action_delete_event).setVisible(false);
-        menu.findItem(R.id.action_add_phone).setVisible(false);
         menu.findItem(R.id.action_edit_event).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
         menu.findItem(R.id.action_notifications).setVisible(false);
         menu.findItem(R.id.action_status).setVisible(false);
+
+        if(genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null)
+        {
+            menu.findItem(R.id.action_add_phone).setVisible(true);
+            menu.findItem(R.id.action_add_phone).setIcon(addPhoneDrawable);
+        }else{
+            menu.findItem(R.id.action_add_phone).setVisible(false);
+        }
+
+        menu.findItem(R.id.action_add_phone).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                displayUpdatePhoneDialog();
+
+                return true;
+            }
+        });
     }
 
 
@@ -454,5 +492,57 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
         intent.setData(uri);
         startActivity(intent);
+    }
+
+    private void displayUpdatePhoneDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(true);
+
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.alert_dialog_add_phone, null);
+        builder.setView(dialogView);
+
+        final EditText phoneNumber = (EditText) dialogView.findViewById(R.id.et_alert_dialog_add_phone);
+
+        builder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Boolean wantToCloseDialog = false;
+                String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
+                if (parsedPhone == null) {
+                    Snackbar.make(getView(), R.string.phone_invalid, Snackbar.LENGTH_LONG).show();
+                    wantToCloseDialog = false;
+                } else {
+
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.PHONE_NUMBER_UPDATED, userService.getActiveUserId());
+
+                    userService.updatePhoneNumber(parsedPhone);
+
+                    menu.findItem(R.id.action_add_phone).setVisible(false);
+                    displayLoadingView();
+                    userService.fetchAllPhoneContacts(getActivity().getContentResolver());
+
+                    InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputManager.hideSoftInputFromWindow(dialogView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
+                    wantToCloseDialog = true;
+                }
+
+                if (wantToCloseDialog) {
+                    alertDialog.dismiss();
+                }
+            }
+        });
+
     }
 }
