@@ -1,11 +1,16 @@
 package reaper.android.app.ui.screens.home;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -16,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +35,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
@@ -123,11 +135,14 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
     /* Event Bus */
     Bus bus;
+    private GenericCache genericCache;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        Log.d("APP", "onCreate");
 
         List<Event> events = new ArrayList<>();
 
@@ -149,6 +164,9 @@ public class HomeFragment extends BaseFragment implements EventsView,
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+
+        Log.d("APP", "onCreateView");
+
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
@@ -181,12 +199,16 @@ public class HomeFragment extends BaseFragment implements EventsView,
     {
         super.onActivityCreated(savedInstanceState);
 
+        Log.d("APP", "onActivityCreated");
+
         loading.getIndeterminateDrawable().setColorFilter(ContextCompat
                 .getColor(getActivity(), R.color.accent), PorterDuff.Mode.SRC_IN);
 
         toolbar.setTitle(R.string.title_home);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         setHasOptionsMenu(true);
+
+        genericCache = CacheManager.getGenericCache();
 
         srlFeed.setOnRefreshListener(this);
         srlFeed.setColorSchemeResources(R.color.category_icon_one, R.color.category_icon_eight,
@@ -269,12 +291,16 @@ public class HomeFragment extends BaseFragment implements EventsView,
             @Override
             public void onClick(View v)
             {
-                createEventPresenter.create(
-                        etTitle.getText().toString(),
-                        selectedCategory,
-                        cbType.isChecked(),
-                        DateTimeUtil.getDateTime(dateTimeUtil
-                                .getDate(dayList.get(selectedDay)), startTime));
+                if (genericCache.get(CacheKeys.READ_CONTACT_PERMISSION_DENIED) == null) {
+
+                    Log.d("APP", "Generic cache contact permission null");
+
+                    handleReadContactsPermission();
+                } else {
+
+                    Log.d("APP", "Generic cache contact permission not null");
+                    createEvent();
+                }
             }
         });
 
@@ -299,6 +325,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
     {
         super.onResume();
 
+        Log.d("APP", "onResume");
+
         bus.register(this);
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.HOME_FRAGMENT);
         CacheManager.getGenericCache().put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.HOME);
@@ -321,10 +349,21 @@ public class HomeFragment extends BaseFragment implements EventsView,
     public void onPause()
     {
         super.onPause();
+
+        Log.d("APP", "onPause");
+
+        bus.unregister(this);
         SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        Log.d("APP", "onStop");
+
         presenter.detachView();
         createEventPresenter.detachView();
-        bus.unregister(this);
     }
 
     /* Listeners */
@@ -416,20 +455,16 @@ public class HomeFragment extends BaseFragment implements EventsView,
         rvFeed.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvFeed.setAdapter(new EventsAdapter(getActivity(), new ArrayList<Event>(), this));
 
-        rvFeed.addOnScrollListener(new RecyclerView.OnScrollListener()
-        {
+        rvFeed.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
-            {
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
 
             }
 
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
-            {
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 boolean enabled = false;
-                if (rvFeed.getChildCount() > 0)
-                {
+                if (rvFeed.getChildCount() > 0) {
                     LinearLayoutManager linearLayoutManager = (LinearLayoutManager) rvFeed
                             .getLayoutManager();
 
@@ -465,11 +500,9 @@ public class HomeFragment extends BaseFragment implements EventsView,
         notification.setIcon(notificationIcon);
 
         notification
-                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-                {
+                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
-                    public boolean onMenuItemClick(MenuItem item)
-                    {
+                    public boolean onMenuItemClick(MenuItem item) {
                         FragmentUtils
                                 .changeFragment(getFragmentManager(), new NotificationFragment());
                         return true;
@@ -485,11 +518,9 @@ public class HomeFragment extends BaseFragment implements EventsView,
                     .build());
 
         menu.findItem(R.id.action_account)
-            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-            {
+            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
-                public boolean onMenuItemClick(MenuItem menuItem)
-                {
+                public boolean onMenuItemClick(MenuItem menuItem) {
                     FragmentUtils.changeFragment(getFragmentManager(), new AccountsFragment());
                     return true;
                 }
@@ -519,11 +550,9 @@ public class HomeFragment extends BaseFragment implements EventsView,
     @Subscribe
     public void newNotificationReceived(NewNotificationReceivedTrigger trigger)
     {
-        getActivity().runOnUiThread(new Runnable()
-        {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 notificationIcon = MaterialDrawableBuilder
                         .with(getActivity())
                         .setIcon(MaterialDrawableBuilder.IconValue.BELL)
@@ -532,8 +561,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
                         .setSizeDp(36)
                         .build();
 
-                if (notification != null)
-                {
+                if (notification != null) {
                     notification.setIcon(notificationIcon);
                 }
             }
@@ -675,11 +703,9 @@ public class HomeFragment extends BaseFragment implements EventsView,
         stringPicker.setCurrent(selectedDay);
 
 
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
-        {
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
+            public void onClick(DialogInterface dialog, int which) {
                 tvDay.setText(stringPicker.getCurrentValue());
                 selectedDay = stringPicker.getCurrent();
                 Timber.d("Selected Day = " + selectedDay);
@@ -687,11 +713,9 @@ public class HomeFragment extends BaseFragment implements EventsView,
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-        {
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
+            public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
             }
         });
@@ -911,4 +935,157 @@ public class HomeFragment extends BaseFragment implements EventsView,
         inviteUsersContainerFragment.setArguments(bundle);
         FragmentUtils.changeFragment(getFragmentManager(), inviteUsersContainerFragment);
     }
+
+    private void handleReadContactsPermission() {
+
+        Log.d("APP", "inside handle permission");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            Log.d("APP", "inside handle permission -- Greater than M");
+
+            try {
+
+                Dexter.checkPermission(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+
+                        Log.d("APP", "inside handle permission -- permission granted");
+
+                        createEvent();
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+
+                        Log.d("APP", "inside handle permission -- permission denied");
+
+                        if (permissionDeniedResponse.isPermanentlyDenied()) {
+
+                            Log.d("APP", "inside handle permission -- permission permanently denied");
+
+                            displayContactsPermissionRequiredDialogPermanentlyDeclinedCase();
+                        } else {
+
+                            Log.d("APP", "inside handle permission -- permission permanently not denied");
+                            displayContactsPermissionRequiredDialog();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+
+                        permissionToken.continuePermissionRequest();
+                    }
+                }, Manifest.permission.READ_CONTACTS);
+            } catch (Exception e) {
+                Log.d("APP", "inside handle Read contacts home fragment --- exception");
+            }
+        } else {
+
+            Log.d("APP", "inside handle permission -- less than M");
+
+          createEvent();
+        }
+    }
+
+    private void displayContactsPermissionRequiredDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
+        builder.setMessage(R.string.read_contacts_permission_required_message);
+        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    try {
+
+                        Log.d("APP", "Marshmallow ---- 2");
+
+                        Dexter.checkPermission(new PermissionListener() {
+                            @Override
+                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+
+                                Log.d("APP", "2 ---- permission granted");
+
+                               createEvent();
+                            }
+
+                            @Override
+                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+
+                                Log.d("APP", "2 ---- permission denied");
+
+                                genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
+
+                               createEvent();
+                            }
+
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+
+                                permissionToken.continuePermissionRequest();
+                            }
+                        }, Manifest.permission.READ_CONTACTS);
+                    } catch (Exception e) {
+
+                    }
+                } else {
+
+                  createEvent();
+                }
+            }
+        });
+
+        builder.create().show();
+    }
+
+    private void displayContactsPermissionRequiredDialogPermanentlyDeclinedCase() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
+        builder.setMessage(R.string.read_contacts_permission_required_message);
+        builder.setPositiveButton("TAKE ME TO SETTINGS", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+                goToSettings();
+            }
+        });
+        builder.setNegativeButton("EXIT", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
+
+               createEvent();
+            }
+        });
+
+        builder.create().show();
+    }
+
+    private void goToSettings() {
+
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
+        intent.setData(uri);
+        startActivity(intent);
+    }
+
+    private void createEvent()
+    {
+        Log.d("APP", "inside create event");
+
+        createEventPresenter.create(
+                etTitle.getText().toString(),
+                selectedCategory,
+                cbType.isChecked(),
+                DateTimeUtil.getDateTime(dateTimeUtil
+                        .getDate(dayList.get(selectedDay)), startTime));
+    }
+
+
 }

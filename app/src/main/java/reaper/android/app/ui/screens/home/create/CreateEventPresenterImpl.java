@@ -1,5 +1,7 @@
 package reaper.android.app.ui.screens.home.create;
 
+import android.util.Log;
+
 import com.squareup.otto.Bus;
 
 import org.joda.time.DateTime;
@@ -53,8 +55,13 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     @Override
     public void create(String title, EventCategory category, boolean isSecret, DateTime startTime)
     {
+
+        Log.d("APP", "inside create -- presenter");
+
         if (view == null)
         {
+            Log.d("APP", "inside create -- presenter -- view null");
+
             return;
         }
 
