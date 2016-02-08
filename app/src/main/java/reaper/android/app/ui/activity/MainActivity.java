@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -84,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.d("APP", "starting main activity " + System.currentTimeMillis());
+
         DateTime start = DateTime.now();
         DateTime end = start.plusDays(1).withTimeAtStartOfDay();
 
@@ -109,20 +112,20 @@ public class MainActivity extends AppCompatActivity {
             eventService.getEventSuggestions();
         }
 
+        Log.d("APP", "deciding where to go " + System.currentTimeMillis());
+
         String shouldGoToDetailsFragment = getIntent()
                 .getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);
         eventId = getIntent().getStringExtra("event_id");
 
         String shouldGoToNotificationsFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_NOTIFICATION_FRAGMENT);
 
-        if(shouldGoToNotificationsFragment != null)
-        {
-            if(shouldGoToNotificationsFragment.equals("yes"))
-            {
+        if (shouldGoToNotificationsFragment != null) {
+            if (shouldGoToNotificationsFragment.equals("yes")) {
                 FragmentUtils
                         .changeFragment(getFragmentManager(), new NotificationFragment());
             }
-        }else if (shouldGoToDetailsFragment.equals("yes") && eventId != null) {
+        } else if (shouldGoToDetailsFragment.equals("yes") && eventId != null) {
             if (getIntent().getBooleanExtra(BundleKeys.POPUP_STATUS_DIALOG, false)) {
                 shouldPopUpStatusDialog = true;
             } else {
@@ -133,6 +136,9 @@ public class MainActivity extends AppCompatActivity {
             eventService.fetchEventsForActivity(locationService.getUserLocation().getZone());
 
         } else {
+
+            Log.d("APP", "decided home " + System.currentTimeMillis());
+
             String lastNotificationReceived = genericCache
                     .get(Timestamps.NOTIFICATION_RECEIVED_TIMESTAMP);
             String lastFriendRelocatedNotificationReceived = genericCache
@@ -158,6 +164,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+            Log.d("APP", "cache deleted " + System.currentTimeMillis());
+
             DateTime lastFacebookFriendsRefreshTimestamp = genericCache
                     .get(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.class);
 
@@ -171,14 +179,20 @@ public class MainActivity extends AppCompatActivity {
                 facebookService.getFacebookFriends(true);
             }
 
-            if (genericCache.get(CacheKeys.GCM_TOKEN) == null) {
-                if (checkPlayServices()) {
-                    gcmService.register();
-                } else {
-                }
-            } else {
-                FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
-            }
+            Log.d("APP", "facebook friends got " + System.currentTimeMillis());
+
+//            if (genericCache.get(CacheKeys.GCM_TOKEN) == null) {
+//                if (checkPlayServices()) {
+//                    gcmService.register();
+//
+//                    Log.d("APP", "starting gcm registeration " + System.currentTimeMillis());
+//                } else {
+//                }
+//            } else {
+//                FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
+//            }
+
+            FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
         }
     }
 
@@ -254,40 +268,43 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean checkPlayServices() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-
-                Toast.makeText(this, "This device does not support Google Play Services.", Toast.LENGTH_LONG)
-                        .show();
-                finish();
-            }
-
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.PLAY_SERVICES_NOT_PRESENT, null);
-
-            return false;
-        }
-
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.PLAY_SERVICES_PRESENT, null);
-
-        return true;
-    }
-
-    @Subscribe
-    public void onGcmRegistrationComplete(GcmRegistrationCompleteTrigger trigger) {
-
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
-            }
-        });
-    }
+//    private boolean checkPlayServices() {
+//        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+//        if (resultCode != ConnectionResult.SUCCESS) {
+//            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+//                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+//                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+//            } else {
+//
+//                Toast.makeText(this, "This device does not support Google Play Services.", Toast.LENGTH_LONG)
+//                        .show();
+//                finish();
+//            }
+//
+//            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.PLAY_SERVICES_NOT_PRESENT, null);
+//
+//            return false;
+//        }
+//
+//        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.PLAY_SERVICES_PRESENT, null);
+//
+//        return true;
+//    }
+//
+//    @Subscribe
+//    public void onGcmRegistrationComplete(GcmRegistrationCompleteTrigger trigger) {
+//
+//
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                Log.d("APP", "going to home fragment" + System.currentTimeMillis());
+//
+//                FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
+//            }
+//        });
+//    }
 
     @Subscribe
     public void onEventsFetched(EventsFetchForActivityTrigger trigger) {
