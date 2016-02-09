@@ -120,7 +120,7 @@ public class LauncherActivity extends AppCompatActivity {
     public void onNewSessionCreated(NewSessionCreatedTrigger trigger) {
         genericCache.put(CacheKeys.SESSION_ID, trigger.getSessionCookie());
         if (!locationService.locationExists()) {
-            progressDialog = ProgressDialog.show(this, "Welcome", "Getting your location...");
+//            progressDialog = ProgressDialog.show(this, "Welcome", "Getting your location...");
             isBlocking = true;
             bus.post(new UserLocationRefreshRequestTrigger());
         } else {
@@ -177,7 +177,7 @@ public class LauncherActivity extends AppCompatActivity {
     @Subscribe
     public void onSessionValidated(SessionValidatedTrigger trigger) {
         if (!locationService.locationExists()) {
-            progressDialog = ProgressDialog.show(this, "Welcome", "Getting your location...");
+//            progressDialog = ProgressDialog.show(this, "Welcome", "Getting your location...");
             isBlocking = true;
             bus.post(new UserLocationRefreshRequestTrigger());
         } else {

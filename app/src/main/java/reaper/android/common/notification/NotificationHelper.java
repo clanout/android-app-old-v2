@@ -82,8 +82,7 @@ public class NotificationHelper
 
     private static String newStatusUpdateReceived(Map<String, String> args) {
 
-//        return args.get("event_name") + " starting at " + args.get("event_name") + " ----- " + args.get("status");
-        return "";
+        return args.get("user_name") + " updated status for clan " + args.get("event_name");
     }
 
     private static String newChatMessageReceivedMessage(Map<String, String> args) {

@@ -722,27 +722,26 @@ public class NotificationService {
 
                             if (invitationCount != 0) {
 
-                                if(updateCount == 0 && chatCount == 0) {
+                                if (updateCount == 0 && chatCount == 0) {
 
-                                    if(invitationCount == 1) {
+                                    if (invitationCount == 1) {
                                         message = message + invitationCount + " invitation";
-                                    }else{
+                                    } else {
                                         message = message + invitationCount + " invitations";
                                     }
-                                }else{
+                                } else {
 
-                                    if(updateCount == 0 || chatCount == 0)
-                                    {
-                                        if(invitationCount == 1) {
+                                    if (updateCount == 0 || chatCount == 0) {
+                                        if (invitationCount == 1) {
                                             message = message + invitationCount + " invitation and ";
-                                        }else{
+                                        } else {
                                             message = message + invitationCount + " invitations and ";
                                         }
-                                    }else {
+                                    } else {
 
-                                        if(invitationCount == 1) {
+                                        if (invitationCount == 1) {
                                             message = message + invitationCount + " invitation, ";
-                                        }else{
+                                        } else {
                                             message = message + invitationCount + " invitations, ";
                                         }
                                     }
@@ -751,18 +750,17 @@ public class NotificationService {
 
                             if (updateCount != 0) {
 
-                                if(chatCount == 0)
-                                {
-                                    if(updateCount == 1) {
+                                if (chatCount == 0) {
+                                    if (updateCount == 1) {
                                         message = message + updateCount + " clan update";
-                                    }else{
+                                    } else {
                                         message = message + updateCount + " clan updates";
                                     }
-                                }else{
+                                } else {
 
-                                    if(updateCount == 1) {
+                                    if (updateCount == 1) {
                                         message = message + updateCount + " clan update and ";
-                                    }else{
+                                    } else {
 
                                         message = message + updateCount + " clan updates and ";
                                     }
@@ -771,20 +769,19 @@ public class NotificationService {
 
                             if (chatCount != 0) {
 
-                                if(chatCount == 1) {
+                                if (chatCount == 1) {
                                     message = message + chatCount + " conversation";
-                                }else{
+                                } else {
                                     message = message + chatCount + " conversations";
                                 }
                             }
 
                             if (chatCount == 0 && updateCount == 0 && invitationCount == 0) {
 
-                                if(notifications.size() == 1)
-                                {
+                                if (notifications.size() == 1) {
                                     message = "You have " + notifications.size() + " new notification";
 
-                                }else {
+                                } else {
 
                                     message = "You have " + notifications.size() + " new notifications";
                                 }
@@ -827,7 +824,9 @@ public class NotificationService {
                                 }
                             }
 
+
                             notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(bigTextMessage.toString()));
+
                         }
 
                         NotificationManager notificationManager =
