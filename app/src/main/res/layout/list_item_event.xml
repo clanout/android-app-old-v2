@@ -54,18 +54,6 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"/>
-
-            <!--<net.steamcrafted.materialiconlib.MaterialIconView-->
-            <!--android:id="@+id/mivCategory"-->
-            <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center"-->
-            <!--android:scaleType="center"-->
-            <!--app:materialIcon="martini"-->
-            <!--app:materialIconColor="@color/whity"-->
-            <!--app:materialIconSize="24dp"/>-->
-
         </LinearLayout>
 
         <TextView
@@ -74,8 +62,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginLeft="16dp"
+            android:layout_marginRight="32dp"
             android:layout_toRightOf="@id/llCategoryIconContainer"
-            android:text="Sex on the Beach"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Sex on the Beach dfsfd sdfdsf"
             android:textColor="@color/text_title"
             android:textSize="18sp"/>
 
@@ -85,54 +76,12 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginLeft="16dp"
+            android:layout_marginRight="48dp"
             android:layout_toRightOf="@+id/llCategoryIconContainer"
-            android:text="Harsh, Aditya &amp; 4 friends joined"
+            android:ellipsize="marquee"
+            android:maxLines="1"
+            android:text="Harsh, Adityassd &amp; 4 friends joined"
             android:textColor="@color/text_subtitle"/>
-
-        <!--<net.steamcrafted.materialiconlib.MaterialIconView-->
-        <!--android:id="@+id/mivFriends"-->
-        <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_marginLeft="16dp"-->
-        <!--android:layout_toRightOf="@id/llCategoryIconContainer"-->
-        <!--android:scaleType="center"-->
-        <!--app:materialIcon="account_star_variant"-->
-        <!--app:materialIconColor="@color/accent"-->
-        <!--app:materialIconSize="18dp"/>-->
-
-        <!--<TextView-->
-        <!--android:id="@+id/tvFriends"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_marginLeft="4dp"-->
-        <!--android:layout_toRightOf="@id/mivFriends"-->
-        <!--android:text="5"-->
-        <!--android:textColor="@color/_text_subtitle"/>-->
-
-        <!--<net.steamcrafted.materialiconlib.MaterialIconView-->
-        <!--android:id="@+id/mivAttendees"-->
-        <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_marginLeft="32dp"-->
-        <!--android:layout_toRightOf="@id/tvFriends"-->
-        <!--android:scaleType="center"-->
-        <!--app:materialIcon="account_multiple"-->
-        <!--app:materialIconColor="@color/accent"-->
-        <!--app:materialIconSize="18dp"/>-->
-
-        <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_marginLeft="4dp"-->
-        <!--android:layout_toRightOf="@id/mivAttendees"-->
-        <!--android:text="10"-->
-        <!--android:textColor="@color/_text_subtitle"/>-->
 
         <net.steamcrafted.materialiconlib.MaterialIconView
             android:id="@+id/mivRsvp"

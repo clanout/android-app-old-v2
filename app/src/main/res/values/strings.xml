@@ -169,4 +169,12 @@
     <string name="label_invited_not_going">Inform friends of your absence</string>
     <string name="label_status">Your clan status</string>
     <string name="label_status_last_moment">Last moment status</string>
+    <string name="title_day_selection">Pick Day</string>
+
+    <!-- Feedback Dialog -->
+    <string name="title_feedback_dialog">Feedback</string>
+    <string name="label_feedback_report">Report a bug</string>
+    <string name="label_feedback_feature">Suggest a new feature</string>
+    <string name="label_feedback_other">Other</string>
+    <string name="label_feedback_message">Comments</string>
 </resources>

@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -18,9 +19,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +32,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -352,7 +357,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
         Log.d("APP", "onPause");
 
-        bus.unregister(this);
         SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
     }
 
@@ -364,6 +368,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
         presenter.detachView();
         createEventPresenter.detachView();
+        bus.unregister(this);
     }
 
     /* Listeners */
@@ -590,8 +595,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
         final UserService userService = new UserService(bus);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.fetch_pending_invites_title);
-        builder.setMessage(R.string.fetch_pending_invites_message);
         builder.setCancelable(false);
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -601,9 +604,30 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
         final EditText phoneNumber = (EditText) dialogView
                 .findViewById(R.id.et_alert_dialog_add_phone);
-        TextView message = (TextView) dialogView
-                .findViewById(R.id.tv_alert_dialog_add_phone_message);
-        message.setVisibility(View.GONE);
+
+        final TextView tvInvalidPhoneError = (TextView) dialogView
+                .findViewById(R.id.tvInvalidPhoneError);
+
+        phoneNumber.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                tvInvalidPhoneError.setVisibility(View.INVISIBLE);
+            }
+        });
 
         builder.setPositiveButton(R.string.fetch_pending_invites_positive_button, new DialogInterface.OnClickListener()
         {
@@ -639,8 +663,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
                                                                                  .toString(), AppConstants.DEFAULT_COUNTRY_CODE);
                            if (parsedPhone == null)
                            {
-                               Snackbar.make(getView(), R.string.phone_invalid, Snackbar.LENGTH_LONG)
-                                       .show();
+                               tvInvalidPhoneError.setVisibility(View.VISIBLE);
                                wantToCloseDialog = false;
                            }
                            else
@@ -697,15 +720,23 @@ public class HomeFragment extends BaseFragment implements EventsView,
         View dialogView = layoutInflater.inflate(R.layout.dialog_day_picker, null);
         builder.setView(dialogView);
 
+        // retrieve display dimensions
+        Rect displayRectangle = new Rect();
+        Window window = getActivity().getWindow();
+        window.getDecorView().getWindowVisibleDisplayFrame(displayRectangle);
+
+        int width = (int) (displayRectangle.width() * 0.80f);
+
         final StringPicker stringPicker = (StringPicker) dialogView
                 .findViewById(R.id.dayPicker);
         stringPicker.setValues(dayList);
         stringPicker.setCurrent(selectedDay);
 
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
                 tvDay.setText(stringPicker.getCurrentValue());
                 selectedDay = stringPicker.getCurrent();
                 Timber.d("Selected Day = " + selectedDay);
@@ -713,14 +744,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
         AlertDialog alertDialog = builder.create();
+        alertDialog.getWindow().setLayout(width, LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
         alertDialog.show();
     }
 

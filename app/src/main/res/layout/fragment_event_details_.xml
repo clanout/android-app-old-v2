@@ -31,17 +31,6 @@
                 android:layout_height="36dp"
                 android:layout_gravity="center"/>
 
-            <!--<net.steamcrafted.materialiconlib.MaterialIconView-->
-            <!--android:id="@+id/mivCategory"-->
-            <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-            <!--android:layout_width="36dp"-->
-            <!--android:layout_height="36dp"-->
-            <!--android:layout_gravity="center"-->
-            <!--android:scaleType="center"-->
-            <!--app:materialIcon="martini"-->
-            <!--app:materialIconColor="@color/whity"-->
-            <!--app:materialIconSize="36dp"/>-->
-
         </LinearLayout>
 
         <TextView
@@ -50,7 +39,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:maxLines="1"
+            android:layout_marginRight="64dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:textColor="@color/text_title"
             android:textSize="24sp"/>
 
@@ -276,9 +267,9 @@
             android:layout_weight="1"
             android:background="@drawable/btn_event_actions"
             android:text="@string/label_btn_invite"
-            android:textStyle="bold"
             android:textAlignment="center"
-            android:textColor="@drawable/button_text_color"/>
+            android:textColor="@drawable/button_text_color"
+            android:textStyle="bold"/>
 
         <Button
             android:id="@+id/btnChat"
@@ -287,9 +278,9 @@
             android:layout_weight="1"
             android:background="@drawable/btn_event_actions"
             android:text="@string/label_btn_chat"
-            android:textStyle="bold"
             android:textAlignment="center"
-            android:textColor="@drawable/button_text_color"/>
+            android:textColor="@drawable/button_text_color"
+            android:textStyle="bold"/>
 
     </LinearLayout>
 

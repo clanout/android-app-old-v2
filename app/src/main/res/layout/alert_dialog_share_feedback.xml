@@ -1,52 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-   <RadioGroup
-       android:id="@+id/rg_share_feedback"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:layout_marginLeft="16dp"
-       android:layout_marginRight="16dp"
-       android:layout_marginTop="16dp"
-       android:layout_marginBottom="16dp"
-       android:checkedButton="@+id/rb_share_feedback_bug">
+    <TextView
+        style="@style/AlertDialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/title_feedback_dialog"/>
 
-       <RadioButton
-           android:id="@+id/rb_share_feedback_bug"
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:text="Report a bug"
-           android:textSize="14sp"
-           android:textColor="@color/text_title"/>
-
-       <RadioButton
-           android:id="@+id/rb_share_feedback_new_feature"
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:text="Suggest new feature"
-           android:textSize="14sp"
-           android:textColor="@color/text_title"/>
-
-       <RadioButton
-           android:id="@+id/rb_share_feedback_other"
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:text="Other"
-           android:textSize="14sp"
-           android:textColor="@color/text_title"/>
-
-   </RadioGroup>
-
-    <EditText
-        android:id="@+id/et_alert_dialog_share_feedback_comment"
+    <RadioGroup
+        android:id="@+id/rg_share_feedback"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:textSize="14sp"
-        android:textColor="@color/text_subtitle"/>
+        android:layout_marginTop="16dp"
+        android:checkedButton="@+id/rb_share_feedback_bug">
+
+        <RadioButton
+            android:id="@+id/rb_share_feedback_bug"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_feedback_report"
+            android:textColor="@color/text_title"/>
+
+        <RadioButton
+            android:id="@+id/rb_share_feedback_new_feature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_feedback_feature"
+            android:textColor="@color/text_title"/>
+
+        <RadioButton
+            android:id="@+id/rb_share_feedback_other"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_feedback_other"
+            android:textColor="@color/text_title"/>
+    </RadioGroup>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/tilFeedbackMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="@string/label_feedback_message">
+
+        <EditText
+            android:id="@+id/et_alert_dialog_share_feedback_comment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_subtitle"/>
+
+    </android.support.design.widget.TextInputLayout>
 
 </LinearLayout>

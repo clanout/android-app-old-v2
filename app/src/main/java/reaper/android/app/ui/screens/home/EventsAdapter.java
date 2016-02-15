@@ -94,14 +94,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         public void render(Event event)
         {
             // Title
-            if (event.getTitle().length() <= 20)
-            {
-                tvTitle.setText(event.getTitle());
-            }
-            else
-            {
-                tvTitle.setText(event.getTitle().substring(0, 18) + "...");
-            }
+            tvTitle.setText(event.getTitle());
 
             // Icon
             EventCategory category = EventCategory.valueOf(event.getCategory());

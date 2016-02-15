@@ -6,15 +6,13 @@
 
     <TextView
         android:id="@+id/tvTitle"
+        style="@style/AlertDialogTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:text="Pick Day"
-        android:textColor="@color/text_title"
-        android:textSize="18sp"
-        android:textStyle="bold"/>
+        android:text="@string/title_day_selection"/>
 
     <View
         android:id="@+id/divider"
@@ -30,6 +28,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/divider"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"/>
+        android:layout_margin="16dp"/>
 
 </RelativeLayout>

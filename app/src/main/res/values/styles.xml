@@ -16,7 +16,6 @@
         <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
 
         <item name="android:textColor">@color/text_title</item>
-        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="LinearProgress" parent="Widget.AppCompat.ProgressBar.Horizontal">
@@ -27,6 +26,16 @@
     <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="colorAccent">@color/accent</item>
         <item name="android:background">@color/white</item>
+    </style>
+
+    <style name="AlertDialogTitle">
+        <item name="android:textColor">@color/text_title</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="AlertDialogMessage">
+        <item name="android:textColor">@color/text_subtitle</item>
     </style>
 
 </resources>

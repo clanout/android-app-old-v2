@@ -1,48 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <TextView
-        android:id="@+id/tv_alert_dialog_add_phone_message"
+        style="@style/AlertDialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/fetch_pending_invites_title"/>
+
+    <TextView
+        style="@style/AlertDialogMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:gravity="center_horizontal"
-        android:text="@string/add_phone_title"
-        android:textColor="@color/text_title"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:textSize="18sp" />
+        android:text="@string/add_phone_title"/>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginLeft="48dp"
-        android:layout_marginRight="48dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="16dp"
         android:orientation="horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingLeft="8dp"
             android:text="+91"
-            android:textColor="@color/text_subtitle"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginRight="4dp"/>
+            android:textColor="@color/text_title"
+            android:textStyle="bold"/>
 
         <EditText
             android:id="@+id/et_alert_dialog_add_phone"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="14sp"
+            android:layout_gravity="center_vertical"
             android:inputType="phone"
-            android:textColor="@color/text_subtitle"/>
+            android:maxLength="10"
+            android:paddingLeft="40dp"
+            android:textColor="@color/text_title"/>
+    </FrameLayout>
 
-    </LinearLayout>
+    <TextView
+        android:id="@+id/tvInvalidPhoneError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:gravity="right"
+        android:text="@string/phone_invalid"
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="invisible"/>
 
 </LinearLayout>

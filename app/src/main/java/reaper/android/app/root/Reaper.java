@@ -3,14 +3,11 @@ package reaper.android.app.root;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 
 import com.facebook.FacebookSdk;
@@ -28,9 +25,7 @@ import com.squareup.otto.ThreadEnforcer;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import reaper.android.BuildConfig;
 import reaper.android.app.cache.core.CacheManager;
@@ -38,26 +33,30 @@ import reaper.android.app.cache.core.DatabaseManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.CacheKeys;
-import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
-import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.gcm.GcmregistrationIntentTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshRequestTrigger;
-import reaper.android.common.alarm.AlarmReceiver;
-import reaper.android.common.alarm.DeviceBootReceiver;
+import reaper.android.app.ui.activity.NoInternetActivity;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 import reaper.android.common.gcm.RegistrationIntentService;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 public class Reaper extends Application implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {
+    private boolean isConnected;
+
     private static Tracker tracker;
     private Bus bus;
     private GoogleApiClient googleApiClient;
@@ -82,7 +81,56 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         super.onCreate();
 
         init();
+        connectivityHandler();
         Stetho.initializeWithDefaults(this);
+    }
+
+    private void connectivityHandler()
+    {
+        isConnected = true;
+
+        Observable
+                .interval(5, TimeUnit.SECONDS)
+                .map(new Func1<Long, Boolean>()
+                {
+                    @Override
+                    public Boolean call(Long aLong)
+                    {
+                        ConnectivityManager cm = (ConnectivityManager) getApplicationContext()
+                                .getSystemService(Context.CONNECTIVITY_SERVICE);
+                        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+
+                        return (netInfo != null && netInfo.isConnected());
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Boolean>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                    }
+
+                    @Override
+                    public void onNext(Boolean isConnectedNow)
+                    {
+                        if (isConnected && !isConnectedNow)
+                        {
+                            startActivity(NoInternetActivity
+                                    .callingIntent(getApplicationContext()));
+                        }
+
+                        isConnected = isConnectedNow;
+                    }
+                });
+
     }
 
     protected void init()
@@ -119,11 +167,15 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         handleTimesApplicationOpened();
     }
 
-    private void handleTimesApplicationOpened() {
+    private void handleTimesApplicationOpened()
+    {
 
-        try {
-            timesApplicationOpened = Integer.parseInt(genericCache.get(CacheKeys.TIMES_APPLICATION_OPENED));
-        }catch (Exception e)
+        try
+        {
+            timesApplicationOpened = Integer
+                    .parseInt(genericCache.get(CacheKeys.TIMES_APPLICATION_OPENED));
+        }
+        catch (Exception e)
         {
             timesApplicationOpened = 0;
         }
@@ -132,7 +184,10 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
 
         genericCache.put(CacheKeys.TIMES_APPLICATION_OPENED, timesApplicationOpened);
 
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.APP_LAUNCHED, "user - " + userService.getActiveUserId() + " time - " + DateTime.now(DateTimeZone.UTC).toString());
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.APP_LAUNCHED, "user - " + userService
+                        .getActiveUserId() + " time - " + DateTime.now(DateTimeZone.UTC)
+                                                                  .toString());
     }
 
     @Subscribe
@@ -179,14 +234,18 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     @Override
     public void onConnectionSuspended(int i)
     {
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.GOOGLE_API_CLIENT_CONNECTION_SUSPENDED, userService.getActiveUserId());
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.GOOGLE_API_CLIENT_CONNECTION_SUSPENDED, userService
+                        .getActiveUserId());
         Log.d("reap3r", "Google API client suspended");
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult)
     {
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.GOOGLE_API_CLIENT_CONNECTION_FAILED, userService.getActiveUserId());
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.GOOGLE_API_CLIENT_CONNECTION_FAILED, userService
+                        .getActiveUserId());
         Timber.v("Has resolution : " + connectionResult.hasResolution());
     }
 
@@ -197,9 +256,10 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
 
     synchronized public static Tracker getAnalyticsTracker()
     {
-        if(tracker == null)
+        if (tracker == null)
         {
-            tracker = GoogleAnalytics.getInstance(instance).newTracker(AppConstants.GOOGLE_ANALYTICS_TRACKING_KEY);
+            tracker = GoogleAnalytics.getInstance(instance)
+                                     .newTracker(AppConstants.GOOGLE_ANALYTICS_TRACKING_KEY);
             tracker.enableExceptionReporting(true);
 
         }

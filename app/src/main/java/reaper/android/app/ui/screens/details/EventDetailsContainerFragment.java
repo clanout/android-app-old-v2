@@ -3,12 +3,15 @@ package reaper.android.app.ui.screens.details;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -280,10 +283,8 @@ public class EventDetailsContainerFragment extends BaseFragment
 
     private void displayShareFeedbackDialog()
     {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
-        builder.setTitle("Feedback");
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.alert_dialog_share_feedback, null);
@@ -298,12 +299,35 @@ public class EventDetailsContainerFragment extends BaseFragment
                 .findViewById(R.id.rb_share_feedback_other);
         final RadioGroup radioGroup = (RadioGroup) dialogView.findViewById(R.id.rg_share_feedback);
 
+        final TextInputLayout tilFeedbackMessage = (TextInputLayout) dialogView
+                .findViewById(R.id.tilFeedbackMessage);
+        commentMessage.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                tilFeedbackMessage.setError("");
+                tilFeedbackMessage.setErrorEnabled(false);
+            }
+        });
+
         builder.setPositiveButton("Submit", new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
             {
-
             }
         });
 
@@ -312,7 +336,6 @@ public class EventDetailsContainerFragment extends BaseFragment
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-
                 dialog.dismiss();
             }
         });
@@ -326,9 +349,7 @@ public class EventDetailsContainerFragment extends BaseFragment
                        @Override
                        public void onClick(View view)
                        {
-
                            int type = 0;
-
                            switch (radioGroup.getCheckedRadioButtonId())
                            {
                                case R.id.rb_share_feedback_bug:
@@ -347,8 +368,8 @@ public class EventDetailsContainerFragment extends BaseFragment
 
                            if (comment == null || comment.isEmpty())
                            {
-                               Snackbar.make(getView(), R.string.empty_rating, Snackbar.LENGTH_SHORT)
-                                    .show();
+                               tilFeedbackMessage.setError(getString(R.string.empty_rating));
+                               tilFeedbackMessage.setErrorEnabled(true);
                                wantToCloseDialog = false;
                            }
                            else
