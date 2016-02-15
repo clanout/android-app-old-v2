@@ -156,6 +156,14 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                             .getString(R.string.label_feed_multiple_friend_default,
                                     event.getFriendCount()));
                 }
+
+                String friendsGoingText = tvFriendsGoing.getText().toString();
+                if (friendsGoingText.length() > 30)
+                {
+                    tvFriendsGoing.setText(context
+                            .getString(R.string.label_feed_multiple_friend_default,
+                                    event.getFriendCount()));
+                }
             }
 
             // RSVP

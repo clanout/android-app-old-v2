@@ -78,7 +78,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="48dp"
             android:layout_toRightOf="@+id/llCategoryIconContainer"
-            android:ellipsize="marquee"
+            android:ellipsize="end"
             android:maxLines="1"
             android:text="Harsh, Adityassd &amp; 4 friends joined"
             android:textColor="@color/text_subtitle"/>
