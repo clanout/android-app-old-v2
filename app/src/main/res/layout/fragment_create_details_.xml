@@ -43,98 +43,42 @@
                 android:layout_height="wrap_content"
                 android:padding="16dp">
 
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/tilTitleContainer"
+                <FrameLayout
+                    android:id="@+id/flTitleContainer"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true">
+                    android:layout_height="wrap_content">
 
-                    <EditText
-                        android:id="@+id/etTitle"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tvTitleLimit"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="@string/label_title"
-                        android:maxLines="1"/>
-                </android.support.design.widget.TextInputLayout>
+                        android:layout_alignParentRight="true"
+                        android:layout_gravity="right|bottom"
+                        android:layout_margin="16dp"
+                        android:text="30"
+                        android:textColor="@color/text_subtitle"/>
 
-                <!--<LinearLayout-->
-                <!--android:id="@+id/llIconAndType"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_alignParentLeft="true"-->
-                <!--android:layout_below="@+id/tilTitleContainer"-->
-                <!--android:layout_marginTop="8dp"-->
-                <!--android:gravity="center_vertical"-->
-                <!--android:orientation="horizontal">-->
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/tilTitleContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
-                <!--<RelativeLayout-->
-                <!--android:id="@+id/llCategoryIconContainer"-->
-                <!--android:layout_width="72dp"-->
-                <!--android:layout_height="72dp"-->
-                <!--android:background="@color/category_icon_one">-->
-
-                <!--<ImageView-->
-                <!--android:id="@+id/ivCategoryIcon"-->
-                <!--android:layout_width="56dp"-->
-                <!--android:layout_height="56dp"-->
-                <!--android:layout_centerInParent="true"/>-->
-
-                <!--<LinearLayout-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:layout_alignParentBottom="true"-->
-                <!--android:background="@drawable/rect_grad"-->
-                <!--android:gravity="bottom"-->
-                <!--android:padding="4dp">-->
-
-                <!--<TextView-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:gravity="center"-->
-                <!--android:text="Change"-->
-                <!--android:textColor="@color/white"-->
-                <!--android:textSize="12sp"/>-->
-
-                <!--</LinearLayout>-->
-
-                <!--</RelativeLayout>-->
-
-                <!--<LinearLayout-->
-                <!--android:id="@+id/llTypeContainer"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginLeft="16dp"-->
-                <!--android:orientation="horizontal">-->
-
-                <!--<CheckBox-->
-                <!--android:id="@+id/cbType"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginLeft="-6dp"-->
-                <!--android:text="This is a secret plan"-->
-                <!--android:textColor="@color/text_subtitle"/>-->
-
-                <!--<net.steamcrafted.materialiconlib.MaterialIconView-->
-                <!--android:id="@+id/mivInfo"-->
-                <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginLeft="16dp"-->
-                <!--android:layout_marginTop="8dp"-->
-                <!--android:scaleType="center"-->
-                <!--app:materialIcon="information_outline"-->
-                <!--app:materialIconColor="@color/text_subtitle"-->
-                <!--app:materialIconSize="18dp"/>-->
-
-                <!--</LinearLayout>-->
-                <!--</LinearLayout>-->
+                        <EditText
+                            android:id="@+id/etTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/label_title"
+                            android:maxLength="30"
+                            android:maxLines="1"
+                            android:paddingRight="32dp"/>
+                    </android.support.design.widget.TextInputLayout>
+                </FrameLayout>
 
                 <RelativeLayout
                     android:id="@+id/llCategoryIconContainer"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:layout_below="@id/tilTitleContainer"
+                    android:layout_below="@id/flTitleContainer"
                     android:background="@color/category_icon_one">
 
                     <ImageView
@@ -167,7 +111,7 @@
                     android:id="@+id/llTypeContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tilTitleContainer"
+                    android:layout_below="@id/flTitleContainer"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
                     android:layout_toRightOf="@id/llCategoryIconContainer"
@@ -190,7 +134,7 @@
                         android:layout_marginTop="8dp"
                         android:scaleType="center"
                         app:materialIcon="information_outline"
-                        app:materialIconColor="@color/text_subtitle"
+                        app:materialIconColor="@color/dark_grey"
                         app:materialIconSize="18dp"/>
 
                 </LinearLayout>

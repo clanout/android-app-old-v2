@@ -114,6 +114,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
     MaterialIconView btnClose;
     EditText etTitle;
+    TextView tvTitleLimit;
     View llCategoryIconContainer;
     ImageView ivCategoryIcon;
     CheckBox cbType;
@@ -186,6 +187,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
         // Create
         btnClose = (MaterialIconView) view.findViewById(R.id.btnClose);
         etTitle = (EditText) view.findViewById(R.id.etTitle);
+        tvTitleLimit = (TextView) view.findViewById(R.id.tvTitleLimit);
         llCategoryIconContainer = view.findViewById(R.id.llCategoryIconContainer);
         ivCategoryIcon = (ImageView) view.findViewById(R.id.ivCategoryIcon);
         cbType = (CheckBox) view.findViewById(R.id.cbType);
@@ -296,12 +298,15 @@ public class HomeFragment extends BaseFragment implements EventsView,
             @Override
             public void onClick(View v)
             {
-                if (genericCache.get(CacheKeys.READ_CONTACT_PERMISSION_DENIED) == null) {
+                if (genericCache.get(CacheKeys.READ_CONTACT_PERMISSION_DENIED) == null)
+                {
 
                     Log.d("APP", "Generic cache contact permission null");
 
                     handleReadContactsPermission();
-                } else {
+                }
+                else
+                {
 
                     Log.d("APP", "Generic cache contact permission not null");
                     createEvent();
@@ -321,6 +326,30 @@ public class HomeFragment extends BaseFragment implements EventsView,
                                 cbType.isChecked(),
                                 dayList.get(selectedDay),
                                 startTime));
+            }
+        });
+
+        tvTitleLimit.setText(String.valueOf(AppConstants.TITLE_LENGTH_LIMIT));
+
+        etTitle.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                int remaining = AppConstants.TITLE_LENGTH_LIMIT - s.length();
+                tvTitleLimit.setText(String.valueOf(remaining));
             }
         });
     }
@@ -361,7 +390,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
     }
 
     @Override
-    public void onStop() {
+    public void onStop()
+    {
         super.onStop();
 
         Log.d("APP", "onStop");
@@ -460,16 +490,20 @@ public class HomeFragment extends BaseFragment implements EventsView,
         rvFeed.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvFeed.setAdapter(new EventsAdapter(getActivity(), new ArrayList<Event>(), this));
 
-        rvFeed.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        rvFeed.addOnScrollListener(new RecyclerView.OnScrollListener()
+        {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
+            {
 
             }
 
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
+            {
                 boolean enabled = false;
-                if (rvFeed.getChildCount() > 0) {
+                if (rvFeed.getChildCount() > 0)
+                {
                     LinearLayoutManager linearLayoutManager = (LinearLayoutManager) rvFeed
                             .getLayoutManager();
 
@@ -505,9 +539,11 @@ public class HomeFragment extends BaseFragment implements EventsView,
         notification.setIcon(notificationIcon);
 
         notification
-                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+                {
                     @Override
-                    public boolean onMenuItemClick(MenuItem item) {
+                    public boolean onMenuItemClick(MenuItem item)
+                    {
                         FragmentUtils
                                 .changeFragment(getFragmentManager(), new NotificationFragment());
                         return true;
@@ -523,9 +559,11 @@ public class HomeFragment extends BaseFragment implements EventsView,
                     .build());
 
         menu.findItem(R.id.action_account)
-            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+            {
                 @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
+                public boolean onMenuItemClick(MenuItem menuItem)
+                {
                     FragmentUtils.changeFragment(getFragmentManager(), new AccountsFragment());
                     return true;
                 }
@@ -555,9 +593,11 @@ public class HomeFragment extends BaseFragment implements EventsView,
     @Subscribe
     public void newNotificationReceived(NewNotificationReceivedTrigger trigger)
     {
-        getActivity().runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
                 notificationIcon = MaterialDrawableBuilder
                         .with(getActivity())
                         .setIcon(MaterialDrawableBuilder.IconValue.BELL)
@@ -566,7 +606,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
                         .setSizeDp(36)
                         .build();
 
-                if (notification != null) {
+                if (notification != null)
+                {
                     notification.setIcon(notificationIcon);
                 }
             }
@@ -961,19 +1002,24 @@ public class HomeFragment extends BaseFragment implements EventsView,
         FragmentUtils.changeFragment(getFragmentManager(), inviteUsersContainerFragment);
     }
 
-    private void handleReadContactsPermission() {
+    private void handleReadContactsPermission()
+    {
 
         Log.d("APP", "inside handle permission");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        {
 
             Log.d("APP", "inside handle permission -- Greater than M");
 
-            try {
+            try
+            {
 
-                Dexter.checkPermission(new PermissionListener() {
+                Dexter.checkPermission(new PermissionListener()
+                {
                     @Override
-                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse)
+                    {
 
                         Log.d("APP", "inside handle permission -- permission granted");
 
@@ -981,16 +1027,20 @@ public class HomeFragment extends BaseFragment implements EventsView,
                     }
 
                     @Override
-                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse)
+                    {
 
                         Log.d("APP", "inside handle permission -- permission denied");
 
-                        if (permissionDeniedResponse.isPermanentlyDenied()) {
+                        if (permissionDeniedResponse.isPermanentlyDenied())
+                        {
 
                             Log.d("APP", "inside handle permission -- permission permanently denied");
 
                             displayContactsPermissionRequiredDialogPermanentlyDeclinedCase();
-                        } else {
+                        }
+                        else
+                        {
 
                             Log.d("APP", "inside handle permission -- permission permanently not denied");
                             displayContactsPermissionRequiredDialog();
@@ -998,67 +1048,85 @@ public class HomeFragment extends BaseFragment implements EventsView,
                     }
 
                     @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken)
+                    {
 
                         permissionToken.continuePermissionRequest();
                     }
                 }, Manifest.permission.READ_CONTACTS);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 Log.d("APP", "inside handle Read contacts home fragment --- exception");
             }
-        } else {
+        }
+        else
+        {
 
             Log.d("APP", "inside handle permission -- less than M");
 
-          createEvent();
+            createEvent();
         }
     }
 
-    private void displayContactsPermissionRequiredDialog() {
+    private void displayContactsPermissionRequiredDialog()
+    {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(false);
         builder.setMessage(R.string.read_contacts_permission_required_message);
-        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
 
                 dialog.dismiss();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                {
+                    try
+                    {
 
                         Log.d("APP", "Marshmallow ---- 2");
 
-                        Dexter.checkPermission(new PermissionListener() {
+                        Dexter.checkPermission(new PermissionListener()
+                        {
                             @Override
-                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse)
+                            {
 
                                 Log.d("APP", "2 ---- permission granted");
 
-                               createEvent();
+                                createEvent();
                             }
 
                             @Override
-                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse)
+                            {
 
                                 Log.d("APP", "2 ---- permission denied");
 
                                 genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
 
-                               createEvent();
+                                createEvent();
                             }
 
                             @Override
-                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken)
+                            {
 
                                 permissionToken.continuePermissionRequest();
                             }
                         }, Manifest.permission.READ_CONTACTS);
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
 
                     }
-                } else {
+                }
+                else
+                {
 
-                  createEvent();
+                    createEvent();
                 }
             }
         });
@@ -1066,32 +1134,38 @@ public class HomeFragment extends BaseFragment implements EventsView,
         builder.create().show();
     }
 
-    private void displayContactsPermissionRequiredDialogPermanentlyDeclinedCase() {
+    private void displayContactsPermissionRequiredDialogPermanentlyDeclinedCase()
+    {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(false);
         builder.setMessage(R.string.read_contacts_permission_required_message);
-        builder.setPositiveButton("TAKE ME TO SETTINGS", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("TAKE ME TO SETTINGS", new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
 
                 dialog.dismiss();
                 goToSettings();
             }
         });
-        builder.setNegativeButton("EXIT", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("EXIT", new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
 
                 genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
 
-               createEvent();
+                createEvent();
             }
         });
 
         builder.create().show();
     }
 
-    private void goToSettings() {
+    private void goToSettings()
+    {
 
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);

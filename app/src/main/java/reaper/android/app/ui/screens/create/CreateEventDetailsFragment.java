@@ -57,6 +57,7 @@ import hotchemi.stringpicker.StringPicker;
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
@@ -95,6 +96,7 @@ public class CreateEventDetailsFragment extends BaseFragment
     ScrollView parent;
     Toolbar toolbar;
     EditText etTitle;
+    TextView tvTitleLimit;
     View llCategoryIconContainer;
     ImageView ivCategoryIcon;
     EditText etDesc;
@@ -162,6 +164,7 @@ public class CreateEventDetailsFragment extends BaseFragment
         parent = (ScrollView) view.findViewById(R.id.sv_createEvent);
         toolbar = (Toolbar) view.findViewById(R.id.tb_createEvent);
         etTitle = (EditText) view.findViewById(R.id.etTitle);
+        tvTitleLimit = (TextView) view.findViewById(R.id.tvTitleLimit);
         llCategoryIconContainer = view.findViewById(R.id.llCategoryIconContainer);
         ivCategoryIcon = (ImageView) view.findViewById(R.id.ivCategoryIcon);
         etDesc = (EditText) view.findViewById(R.id.etDesc);
@@ -195,34 +198,45 @@ public class CreateEventDetailsFragment extends BaseFragment
 
         CacheManager.getGenericCache().put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.CREATE);
 
-        etLocation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        etLocation.setOnFocusChangeListener(new View.OnFocusChangeListener()
+        {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
+            public void onFocusChange(View v, boolean hasFocus)
+            {
+                if (hasFocus)
+                {
                     parent.scrollTo(0, rvLocationSuggestions.getBottom());
                 }
             }
         });
 
-        etLocation.addTextChangedListener(new TextWatcher() {
+        etLocation.addTextChangedListener(new TextWatcher()
+        {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
 
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
 
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
+            public void afterTextChanged(Editable s)
+            {
                 parent.scrollTo(0, rvLocationSuggestions.getBottom());
 
-                if (!isLocationUpdating) {
-                    if (s.length() == 0) {
+                if (!isLocationUpdating)
+                {
+                    if (s.length() == 0)
+                    {
                         presenter.changeCategory(selectedCategory);
-                    } else if (s.length() >= 3) {
+                    }
+                    else if (s.length() >= 3)
+                    {
                         presenter.autocomplete(s.toString());
                     }
 
@@ -245,7 +259,8 @@ public class CreateEventDetailsFragment extends BaseFragment
     }
 
     @Override
-    public void onStop() {
+    public void onStop()
+    {
         super.onStop();
 
         presenter.detachView();
@@ -346,6 +361,30 @@ public class CreateEventDetailsFragment extends BaseFragment
             public void onClick(View v)
             {
                 displayCategoryChangeDialog();
+            }
+        });
+
+        tvTitleLimit.setText(String.valueOf(AppConstants.TITLE_LENGTH_LIMIT));
+
+        etTitle.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                int remaining = AppConstants.TITLE_LENGTH_LIMIT - s.length();
+                tvTitleLimit.setText(String.valueOf(remaining));
             }
         });
     }
@@ -503,9 +542,11 @@ public class CreateEventDetailsFragment extends BaseFragment
         stringPicker.setCurrent(selectedDay);
 
 
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
                 tvDay.setText(stringPicker.getCurrentValue());
                 selectedDay = stringPicker.getCurrent();
                 Timber.d("Selected Day = " + selectedDay);
@@ -513,9 +554,11 @@ public class CreateEventDetailsFragment extends BaseFragment
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
                 dialog.dismiss();
             }
         });
@@ -681,18 +724,23 @@ public class CreateEventDetailsFragment extends BaseFragment
         menu.findItem(R.id.action_create).setIcon(drawable);
 
         menu.findItem(R.id.action_create)
-            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+            {
                 @Override
-                public boolean onMenuItemClick(MenuItem item) {
+                public boolean onMenuItemClick(MenuItem item)
+                {
 
                     SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
 
-                    if (genericCache.get(CacheKeys.READ_CONTACT_PERMISSION_DENIED) == null) {
+                    if (genericCache.get(CacheKeys.READ_CONTACT_PERMISSION_DENIED) == null)
+                    {
 
                         Log.d("APP", "Generic cache contact permission null");
 
                         handleReadContactsPermission();
-                    } else {
+                    }
+                    else
+                    {
 
                         Log.d("APP", "Generic cache contact permission not null");
                         createEvent();
@@ -703,7 +751,8 @@ public class CreateEventDetailsFragment extends BaseFragment
             });
     }
 
-    private void createEvent() {
+    private void createEvent()
+    {
 
         String eventTitle = etTitle.getText().toString();
         String eventDescription = etDesc.getText().toString();
@@ -723,62 +772,83 @@ public class CreateEventDetailsFragment extends BaseFragment
 
     }
 
-    private void handleReadContactsPermission() {
+    private void handleReadContactsPermission()
+    {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        {
+            try
+            {
 
-                Dexter.checkPermission(new PermissionListener() {
+                Dexter.checkPermission(new PermissionListener()
+                {
                     @Override
-                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse)
+                    {
 
                         createEvent();
                     }
 
                     @Override
-                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse)
+                    {
 
-                        if (permissionDeniedResponse.isPermanentlyDenied()) {
+                        if (permissionDeniedResponse.isPermanentlyDenied())
+                        {
 
                             displayContactsPermissionRequiredDialogPermanentlyDeclinedCase();
-                        } else {
+                        }
+                        else
+                        {
 
                             displayContactsPermissionRequiredDialog();
                         }
                     }
 
                     @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken)
+                    {
 
                         permissionToken.continuePermissionRequest();
                     }
                 }, Manifest.permission.READ_CONTACTS);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 Log.d("APP", "inside handle Read contacts home fragment --- exception");
             }
-        } else {
+        }
+        else
+        {
 
             createEvent();
         }
     }
 
-    private void displayContactsPermissionRequiredDialog() {
+    private void displayContactsPermissionRequiredDialog()
+    {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(false);
         builder.setMessage(R.string.read_contacts_permission_required_message);
-        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
 
                 dialog.dismiss();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                {
+                    try
+                    {
 
                         Log.d("APP", "Marshmallow ---- 2");
 
-                        Dexter.checkPermission(new PermissionListener() {
+                        Dexter.checkPermission(new PermissionListener()
+                        {
                             @Override
-                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse)
+                            {
 
                                 Log.d("APP", "2 ---- permission granted");
 
@@ -786,7 +856,8 @@ public class CreateEventDetailsFragment extends BaseFragment
                             }
 
                             @Override
-                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse)
+                            {
 
                                 Log.d("APP", "2 ---- permission denied");
 
@@ -796,15 +867,20 @@ public class CreateEventDetailsFragment extends BaseFragment
                             }
 
                             @Override
-                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken)
+                            {
 
                                 permissionToken.continuePermissionRequest();
                             }
                         }, Manifest.permission.READ_CONTACTS);
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
 
                     }
-                } else {
+                }
+                else
+                {
 
                     createEvent();
                 }
@@ -814,21 +890,26 @@ public class CreateEventDetailsFragment extends BaseFragment
         builder.create().show();
     }
 
-    private void displayContactsPermissionRequiredDialogPermanentlyDeclinedCase() {
+    private void displayContactsPermissionRequiredDialogPermanentlyDeclinedCase()
+    {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(false);
         builder.setMessage(R.string.read_contacts_permission_required_message);
-        builder.setPositiveButton("TAKE ME TO SETTINGS", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("TAKE ME TO SETTINGS", new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
 
                 dialog.dismiss();
                 goToSettings();
             }
         });
-        builder.setNegativeButton("EXIT", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("EXIT", new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
 
                 genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
 
@@ -839,7 +920,8 @@ public class CreateEventDetailsFragment extends BaseFragment
         builder.create().show();
     }
 
-    private void goToSettings() {
+    private void goToSettings()
+    {
 
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);

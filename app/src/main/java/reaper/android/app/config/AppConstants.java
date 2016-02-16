@@ -23,4 +23,6 @@ public class AppConstants
 
     // App Link
     public static final String APP_LINK = "www.clanout.com"; // TODO -- change link
+
+    public static final int TITLE_LENGTH_LIMIT = 30;
 }
