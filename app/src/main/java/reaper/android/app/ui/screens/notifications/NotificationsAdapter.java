@@ -48,13 +48,13 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     private void generateDrawables() {
         chatDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE)
+                .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE_TEXT)
                 .setColor(ContextCompat.getColor(context, R.color.light_grey))
                 .setSizeDp(48)
                 .build();
 
         personDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_BOX)
                 .setColor(ContextCompat.getColor(context, R.color.light_grey))
                 .setSizeDp(48)
                 .build();
@@ -84,7 +84,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 .build();
 
         eventInvitationDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.EMAIL)
+                .setIcon(MaterialDrawableBuilder.IconValue.EMAIL_OPEN)
                 .setColor(ContextCompat.getColor(context, R.color.light_grey))
                 .setSizeDp(48)
                 .build();
@@ -96,7 +96,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 .build();
 
         statusDrawable = MaterialDrawableBuilder.with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE_TEXT)
+                .setIcon(MaterialDrawableBuilder.IconValue.COMMENT_PROCESSING)
                 .setColor(ContextCompat.getColor(context, R.color.light_grey))
                 .setSizeDp(48)
                 .build();
