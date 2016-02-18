@@ -68,6 +68,8 @@ public class LauncherActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.LAUNCHER_ACTIVITY);
+
         setContentView(R.layout.activity_launcher);
         ShimmerFrameLayout container =
                 (ShimmerFrameLayout) findViewById(R.id.shimmer_view_container);
@@ -96,7 +98,7 @@ public class LauncherActivity extends AppCompatActivity {
 
         bus.register(this);
 
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.LAUNCHER_ACTIVITY);
+
 
         proceed();
 

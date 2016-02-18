@@ -86,7 +86,10 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_THROUGH_SMS_FRAGMENT);
     }
 
     @Nullable
@@ -179,8 +182,6 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     @Override
     public void onResume() {
         super.onResume();
-
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_THROUGH_SMS_FRAGMENT);
 
         bus.register(this);
 

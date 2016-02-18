@@ -142,6 +142,8 @@ public class CreateEventDetailsFragment extends BaseFragment
     {
         super.onCreate(savedInstanceState);
 
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.CREATE_FRAGMENT);
+
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
         genericCache = CacheManager.getGenericCache();

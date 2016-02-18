@@ -77,6 +77,8 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.ACCOUNTS_FRAGMENT);
         setHasOptionsMenu(true);
     }
 
@@ -139,7 +141,6 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
     {
         super.onResume();
 
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.ACCOUNTS_FRAGMENT);
         ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_account);
 
         bus.register(this);

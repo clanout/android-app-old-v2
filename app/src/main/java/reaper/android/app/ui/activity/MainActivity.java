@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d("APP", "starting main activity " + System.currentTimeMillis());
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.MAIN_ACTIVITY);
 
         DateTime start = DateTime.now();
         DateTime end = start.plusDays(1).withTimeAtStartOfDay();
@@ -200,6 +200,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        Log.d("APP", "onStart M");
+
         if (!isBusRegistered) {
             bus.register(this);
         }
@@ -208,7 +210,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.MAIN_ACTIVITY);
+
+        Log.d("APP", "onResume M");
 
         notificationManager.cancelAll();
 
@@ -219,6 +222,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
+        Log.d("APP", "onPause M");
+
         genericCache.put(CacheKeys.IS_APP_IN_FOREGROUND, false);
 
         AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.APP_CLOSED, "user - " + userService.getActiveUserId() + " time - " + DateTime.now(DateTimeZone.UTC).toString());
@@ -227,6 +232,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+
+        Log.d("APP", "onStop M");
+
         bus.unregister(this);
         isBusRegistered = false;
     }
@@ -234,6 +242,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        Log.d("APP", "onDestroy M");
+
         ChatHelper.disconnectConnection();
     }
 

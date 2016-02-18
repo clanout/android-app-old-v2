@@ -148,7 +148,9 @@ public class HomeFragment extends BaseFragment implements EventsView,
     {
         super.onCreate(savedInstanceState);
 
-        Log.d("APP", "onCreate");
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.HOME_FRAGMENT);
+
+        Log.d("APP", "onCreate H");
 
         List<Event> events = new ArrayList<>();
 
@@ -171,7 +173,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
 
-        Log.d("APP", "onCreateView");
+        Log.d("APP", "onCreateView H");
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
@@ -206,7 +208,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
     {
         super.onActivityCreated(savedInstanceState);
 
-        Log.d("APP", "onActivityCreated");
+        Log.d("APP", "onActivityCreated H");
 
         loading.getIndeterminateDrawable().setColorFilter(ContextCompat
                 .getColor(getActivity(), R.color.accent), PorterDuff.Mode.SRC_IN);
@@ -359,10 +361,10 @@ public class HomeFragment extends BaseFragment implements EventsView,
     {
         super.onResume();
 
-        Log.d("APP", "onResume");
+        Log.d("APP", "onResume H");
 
         bus.register(this);
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.HOME_FRAGMENT);
+
         CacheManager.getGenericCache().put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.HOME);
 
         initView();
@@ -384,7 +386,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
     {
         super.onPause();
 
-        Log.d("APP", "onPause");
+        Log.d("APP", "onPause H");
 
         SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
     }
@@ -394,7 +396,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
     {
         super.onStop();
 
-        Log.d("APP", "onStop");
+        Log.d("APP", "onStop H");
 
         presenter.detachView();
         createEventPresenter.detachView();

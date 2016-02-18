@@ -130,6 +130,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
     {
         super.onCreate(savedInstanceState);
 
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EDIT_EVENT_FRAGMENT);
+
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
 
@@ -187,7 +189,6 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
         bus.register(this);
 
         CacheManager.getGenericCache().put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EDIT);
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EDIT_EVENT_FRAGMENT);
 
         etLocation.setOnFocusChangeListener(new View.OnFocusChangeListener()
         {

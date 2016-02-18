@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.Button;
 
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class NoInternetActivity extends AppCompatActivity
 {
@@ -27,6 +29,8 @@ public class NoInternetActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.NO_INTERNET_ACTIVITY);
         setContentView(R.layout.activity_no_internet);
 
         btnRetry = (Button) findViewById(R.id.btnRetry);

@@ -106,7 +106,10 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_FACEBOOK_FRIENDS_FRAGMENT);
     }
 
     @Nullable
@@ -246,8 +249,6 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
     @Override
     public void onResume() {
         super.onResume();
-
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_FACEBOOK_FRIENDS_FRAGMENT);
 
         bus.register(this);
         userService.getAppFriends(locationService.getUserLocation().getZone());

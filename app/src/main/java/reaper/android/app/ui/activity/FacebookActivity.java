@@ -89,6 +89,8 @@ public class FacebookActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
 
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.FACEBOOK_ACTIVITY);
+
         // TODO ---- disable development mode in facebook and enable public mode. Also, turn on deep linking if 'share to facebook' opton is required. Check proguard for facebook sdk.
 
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -193,7 +195,7 @@ public class FacebookActivity extends AppCompatActivity
     {
         super.onResume();
 
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.FACEBOOK_ACTIVITY);
+
 
         if (backFromSettingsPage)
         {

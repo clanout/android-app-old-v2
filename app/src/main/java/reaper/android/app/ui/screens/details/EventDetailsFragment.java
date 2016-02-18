@@ -147,6 +147,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EVENT_DETAILS_FRAGMENT);
         setHasOptionsMenu(true);
 
         int flag;

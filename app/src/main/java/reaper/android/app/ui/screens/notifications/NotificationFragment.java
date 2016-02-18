@@ -66,7 +66,10 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.NOTIFICATION_FRAGMENT);
     }
 
     @Nullable
@@ -130,7 +133,7 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
         super.onResume();
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.NOTIFICATIONS);
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.NOTIFICATION_FRAGMENT);
+
         ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_notification);
 
         bus.register(this);

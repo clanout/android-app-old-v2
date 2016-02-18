@@ -78,6 +78,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_USERS_CONTAINER_FRAGMENT);
     }
 
     @Nullable
@@ -194,7 +195,6 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
     public void onResume() {
         super.onResume();
 
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_USERS_CONTAINER_FRAGMENT);
         ((MainActivity) getActivity()).getSupportActionBar().setTitle("Invite Friends");
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.INVITE_USERS_CONTAINER);

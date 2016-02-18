@@ -78,7 +78,10 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.MANAGE_FRIENDS_FRAGMENT);
     }
 
     @Nullable
@@ -184,7 +187,6 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
     public void onResume() {
         super.onResume();
 
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.MANAGE_FRIENDS_FRAGMENT);
         ((MainActivity) getActivity()).getSupportActionBar().setTitle("Block a Friend");
 
         genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.MANAGE_FRIENDS);

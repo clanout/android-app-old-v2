@@ -112,6 +112,8 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.CHAT_FRAGMENT);
     }
 
     @Override
@@ -237,7 +239,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
 
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.CHAT_FRAGMENT);
         ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_chat);
 
         bus.register(this);
