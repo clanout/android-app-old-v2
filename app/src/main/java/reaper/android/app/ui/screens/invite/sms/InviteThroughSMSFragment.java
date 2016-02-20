@@ -1,6 +1,5 @@
 package reaper.android.app.ui.screens.invite.sms;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -22,7 +21,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -47,19 +45,20 @@ import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.PhoneContact;
 import reaper.android.app.model.PhoneContactComparator;
 import reaper.android.app.service.AccountsService;
-import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.AllPhoneContactsForSMSFetchedTrigger;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 /**
  * Created by harsh on 25/09/15.
  */
-public class InviteThroughSMSFragment extends BaseFragment implements View.OnClickListener {
+public class InviteThroughSMSFragment extends BaseFragment implements View.OnClickListener
+{
 
     private RecyclerView recyclerView;
     private TextView noContactsMessage, invitesLockedMessage, givePermission;
@@ -94,28 +93,36 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
         View view = inflater.inflate(R.layout.fragment_invite_through_sms, container, false);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_invite_through_sms);
         noContactsMessage = (TextView) view.findViewById(R.id.tv_invite_through_sms_no_users);
         givePermission = (TextView) view.findViewById(R.id.tvGivePermission);
-        invitesLockedMessage = (TextView) view.findViewById(R.id.tv_fragment_invte_through_sms_locked);
-        addPhone = (FloatingActionButton) view.findViewById(R.id.fib_fragment_invite_through_sms_add_phone);
-        inviteWhatsapp = (FloatingActionButton) view.findViewById(R.id.fib_fragment_invite_through_sms_invite_people_whatsapp);
-        lockedContent = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_through_sms_locked_content);
-        mainContent = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_through_sms_main_content);
+        invitesLockedMessage = (TextView) view
+                .findViewById(R.id.tv_fragment_invte_through_sms_locked);
+        addPhone = (FloatingActionButton) view
+                .findViewById(R.id.fib_fragment_invite_through_sms_add_phone);
+        inviteWhatsapp = (FloatingActionButton) view
+                .findViewById(R.id.fib_fragment_invite_through_sms_invite_people_whatsapp);
+        lockedContent = (LinearLayout) view
+                .findViewById(R.id.ll_fragment_invite_through_sms_locked_content);
+        mainContent = (LinearLayout) view
+                .findViewById(R.id.ll_fragment_invite_through_sms_main_content);
         loading = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_through_sms_loading);
         progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_invite_through_sms);
         search = (EditText) view.findViewById(R.id.et_fragment_invite_through_sms_search);
-        searchContainer = (LinearLayout) view.findViewById(R.id.ll_fragment_invite_through_sms_search);
+        searchContainer = (LinearLayout) view
+                .findViewById(R.id.ll_fragment_invite_through_sms_search);
         divider = view.findViewById(R.id.v_divider_invite_sms);
 
         return view;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    {
         super.onActivityCreated(savedInstanceState);
 
         bus = Communicator.getInstance().getBus();
@@ -133,34 +140,47 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
         visiblePhoneContactList = new ArrayList<>();
 
-        searchWatcher = new TextWatcher() {
+        searchWatcher = new TextWatcher()
+        {
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
 
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
 
-                if (s.length() >= 1) {
+                if (s.length() >= 1)
+                {
                     visiblePhoneContactList = new ArrayList<>();
-                    for (PhoneContact phoneContact : phoneContactList) {
-                        if (phoneContact.getName().toLowerCase().contains(s.toString().toLowerCase())) {
+                    for (PhoneContact phoneContact : phoneContactList)
+                    {
+                        if (phoneContact.getName().toLowerCase()
+                                        .contains(s.toString().toLowerCase()))
+                        {
                             visiblePhoneContactList.add(phoneContact);
                         }
                     }
 
-                    if (visiblePhoneContactList.size() == 0) {
+                    if (visiblePhoneContactList.size() == 0)
+                    {
                         displayNoSearchResultsView();
-                    } else {
+                    }
+                    else
+                    {
                         Collections.sort(phoneContactList, new PhoneContactComparator());
                         refreshRecyclerView();
                     }
-                } else if (s.length() == 0) {
+                }
+                else if (s.length() == 0)
+                {
                     visiblePhoneContactList = new ArrayList<>();
 
-                    for (PhoneContact phoneContact : phoneContactList) {
+                    for (PhoneContact phoneContact : phoneContactList)
+                    {
                         visiblePhoneContactList.add(phoneContact);
                     }
 
@@ -170,7 +190,8 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
+            public void afterTextChanged(Editable s)
+            {
 
             }
         };
@@ -180,8 +201,11 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     }
 
     @Override
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
+
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.INVITE_THROUGH_SMS_FRAGMENT);
 
         bus.register(this);
 
@@ -190,34 +214,38 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         userService.fetchAllPhoneContacts(getActivity().getContentResolver());
     }
 
-    private void generateDrawables() {
+    private void generateDrawables()
+    {
 
         whatsappDrawable = MaterialDrawableBuilder.with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.WHATSAPP)
-                .setColor(getResources().getColor(R.color.white))
-                .setSizeDp(36)
-                .build();
+                                                  .setIcon(MaterialDrawableBuilder.IconValue.WHATSAPP)
+                                                  .setColor(getResources().getColor(R.color.white))
+                                                  .setSizeDp(36)
+                                                  .build();
 
         phoneDrawable = MaterialDrawableBuilder.with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE_ANDROID)
-                .setColor(getResources().getColor(R.color.white))
-                .setSizeDp(36)
-                .build();
+                                               .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE_ANDROID)
+                                               .setColor(getResources().getColor(R.color.white))
+                                               .setSizeDp(36)
+                                               .build();
 
         addPhoneDrawable = MaterialDrawableBuilder.with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE)
-                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
-                .setSizeDp(36)
-                .build();
+                                                  .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE)
+                                                  .setColor(ContextCompat
+                                                          .getColor(getActivity(), R.color.white))
+                                                  .setSizeDp(36)
+                                                  .build();
     }
 
     @Override
-    public void onStop() {
+    public void onStop()
+    {
         super.onStop();
     }
 
     @Override
-    public void onPause() {
+    public void onPause()
+    {
         super.onPause();
 
         bus.unregister(this);
@@ -227,15 +255,18 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
+    public void setUserVisibleHint(boolean isVisibleToUser)
+    {
         super.setUserVisibleHint(isVisibleToUser);
 
-        if (isVisibleToUser) {
+        if (isVisibleToUser)
+        {
             setHasOptionsMenu(true);
         }
     }
 
-    private void displayInvitesLockedView() {
+    private void displayInvitesLockedView()
+    {
         mainContent.setVisibility(View.GONE);
         searchContainer.setVisibility(View.GONE);
         lockedContent.setVisibility(View.VISIBLE);
@@ -244,7 +275,8 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         loading.setVisibility(View.GONE);
     }
 
-    private void displayNoContactsView() {
+    private void displayNoContactsView()
+    {
         noContactsMessage.setText(R.string.no_local_phone_contacts);
         noContactsMessage.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.GONE);
@@ -257,7 +289,8 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         divider.setVisibility(View.VISIBLE);
     }
 
-    private void displayNoSearchResultsView() {
+    private void displayNoSearchResultsView()
+    {
         noContactsMessage.setText(R.string.no_search_results_phonebook);
         noContactsMessage.setVisibility(View.VISIBLE);
         givePermission.setVisibility(View.GONE);
@@ -270,7 +303,8 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         divider.setVisibility(View.VISIBLE);
     }
 
-    private void displayBasicView() {
+    private void displayBasicView()
+    {
         mainContent.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.VISIBLE);
         inviteWhatsapp.setVisibility(View.GONE);
@@ -282,9 +316,12 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         divider.setVisibility(View.VISIBLE);
     }
 
-    private void displayErrorView() {
+    private void displayErrorView()
+    {
 
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_LOAD_PHONEBOOK, userService.getActiveUserId());
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_LOAD_PHONEBOOK, userService
+                        .getActiveUserId());
 
         mainContent.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
@@ -298,7 +335,8 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         divider.setVisibility(View.GONE);
     }
 
-    private void displayLoadingView() {
+    private void displayLoadingView()
+    {
         mainContent.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
         inviteWhatsapp.setVisibility(View.GONE);
@@ -310,7 +348,8 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
         super.onCreateOptionsMenu(menu, inflater);
 
         menu.clear();
@@ -327,94 +366,68 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         menu.findItem(R.id.action_notifications).setVisible(false);
         menu.findItem(R.id.action_status).setVisible(false);
 
-        if(genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null)
+        if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null)
         {
             menu.findItem(R.id.action_add_phone).setVisible(true);
             menu.findItem(R.id.action_add_phone).setIcon(addPhoneDrawable);
-        }else{
+        }
+        else
+        {
             menu.findItem(R.id.action_add_phone).setVisible(false);
         }
 
-        menu.findItem(R.id.action_add_phone).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
+        menu.findItem(R.id.action_add_phone)
+            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+            {
+                @Override
+                public boolean onMenuItemClick(MenuItem item)
+                {
 
-                displayUpdatePhoneDialog();
+                    displayUpdatePhoneDialog();
 
-                return true;
-            }
-        });
+                    return true;
+                }
+            });
     }
 
 
     @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.fib_fragment_invite_through_sms_add_phone) {
+    public void onClick(View view)
+    {
+        if (view.getId() == R.id.fib_fragment_invite_through_sms_add_phone)
+        {
+            AnalyticsHelper
+                    .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.UPDATE_PHONE_CLICKED_INVITE_SMS_FRAGMENT, userService
+                            .getActiveUserId());
 
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.UPDATE_PHONE_CLICKED_INVITE_SMS_FRAGMENT, userService.getActiveUserId());
+            displayUpdatePhoneDialog();
+        }
+        else if (view.getId() == R.id.fib_fragment_invite_through_sms_invite_people_whatsapp)
+        {
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setCancelable(true);
+            AnalyticsHelper
+                    .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.WHATSAPP_INVITATION_INVITE_THROUGH_SMS_FRAGMENT, userService
+                            .getActiveUserId());
 
-            LayoutInflater inflater = getActivity().getLayoutInflater();
-            final View dialogView = inflater.inflate(R.layout.alert_dialog_add_phone, null);
-            builder.setView(dialogView);
-
-            final EditText phoneNumber = (EditText) dialogView.findViewById(R.id.et_alert_dialog_add_phone);
-
-            builder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-                }
-            });
-
-            final AlertDialog alertDialog = builder.create();
-            alertDialog.show();
-
-            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Boolean wantToCloseDialog = false;
-                    String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
-                    if (parsedPhone == null) {
-                        Snackbar.make(getView(), R.string.phone_invalid, Snackbar.LENGTH_LONG).show();
-                        wantToCloseDialog = false;
-                    } else {
-
-                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.UPDATED_PHONE_INVITE_SMS_FRAGMENT, userService.getActiveUserId());
-
-                        userService.updatePhoneNumber(parsedPhone);
-
-                        InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                        inputManager.hideSoftInputFromWindow(dialogView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-
-                        wantToCloseDialog = true;
-
-                    }
-
-                    if (wantToCloseDialog) {
-                        alertDialog.dismiss();
-                    }
-                }
-            });
-
-        } else if (view.getId() == R.id.fib_fragment_invite_through_sms_invite_people_whatsapp) {
-
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.WHATSAPP_INVITATION_INVITE_THROUGH_SMS_FRAGMENT, userService.getActiveUserId());
-
-            boolean isWhatsappInstalled = AccountsService.appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
-            if (isWhatsappInstalled) {
+            boolean isWhatsappInstalled = AccountsService
+                    .appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
+            if (isWhatsappInstalled)
+            {
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, userService.getActiveUserName() + AppConstants.WHATSAPP_INVITATION_MESSAGE + AppConstants.APP_LINK);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, userService
+                        .getActiveUserName() + AppConstants.WHATSAPP_INVITATION_MESSAGE + AppConstants.APP_LINK);
                 sendIntent.setType("text/plain");
                 sendIntent.setPackage("com.whatsapp");
                 startActivity(sendIntent);
-            } else {
-                Snackbar.make(getView(), R.string.whatsapp_not_installed, Snackbar.LENGTH_LONG).show();
             }
-        } else if(view.getId() == R.id.tvGivePermission)
+            else
+            {
+                Snackbar.make(getView(), R.string.whatsapp_not_installed, Snackbar.LENGTH_LONG)
+                        .show();
+            }
+        }
+        else if (view.getId() == R.id.tvGivePermission)
         {
 //            Dexter.checkPermission(new PermissionListener() {
 //                @Override
@@ -445,12 +458,14 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     }
 
     @Subscribe
-    public void onAllContactsForSMSFetched(AllPhoneContactsForSMSFetchedTrigger trigger) {
+    public void onAllContactsForSMSFetched(AllPhoneContactsForSMSFetchedTrigger trigger)
+    {
         phoneContactList = trigger.getPhoneContactList();
 
         visiblePhoneContactList = new ArrayList<>();
 
-        for (PhoneContact phoneContact : phoneContactList) {
+        for (PhoneContact phoneContact : phoneContactList)
+        {
             visiblePhoneContactList.add(phoneContact);
         }
 
@@ -459,14 +474,17 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     }
 
     @Subscribe
-    public void onAllContactsForSMSNotFetched(GenericErrorTrigger trigger) {
-        if (trigger.getErrorCode() == ErrorCode.PHONE_CONTACTS_FOR_SMS_FETCH_FAILURE) {
+    public void onAllContactsForSMSNotFetched(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.PHONE_CONTACTS_FOR_SMS_FETCH_FAILURE)
+        {
             displayErrorView();
         }
     }
 
 
-    private void initRecyclerView() {
+    private void initRecyclerView()
+    {
 
         inviteThroughSMSAdapter = new InviteThroughSMSAdapter(getActivity(), visiblePhoneContactList, bus);
         recyclerView.setAdapter(inviteThroughSMSAdapter);
@@ -474,19 +492,24 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
     }
 
-    private void refreshRecyclerView() {
+    private void refreshRecyclerView()
+    {
 
         inviteThroughSMSAdapter = new InviteThroughSMSAdapter(getActivity(), visiblePhoneContactList, bus);
         recyclerView.setAdapter(inviteThroughSMSAdapter);
 
-        if (visiblePhoneContactList.size() == 0) {
+        if (visiblePhoneContactList.size() == 0)
+        {
             displayNoContactsView();
-        } else {
+        }
+        else
+        {
             displayBasicView();
         }
     }
 
-    private void goToSettings() {
+    private void goToSettings()
+    {
 
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -495,7 +518,8 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         startActivity(intent);
     }
 
-    private void displayUpdatePhoneDialog() {
+    private void displayUpdatePhoneDialog()
+    {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
 
@@ -503,11 +527,38 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         final View dialogView = inflater.inflate(R.layout.alert_dialog_add_phone, null);
         builder.setView(dialogView);
 
-        final EditText phoneNumber = (EditText) dialogView.findViewById(R.id.et_alert_dialog_add_phone);
+        final EditText phoneNumber = (EditText) dialogView
+                .findViewById(R.id.etMobileNumber);
 
-        builder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+        final TextView tvInvalidPhoneError = (TextView) dialogView
+                .findViewById(R.id.tvInvalidPhoneError);
+
+        phoneNumber.addTextChangedListener(new TextWatcher()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                tvInvalidPhoneError.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        builder.setPositiveButton(R.string.add_phone_positive_button, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
 
             }
         });
@@ -515,35 +566,43 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         final AlertDialog alertDialog = builder.create();
         alertDialog.show();
 
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Boolean wantToCloseDialog = false;
-                String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText().toString(), AppConstants.DEFAULT_COUNTRY_CODE);
-                if (parsedPhone == null) {
-                    Snackbar.make(getView(), R.string.phone_invalid, Snackbar.LENGTH_LONG).show();
-                    wantToCloseDialog = false;
-                } else {
+        alertDialog
+                .getButton(AlertDialog.BUTTON_POSITIVE)
+                .setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        Boolean wantToCloseDialog = false;
+                        String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText()
+                                                                              .toString(), AppConstants.DEFAULT_COUNTRY_CODE);
+                        if (parsedPhone == null)
+                        {
+                            tvInvalidPhoneError.setVisibility(View.VISIBLE);
+                            wantToCloseDialog = false;
+                        }
+                        else
+                        {
+                            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK,
+                                    GoogleAnalyticsConstants.PHONE_NUMBER_UPDATED, userService
+                                            .getActiveUserId());
 
-                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.PHONE_NUMBER_UPDATED, userService.getActiveUserId());
+                            userService.updatePhoneNumber(parsedPhone);
 
-                    userService.updatePhoneNumber(parsedPhone);
+                            menu.findItem(R.id.action_add_phone).setVisible(false);
+                            displayLoadingView();
+                            userService.fetchAllPhoneContacts(getActivity().getContentResolver());
 
-                    menu.findItem(R.id.action_add_phone).setVisible(false);
-                    displayLoadingView();
-                    userService.fetchAllPhoneContacts(getActivity().getContentResolver());
+                            SoftKeyboardHandler.hideKeyboard(getActivity(), dialogView);
+                            wantToCloseDialog = true;
+                        }
 
-                    InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputManager.hideSoftInputFromWindow(dialogView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-
-                    wantToCloseDialog = true;
-                }
-
-                if (wantToCloseDialog) {
-                    alertDialog.dismiss();
-                }
-            }
-        });
+                        if (wantToCloseDialog)
+                        {
+                            alertDialog.dismiss();
+                        }
+                    }
+                });
 
     }
 }

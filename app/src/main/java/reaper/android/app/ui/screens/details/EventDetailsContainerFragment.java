@@ -4,22 +4,20 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -296,15 +294,10 @@ public class EventDetailsContainerFragment extends BaseFragment
 
         final EditText commentMessage = (EditText) dialogView
                 .findViewById(R.id.et_alert_dialog_share_feedback_comment);
-        RadioButton bug = (RadioButton) dialogView.findViewById(R.id.rb_share_feedback_bug);
-        RadioButton newFeature = (RadioButton) dialogView
-                .findViewById(R.id.rb_share_feedback_new_feature);
-        RadioButton suggestion = (RadioButton) dialogView
-                .findViewById(R.id.rb_share_feedback_other);
         final RadioGroup radioGroup = (RadioGroup) dialogView.findViewById(R.id.rg_share_feedback);
-
         final TextInputLayout tilFeedbackMessage = (TextInputLayout) dialogView
                 .findViewById(R.id.tilFeedbackMessage);
+
         commentMessage.addTextChangedListener(new TextWatcher()
         {
             @Override
@@ -327,7 +320,7 @@ public class EventDetailsContainerFragment extends BaseFragment
             }
         });
 
-        builder.setPositiveButton("Submit", new DialogInterface.OnClickListener()
+        builder.setPositiveButton(R.string.feedback_positive_button, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
@@ -335,7 +328,7 @@ public class EventDetailsContainerFragment extends BaseFragment
             }
         });
 
-        builder.setNegativeButton("REMIND LATER", new DialogInterface.OnClickListener()
+        builder.setNegativeButton(R.string.feedback_remind_button, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialog, int which)
@@ -370,9 +363,9 @@ public class EventDetailsContainerFragment extends BaseFragment
                            String comment = commentMessage.getText().toString();
                            Boolean wantToCloseDialog = false;
 
-                           if (comment == null || comment.isEmpty())
+                           if (TextUtils.isEmpty(comment))
                            {
-                               tilFeedbackMessage.setError(getString(R.string.empty_rating));
+                               tilFeedbackMessage.setError(getString(R.string.feedback_empty_comment));
                                tilFeedbackMessage.setErrorEnabled(true);
                                wantToCloseDialog = false;
                            }
@@ -386,9 +379,6 @@ public class EventDetailsContainerFragment extends BaseFragment
                                userService.shareFeedback(type, comment);
 
                                genericCache.put(CacheKeys.HAS_GIVEN_FEEDBACK, true);
-
-                               Snackbar.make(getView(), R.string.feedback_submitted, Snackbar.LENGTH_SHORT)
-                                    .show();
                                wantToCloseDialog = true;
                            }
 

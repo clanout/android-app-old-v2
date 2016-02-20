@@ -442,7 +442,6 @@ public class FacebookActivity extends AppCompatActivity
 
     private void displayLocationRequiredDialog()
     {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false);
         builder.setTitle(R.string.location_required_title);

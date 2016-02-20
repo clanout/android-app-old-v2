@@ -7,30 +7,17 @@
     android:padding="16dp">
 
     <TextView
+        android:id="@+id/tvTitle"
         style="@style/AlertDialogTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/status_dialog_title"/>
+        android:text="@string/add_phone_title"/>
 
     <TextView
         android:id="@+id/tvMessage"
         style="@style/AlertDialogMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/status_dialog_message"/>
-
-    <EditText
-        android:id="@+id/etStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:textColor="@color/text_title"/>
-
-    <ListView
-        android:id="@+id/lvStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"/>
-
+        android:text="@string/add_phone_message"/>
 </LinearLayout>

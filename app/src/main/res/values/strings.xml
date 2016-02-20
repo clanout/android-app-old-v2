@@ -31,33 +31,56 @@
     <string name="location_permission_negative_button">EXIT</string>
     <string name="location_denied"> Cautious? Once inside, make a secret clan with your friends. Later!</string>
 
-
+    <!-- Fetch Pending Invites Dialog -->
     <string name="fetch_pending_invites_title">Pending Invites</string>
-    <string name="fetch_pending_invites_message">To see pending invites, enter your mobile number</string>
-    <string name="fetch_pending_invites_positive_button">ENTER</string>
-    <string name="fetch_pending_invites_negative_button">CANCEL</string>
+    <string name="fetch_pending_invites_message">Enter number to enable invitations from friends who have your contact number</string>
+    <string name="fetch_pending_invites_positive_button">Enter</string>
+    <string name="fetch_pending_invites_negative_button">Cancel</string>
 
-    <!-- Dialog messages -->
-    <string name="event_delete_heading">Dismiss Clan</string>
+    <!-- Add Phone Dialog -->
+    <string name="add_phone_title">Update Mobile Number</string>
+    <string name="add_phone_message">Enter number to enable invitations from friends who have your contact number</string>
+    <string name="add_phone_positive_button">Update</string>
 
-    <string name="event_delete_message">This will delete all information related to this clan. And it will be removed from everyone\'s feed.</string>
-    <string name="even_delete_positive_button">DISMISS</string>
-    <string name="even_delete_negative_button">CANCEL</string>
+    <!-- Feedback Dialog -->
+    <string name="feedback_title">Feedback</string>
+    <string name="feedback_positive_button">Submit</string>
+    <string name="feedback_remind_button">Remind Later</string>
+    <string name="label_feedback_comment">Comment</string>
+    <string name="feedback_empty_comment">Please provide a comment</string>
+    <string name="label_feedback_report">Report a bug</string>
+    <string name="label_feedback_feature">Suggest a new feature</string>
+    <string name="label_feedback_other">Other</string>
 
-    <string name="event_lock_heading">Finalize details?</string>
-    <string name="event_lock_message">Your friends can no longer edit details</string>
-    <string name="event_lock_negative_button">NOT YET</string>
-    <string name="event_lock_positive_button">FINALIZE</string>
+    <!-- Status Dialog -->
+    <string name="status_dialog_title">Status</string>
+    <string name="status_dialog_message">Tell friends how you feel about this clan</string>
+    <string name="status_dialog_message_last_minute">Dude, where are you? Inform friends of your last minute status</string>
+    <string name="status_dialog_positive_button">OK</string>
 
-    <string name="event_unlock_heading">Allow changes?</string>
-    <string name="event_unlock_message">Your friends will be able to edit details now.</string>
-    <string name="event_unlock_positive_button">ALLOW</string>
-    <string name="event_unlock_negative_button">CANCEL</string>
-
-    <string name="refreshing_attendee_list">Updating</string>
-
+    <!-- Invitation Response Dialog -->
+    <string name="invitation_response_title">Not Going?</string>
+    <string name="invitation_response_message">Inform friends of your absence by leaving a message</string>
+    <string name="invitation_response_positive_button">OK</string>
     <string name="invitation_response_sent">Your friends will be notified</string>
-    <string name="invitation_response_title">Inform friends of your absence by leaving a message</string>
+
+    <!-- Event Unlock Dialog -->
+    <string name="event_unlock_title">Allow changes?</string>
+    <string name="event_unlock_message">Your friends will be able to edit details now.</string>
+    <string name="event_unlock_positive_button">Allow</string>
+    <string name="event_unlock_negative_button">Cancel</string>
+
+    <!-- Event Lock Dialog -->
+    <string name="event_lock_title">Finalize details?</string>
+    <string name="event_lock_message">Your friends can no longer edit details</string>
+    <string name="event_lock_negative_button">Not Yet</string>
+    <string name="event_lock_positive_button">Finalize</string>
+
+    <!-- Event Delete Dialog -->
+    <string name="event_delete_title">Dismiss Clan</string>
+    <string name="event_delete_message">This will delete all information related to this clan. And it will be removed from everyone\'s feed.</string>
+    <string name="event_delete_positive_button">Dismiss</string>
+    <string name="event_delete_negative_button">Cancel</string>
 
     <!-- RSVP -->
     <string name="rsvp_yes">YAY</string>
@@ -106,9 +129,6 @@
 
     <string name="whatsapp_not_installed"> Whatsapp is not installed on this device </string>
 
-    <string name="empty_rating"> Show some love </string>
-    <string name="feedback_submitted"> Thanks </string>
-
     <string name="chat_messages_not_fetched"> Unable to load conversations. Refresh </string>
     <string name="chat_message_not_sent"> Unable to send message. Resend </string>
 
@@ -128,8 +148,6 @@
     <string name="event_not_found">Unable to locate this clan</string>
 
     <string name="default_event_status"></string>
-    <string name="event_status_dialog_title">Dude, where are you? Inform friends of your last minute status</string>
-    <string name="event_status_dialog_title_alternate">Your clan status</string>
 
     <string name="reminder_notification_message">1 hour to go. Giddy up!</string>
 
@@ -155,7 +173,6 @@
     <string name="read_contacts_permission_required_message">You\'ll not be able to invite friends from your phonebook to your plans. We do not store your phonebook information.</string>
     <string name="open_type_definition">Everyone can see your plan. You can still send personal invites.</string>
     <string name="secret_type_definition">Only people you have invited can see your plan</string>
-    <string name="add_phone_title">Enter number to enable invitations from friends who have your contact number</string>
     <string name="invite_app_friends_title">All your %s friends present on Clanout</string>
     <string name="invite_phonebook_title">A free SMS will be sent for the invite</string>
     <string name="friends_invited_message">Invitations Sent</string>
@@ -170,11 +187,4 @@
     <string name="label_status">Your clan status</string>
     <string name="label_status_last_moment">Last moment status</string>
     <string name="title_day_selection">Pick Day</string>
-
-    <!-- Feedback Dialog -->
-    <string name="title_feedback_dialog">Feedback</string>
-    <string name="label_feedback_report">Report a bug</string>
-    <string name="label_feedback_feature">Suggest a new feature</string>
-    <string name="label_feedback_other">Other</string>
-    <string name="label_feedback_message">Comments</string>
 </resources>

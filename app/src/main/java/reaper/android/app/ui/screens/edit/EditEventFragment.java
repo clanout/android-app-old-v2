@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -22,6 +24,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -289,16 +292,15 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                dialog.dismiss();
-            }
-        });
-
         AlertDialog alertDialog = builder.create();
+
+        /* Set Width */
+        Rect displayRectangle = new Rect();
+        Window window = getActivity().getWindow();
+        window.getDecorView().getWindowVisibleDisplayFrame(displayRectangle);
+        int width = (int) (displayRectangle.width() * 0.80f);
+        alertDialog.getWindow().setLayout(width, LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
+
         alertDialog.show();
     }
 
@@ -621,8 +623,16 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
                 {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setCancelable(true);
-                    builder.setTitle(R.string.event_unlock_heading);
-                    builder.setMessage(R.string.event_unlock_message);
+
+                    LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+                    View dialogView = layoutInflater.inflate(R.layout.alert_dialog_default, null);
+                    builder.setView(dialogView);
+
+                    TextView tvTitle = (TextView) dialogView.findViewById(R.id.tvTitle);
+                    TextView tvMessage = (TextView) dialogView.findViewById(R.id.tvMessage);
+
+                    tvTitle.setText(R.string.event_unlock_title);
+                    tvMessage.setText(R.string.event_unlock_message);
 
                     builder.setPositiveButton(R.string.event_unlock_positive_button, new DialogInterface.OnClickListener()
                     {
@@ -654,8 +664,16 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
                 {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setCancelable(true);
-                    builder.setTitle(R.string.event_lock_heading);
-                    builder.setMessage(R.string.event_lock_message);
+
+                    LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+                    View dialogView = layoutInflater.inflate(R.layout.alert_dialog_default, null);
+                    builder.setView(dialogView);
+
+                    TextView tvTitle = (TextView) dialogView.findViewById(R.id.tvTitle);
+                    TextView tvMessage = (TextView) dialogView.findViewById(R.id.tvMessage);
+
+                    tvTitle.setText(R.string.event_lock_title);
+                    tvMessage.setText(R.string.event_lock_message);
 
                     builder.setPositiveButton(R.string.event_lock_positive_button, new DialogInterface.OnClickListener()
                     {
@@ -696,10 +714,18 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setCancelable(true);
-                builder.setTitle(R.string.event_delete_heading);
-                builder.setMessage(R.string.event_delete_message);
 
-                builder.setPositiveButton(R.string.even_delete_positive_button, new DialogInterface.OnClickListener()
+                LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+                View dialogView = layoutInflater.inflate(R.layout.alert_dialog_default, null);
+                builder.setView(dialogView);
+
+                TextView tvTitle = (TextView) dialogView.findViewById(R.id.tvTitle);
+                TextView tvMessage = (TextView) dialogView.findViewById(R.id.tvMessage);
+
+                tvTitle.setText(R.string.event_delete_title);
+                tvMessage.setText(R.string.event_delete_message);
+
+                builder.setPositiveButton(R.string.event_delete_positive_button, new DialogInterface.OnClickListener()
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int which)
@@ -712,7 +738,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
                     }
                 });
 
-                builder.setNegativeButton(R.string.even_delete_negative_button, new DialogInterface.OnClickListener()
+                builder.setNegativeButton(R.string.event_delete_negative_button, new DialogInterface.OnClickListener()
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int which)

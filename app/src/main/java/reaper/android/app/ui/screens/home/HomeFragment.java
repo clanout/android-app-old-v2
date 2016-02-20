@@ -389,6 +389,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
         Log.d("APP", "onPause H");
 
         SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+        bus.unregister(this);
     }
 
     @Override
@@ -400,7 +401,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
         presenter.detachView();
         createEventPresenter.detachView();
-        bus.unregister(this);
     }
 
     /* Listeners */
@@ -642,11 +642,11 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
         @SuppressLint("InflateParams") final View dialogView = inflater
-                .inflate(R.layout.alert_dialog_add_phone, null);
+                .inflate(R.layout.alert_dialog_fetch_pending_invites, null);
         builder.setView(dialogView);
 
         final EditText phoneNumber = (EditText) dialogView
-                .findViewById(R.id.et_alert_dialog_add_phone);
+                .findViewById(R.id.etMobileNumber);
 
         final TextView tvInvalidPhoneError = (TextView) dialogView
                 .findViewById(R.id.tvInvalidPhoneError);
@@ -677,7 +677,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-
             }
         });
 
@@ -724,7 +723,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
                            if (wantToCloseDialog)
                            {
                                alertDialog.dismiss();
-
                                showLoading();
                            }
                        }
@@ -763,13 +761,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
         View dialogView = layoutInflater.inflate(R.layout.dialog_day_picker, null);
         builder.setView(dialogView);
 
-        // retrieve display dimensions
-        Rect displayRectangle = new Rect();
-        Window window = getActivity().getWindow();
-        window.getDecorView().getWindowVisibleDisplayFrame(displayRectangle);
-
-        int width = (int) (displayRectangle.width() * 0.80f);
-
         final StringPicker stringPicker = (StringPicker) dialogView
                 .findViewById(R.id.dayPicker);
         stringPicker.setValues(dayList);
@@ -788,7 +779,14 @@ public class HomeFragment extends BaseFragment implements EventsView,
         });
 
         AlertDialog alertDialog = builder.create();
+
+        /* Set Width */
+        Rect displayRectangle = new Rect();
+        Window window = getActivity().getWindow();
+        window.getDecorView().getWindowVisibleDisplayFrame(displayRectangle);
+        int width = (int) (displayRectangle.width() * 0.80f);
         alertDialog.getWindow().setLayout(width, LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
+
         alertDialog.show();
     }
 

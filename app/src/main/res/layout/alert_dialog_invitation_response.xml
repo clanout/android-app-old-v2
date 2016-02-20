@@ -7,34 +7,33 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/tv_alert_dialog_invitation_response_title"
+        android:id="@+id/tvTitle"
         style="@style/AlertDialogTitle"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Not Going?"/>
+        android:text="@string/invitation_response_title"/>
 
     <TextView
         android:id="@+id/tvMessage"
         style="@style/AlertDialogMessage"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_alert_dialog_invitation_response_title"
+        android:layout_below="@id/tvTitle"
         android:layout_marginTop="16dp"
-        android:text="@string/invitation_response_title"/>
+        android:text="@string/invitation_response_message"/>
 
     <EditText
-        android:id="@+id/et_alert_dialog_invitation_response_message"
+        android:id="@+id/etInvitationResponse"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvMessage"
-        android:layout_marginTop="16dp"
-        android:textColor="@color/text_subtitle"/>
+        android:layout_marginTop="16dp"/>
 
     <ListView
-        android:id="@+id/lv_alert_dialog_invitation_response"
+        android:id="@+id/lvInvitationResponse"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/et_alert_dialog_invitation_response_message"
+        android:layout_below="@+id/etInvitationResponse"
         android:layout_marginTop="16dp"/>
 
 </RelativeLayout>

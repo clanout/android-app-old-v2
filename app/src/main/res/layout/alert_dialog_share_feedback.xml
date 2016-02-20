@@ -10,7 +10,7 @@
         style="@style/AlertDialogTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/title_feedback_dialog"/>
+        android:text="@string/feedback_title"/>
 
     <RadioGroup
         android:id="@+id/rg_share_feedback"
@@ -23,22 +23,19 @@
             android:id="@+id/rb_share_feedback_bug"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/label_feedback_report"
-            android:textColor="@color/text_title"/>
+            android:text="@string/label_feedback_report"/>
 
         <RadioButton
             android:id="@+id/rb_share_feedback_new_feature"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/label_feedback_feature"
-            android:textColor="@color/text_title"/>
+            android:text="@string/label_feedback_feature"/>
 
         <RadioButton
             android:id="@+id/rb_share_feedback_other"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/label_feedback_other"
-            android:textColor="@color/text_title"/>
+            android:text="@string/label_feedback_other"/>
     </RadioGroup>
 
     <android.support.design.widget.TextInputLayout
@@ -46,13 +43,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="@string/label_feedback_message">
+        android:hint="@string/label_feedback_comment">
 
         <EditText
             android:id="@+id/et_alert_dialog_share_feedback_comment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_subtitle"/>
+            android:layout_height="wrap_content"/>
 
     </android.support.design.widget.TextInputLayout>
 

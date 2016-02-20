@@ -32,6 +32,7 @@
 
     <!-- Fonts -->
     <color name="text_title">#AA000000</color>
+    <color name="text_default">#AA222222</color>
     <color name="text_subtitle">#AA777777</color>
 
     <!-- Category Icons -->

@@ -1,28 +1,29 @@
 package reaper.android.app.ui.screens.accounts;
 
 import android.app.FragmentManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -49,6 +50,7 @@ import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
@@ -260,7 +262,6 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         }
         else if (position == 3)
         {
-
             AnalyticsHelper
                     .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.SHARE_FEEDBACK_CLICKED, userService
                             .getActiveUserId());
@@ -274,15 +275,34 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
 
             final EditText commentMessage = (EditText) dialogView
                     .findViewById(R.id.et_alert_dialog_share_feedback_comment);
-            RadioButton bug = (RadioButton) dialogView.findViewById(R.id.rb_share_feedback_bug);
-            RadioButton newFeature = (RadioButton) dialogView
-                    .findViewById(R.id.rb_share_feedback_new_feature);
-            RadioButton suggestion = (RadioButton) dialogView
-                    .findViewById(R.id.rb_share_feedback_other);
             final RadioGroup radioGroup = (RadioGroup) dialogView
                     .findViewById(R.id.rg_share_feedback);
+            final TextInputLayout tilFeedbackMessage = (TextInputLayout) dialogView
+                    .findViewById(R.id.tilFeedbackMessage);
 
-            builder.setPositiveButton("Submit", new DialogInterface.OnClickListener()
+            commentMessage.addTextChangedListener(new TextWatcher()
+            {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after)
+                {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count)
+                {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s)
+                {
+                    tilFeedbackMessage.setError("");
+                    tilFeedbackMessage.setErrorEnabled(false);
+                }
+            });
+
+            builder.setPositiveButton(R.string.feedback_positive_button, new DialogInterface.OnClickListener()
             {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i)
@@ -302,7 +322,6 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                            {
 
                                int type = 0;
-
                                switch (radioGroup.getCheckedRadioButtonId())
                                {
                                    case R.id.rb_share_feedback_bug:
@@ -319,22 +338,19 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                                String comment = commentMessage.getText().toString();
                                Boolean wantToCloseDialog = false;
 
-                               if (comment == null || comment.isEmpty())
+                               if (TextUtils.isEmpty(comment))
                                {
-                                   Snackbar.make(getView(), R.string.empty_rating, Snackbar.LENGTH_SHORT)
-                                           .show();
+                                   tilFeedbackMessage.setError(getString(R.string.feedback_empty_comment));
+                                   tilFeedbackMessage.setErrorEnabled(true);
                                    wantToCloseDialog = false;
                                }
                                else
                                {
-
                                    AnalyticsHelper
                                            .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.FEEDBACK_SHARED, userService
                                                    .getActiveUserId());
 
                                    userService.shareFeedback(type, comment);
-                                   Snackbar.make(getView(), R.string.feedback_submitted, Snackbar.LENGTH_SHORT)
-                                           .show();
                                    wantToCloseDialog = true;
                                }
 
@@ -347,7 +363,6 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         }
         else if (position == 4)
         {
-
             AnalyticsHelper
                     .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.FAQ_CLICKED_ACCOUNTS_FRAGMENT, userService
                             .getActiveUserId());
@@ -364,9 +379,33 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         builder.setView(dialogView);
 
         final EditText phoneNumber = (EditText) dialogView
-                .findViewById(R.id.et_alert_dialog_add_phone);
+                .findViewById(R.id.etMobileNumber);
 
-        builder.setPositiveButton("Done", new DialogInterface.OnClickListener()
+        final TextView tvInvalidPhoneError = (TextView) dialogView
+                .findViewById(R.id.tvInvalidPhoneError);
+
+        phoneNumber.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                tvInvalidPhoneError.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        builder.setPositiveButton(R.string.add_phone_positive_button, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialog, int which)
@@ -389,24 +428,17 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                                                                                  .toString(), AppConstants.DEFAULT_COUNTRY_CODE);
                            if (parsedPhone == null)
                            {
-                               Snackbar.make(getView(), R.string.phone_invalid, Snackbar.LENGTH_LONG)
-                                       .show();
+                               tvInvalidPhoneError.setVisibility(View.VISIBLE);
                                wantToCloseDialog = false;
                            }
                            else
                            {
-
                                AnalyticsHelper
                                        .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.PHONE_NUMBER_UPDATED, userService
                                                .getActiveUserId());
 
                                userService.updatePhoneNumber(parsedPhone);
-
-
-                               InputMethodManager inputManager = (InputMethodManager) getActivity()
-                                       .getSystemService(Context.INPUT_METHOD_SERVICE);
-                               inputManager.hideSoftInputFromWindow(dialogView
-                                       .getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                               SoftKeyboardHandler.hideKeyboard(getActivity(), dialogView);
 
                                wantToCloseDialog = true;
                            }
