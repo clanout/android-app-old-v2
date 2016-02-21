@@ -3,7 +3,25 @@ package reaper.android.app.config;
 /**
  * Created by Aditya on 16-09-2015.
  */
-public class GoogleAnalyticsConstants {
+public class GoogleAnalyticsConstants
+{
+    /* Category */
+    public static final String CATEGORY_LOGIN = "login";
+    public static final String CATEGORY_HOME = "home";
+    public static final String CATEGORY_CREATE = "create";
+    public static final String CATEGORY_CREATE_DETAIL = "create_details";
+    public static final String CATEGORY_INVITE = "invite";
+    public static final String CATEGORY_DETAILS = "details";
+    public static final String CATEGORY_EDIT = "edit";
+    public static final String CATEGORY_ACCOUNT = "account";
+    public static final String CATEGORY_NOTIFICATION = "notification";
+
+    public static final String CATEGORY_BACKGROUND = "background";
+    public static final String CATEGORY_ERROR = "error";
+
+    /* Actions */
+    public static final String ACTION_OPEN = "open";
+
     // Screen Names
     public static final String MAIN_ACTIVITY = "MAIN_ACTIVITY";
     public static final String FACEBOOK_ACTIVITY = "FACEBOOK_ACTIVITY";
@@ -123,8 +141,6 @@ public class GoogleAnalyticsConstants {
     public static final String ON_CANCEL_FACEBOOK_CALLBACK = "on_cancel_facebook_callback";
     public static final String FACEBOOK_FRIENDS_NOT_FETCHED = "facebook_friends_not_fetched";
     public static final String FACEBOOK_PROFILE_NOT_FETCHED = "facebook_profile_not_fetched";
-
-
 
 
 }

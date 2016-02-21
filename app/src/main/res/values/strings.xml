@@ -24,12 +24,34 @@
     <string name="title_notification">Notifications</string>
     <string name="title_chat">Clan Chat</string>
 
-    <!-- Location -->
+    <!-- Play Services Error Dialog -->
+    <string name="play_services_error_dialog_title">Google Play Services Error</string>
+    <string name="play_services_error_dialog_message">Google Play Services is not available
+        on this device. Try updating Play Services and open the app again.</string>
+    <string name="play_services_error_dialog_negative_button">Close App</string>
+
+    <!-- Facebook Permissions Dialog -->
+    <string name="facebook_permission_dialog_title">Request for permission</string>
+    <string name="facebook_permission_dialog_message">Allow access to your basic profile information, email and friend list. This is required to connect you with your facebook friends on Clanout</string>
+    <string name="facebook_permission_dialog_positive_button">Allow</string>
+    <string name="facebook_permission_dialog_negative_button">Close App</string>
+
+    <!-- Location Permission Dialog -->
+    <string name="location_permission_title">Turn on GPS</string>
+    <string name="location_permission_message">Cautious? Once inside, make a secret clan.
+        Your location helps us connect you with your nearby friends.</string>
+    <string name="location_permission_positive_button">Go To Settings</string>
+    <string name="location_permission_negative_button">Close App</string>
+
+    <!-- TODO: To be removed -->
     <string name="location_permission_heading">Turn on GPS</string>
-    <string name="location_permission_message">Your location helps us connect you with your nearby friends</string>
-    <string name="location_permission_positive_button">YES</string>
-    <string name="location_permission_negative_button">EXIT</string>
+    <!--<string name="location_permission_message">Your location helps us connect you with your nearby friends</string>-->
+    <!--<string name="location_permission_positive_button">YES</string>-->
+    <!--<string name="location_permission_negative_button">EXIT</string>-->
     <string name="location_denied"> Cautious? Once inside, make a secret clan with your friends. Later!</string>
+    <!-- to be removed -->
+
+
 
     <!-- Fetch Pending Invites Dialog -->
     <string name="fetch_pending_invites_title">Pending Invites</string>

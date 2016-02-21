@@ -3,7 +3,6 @@ package reaper.android.common.analytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
-import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.root.Reaper;
 
 /**
@@ -32,7 +31,17 @@ public class AnalyticsHelper
                 .build());
     }
 
-    public static void  sendCaughtExceptions(String exceptionMethod, String exceptionLocation, boolean isFatal)
+    public static void sendEvents(String category, String action, String label, long value)
+    {
+        googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
+                .setCategory(category)
+                .setAction(action)
+                .setLabel(label)
+                .setValue(value)
+                .build());
+    }
+
+    public static void sendCaughtExceptions(String exceptionMethod, String exceptionLocation, boolean isFatal)
     {
         googleAnalyticsTracker.send(new HitBuilders.ExceptionBuilder()
                 .setDescription(exceptionMethod + ":" + exceptionLocation)
