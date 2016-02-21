@@ -36,7 +36,7 @@ import reaper.android.app.trigger.notifications.NewNotificationReceivedTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationsAvailableTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationsNotAvailableTrigger;
 import reaper.android.app.trigger.notifications.NotificationsFetchedTrigger;
-import reaper.android.app.ui.activity.LauncherActivity;
+import reaper.android.app.ui.screens.launch.LauncherActivity;
 import reaper.android.common.notification.Notification;
 import rx.Observable;
 import rx.Subscriber;
@@ -689,7 +689,7 @@ public class NotificationService {
 
                         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(Reaper.getReaperContext())
-                                .setSmallIcon(R.mipmap.logo_red)
+                                .setSmallIcon(R.mipmap.app_icon)
                                 .setAutoCancel(true)
                                 .setSound(defaultSoundUri)
                                 .setContentIntent(pendingIntent);

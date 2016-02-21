@@ -3,103 +3,120 @@ package reaper.android.app.service;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.squareup.otto.Bus;
+import com.facebook.login.LoginManager;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import reaper.android.app.api.core.FacebookApiManager;
 import reaper.android.app.api.fb.FacebookApi;
 import reaper.android.app.api.fb.response.FacebookCoverPicResponse;
 import reaper.android.app.api.fb.response.FacebookProfileResponse;
-import reaper.android.app.config.ErrorCode;
-import reaper.android.app.trigger.common.GenericErrorTrigger;
-import reaper.android.app.trigger.facebook.FacebookCoverPicFetchedTrigger;
-import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
-import reaper.android.app.trigger.facebook.FacebookProfileFetchedTrigger;
+import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.model.User;
 import rx.Observable;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
-public class FacebookService
+public class FacebookService_
 {
-    private Bus bus;
+    public static List<String> PERMISSIONS = Arrays.asList("email", "user_friends");
+    private static final String PROFILE_PIC_URL = "https://graph.facebook.com/v2.4/$$$/picture?height=1000";
+
     private FacebookApi facebookApi;
 
-    public FacebookService(Bus bus)
+    public FacebookService_()
     {
-        this.bus = bus;
         facebookApi = FacebookApiManager.getInstance().getApi();
     }
 
-    public void getUserCoverPic()
+    public boolean isAccessTokenValid()
     {
-        facebookApi.getCoverPic().subscribeOn(Schedulers.newThread())
-                   .observeOn(AndroidSchedulers.mainThread())
-                   .subscribe(new Subscriber<FacebookCoverPicResponse>()
-                   {
-                       @Override
-                       public void onCompleted()
-                       {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
 
-                       }
+        if (accessToken == null)
+        {
+            return false;
+        }
 
-                       @Override
-                       public void onError(Throwable e)
-                       {
+        if (accessToken.isExpired())
+        {
+            return false;
+        }
 
-                       }
+        return accessToken.getDeclinedPermissions().size() == 0;
 
-                       @Override
-                       public void onNext(FacebookCoverPicResponse response)
-                       {
-
-                           bus.post(new FacebookCoverPicFetchedTrigger(response.getCover()
-                                                                               .getSource()));
-                       }
-                   });
     }
 
-
-    public void getUserFacebookProfile()
+    public void logout()
     {
-        facebookApi.getProfile()
-                   .subscribeOn(Schedulers.newThread())
-                   .observeOn(AndroidSchedulers.mainThread())
-                   .subscribe(new Subscriber<FacebookProfileResponse>()
-                   {
-                       @Override
-                       public void onCompleted()
-                       {
-                       }
-
-                       @Override
-                       public void onError(Throwable e)
-                       {
-                           bus.post(new GenericErrorTrigger(ErrorCode.FACEBOOK_PROFILE_FETCH_FAILURE, (Exception) e));
-                       }
-
-                       @Override
-                       public void onNext(FacebookProfileResponse response)
-                       {
-                           bus.post(new FacebookProfileFetchedTrigger(response.getId(), response
-                                   .getFirstname(), response.getLastname(), response
-                                   .getGender(), response.getEmail()));
-                       }
-                   });
+        CacheManager.clearAllCaches();
+        LoginManager.getInstance().logOut();
     }
 
-    public void getFacebookFriends(final boolean isPolling)
+    public String getAccessToken()
+    {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken == null)
+        {
+            return null;
+        }
+
+        return accessToken.getToken();
+    }
+
+    public Set<String> getDeclinedPermissions()
+    {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken == null)
+        {
+            return null;
+        }
+
+        return accessToken.getDeclinedPermissions();
+    }
+
+    public Observable<User> getUser()
+    {
+        return Observable
+                .zip(getProfile(), getCoverPicUrl(), new Func2<FacebookProfileResponse, String, User>()
+                {
+                    @Override
+                    public User call(FacebookProfileResponse profile, String coverPicUrl)
+                    {
+                        User user = new User();
+
+                        user.setId(profile.getId());
+                        user.setFirstname(profile.getFirstname());
+                        user.setLastname(profile.getLastname());
+                        user.setEmail(profile.getEmail());
+                        user.setGender(profile.getGender());
+
+                        String profilePicUrl = PROFILE_PIC_URL.replace("$$$", user.getId());
+                        user.setProfilePicUrl(profilePicUrl);
+
+                        user.setCoverPicUrl(coverPicUrl);
+
+                        return user;
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
+
+    public Observable<List<String>> getFriends()
     {
         final GraphResponse[] response = new GraphResponse[1];
         final int[] totalFriends = {0};
         final List<String> friendsIdList = new ArrayList<>();
 
-        Observable
+        return Observable
                 .create(new Observable.OnSubscribe<List<String>>()
                         {
                             @Override
@@ -214,30 +231,30 @@ public class FacebookService
                         }
 
                 )
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<String>>()
-                           {
-                               @Override
-                               public void onCompleted()
-                               {
+                .subscribeOn(Schedulers.newThread());
+    }
 
-                               }
 
-                               @Override
-                               public void onError(Throwable e)
-                               {
-                                   bus.post(new GenericErrorTrigger(ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE, (Exception) e));
-                               }
+    /* Helper Methods */
+    private Observable<String> getCoverPicUrl()
+    {
+        return facebookApi
+                .getCoverPic()
+                .map(new Func1<FacebookCoverPicResponse, String>()
+                {
+                    @Override
+                    public String call(FacebookCoverPicResponse response)
+                    {
+                        return response.getCover().getSource();
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
 
-                               @Override
-                               public void onNext(List<String> strings)
-                               {
-                                   bus.post(new FacebookFriendsIdFetchedTrigger(strings, isPolling));
-                               }
-                           }
-
-                );
+    private Observable<FacebookProfileResponse> getProfile()
+    {
+        return facebookApi.getProfile()
+                          .subscribeOn(Schedulers.newThread());
     }
 }
 

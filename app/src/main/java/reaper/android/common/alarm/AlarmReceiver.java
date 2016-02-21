@@ -21,7 +21,7 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.model.Event;
-import reaper.android.app.ui.activity.LauncherActivity;
+import reaper.android.app.ui.screens.launch.LauncherActivity;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -101,7 +101,7 @@ public class AlarmReceiver extends BroadcastReceiver
 
                 Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.mipmap.logo_red)
+                        .setSmallIcon(R.mipmap.app_icon)
                         .setContentTitle(events.get(0).getTitle())
                         .setContentText(context.getResources()
                                 .getString(R.string.reminder_notification_message))
@@ -124,7 +124,7 @@ public class AlarmReceiver extends BroadcastReceiver
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.mipmap.logo_red)
+                    .setSmallIcon(R.mipmap.app_icon)
                     .setContentTitle("Clanout")
                     .setContentText(events.size() + " clans starting in an hour. Giddy up!")
                     .setAutoCancel(true)

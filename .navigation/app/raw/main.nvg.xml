@@ -6,7 +6,7 @@
     <statePointEntry>
       <state      
         class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
-        className = "reaper.android.app.ui.activity.FacebookActivity"/>
+        className = "reaper.android.app.ui.activity.obsolete.FacebookActivity"/>
       <point      
         x = "64"      
         y = "72"/>
@@ -22,7 +22,7 @@
     <statePointEntry>
       <state      
         class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
-        className = "reaper.android.app.ui.activity.MainActivity"/>
+        className = "reaper.android.app.ui.screens.MainActivity"/>
       <point      
         x = "1404"      
         y = "352"/>
@@ -38,7 +38,7 @@
     <statePointEntry>
       <state      
         class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
-        className = "reaper.android.app.ui.activity.LauncherActivity"/>
+        className = "reaper.android.app.ui.activity.obsolete.LauncherActivity"/>
       <point      
         x = "700"      
         y = "300"/>

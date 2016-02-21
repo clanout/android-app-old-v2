@@ -1,8 +1,6 @@
 package reaper.android.app.root;
 
-import android.app.AlarmManager;
 import android.app.Application;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -35,7 +33,6 @@ import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
-import reaper.android.app.service.EventService;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
@@ -66,12 +63,7 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
     // Services
     private LocationService locationService;
     private UserService userService;
-    private EventService eventService;
-
     private GenericCache genericCache;
-
-    private AlarmManager alarmManager;
-    private PendingIntent pendingIntent;
 
     private int timesApplicationOpened;
 
@@ -156,7 +148,6 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         locationService = new LocationService(bus);
         userService = new UserService(bus);
         genericCache = CacheManager.getGenericCache();
-        eventService = new EventService(bus);
 
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -265,5 +256,4 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         }
         return tracker;
     }
-
 }

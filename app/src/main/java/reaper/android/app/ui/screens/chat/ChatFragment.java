@@ -2,7 +2,6 @@ package reaper.android.app.ui.screens.chat;
 
 import android.app.FragmentManager;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
@@ -29,7 +28,6 @@ import android.widget.TextView;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
-import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 import net.steamcrafted.materialiconlib.MaterialIconView;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
@@ -59,7 +57,7 @@ import reaper.android.app.trigger.chat.XmppConnectionAuthenticatedTrigger;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
-import reaper.android.app.ui.activity.MainActivity;
+import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;

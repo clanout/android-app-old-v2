@@ -30,7 +30,6 @@ import retrofit.client.Response;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import timber.log.Timber;
 
 public class LocationService
 {
@@ -40,6 +39,7 @@ public class LocationService
     private GenericCache cache;
     private MeApi meApi;
     private UserService userService;
+    private LocationService_ locationService;
 
     public LocationService(Bus bus)
     {
@@ -51,14 +51,17 @@ public class LocationService
 
     public Location getUserLocation()
     {
-        Location location = cache.get(CacheKeys.USER_LOCATION, Location.class);
-        if (location == null)
-        {
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.USER_LOCATION_NULL, userService.getActiveUserId());
-            throw new IllegalStateException("User location cannot be null");
-        }
-        return location;
+        return LocationService_.getInstance().getCurrentLocation();
+
+//        Location location = cache.get(CacheKeys.USER_LOCATION, Location.class);
+//        if (location == null)
+//        {
+//            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.USER_LOCATION_NULL, userService.getActiveUserId());
+//            throw new IllegalStateException("User location cannot be null");
+//        }
+//        return location;
     }
+
 
     public void refreshUserLocation(Context context, GoogleApiClient apiClient)
     {
@@ -68,6 +71,7 @@ public class LocationService
             String zone = null;
             try
             {
+                //noinspection MissingPermission
                 googleApiLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
 
                 Geocoder gcd = new Geocoder(context, Locale.getDefault());
@@ -85,7 +89,9 @@ public class LocationService
             catch (Exception e)
             {
                 e.printStackTrace();
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.UNABLE_TO_REFRESH_USER_LOCATION, userService.getActiveUserId());
+                AnalyticsHelper
+                        .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.UNABLE_TO_REFRESH_USER_LOCATION, userService
+                                .getActiveUserId());
                 Log.d("APP", "Unable to refresh user location (" + e.getMessage() + ")");
                 bus.post(new GenericErrorTrigger(ErrorCode.GOOGLE_API_LOCATION_FETCH_FAILURE, null));
                 return;
@@ -96,10 +102,10 @@ public class LocationService
             location.setLatitude(googleApiLocation.getLatitude());
             location.setZone(zone);
 
-            if(locationExists())
+            if (locationExists())
             {
                 Location oldLocation = getUserLocation();
-                if(!oldLocation.getZone().equalsIgnoreCase(location.getZone()))
+                if (!oldLocation.getZone().equalsIgnoreCase(location.getZone()))
                 {
                     EventCache eventCache = CacheManager.getEventCache();
                     eventCache.deleteAll();
@@ -134,27 +140,27 @@ public class LocationService
     {
         UserZoneUpdatedApiRequest request = new UserZoneUpdatedApiRequest(zone);
         meApi.updateUserZone(request)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Response>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
+             .subscribeOn(Schedulers.newThread())
+             .observeOn(AndroidSchedulers.mainThread())
+             .subscribe(new Subscriber<Response>()
+             {
+                 @Override
+                 public void onCompleted()
+                 {
 
-                    }
+                 }
 
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                        Log.d("APP", e.getMessage());
-                    }
+                 @Override
+                 public void onError(Throwable e)
+                 {
+                     Log.d("APP", e.getMessage());
+                 }
 
-                    @Override
-                    public void onNext(Response response)
-                    {
+                 @Override
+                 public void onNext(Response response)
+                 {
 
-                    }
-                });
+                 }
+             });
     }
 }

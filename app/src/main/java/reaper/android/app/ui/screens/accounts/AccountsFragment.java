@@ -45,7 +45,7 @@ import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.facebook.FacebookCoverPicFetchedTrigger;
-import reaper.android.app.ui.activity.MainActivity;
+import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.util.FragmentUtils;

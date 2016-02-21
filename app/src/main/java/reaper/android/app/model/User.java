@@ -1,0 +1,96 @@
+package reaper.android.app.model;
+
+import reaper.android.app.api.core.GsonProvider;
+import reaper.android.app.model.core.Model;
+
+public class User implements Model
+{
+    private String id;
+    private String firstname;
+    private String lastname;
+    private String email;
+    private String gender;
+    private String profilePicUrl;
+    private String coverPicUrl;
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+    public String getName()
+    {
+        return String.format("%s %s", firstname, lastname);
+    }
+
+    public String getFirstname()
+    {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname)
+    {
+        this.firstname = firstname;
+    }
+
+    public String getLastname()
+    {
+        return lastname;
+    }
+
+    public void setLastname(String lastname)
+    {
+        this.lastname = lastname;
+    }
+
+    public String getEmail()
+    {
+        return email;
+    }
+
+    public void setEmail(String email)
+    {
+        this.email = email;
+    }
+
+    public String getGender()
+    {
+        return gender;
+    }
+
+    public void setGender(String gender)
+    {
+        this.gender = gender;
+    }
+
+    public String getProfilePicUrl()
+    {
+        return profilePicUrl;
+    }
+
+    public void setProfilePicUrl(String profilePicUrl)
+    {
+        this.profilePicUrl = profilePicUrl;
+    }
+
+    public String getCoverPicUrl()
+    {
+        return coverPicUrl;
+    }
+
+    public void setCoverPicUrl(String coverPicUrl)
+    {
+        this.coverPicUrl = coverPicUrl;
+    }
+
+    @Override
+    public String toString()
+    {
+        return GsonProvider.getGson().toJson(this);
+    }
+}

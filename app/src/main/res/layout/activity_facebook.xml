@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_margin="16dp"
-        android:src="@mipmap/logo_red"/>
+        android:src="@mipmap/app_icon"/>
 
     <ImageSwitcher
         android:id="@+id/isIntro"

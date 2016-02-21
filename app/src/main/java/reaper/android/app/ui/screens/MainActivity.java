@@ -1,4 +1,4 @@
-package reaper.android.app.ui.activity;
+package reaper.android.app.ui.screens;
 
 import android.app.AlarmManager;
 import android.app.NotificationManager;
@@ -13,8 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -44,7 +42,6 @@ import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchForActivityTrigger;
-import reaper.android.app.trigger.gcm.GcmRegistrationCompleteTrigger;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
@@ -74,8 +71,6 @@ public class MainActivity extends AppCompatActivity {
     private boolean isBusRegistered;
 
     private NotificationManager notificationManager;
-
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     boolean shouldPopUpStatusDialog;
     private PendingIntent pendingIntent;
@@ -254,6 +249,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (activeFragment == null) {
             super.onBackPressed();
+            return;
         }
 
         if (activeFragment.equals(BackstackTags.HOME)) {
@@ -278,44 +274,6 @@ public class MainActivity extends AppCompatActivity {
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
         }
     }
-
-//    private boolean checkPlayServices() {
-//        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-//        if (resultCode != ConnectionResult.SUCCESS) {
-//            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-//                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
-//                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-//            } else {
-//
-//                Toast.makeText(this, "This device does not support Google Play Services.", Toast.LENGTH_LONG)
-//                        .show();
-//                finish();
-//            }
-//
-//            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.PLAY_SERVICES_NOT_PRESENT, null);
-//
-//            return false;
-//        }
-//
-//        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.PLAY_SERVICES_PRESENT, null);
-//
-//        return true;
-//    }
-//
-//    @Subscribe
-//    public void onGcmRegistrationComplete(GcmRegistrationCompleteTrigger trigger) {
-//
-//
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                Log.d("APP", "going to home fragment" + System.currentTimeMillis());
-//
-//                FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
-//            }
-//        });
-//    }
 
     @Subscribe
     public void onEventsFetched(EventsFetchForActivityTrigger trigger) {

@@ -1,4 +1,4 @@
-package reaper.android.app.ui.activity;
+package reaper.android.app.ui.activity.obsolete;
 
 import android.Manifest;
 import android.content.DialogInterface;

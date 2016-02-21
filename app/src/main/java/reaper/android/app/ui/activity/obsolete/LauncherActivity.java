@@ -1,4 +1,4 @@
-package reaper.android.app.ui.activity;
+package reaper.android.app.ui.activity.obsolete;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -39,6 +39,7 @@ import reaper.android.app.trigger.user.NewSessionCreatedTrigger;
 import reaper.android.app.trigger.user.SessionValidatedTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshRequestTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshTrigger;
+import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
@@ -230,6 +231,7 @@ public class LauncherActivity extends AppCompatActivity {
             finish();
         }
     }
+
 
     private Intent handleIntent() {
 
