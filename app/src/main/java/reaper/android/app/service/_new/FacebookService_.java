@@ -106,23 +106,29 @@ public class FacebookService_
                     @Override
                     public User call(FacebookProfileResponse profile, String coverPicUrl)
                     {
-                        User user = new User();
+                        if (profile == null || coverPicUrl == null)
+                        {
+                            return null;
+                        }
+                        else
+                        {
+                            User user = new User();
 
-                        user.setId(profile.getId());
-                        user.setFirstname(profile.getFirstname());
-                        user.setLastname(profile.getLastname());
-                        user.setEmail(profile.getEmail());
-                        user.setGender(profile.getGender());
+                            user.setId(profile.getId());
+                            user.setFirstname(profile.getFirstname());
+                            user.setLastname(profile.getLastname());
+                            user.setEmail(profile.getEmail());
+                            user.setGender(profile.getGender());
 
-                        String profilePicUrl = PROFILE_PIC_URL.replace("$$$", user.getId());
-                        user.setProfilePicUrl(profilePicUrl);
+                            String profilePicUrl = PROFILE_PIC_URL.replace("$$$", user.getId());
+                            user.setProfilePicUrl(profilePicUrl);
 
-                        user.setCoverPicUrl(coverPicUrl);
+                            user.setCoverPicUrl(coverPicUrl);
 
-                        return user;
+                            return user;
+                        }
                     }
-                })
-                .subscribeOn(Schedulers.newThread());
+                });
     }
 
     public Observable<List<String>> getFriends()
@@ -268,8 +274,9 @@ public class FacebookService_
 
     private Observable<FacebookProfileResponse> getProfile()
     {
-        return facebookApi.getProfile()
-                          .subscribeOn(Schedulers.newThread());
+        return facebookApi
+                .getProfile()
+                .subscribeOn(Schedulers.newThread());
     }
 }
 

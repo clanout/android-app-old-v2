@@ -7,8 +7,7 @@
     <RelativeLayout
         android:id="@+id/rlBootstrap"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/ivLogo"
@@ -27,13 +26,44 @@
             android:text="@string/app_name"
             android:textSize="24sp"/>
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
+        <FrameLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="72dp"/>
+            android:layout_marginBottom="72dp">
+
+            <ProgressBar
+                android:id="@+id/loading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"/>
+
+            <LinearLayout
+                android:id="@+id/llPermission"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_margin="16dp"
+                    android:gravity="center_horizontal"
+                    android:text="@string/permission_location_message"/>
+
+                <TextView
+                    android:id="@+id/tvPermissionAction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/permission_goto_settings"
+                    android:textColor="@color/accent"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+        </FrameLayout>
 
     </RelativeLayout>
 
@@ -41,7 +71,8 @@
         android:id="@+id/llFb"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <android.support.v4.view.ViewPager
             android:id="@+id/vpIntro"

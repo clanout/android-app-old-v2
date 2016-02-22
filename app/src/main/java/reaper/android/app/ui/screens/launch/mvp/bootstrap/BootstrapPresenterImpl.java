@@ -19,8 +19,7 @@ import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-public class
-BootstrapPresenterImpl implements BootstrapPresenter
+public class BootstrapPresenterImpl implements BootstrapPresenter
 {
     private BootstrapView view;
     private LocationService_ locationService;
@@ -47,13 +46,20 @@ BootstrapPresenterImpl implements BootstrapPresenter
     {
         this.view = view;
 
-        if (locationService.isLocationServiceAvailable())
+        if (locationService.isLocationPermissionGranted())
         {
-            init();
+            if (locationService.isLocationServiceAvailable())
+            {
+                init();
+            }
+            else
+            {
+                this.view.displayLocationServiceUnavailableMessage();
+            }
         }
         else
         {
-            this.view.displayLocationServiceUnavailableMessage();
+            this.view.handleLocationPermissions();
         }
     }
 

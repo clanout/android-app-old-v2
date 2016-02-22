@@ -28,6 +28,13 @@
     <string name="error_default">Looks like we messed up. Please try again.</string>
     <string name="error_facebook">Facebook login failed. Please try again.</string>
 
+    <!-- Permission Defaults -->
+    <string name="permission_request_again">Request Again</string>
+    <string name="permission_goto_settings">Go To Settings</string>
+
+    <!-- Location Permissions -->
+    <string name="permission_location_message">Clanout helps you make plans and join clans with friends in your city. We need your location to provide you the Clanout experience. </string>
+
     <!-- Play Services Error Dialog -->
     <string name="play_services_error_dialog_title">Google Play Services Error</string>
     <string name="play_services_error_dialog_message">Google Play Services is not available
@@ -41,11 +48,11 @@
     <string name="facebook_permission_dialog_negative_button">Close App</string>
 
     <!-- Location Permission Dialog -->
-    <string name="location_permission_title">Turn on GPS</string>
-    <string name="location_permission_message">Cautious? Once inside, make a secret clan.
+    <string name="location_off_title">Turn on GPS</string>
+    <string name="location_off_message">Cautious? Once inside, make a secret clan.
         Your location helps us connect you with your nearby friends.</string>
-    <string name="location_permission_positive_button">Go To Settings</string>
-    <string name="location_permission_negative_button">Close App</string>
+    <string name="location_off_positive_button">Go To Settings</string>
+    <string name="location_off_negative_button">Close App</string>
 
     <!-- TODO: To be removed -->
     <string name="location_permission_heading">Turn on GPS</string>
@@ -194,7 +201,7 @@
     <string name="label_btn_invite">Invite</string>
     <string name="label_btn_chat">Chat</string>
     <string name="location_required_title">Location Required</string>
-    <string name="location_required_message">ClanOut helps you make plans and join clans with friends in your city. We cannot proceed to provide you the ClanOut experience without knowing your location. </string>
+    <string name="location_required_message">Clanout helps you make plans and join clans with friends in your city. We cannot proceed to provide you the ClanOut experience without knowing your location. </string>
     <string name="read_contacts_permission_required_message">You\'ll not be able to invite friends from your phonebook to your plans. We do not store your phonebook information.</string>
     <string name="open_type_definition">Everyone can see your plan. You can still send personal invites.</string>
     <string name="secret_type_definition">Only people you have invited can see your plan</string>

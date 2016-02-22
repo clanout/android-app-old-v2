@@ -1,9 +1,13 @@
 package reaper.android.app.service._new;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
+import android.os.Build;
+import android.support.v4.app.ActivityCompat;
 
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -67,6 +71,19 @@ public class LocationService_
         this.meApi = ApiManager.getInstance().getApi(MeApi.class);
     }
 
+    public boolean isLocationPermissionGranted()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        {
+            return ActivityCompat
+                    .checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
     public boolean isLocationServiceAvailable()
     {
         return locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -84,7 +101,8 @@ public class LocationService_
                         {
                             //noinspection MissingPermission
                             if (!LocationServices.FusedLocationApi
-                                    .getLocationAvailability(googleService.getGoogleApiClient()).isLocationAvailable())
+                                    .getLocationAvailability(googleService.getGoogleApiClient())
+                                    .isLocationAvailable())
                             {
                                 Timber.v("[FusedLocationApi] Last Known Location Unavailable");
                                 subscriber.onNext(null);
@@ -171,7 +189,8 @@ public class LocationService_
 
                                         //noinspection MissingPermission
                                         LocationServices.FusedLocationApi
-                                                .requestLocationUpdates(googleService.getGoogleApiClient(), locationRequest, locationListener);
+                                                .requestLocationUpdates(googleService
+                                                        .getGoogleApiClient(), locationRequest, locationListener);
                                     }
                                 });
                     }
@@ -185,7 +204,8 @@ public class LocationService_
                         if (locationListener != null)
                         {
                             LocationServices.FusedLocationApi
-                                    .removeLocationUpdates(googleService.getGoogleApiClient(), locationListener);
+                                    .removeLocationUpdates(googleService
+                                            .getGoogleApiClient(), locationListener);
 
                             Timber.v("[FusedLocationApi] Closed Location Listener");
                         }

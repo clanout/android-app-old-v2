@@ -36,4 +36,38 @@ public class SnackbarFactory
         snackbar.show();
         return snackbar;
     }
+
+    public static Snackbar create(Activity activity, String text, String actionText, View.OnClickListener onClickListener)
+    {
+        Snackbar snackbar = Snackbar
+                .make(activity
+                        .findViewById(android.R.id.content), text, Snackbar.LENGTH_INDEFINITE);
+
+        snackbar.setAction(actionText, onClickListener);
+
+        View snackBarView = snackbar.getView();
+        TextView tv = (TextView) snackBarView
+                .findViewById(android.support.design.R.id.snackbar_text);
+        tv.setTextColor(Color.WHITE);
+
+        snackbar.show();
+        return snackbar;
+    }
+
+    public static Snackbar create(Activity activity, @StringRes int resId, @StringRes int actionResId, View.OnClickListener onClickListener)
+    {
+        Snackbar snackbar = Snackbar
+                .make(activity
+                        .findViewById(android.R.id.content), resId, Snackbar.LENGTH_INDEFINITE);
+
+        snackbar.setAction(actionResId, onClickListener);
+
+        View snackBarView = snackbar.getView();
+        TextView tv = (TextView) snackBarView
+                .findViewById(android.support.design.R.id.snackbar_text);
+        tv.setTextColor(Color.WHITE);
+
+        snackbar.show();
+        return snackbar;
+    }
 }

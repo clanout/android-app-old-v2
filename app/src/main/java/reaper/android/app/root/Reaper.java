@@ -10,6 +10,7 @@ import com.facebook.stetho.Stetho;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.karumi.dexter.Dexter;
+import com.squareup.leakcanary.LeakCanary;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.ThreadEnforcer;
@@ -73,6 +74,8 @@ public class Reaper extends Application
     public void onCreate()
     {
         super.onCreate();
+
+        LeakCanary.install(this);
 
         init();
         connectivityHandler();

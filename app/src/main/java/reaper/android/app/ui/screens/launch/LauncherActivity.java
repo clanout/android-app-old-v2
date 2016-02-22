@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,6 +14,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.facebook.CallbackManager;
@@ -41,6 +43,7 @@ import reaper.android.app.service._new.GcmService_;
 import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.ui._core.BaseActivity;
+import reaper.android.app.ui._core.PermissionHandler;
 import reaper.android.app.ui.screens.FlowEntry;
 import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.app.ui.screens.launch.mvp.bootstrap.BootstrapPresenter;
@@ -77,7 +80,6 @@ public class LauncherActivity extends BaseActivity implements
         return intent;
     }
 
-
     FacebookLoginPresenter facebookLoginPresenter;
 
     BootstrapPresenter bootstrapPresenter;
@@ -106,6 +108,15 @@ public class LauncherActivity extends BaseActivity implements
 
     @Bind(R.id.ivIntro4)
     ImageView ivIntro4;
+
+    @Bind(R.id.loading)
+    ProgressBar loading;
+
+    @Bind(R.id.llPermission)
+    View llPermission;
+
+    @Bind(R.id.tvPermissionAction)
+    TextView tvPermissionAction;
 
     /* Fields */
     CallbackManager facebookCallbackManager;
@@ -161,26 +172,19 @@ public class LauncherActivity extends BaseActivity implements
     }
 
     @Override
-    protected void onResume()
+    protected void onStart()
     {
-        super.onResume();
+        super.onStart();
         setupGooglePlayService();
-    }
-
-    @Override
-    protected void onPause()
-    {
-        super.onPause();
-        facebookLoginPresenter.detachView();
-        bootstrapPresenter.detachView();
     }
 
     @Override
     protected void onStop()
     {
         super.onStop();
-
-        googleApiClient.disconnect();
+        facebookLoginPresenter.detachView();
+        bootstrapPresenter.detachView();
+        googleService.disconnect();
     }
 
     @Override
@@ -188,6 +192,56 @@ public class LauncherActivity extends BaseActivity implements
     {
         super.onActivityResult(requestCode, resultCode, data);
         facebookCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == PermissionHandler.Permissions.LOCATION)
+        {
+            if (grantResults[0] == PackageManager.PERMISSION_DENIED)
+            {
+                if (PermissionHandler
+                        .isRationalRequired(this, PermissionHandler.Permissions.LOCATION))
+                {
+                    loading.setVisibility(View.GONE);
+                    llPermission.setVisibility(View.VISIBLE);
+
+                    tvPermissionAction.setText(R.string.permission_request_again);
+                    tvPermissionAction.setOnClickListener(new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            PermissionHandler
+                                    .requestPermission(LauncherActivity.this, PermissionHandler.Permissions.LOCATION);
+                        }
+                    });
+                }
+                else
+                {
+                    loading.setVisibility(View.GONE);
+                    llPermission.setVisibility(View.VISIBLE);
+
+                    tvPermissionAction.setText(R.string.permission_goto_settings);
+                    tvPermissionAction.setOnClickListener(new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            LauncherActivity.this.gotoAppSettings();
+                        }
+                    });
+                }
+            }
+            else
+            {
+                displayBootstrapView();
+                bootstrapPresenter.attachView(this);
+            }
+        }
     }
 
     /* View Methods (FacebookLogonView) */
@@ -222,6 +276,32 @@ public class LauncherActivity extends BaseActivity implements
     }
 
     /* View Methods (BootstrapView) */
+    @Override
+    public void handleLocationPermissions()
+    {
+        if (PermissionHandler.isRationalRequired(this, PermissionHandler.Permissions.LOCATION))
+        {
+            loading.setVisibility(View.GONE);
+            llPermission.setVisibility(View.VISIBLE);
+
+            tvPermissionAction.setText(R.string.permission_request_again);
+            tvPermissionAction.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    PermissionHandler
+                            .requestPermission(LauncherActivity.this, PermissionHandler.Permissions.LOCATION);
+                }
+            });
+        }
+        else
+        {
+            // Location permission has not been granted yet. Request it directly.
+            PermissionHandler.requestPermission(this, PermissionHandler.Permissions.LOCATION);
+        }
+    }
+
     @Override
     public void displayLocationServiceUnavailableMessage()
     {
@@ -429,6 +509,9 @@ public class LauncherActivity extends BaseActivity implements
 
     private void displayBootstrapView()
     {
+        loading.setVisibility(View.VISIBLE);
+        llPermission.setVisibility(View.GONE);
+
         llFb.setVisibility(View.GONE);
         rlBootstrap.setVisibility(View.VISIBLE);
     }
@@ -524,12 +607,12 @@ public class LauncherActivity extends BaseActivity implements
         TextView tvTitle = (TextView) dialogView.findViewById(R.id.tvTitle);
         TextView tvMessage = (TextView) dialogView.findViewById(R.id.tvMessage);
 
-        tvTitle.setText(R.string.location_permission_title);
-        tvMessage.setText(R.string.location_permission_message);
+        tvTitle.setText(R.string.location_off_title);
+        tvMessage.setText(R.string.location_off_message);
 
         builder.setCancelable(false);
 
-        builder.setPositiveButton(R.string.location_permission_positive_button, new DialogInterface.OnClickListener()
+        builder.setPositiveButton(R.string.location_off_positive_button, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
@@ -538,7 +621,7 @@ public class LauncherActivity extends BaseActivity implements
             }
         });
 
-        builder.setNegativeButton(R.string.location_permission_negative_button, new DialogInterface.OnClickListener()
+        builder.setNegativeButton(R.string.location_off_negative_button, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)

@@ -42,4 +42,17 @@ public class GoogleService_
 
         this.googleApiClient = googleApiClient;
     }
+
+    public void disconnect()
+    {
+        if (googleApiClient != null)
+        {
+            if (googleApiClient.isConnected())
+            {
+                googleApiClient.disconnect();
+            }
+
+            googleApiClient = null;
+        }
+    }
 }

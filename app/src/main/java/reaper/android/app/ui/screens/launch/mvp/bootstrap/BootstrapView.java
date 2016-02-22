@@ -6,6 +6,8 @@ import reaper.android.app.model.Event;
 
 public interface BootstrapView
 {
+    void handleLocationPermissions();
+
     void displayLocationServiceUnavailableMessage();
 
     void displayError();

@@ -4,6 +4,7 @@ import com.squareup.okhttp.OkHttpClient;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import reaper.android.app.config.AppConstants;
 import retrofit.RestAdapter;
@@ -18,8 +19,12 @@ public class ApiManager
 
     static
     {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        okHttpClient.setReadTimeout(15, TimeUnit.SECONDS);
+        okHttpClient.setWriteTimeout(15, TimeUnit.SECONDS);
+
         restAdapter = new RestAdapter.Builder()
-                .setClient(new OkClient(new OkHttpClient()))
+                .setClient(new OkClient(okHttpClient))
                 .setConverter(new GsonConverter(GsonProvider.getGson()))
                 .setEndpoint(AppConstants.SERVER_URL)
                 .setLogLevel(RestAdapter.LogLevel.FULL)
