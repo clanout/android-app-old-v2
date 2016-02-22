@@ -423,7 +423,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
             }
             else
             {
-                Snackbar.make(getView(), R.string.whatsapp_not_installed, Snackbar.LENGTH_LONG)
+                Snackbar.make(getView(), R.string.error_no_watsapp, Snackbar.LENGTH_LONG)
                         .show();
             }
         }

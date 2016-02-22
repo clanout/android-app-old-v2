@@ -62,7 +62,7 @@
             android:layout_marginRight="16dp"
             android:layout_gravity="center_vertical"
             android:gravity="center_vertical"
-            android:text="@string/block_screen_title_message"
+            android:text="@string/message_blocked_friends"
             android:textColor="@color/text_subtitle"
             android:textSize="14sp"
             />

@@ -280,11 +280,11 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
         switch (event.getType())
         {
             case INVITE_ONLY:
-                tvType.setText(R.string.event_details_type_invite_only);
+                tvType.setText(R.string.event_type_secret);
                 break;
 
             case PUBLIC:
-                tvType.setText(R.string.event_details_type_public);
+                tvType.setText(R.string.event_type_open);
                 break;
         }
 
@@ -386,7 +386,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     @Override
     public void displayRsvpError()
     {
-        Snackbar.make(getView(), R.string.message_rsvp_update_failure, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(getView(), R.string.error_rsvp_update, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -549,7 +549,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
 
         if (oldStatus == null || oldStatus.isEmpty())
         {
-            status.setHint(R.string.default_event_status);
+            status.setHint(R.string.status_default);
         }
         else
         {
@@ -673,7 +673,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     @Override
     public void displayEventFinalizedMessage()
     {
-        Snackbar.make(getView(), R.string.cannot_edit_event_locked, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(getView(), R.string.error_edit_finalized, Snackbar.LENGTH_LONG).show();
     }
 
     @Override

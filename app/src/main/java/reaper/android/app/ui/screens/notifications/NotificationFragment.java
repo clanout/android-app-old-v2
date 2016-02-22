@@ -245,7 +245,7 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
         if (events.contains(activeEvent)) {
             activePosition = events.indexOf(activeEvent);
         } else {
-            Snackbar.make(getView(), R.string.event_not_found, Snackbar.LENGTH_LONG).show();
+            Snackbar.make(getView(), R.string.error_event_not_found, Snackbar.LENGTH_LONG).show();
             return;
         }
 

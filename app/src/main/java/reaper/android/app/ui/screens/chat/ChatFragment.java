@@ -293,7 +293,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener
         mainContent.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
         noSessionMessage.setVisibility(View.VISIBLE);
-        noSessionMessage.setText(R.string.chat_messages_not_fetched);
+        noSessionMessage.setText(R.string.error_chat_not_fetched);
         return;
     }
 
@@ -495,7 +495,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener
                                 .getActiveUserId());
 
                 typeMessage.setText(message);
-                Snackbar.make(getView(), R.string.chat_message_not_sent, Snackbar.LENGTH_LONG)
+                Snackbar.make(getView(), R.string.error_chat_not_sent, Snackbar.LENGTH_LONG)
                         .show();
                 return;
             }

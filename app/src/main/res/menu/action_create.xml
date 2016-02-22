@@ -5,6 +5,6 @@
     <item
         android:id="@+id/action_create"
         android:orderInCategory="1"
-        android:title="CREATE"
+        android:title="@string/action_save_event"
         app:showAsAction="always"/>
 </menu>

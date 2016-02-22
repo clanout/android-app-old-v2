@@ -235,9 +235,9 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
         generateDrawables();
 
         tabTitle.setText(getResources()
-                .getString(R.string.invite_app_friends_title, LocationService_.getInstance()
-                                                                              .getCurrentLocation()
-                                                                              .getZone()));
+                .getString(R.string.message_friends_invite, LocationService_.getInstance()
+                                                                            .getCurrentLocation()
+                                                                            .getZone()));
 
         inviteWhatsapp.setImageDrawable(whatsappDrawable);
 
@@ -363,7 +363,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
         loading.setVisibility(View.GONE);
         divider.setVisibility(View.GONE);
 
-        noFriendsMessage.setText(R.string.facebook_friends_not_fetched);
+        noFriendsMessage.setText(R.string.error_facebook_friends);
     }
 
     @Override
@@ -689,7 +689,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
             }
             else
             {
-                Snackbar.make(getView(), R.string.whatsapp_not_installed, Snackbar.LENGTH_LONG)
+                Snackbar.make(getView(), R.string.error_no_watsapp, Snackbar.LENGTH_LONG)
                         .show();
             }
         }

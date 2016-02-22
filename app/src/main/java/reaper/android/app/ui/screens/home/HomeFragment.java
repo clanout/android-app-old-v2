@@ -951,7 +951,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
             createProgressDialog.dismiss();
         }
 
-        Snackbar.make(getView(), R.string.message_no_title, Snackbar.LENGTH_LONG)
+        Snackbar.make(getView(), R.string.error_no_title, Snackbar.LENGTH_LONG)
                 .show();
     }
 

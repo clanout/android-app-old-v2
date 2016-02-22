@@ -318,11 +318,11 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
         // Type
         if (event.getType() == Event.Type.INVITE_ONLY)
         {
-            tvType.setText(R.string.event_details_type_invite_only);
+            tvType.setText(R.string.event_type_secret);
         }
         else
         {
-            tvType.setText(R.string.event_details_type_public);
+            tvType.setText(R.string.event_type_open);
         }
 
         //Description
@@ -497,7 +497,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
             progressDialog.dismiss();
         }
 
-        Snackbar.make(getView(), R.string.cannot_edit_event_locked, Snackbar.LENGTH_LONG)
+        Snackbar.make(getView(), R.string.error_edit_finalized, Snackbar.LENGTH_LONG)
                 .show();
     }
 
@@ -509,7 +509,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
             progressDialog.dismiss();
         }
 
-        Snackbar.make(getView(), R.string.messed_up, Snackbar.LENGTH_LONG)
+        Snackbar.make(getView(), R.string.error_default, Snackbar.LENGTH_LONG)
                 .show();
     }
 

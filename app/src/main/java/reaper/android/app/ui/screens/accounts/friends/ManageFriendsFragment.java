@@ -222,7 +222,7 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         infoContainer.setVisibility(View.GONE);
         searchContainer.setVisibility(View.GONE);
 
-        noFriendsMessage.setText(R.string.facebook_friends_not_fetched);
+        noFriendsMessage.setText(R.string.error_facebook_friends);
     }
 
     private void displayNoFriendsView() {

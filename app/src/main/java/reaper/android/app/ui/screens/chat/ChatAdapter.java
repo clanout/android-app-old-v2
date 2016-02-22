@@ -1,8 +1,6 @@
 package reaper.android.app.ui.screens.chat;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,14 +10,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
 import reaper.android.app.model.ChatMessage;
-import reaper.android.app.root.Reaper;
 
 
 /**
@@ -133,7 +128,7 @@ public class ChatAdapter extends BaseAdapter
     {
         if (!isMe)
         {
-            chatViewHolder.contentWithBackground.setBackgroundResource(R.drawable.rounded_rectangle_not_me);
+            chatViewHolder.contentWithBackground.setBackgroundResource(R.drawable.bg_chat);
 
             LinearLayout.LayoutParams layoutParams =
                     (LinearLayout.LayoutParams) chatViewHolder.contentWithBackground.getLayoutParams();
@@ -157,7 +152,7 @@ public class ChatAdapter extends BaseAdapter
         else
         {
 
-            chatViewHolder.contentWithBackground.setBackgroundResource(R.drawable.rounded_rectangle_me);
+            chatViewHolder.contentWithBackground.setBackgroundResource(R.drawable.bg_chat_me);
 
             LinearLayout.LayoutParams layoutParams =
                     (LinearLayout.LayoutParams) chatViewHolder.contentWithBackground.getLayoutParams();

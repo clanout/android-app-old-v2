@@ -258,7 +258,7 @@ public class LauncherActivity extends BaseActivity implements
     @Override
     public void displayFacebookLoginError()
     {
-        SnackbarFactory.create(this, R.string.error_facebook);
+        SnackbarFactory.create(this, R.string.error_facebook_login);
     }
 
     @Override

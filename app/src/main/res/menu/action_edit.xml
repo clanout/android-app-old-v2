@@ -17,6 +17,6 @@
     <item
         android:id="@+id/action_edit"
         android:orderInCategory="3"
-        android:title="SAVE"
+        android:title="@string/action_save_event"
         app:showAsAction="always"/>
 </menu>

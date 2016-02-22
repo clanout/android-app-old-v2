@@ -98,7 +98,7 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
 
             if (attendee.getStatus() == null || attendee.getStatus().isEmpty())
             {
-                status.setText(R.string.default_event_status);
+                status.setText(R.string.status_default);
             }
             else
             {

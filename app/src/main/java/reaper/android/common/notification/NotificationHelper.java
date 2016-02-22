@@ -2,7 +2,6 @@ package reaper.android.common.notification;
 
 import java.util.Map;
 
-import reaper.android.R;
 import reaper.android.app.config.NotificationConstants;
 
 public class NotificationHelper
@@ -127,11 +126,6 @@ public class NotificationHelper
     private static String getEventInvitationMessage(Map<String, String> args)
     {
         return args.get("user_name") + " invited you to " + args.get("event_name");
-    }
-
-    public static int getIcon(int type)
-    {
-        return R.drawable.ic_btn_rsvp_going;
     }
 
     private static String getEventCreatedMessage(Map<String, String> args)

@@ -49,7 +49,7 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
         android:gravity="right"
-        android:text="@string/phone_invalid"
+        android:text="@string/error_invalid_phone"
         android:textColor="@android:color/holo_red_dark"
         android:visibility="invisible"/>
 

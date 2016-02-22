@@ -44,7 +44,7 @@
             android:layout_marginRight="16dp"
             android:layout_gravity="center_vertical"
             android:gravity="center_vertical"
-            android:text="@string/invite_phonebook_title"
+            android:text="@string/message_phonebook_invite"
             android:textColor="@color/text_subtitle"
             android:textSize="14sp"/>
 

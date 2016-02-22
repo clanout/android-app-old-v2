@@ -2,7 +2,6 @@ package reaper.android.app.ui.screens.details;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -110,7 +109,7 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
 
             if (attendee.getStatus() == null || attendee.getStatus().isEmpty())
             {
-                tvStatus.setText(R.string.default_event_status);
+                tvStatus.setText(R.string.status_default);
             }
             else
             {

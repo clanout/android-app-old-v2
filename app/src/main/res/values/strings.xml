@@ -1,22 +1,18 @@
 <resources>
     <string name="app_name">Clanout</string>
 
-    <!-- Intro Screens -->
-    <string name="intro_title_1">Explore and Join</string>
-    <string name="intro_description_1">Check out what your friends are planning and join the one
-        that suits your mood. You\'ll never walk alone.</string>
+    <!-- Facebook SDK -->
+    <string name="facebook_app_id">711701748936592</string>
 
-    <string name="intro_title_2">Privacy in Check</string>
-    <string name="intro_description_2">Make a plan with all your friends or keep it secret with
-        your close ones.</string>
+    <!-- Event Type -->
+    <string name="event_type_open">Open</string>
+    <string name="event_type_secret">Secret</string>
+    <string name="event_type_open_description">Everyone can see your plan. You can still send personal invites.</string>
+    <string name="event_type_secret_description">Only people you have invited can see your plan</string>
 
-    <string name="intro_title_3">All Friends at One Place</string>
-    <string name="intro_description_3">Invite friends from a pool of facebook and phonebook
-        contacts every time you make a new plan.</string>
-
-    <string name="intro_title_4">Clan Chat</string>
-    <string name="intro_description_4">Make a plan, discuss it with your friends, finalize
-        details and clan out. Simple.</string>
+    <!-- RSVP -->
+    <string name="rsvp_yes">YAY</string>
+    <string name="rsvp_no">NAY</string>
 
     <!-- Screen Titles -->
     <string name="title_home">@string/app_name</string>
@@ -25,9 +21,84 @@
     <string name="title_notification">Notifications</string>
     <string name="title_chat">Clan Chat</string>
 
+    <!-- Action Bar -->
+    <string name="action_account">Account</string>
+    <string name="action_home">Home</string>
+    <string name="action_edit_event">Edit</string>
+    <string name="action_finalize_event">Finalize Details</string>
+    <string name="action_notification">Notifications</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_delete_event">Dismiss</string>
+    <string name="action_save_event">Save</string>
+    <string name="action_chat_load">Load</string>
+
     <!-- Error Messages -->
-    <string name="error_default">Looks like we messed up. Please try again.</string>
-    <string name="error_facebook">Facebook login failed. Please try again.</string>
+    <string name="error_default">Looks like we messed up. While we fix this issue, go feed your dog.</string>
+    <string name="error_facebook_login">Facebook login failed. Please try again.</string>
+    <string name="error_no_title">Please enter a clan name</string>
+    <string name="error_rsvp_update">RSVP update failed. Please try again Later</string>
+    <string name="error_edit_finalized">Organizer finalized the details</string>
+    <string name="error_event_not_found">Unable to locate this clan</string>
+    <string name="error_invalid_phone">Please enter a valid phone number</string>
+    <string name="error_facebook_friends">Unable to show your friends. Refresh.</string>
+    <string name="error_chat_not_sent"> Unable to send message. Resend.</string>
+    <string name="error_chat_not_fetched"> Unable to load conversations. Refresh.</string>
+    <string name="error_no_watsapp">WhatsApp is not installed on this device</string>
+
+    <!-- Intro Screens -->
+    <string name="intro_title_1">Explore and Join</string>
+    <string name="intro_title_2">Privacy in Check</string>
+    <string name="intro_title_3">All Friends at One Place</string>
+    <string name="intro_title_4">Clan Chat</string>
+
+    <!-- Home Screen -->
+    <string name="home_no_events">No active clans</string>
+    <string name="home_events_fetch_error"> Unable to show clans. Swipe to refresh </string>
+    <!-- Feed - Friends Going -->
+    <string name="label_feed_no_friends">Waiting for friends to join</string>
+    <string name="label_feed_one_friend">%s joined</string>
+    <string name="label_feed_one_friend_default">1 friend joined</string>
+    <string name="label_feed_multiple_friend" formatted="false">%s, %s and %s other friends joined</string>
+    <string name="label_feed_multiple_friend_default">%s friends joined</string>
+    <string name="label_feed_multiple_friend_one_name" formatted="false">%s and %s other friends joined</string>
+    <string name="label_feed_multiple_friend_two_name" formatted="false">%s and %s joined</string>
+
+    <!-- Create Screen -->
+    <string name="label_title">Plan</string>
+    <string name="title_day_selection">Pick Day</string>
+
+    <!-- Details Screen -->
+    <string name="label_btn_invite">Invite</string>
+    <string name="label_btn_chat">Chat</string>
+    <string name="event_details_no_description">No Description</string>
+    <string name="event_details_no_attendees">This clan is no longer available. Refresh to remove dismissed clans from your feed</string>
+    <string name="event_details_no_location">To be decided</string>
+    <!-- Status Labels -->
+    <string name="status_default"/>
+    <string name="label_invited_not_going">Inform friends of your absence</string>
+    <string name="label_status">Your clan status</string>
+    <string name="label_status_last_moment">Last moment status</string>
+
+    <!-- Invite Screen -->
+    <string name="no_local_facebook_friends">Clanout is exciting with your friends around. Invite them by WhatsApp.</string>
+    <string name="no_search_results_facebook">No matches found</string>
+    <string name="no_search_results_phonebook">No matches found</string>
+    <string name="message_friends_invite">All your %s friends present on Clanout</string>
+    <string name="message_phonebook_invite">A free SMS will be sent for the invite</string>
+    <string name="friends_invited_message">Invitations Sent</string>
+    <string name="phone_contacts_not_fetched">ClanOut requires your permissions to access phonebook contacts. Once permitted, you can invite friends from phonebook to your plans. We do not store your phonebook information.</string>
+    <string name="no_local_phone_contacts">You have no friends present on Clanout. Invite friends from your phonebook.</string>
+    <string name="add_phone_number">Clanout is exciting with your friends around. Add your number to instantly connect with your nearby phonebook friends.\n\nClanOut won\'t share your personal information with anyone</string>
+    <string name="read_contacts_permission_required_message">You\'ll not be able to invite friends from your phonebook to your plans. We do not store your phonebook information.</string>
+
+    <!-- Account Screen -->
+    <string name="no_facebook_friends">Nothing to show here :)</string>
+    <string name="message_blocked_friends">Blocked friends cannot invite you or see what clans you have joined.</string>
+
+    <!-- Notifications -->
+    <string name="no_notifications">Nothing to show here</string>
+    <string name="notifications_fetch_failure">Unable to load notifications</string>
+    <string name="reminder_notification_message">1 hour to go. Giddy up!</string>
 
     <!-- Permission Defaults -->
     <string name="permission_request_again">Request Again</string>
@@ -106,109 +177,4 @@
     <string name="event_delete_positive_button">Dismiss</string>
     <string name="event_delete_negative_button">Cancel</string>
 
-    <!-- RSVP -->
-    <string name="rsvp_yes">YAY</string>
-    <string name="rsvp_maybe">MAYBE</string>
-    <string name="rsvp_no">NAY</string>
-
-    <!-- Action Bar -->
-    <string name="action_account">Account</string>
-    <string name="action_home">Home</string>
-    <string name="action_edit_event">Edit</string>
-    <string name="action_finalize_event">Finalize Details</string>
-    <string name="action_notification">Notifications</string>
-    <string name="action_clear">Clear</string>
-    <string name="action_delete_event">Dismiss Clan?</string>
-
-    <string name="home_no_events">No active clans</string>
-    <string name="home_events_fetch_error"> Unable to show clans. Swipe to refresh </string>
-
-    <!-- Event Details Fragment -->
-    <string name="event_details_no_description">No Description</string>
-    <string name="event_details_no_attendees">This clan is no longer available. Refresh to remove dismissed clans from your feed</string>
-    <string name="event_details_no_location">To be decided</string>
-
-    <string name="event_details_type_public">Open</string>
-    <string name="event_details_type_invite_only">Secret</string>
-
-    <string name="cannot_edit_event_not_going"> To edit details, join the clan </string>
-    <string name="cannot_edit_event_locked"> Organizer finalized the details </string>
-    <string name="cannot_invite"> To invite new friends, join the clan  </string>
-    <string name="cannot_chat"> You can discuss details once you join the clan </string>
-    <string name="cannot_change_rsvp"> You are the organizer </string>
-
-    <!-- Toast and Blank Screen Messages -->
-    <string name="location_not_found"> Unable to find the desired location. Try a location nearby </string>
-    <string name="location_not_available_on_map"> Unable to detect the location on map. Try again </string>
-
-    <string name="no_facebook_friends"> Nothing to show here :)  </string>
-    <string name="no_local_facebook_friends"> Clanout is exciting with your friends around. Invite them by Whatsapp </string>
-    <string name="facebook_friends_not_fetched"> Unable to show your friends. Refresh </string>
-
-    <string name="no_search_results_facebook">No matches found.</string>
-    <string name="no_search_results_phonebook">No matches found.</string>
-
-    <string name="phone_contacts_not_fetched"> ClanOut requires your permissions to access phonebook contacts. Once permitted, you can invite friends from phonebook to your plans. We do not store your phonebook information.</string>
-    <string name="no_local_phone_contacts"> You have no friends present on Clanout. Invite friends from your phonebook.</string>
-
-    <string name="whatsapp_not_installed"> Whatsapp is not installed on this device </string>
-
-    <string name="chat_messages_not_fetched"> Unable to load conversations. Refresh </string>
-    <string name="chat_message_not_sent"> Unable to send message. Resend </string>
-
-    <string name="messed_up"> Looks like we screwed up. While we fix this issue, go feed your dog </string>
-
-    <string name="phone_invalid"> Please enter a valid phone number</string>
-    <string name="add_phone_number"> Clanout is exciting with your friends around. Add your number to instantly connect with your nearby phonebook friends.\n\nClanOut won\'t share your personal information with anyone</string>
-    <string name="add_phone_number_toast">Please add your phone number</string>
-
-    <string name="event_edit_failed_locked"> Organizer finalized the details </string>
-    <string name="event_finalisation_failed"> Currently unable to finalize details. Try again</string>
-    <string name="event_unfinalisation_failed"> Currently unable to allow modifications. Try again</string>
-
-    <string name="no_notifications">Nothing to show here.</string>
-    <string name="notifications_fetch_failure">Unable to load notifications</string>
-
-    <string name="event_not_found">Unable to locate this clan</string>
-
-    <string name="default_event_status"></string>
-
-    <string name="reminder_notification_message">1 hour to go. Giddy up!</string>
-
-    <!-- Facebook -->
-    <string name="facebook_app_id">711701748936592</string>
-    <string name="problem_contacting_facebook"> Currently unable to reach facebook. Try again.</string>
-    <string name="block_screen_title_message">Blocked friends cannot invite you or see what clans you have joined.</string>
-
-    <!-- Feed - Friends Going -->
-    <string name="label_feed_no_friends">Waiting for friends to join</string>
-    <string name="label_feed_one_friend">%s joined</string>
-    <string name="label_feed_one_friend_default">1 friend joined</string>
-    <string name="label_feed_multiple_friend" formatted="false">%s, %s and %s other friends joined</string>
-    <string name="label_feed_multiple_friend_default">%s friends joined</string>
-    <string name="label_feed_multiple_friend_one_name" formatted="false">%s and %s other friends joined</string>
-    <string name="label_feed_multiple_friend_two_name" formatted="false">%s and %s joined</string>
-
-    <!-- Button -->
-    <string name="label_btn_invite">Invite</string>
-    <string name="label_btn_chat">Chat</string>
-    <string name="location_required_title">Location Required</string>
-    <string name="location_required_message">Clanout helps you make plans and join clans with friends in your city. We cannot proceed to provide you the ClanOut experience without knowing your location. </string>
-    <string name="read_contacts_permission_required_message">You\'ll not be able to invite friends from your phonebook to your plans. We do not store your phonebook information.</string>
-    <string name="open_type_definition">Everyone can see your plan. You can still send personal invites.</string>
-    <string name="secret_type_definition">Only people you have invited can see your plan</string>
-    <string name="invite_app_friends_title">All your %s friends present on Clanout</string>
-    <string name="invite_phonebook_title">A free SMS will be sent for the invite</string>
-    <string name="friends_invited_message">Invitations Sent</string>
-
-    <string name="label_title">Plan</string>
-
-    <!-- Create -->
-    <string name="message_no_title">Please enter a clan name</string>
-
-    <!-- Status Labels -->
-    <string name="label_invited_not_going">Inform friends of your absence</string>
-    <string name="label_status">Your clan status</string>
-    <string name="label_status_last_moment">Last moment status</string>
-    <string name="title_day_selection">Pick Day</string>
 </resources>
