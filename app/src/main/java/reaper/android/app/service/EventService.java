@@ -51,6 +51,7 @@ import reaper.android.app.model.EventComparator;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.Suggestion;
+import reaper.android.app.service._new.GcmService_;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventCreatedTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
@@ -78,7 +79,7 @@ public class EventService
 
     private Bus bus;
     private UserService userService;
-    private GCMService gcmService;
+    private GcmService_ gcmService;
     private EventApi eventApi;
     private EventCache eventCache;
     private GenericCache genericCache;
@@ -87,7 +88,7 @@ public class EventService
     {
         this.bus = bus;
         userService = new UserService(bus);
-        gcmService = new GCMService(bus);
+        gcmService = GcmService_.getInstance();
         eventApi = ApiManager.getInstance().getApi(EventApi.class);
         eventCache = CacheManager.getEventCache();
         genericCache = CacheManager.getGenericCache();

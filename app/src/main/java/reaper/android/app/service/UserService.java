@@ -87,11 +87,21 @@ public class UserService
 
     public String getActiveUserId()
     {
+        if (getActiveUser() == null)
+        {
+            return null;
+        }
+
         return getActiveUser().getId();
     }
 
     public String getActiveUserName()
     {
+        if (getActiveUser() == null)
+        {
+            return null;
+        }
+
         return getActiveUser().getName();
     }
 

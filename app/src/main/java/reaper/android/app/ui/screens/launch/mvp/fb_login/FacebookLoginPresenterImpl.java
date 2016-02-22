@@ -1,15 +1,18 @@
 package reaper.android.app.ui.screens.launch.mvp.fb_login;
 
 
-import reaper.android.app.service.FacebookService_;
+import reaper.android.app.service._new.AuthService_;
+import reaper.android.app.service._new.FacebookService_;
 
 public class FacebookLoginPresenterImpl implements FacebookLoginPresenter
 {
     private FacebookLoginView view;
+    private AuthService_ authService;
     private FacebookService_ facebookService;
 
-    public FacebookLoginPresenterImpl(FacebookService_ facebookService)
+    public FacebookLoginPresenterImpl(AuthService_ authService, FacebookService_ facebookService)
     {
+        this.authService = authService;
         this.facebookService = facebookService;
     }
 
@@ -24,7 +27,7 @@ public class FacebookLoginPresenterImpl implements FacebookLoginPresenter
         }
         else
         {
-            facebookService.logout();
+            authService.logout();
             this.view.displayFacebookLoginButton();
         }
     }
@@ -38,6 +41,11 @@ public class FacebookLoginPresenterImpl implements FacebookLoginPresenter
     @Override
     public void onFacebookLoginSuccess()
     {
+        if (view == null)
+        {
+            return;
+        }
+
         if (facebookService.getAccessToken() == null)
         {
             view.displayFacebookLoginError();
@@ -58,12 +66,22 @@ public class FacebookLoginPresenterImpl implements FacebookLoginPresenter
     @Override
     public void onFacebookLoginCancel()
     {
+        if (view == null)
+        {
+            return;
+        }
+
         view.displayFacebookLoginButton();
     }
 
     @Override
     public void onFacebookLoginError()
     {
+        if (view == null)
+        {
+            return;
+        }
+
         view.displayFacebookLoginError();
     }
 }

@@ -19,10 +19,14 @@
         details and clan out. Simple.</string>
 
     <!-- Screen Titles -->
-    <string name="title_home">Clanout</string>
+    <string name="title_home">@string/app_name</string>
     <string name="title_account">Account</string>
     <string name="title_notification">Notifications</string>
     <string name="title_chat">Clan Chat</string>
+
+    <!-- Error Messages -->
+    <string name="error_default">Looks like we messed up. Please try again.</string>
+    <string name="error_facebook">Facebook login failed. Please try again.</string>
 
     <!-- Play Services Error Dialog -->
     <string name="play_services_error_dialog_title">Google Play Services Error</string>
@@ -50,7 +54,6 @@
     <!--<string name="location_permission_negative_button">EXIT</string>-->
     <string name="location_denied"> Cautious? Once inside, make a secret clan with your friends. Later!</string>
     <!-- to be removed -->
-
 
 
     <!-- Fetch Pending Invites Dialog -->

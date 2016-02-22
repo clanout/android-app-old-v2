@@ -2,19 +2,13 @@ package reaper.android.app.root;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Bundle;
-import android.util.Log;
 
 import com.facebook.FacebookSdk;
 import com.facebook.stetho.Stetho;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.karumi.dexter.Dexter;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -33,16 +27,12 @@ import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
-import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
-import reaper.android.app.trigger.gcm.GcmregistrationIntentTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
-import reaper.android.app.trigger.user.UserLocationRefreshRequestTrigger;
 import reaper.android.app.ui.activity.NoInternetActivity;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
-import reaper.android.common.gcm.RegistrationIntentService;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -50,22 +40,34 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
-public class Reaper extends Application implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
+public class Reaper extends Application
 {
-    private boolean isConnected;
-
+    private static Reaper instance;
     private static Tracker tracker;
     private Bus bus;
-    private GoogleApiClient googleApiClient;
-
-    private static Reaper instance;
 
     // Services
-    private LocationService locationService;
     private UserService userService;
     private GenericCache genericCache;
 
-    private int timesApplicationOpened;
+    private boolean isConnected;
+
+    public static Reaper getReaperContext()
+    {
+        return instance;
+    }
+
+    synchronized public static Tracker getAnalyticsTracker()
+    {
+        if (tracker == null)
+        {
+            tracker = GoogleAnalytics.getInstance(instance)
+                                     .newTracker(AppConstants.GOOGLE_ANALYTICS_TRACKING_KEY);
+            tracker.enableExceptionReporting(true);
+
+        }
+        return tracker;
+    }
 
     @Override
     public void onCreate()
@@ -140,27 +142,19 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
 
         bus = new Bus(ThreadEnforcer.ANY);
         bus.register(this);
-
         Communicator.init(bus);
 
         DatabaseManager.init(this);
 
-        locationService = new LocationService(bus);
         userService = new UserService(bus);
         genericCache = CacheManager.getGenericCache();
-
-        googleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
 
         handleTimesApplicationOpened();
     }
 
     private void handleTimesApplicationOpened()
     {
-
+        int timesApplicationOpened;
         try
         {
             timesApplicationOpened = Integer
@@ -175,26 +169,16 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
 
         genericCache.put(CacheKeys.TIMES_APPLICATION_OPENED, timesApplicationOpened);
 
-        AnalyticsHelper
-                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.APP_LAUNCHED, "user - " + userService
-                        .getActiveUserId() + " time - " + DateTime.now(DateTimeZone.UTC)
-                                                                  .toString());
-    }
-
-    @Subscribe
-    public void onUserLocationRefreshRequestTrigger(UserLocationRefreshRequestTrigger trigger)
-    {
-        if (googleApiClient != null)
+        String userId = userService.getActiveUserId();
+        if (userId == null)
         {
-            googleApiClient.connect();
+            userId = "0";
         }
-    }
 
-    @Subscribe
-    public void onGcmRegistrationIntentTriggerReceived(GcmregistrationIntentTrigger trigger)
-    {
-        Intent intent = new Intent(this, RegistrationIntentService.class);
-        startService(intent);
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.APP_LAUNCHED, "user - " + userId + " time - " + DateTime
+                        .now(DateTimeZone.UTC)
+                        .toString());
     }
 
     @Subscribe
@@ -213,47 +197,5 @@ public class Reaper extends Application implements GoogleApiClient.ConnectionCal
         {
             genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now());
         }
-    }
-
-    // GOOGLE API CLIENT CALLBACKS
-    @Override
-    public void onConnected(Bundle bundle)
-    {
-        locationService.refreshUserLocation(this, googleApiClient);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i)
-    {
-        AnalyticsHelper
-                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.GOOGLE_API_CLIENT_CONNECTION_SUSPENDED, userService
-                        .getActiveUserId());
-        Log.d("reap3r", "Google API client suspended");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult)
-    {
-        AnalyticsHelper
-                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.GOOGLE_API_CLIENT_CONNECTION_FAILED, userService
-                        .getActiveUserId());
-        Timber.v("Has resolution : " + connectionResult.hasResolution());
-    }
-
-    public static Reaper getReaperContext()
-    {
-        return instance;
-    }
-
-    synchronized public static Tracker getAnalyticsTracker()
-    {
-        if (tracker == null)
-        {
-            tracker = GoogleAnalytics.getInstance(instance)
-                                     .newTracker(AppConstants.GOOGLE_ANALYTICS_TRACKING_KEY);
-            tracker.enableExceptionReporting(true);
-
-        }
-        return tracker;
     }
 }

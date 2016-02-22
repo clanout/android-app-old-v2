@@ -28,7 +28,7 @@ import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.AuthService;
 import reaper.android.app.service.FacebookService;
-import reaper.android.app.service.GCMService;
+import reaper.android.app.service._new.GcmService_;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
@@ -44,7 +44,8 @@ import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
 
-public class LauncherActivity extends AppCompatActivity {
+public class LauncherActivity extends AppCompatActivity
+{
     private Bus bus;
     private LocationManager locationManager;
 
@@ -55,7 +56,7 @@ public class LauncherActivity extends AppCompatActivity {
     private LocationService locationService;
     private FacebookService facebookService;
     private UserService userService;
-    private GCMService gcmService;
+    private GcmService_ gcmService;
     private NotificationCache notificationCache;
 
     // UI Elements
@@ -66,7 +67,8 @@ public class LauncherActivity extends AppCompatActivity {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.LAUNCHER_ACTIVITY);
@@ -79,7 +81,7 @@ public class LauncherActivity extends AppCompatActivity {
         bus = Communicator.getInstance().getBus();
 
         authService = new AuthService(bus);
-        gcmService = new GCMService(bus);
+        gcmService = GcmService_.getInstance();
         locationService = new LocationService(bus);
         facebookService = new FacebookService(bus);
         userService = new UserService(bus);
@@ -91,7 +93,8 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
 
         Log.d("APP", "onResume launcher");
@@ -100,13 +103,13 @@ public class LauncherActivity extends AppCompatActivity {
         bus.register(this);
 
 
-
         proceed();
 
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause()
+    {
         super.onPause();
 
         Log.d("APP", "onPause");
@@ -115,18 +118,23 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
+    protected void onStop()
+    {
         super.onStop();
     }
 
     @Subscribe
-    public void onNewSessionCreated(NewSessionCreatedTrigger trigger) {
+    public void onNewSessionCreated(NewSessionCreatedTrigger trigger)
+    {
         genericCache.put(CacheKeys.SESSION_ID, trigger.getSessionCookie());
-        if (!locationService.locationExists()) {
+        if (!locationService.locationExists())
+        {
 //            progressDialog = ProgressDialog.show(this, "Welcome", "Getting your location...");
             isBlocking = true;
             bus.post(new UserLocationRefreshRequestTrigger());
-        } else {
+        }
+        else
+        {
             isBlocking = false;
             bus.post(new UserLocationRefreshRequestTrigger());
             gotoMainActivity();
@@ -134,15 +142,18 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     @Subscribe
-    public void onNewSessionNotCreated(GenericErrorTrigger trigger) {
-        if (trigger.getErrorCode() == ErrorCode.NEW_SESSION_CREATION_FAILURE) {
+    public void onNewSessionNotCreated(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.NEW_SESSION_CREATION_FAILURE)
+        {
             Toast.makeText(this, R.string.messed_up, Toast.LENGTH_LONG).show();
             finish();
         }
     }
 
     @Subscribe
-    public void onFacebookProfileFetched(FacebookProfileFetchedTrigger trigger) {
+    public void onFacebookProfileFetched(FacebookProfileFetchedTrigger trigger)
+    {
         genericCache.put(CacheKeys.USER_ID, trigger.getId());
         genericCache.put(CacheKeys.USER_FIRST_NAME, trigger.getFirstName());
         genericCache.put(CacheKeys.USER_LAST_NAME, trigger.getLastName());
@@ -153,14 +164,22 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     @Subscribe
-    public void onFacebookFriendsFetched(FacebookFriendsIdFetchedTrigger trigger) {
-        authService.createNewSession(genericCache.get(CacheKeys.USER_FIRST_NAME), genericCache.get(CacheKeys.USER_LAST_NAME), genericCache.get(CacheKeys.USER_GENDER), genericCache.get(CacheKeys.USER_EMAIL), genericCache.get(CacheKeys.USER_ID), trigger.getFriendsIdList());
+    public void onFacebookFriendsFetched(FacebookFriendsIdFetchedTrigger trigger)
+    {
+        authService.createNewSession(genericCache.get(CacheKeys.USER_FIRST_NAME), genericCache
+                .get(CacheKeys.USER_LAST_NAME), genericCache
+                .get(CacheKeys.USER_GENDER), genericCache.get(CacheKeys.USER_EMAIL), genericCache
+                .get(CacheKeys.USER_ID), trigger.getFriendsIdList());
     }
 
     @Subscribe
-    public void onFacebookFriendsNotFetched(GenericErrorTrigger trigger) {
-        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE) {
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FACEBOOK_FRIENDS_NOT_FETCHED, userService.getActiveUserId());
+    public void onFacebookFriendsNotFetched(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_FRIENDS_FETCHED_FAILURE)
+        {
+            AnalyticsHelper
+                    .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FACEBOOK_FRIENDS_NOT_FETCHED, userService
+                            .getActiveUserId());
             Toast.makeText(this, R.string.problem_contacting_facebook, Toast.LENGTH_LONG).show();
             LoginManager.getInstance().logOut();
             finish();
@@ -168,9 +187,13 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     @Subscribe
-    public void onFacebookProfileNotFetched(GenericErrorTrigger trigger) {
-        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_PROFILE_FETCH_FAILURE) {
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FACEBOOK_PROFILE_NOT_FETCHED, userService.getActiveUserId());
+    public void onFacebookProfileNotFetched(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.FACEBOOK_PROFILE_FETCH_FAILURE)
+        {
+            AnalyticsHelper
+                    .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FACEBOOK_PROFILE_NOT_FETCHED, userService
+                            .getActiveUserId());
             Toast.makeText(this, R.string.problem_contacting_facebook, Toast.LENGTH_LONG).show();
             LoginManager.getInstance().logOut();
             finish();
@@ -178,12 +201,16 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     @Subscribe
-    public void onSessionValidated(SessionValidatedTrigger trigger) {
-        if (!locationService.locationExists()) {
+    public void onSessionValidated(SessionValidatedTrigger trigger)
+    {
+        if (!locationService.locationExists())
+        {
 //            progressDialog = ProgressDialog.show(this, "Welcome", "Getting your location...");
             isBlocking = true;
             bus.post(new UserLocationRefreshRequestTrigger());
-        } else {
+        }
+        else
+        {
             isBlocking = false;
             bus.post(new UserLocationRefreshRequestTrigger());
             gotoMainActivity();
@@ -191,69 +218,94 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     @Subscribe
-    public void onGenericErrorTrigger(GenericErrorTrigger trigger) {
-        if (trigger.getErrorCode() == ErrorCode.INVALID_SESSION) {
+    public void onGenericErrorTrigger(GenericErrorTrigger trigger)
+    {
+        if (trigger.getErrorCode() == ErrorCode.INVALID_SESSION)
+        {
             facebookService.getUserFacebookProfile();
         }
     }
 
     @Subscribe
-    public void onUserLocationRefreshTrigger(UserLocationRefreshTrigger trigger) {
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.LOCATION_REFRESHED, null);
+    public void onUserLocationRefreshTrigger(UserLocationRefreshTrigger trigger)
+    {
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.LOCATION_REFRESHED, null);
 
-        if (progressDialog != null) {
+        if (progressDialog != null)
+        {
             progressDialog.dismiss();
         }
 
-        if (isBlocking) {
+        if (isBlocking)
+        {
             gotoMainActivity();
         }
     }
 
-    public void gotoMainActivity() {
+    public void gotoMainActivity()
+    {
 
-        if (genericCache.get(CacheKeys.GCM_TOKEN) == null) {
-            if (checkPlayServices()) {
+        if (genericCache.get(CacheKeys.GCM_TOKEN) == null)
+        {
+            if (checkPlayServices())
+            {
 
                 Log.d("APP", "starting gcm registeration " + System.currentTimeMillis());
 
                 gcmService.register();
 
-            } else {
             }
-        } else {
+            else
+            {
+            }
+        }
+        else
+        {
 
 
             startActivity(handleIntent());
 
-            Log.d("APP", "going to main activity without gcm registeration " + System.currentTimeMillis());
+            Log.d("APP", "going to main activity without gcm registeration " + System
+                    .currentTimeMillis());
 
             finish();
         }
     }
 
 
-    private Intent handleIntent() {
+    private Intent handleIntent()
+    {
 
         Intent intent = new Intent(this, MainActivity.class);
 
-        String shouldGoToNotificationFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_NOTIFICATION_FRAGMENT);
+        String shouldGoToNotificationFragment = getIntent()
+                .getStringExtra(BundleKeys.SHOULD_GO_TO_NOTIFICATION_FRAGMENT);
 
-        if (shouldGoToNotificationFragment != null) {
-            if (shouldGoToNotificationFragment.equals("yes")) {
+        if (shouldGoToNotificationFragment != null)
+        {
+            if (shouldGoToNotificationFragment.equals("yes"))
+            {
                 intent.putExtra(BundleKeys.SHOULD_GO_TO_NOTIFICATION_FRAGMENT, "yes");
                 startActivity(intent);
                 finish();
             }
-        } else {
+        }
+        else
+        {
 
-            String shouldGoToDetailsFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);
-            if (shouldGoToDetailsFragment == null) {
+            String shouldGoToDetailsFragment = getIntent()
+                    .getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);
+            if (shouldGoToDetailsFragment == null)
+            {
                 shouldGoToDetailsFragment = "no";
                 intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
 
-            } else {
-                if (shouldGoToDetailsFragment.equals("yes")) {
+            }
+            else
+            {
+                if (shouldGoToDetailsFragment.equals("yes"))
+                {
 
                     notificationCache.clearAll();
 
@@ -261,23 +313,32 @@ public class LauncherActivity extends AppCompatActivity {
                     intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
                     intent.putExtra("event_id", eventId);
 
-                    if (getIntent().getBooleanExtra(BundleKeys.POPUP_STATUS_DIALOG, false)) {
+                    if (getIntent().getBooleanExtra(BundleKeys.POPUP_STATUS_DIALOG, false))
+                    {
                         intent.putExtra(BundleKeys.POPUP_STATUS_DIALOG, true);
-                    } else {
+                    }
+                    else
+                    {
                         intent.putExtra(BundleKeys.POPUP_STATUS_DIALOG, false);
                     }
 
-                    String shouldGoToChatFragment = getIntent().getStringExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT);
+                    String shouldGoToChatFragment = getIntent()
+                            .getStringExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT);
 
-                    if (shouldGoToChatFragment == null) {
+                    if (shouldGoToChatFragment == null)
+                    {
                         shouldGoToChatFragment = "no";
                         intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, shouldGoToChatFragment);
-                    } else {
+                    }
+                    else
+                    {
 
                         intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, shouldGoToChatFragment);
                     }
 
-                } else {
+                }
+                else
+                {
                     intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
                 }
             }
@@ -287,71 +348,96 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
 
-    private void proceed() {
+    private void proceed()
+    {
 
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+        {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Base_Theme_AppCompat_Light_Dialog_Alert)
                     .setTitle(R.string.location_permission_heading)
                     .setMessage(R.string.location_permission_message)
                     .setCancelable(false)
-                    .setPositiveButton(R.string.location_permission_positive_button, new DialogInterface.OnClickListener() {
+                    .setPositiveButton(R.string.location_permission_positive_button, new DialogInterface.OnClickListener()
+                    {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.LOCATION_GRANTED, null);
+                        public void onClick(DialogInterface dialogInterface, int i)
+                        {
+                            AnalyticsHelper
+                                    .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.LOCATION_GRANTED, null);
                             startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                         }
                     })
-                    .setNegativeButton(R.string.location_permission_negative_button, new DialogInterface.OnClickListener() {
+                    .setNegativeButton(R.string.location_permission_negative_button, new DialogInterface.OnClickListener()
+                    {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.LOCATION_DENIED, null);
-                            Toast.makeText(LauncherActivity.this, R.string.location_denied, Toast.LENGTH_LONG).show();
+                        public void onClick(DialogInterface dialogInterface, int i)
+                        {
+                            AnalyticsHelper
+                                    .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.LOCATION_DENIED, null);
+                            Toast.makeText(LauncherActivity.this, R.string.location_denied, Toast.LENGTH_LONG)
+                                 .show();
                             finish();
                         }
                     });
             builder.create().show();
-        } else {
+        }
+        else
+        {
             String sessionCookie = genericCache.get(CacheKeys.SESSION_ID);
-            if (sessionCookie != null) {
+            if (sessionCookie != null)
+            {
                 authService.validateSession(sessionCookie);
-            } else {
+            }
+            else
+            {
                 facebookService.getUserFacebookProfile();
             }
         }
     }
 
-    private boolean checkPlayServices() {
+    private boolean checkPlayServices()
+    {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+        if (resultCode != ConnectionResult.SUCCESS)
+        {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode))
+            {
                 GooglePlayServicesUtil.getErrorDialog(resultCode, this,
                         PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
+            }
+            else
+            {
 
                 Toast.makeText(this, "This device does not support Google Play Services.", Toast.LENGTH_LONG)
-                        .show();
+                     .show();
                 finish();
             }
 
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.PLAY_SERVICES_NOT_PRESENT, null);
+            AnalyticsHelper
+                    .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.PLAY_SERVICES_NOT_PRESENT, null);
 
             return false;
         }
 
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.PLAY_SERVICES_PRESENT, null);
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.PLAY_SERVICES_PRESENT, null);
 
         return true;
     }
 
     @Subscribe
-    public void onGcmRegistrationComplete(GcmRegistrationCompleteTrigger trigger) {
+    public void onGcmRegistrationComplete(GcmRegistrationCompleteTrigger trigger)
+    {
 
 
-        runOnUiThread(new Runnable() {
+        runOnUiThread(new Runnable()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
 
-                Log.d("APP", "going to main activity after gcm registeration" + System.currentTimeMillis());
+                Log.d("APP", "going to main activity after gcm registeration" + System
+                        .currentTimeMillis());
 
                 startActivity(handleIntent());
                 finish();

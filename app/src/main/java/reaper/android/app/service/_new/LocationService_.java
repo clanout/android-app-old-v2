@@ -1,11 +1,10 @@
-package reaper.android.app.service;
+package reaper.android.app.service._new;
 
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -31,21 +30,21 @@ public class LocationService_
 {
     private static LocationService_ instance;
 
-    public static void init(Context context, LocationManager locationManager, GoogleApiClient googleApiClient)
+    public static void init(Context context, LocationManager locationManager, GoogleService_ googleService)
     {
         if (instance != null)
         {
             return;
         }
 
-        instance = new LocationService_(context, locationManager, googleApiClient);
+        instance = new LocationService_(context, locationManager, googleService);
     }
 
     public static LocationService_ getInstance()
     {
         if (instance == null)
         {
-            throw new IllegalStateException("Location Service Not Initialized");
+            throw new IllegalStateException("[LocationService Not Initialized]");
         }
 
         return instance;
@@ -53,18 +52,18 @@ public class LocationService_
 
     private Context context;
     private LocationManager locationManager;
-    private GoogleApiClient googleApiClient;
+    private GoogleService_ googleService;
     private MeApi meApi;
 
     private Location location;
 
     private LocationListener locationListener;
 
-    private LocationService_(Context context, LocationManager locationManager, GoogleApiClient googleApiClient)
+    private LocationService_(Context context, LocationManager locationManager, GoogleService_ googleService)
     {
         this.context = context;
         this.locationManager = locationManager;
-        this.googleApiClient = googleApiClient;
+        this.googleService = googleService;
         this.meApi = ApiManager.getInstance().getApi(MeApi.class);
     }
 
@@ -85,7 +84,7 @@ public class LocationService_
                         {
                             //noinspection MissingPermission
                             if (!LocationServices.FusedLocationApi
-                                    .getLocationAvailability(googleApiClient).isLocationAvailable())
+                                    .getLocationAvailability(googleService.getGoogleApiClient()).isLocationAvailable())
                             {
                                 Timber.v("[FusedLocationApi] Last Known Location Unavailable");
                                 subscriber.onNext(null);
@@ -96,7 +95,7 @@ public class LocationService_
                                 Timber.v("[FusedLocationApi] Last Known Location Available");
                                 //noinspection MissingPermission
                                 android.location.Location location = LocationServices.FusedLocationApi
-                                        .getLastLocation(googleApiClient);
+                                        .getLastLocation(googleService.getGoogleApiClient());
 
                                 subscriber.onNext(location);
                                 subscriber.onCompleted();
@@ -172,7 +171,7 @@ public class LocationService_
 
                                         //noinspection MissingPermission
                                         LocationServices.FusedLocationApi
-                                                .requestLocationUpdates(googleApiClient, locationRequest, locationListener);
+                                                .requestLocationUpdates(googleService.getGoogleApiClient(), locationRequest, locationListener);
                                     }
                                 });
                     }
@@ -186,7 +185,7 @@ public class LocationService_
                         if (locationListener != null)
                         {
                             LocationServices.FusedLocationApi
-                                    .removeLocationUpdates(googleApiClient, locationListener);
+                                    .removeLocationUpdates(googleService.getGoogleApiClient(), locationListener);
 
                             Timber.v("[FusedLocationApi] Closed Location Listener");
                         }

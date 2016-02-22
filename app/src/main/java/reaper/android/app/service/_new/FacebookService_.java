@@ -1,4 +1,4 @@
-package reaper.android.app.service;
+package reaper.android.app.service._new;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -17,7 +17,6 @@ import reaper.android.app.api.core.FacebookApiManager;
 import reaper.android.app.api.fb.FacebookApi;
 import reaper.android.app.api.fb.response.FacebookCoverPicResponse;
 import reaper.android.app.api.fb.response.FacebookProfileResponse;
-import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.model.User;
 import rx.Observable;
 import rx.Subscriber;
@@ -27,12 +26,29 @@ import rx.schedulers.Schedulers;
 
 public class FacebookService_
 {
+    public static FacebookService_ instance;
+
+    public static void init()
+    {
+        instance = new FacebookService_();
+    }
+
+    public static FacebookService_ getInstance()
+    {
+        if (instance == null)
+        {
+            throw new IllegalStateException("[FacebookService Not Initialized]");
+        }
+
+        return instance;
+    }
+
     public static List<String> PERMISSIONS = Arrays.asList("email", "user_friends");
     private static final String PROFILE_PIC_URL = "https://graph.facebook.com/v2.4/$$$/picture?height=1000";
 
     private FacebookApi facebookApi;
 
-    public FacebookService_()
+    private FacebookService_()
     {
         facebookApi = FacebookApiManager.getInstance().getApi();
     }
@@ -57,7 +73,6 @@ public class FacebookService_
 
     public void logout()
     {
-        CacheManager.clearAllCaches();
         LoginManager.getInstance().logOut();
     }
 

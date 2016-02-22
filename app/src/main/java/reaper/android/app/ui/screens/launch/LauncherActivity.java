@@ -25,7 +25,6 @@ import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.squareup.otto.Bus;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,11 +33,11 @@ import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.config.BundleKeys;
-import reaper.android.app.service.AuthService_;
-import reaper.android.app.service.FacebookService_;
-import reaper.android.app.service.GCMService;
-import reaper.android.app.service.LocationService_;
-import reaper.android.app.service.UserService;
+import reaper.android.app.service._new.AuthService_;
+import reaper.android.app.service._new.FacebookService_;
+import reaper.android.app.service._new.GcmService_;
+import reaper.android.app.service._new.GoogleService_;
+import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.app.ui.screens.launch.mvp.bootstrap.BootstrapPresenter;
 import reaper.android.app.ui.screens.launch.mvp.bootstrap.BootstrapPresenterImpl;
@@ -47,11 +46,9 @@ import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginPresenter;
 import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginPresenterImpl;
 import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginView;
 import reaper.android.app.ui.util.SnackbarFactory;
-import reaper.android.common.communicator.Communicator;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import timber.log.Timber;
 
 
 public class LauncherActivity extends AppCompatActivity implements
@@ -91,10 +88,15 @@ public class LauncherActivity extends AppCompatActivity implements
     ImageView ivIntro4;
 
     /* Fields */
-    Bus bus;
     CallbackManager facebookCallbackManager;
     GoogleApiClient googleApiClient;
+
+    GoogleService_ googleService;
     FacebookService_ facebookService;
+    LocationService_ locationService;
+    AuthService_ authService;
+    GcmService_ gcmService;
+
     boolean introScrolled;
 
     /* Lifecycle Methods */
@@ -106,13 +108,35 @@ public class LauncherActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_launcher_);
         ButterKnife.bind(this);
 
-        // Init View
+        /* Init View */
         displayBootstrapView();
 
-        bus = Communicator.getInstance().getBus();
         facebookCallbackManager = CallbackManager.Factory.create();
-        facebookService = new FacebookService_();
-        facebookLoginPresenter = new FacebookLoginPresenterImpl(facebookService);
+
+        /* Google Service */
+        GoogleService_.init();
+        googleService = GoogleService_.getInstance();
+
+        /* Facebook Service */
+        FacebookService_.init();
+        facebookService = FacebookService_.getInstance();
+
+        /* Location Service */
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        LocationService_.init(getApplicationContext(), locationManager, googleService);
+        locationService = LocationService_.getInstance();
+
+        /* Auth Service */
+        AuthService_.init(facebookService, CacheManager.getGenericCache());
+        authService = AuthService_.getInstance();
+
+        /* Gcm Service */
+        GcmService_.init();
+        gcmService = GcmService_.getInstance();
+
+        /* Presenters */
+        facebookLoginPresenter = new FacebookLoginPresenterImpl(authService, facebookService);
+        bootstrapPresenter = new BootstrapPresenterImpl(locationService, authService, gcmService);
     }
 
     @Override
@@ -120,6 +144,22 @@ public class LauncherActivity extends AppCompatActivity implements
     {
         super.onResume();
         setupGooglePlayService();
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        facebookLoginPresenter.detachView();
+        bootstrapPresenter.detachView();
+    }
+
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+
+        googleApiClient.disconnect();
     }
 
     @Override
@@ -143,7 +183,7 @@ public class LauncherActivity extends AppCompatActivity implements
     @Override
     public void displayFacebookLoginError()
     {
-        SnackbarFactory.create(findViewById(android.R.id.content), "Facebook Login Error");
+        SnackbarFactory.create(this, R.string.error_facebook);
     }
 
     @Override
@@ -170,15 +210,12 @@ public class LauncherActivity extends AppCompatActivity implements
     @Override
     public void displayError()
     {
-        SnackbarFactory.create(findViewById(android.R.id.content), "Server Error");
+        SnackbarFactory.create(this, R.string.error_default);
     }
 
     @Override
     public void proceed()
     {
-        UserService userService = new UserService(bus);
-        Timber.v("[USER] " + userService.getActiveUser().toString());
-
         gotoMainActivity();
         finish();
     }
@@ -230,7 +267,8 @@ public class LauncherActivity extends AppCompatActivity implements
         }
         else
         {
-            initBootstrapPresenter();
+            googleService.setGoogleApiClient(googleApiClient);
+
             facebookLoginPresenter.attachView(this);
         }
     }
@@ -238,7 +276,8 @@ public class LauncherActivity extends AppCompatActivity implements
     @Override
     public void onConnected(@Nullable Bundle bundle)
     {
-        initBootstrapPresenter();
+        googleService.setGoogleApiClient(googleApiClient);
+
         facebookLoginPresenter.attachView(this);
     }
 
@@ -254,19 +293,6 @@ public class LauncherActivity extends AppCompatActivity implements
     }
 
     /* Helper Methods */
-    private void initBootstrapPresenter()
-    {
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        LocationService_.init(getApplicationContext(), locationManager, googleApiClient);
-        LocationService_ locationService = LocationService_.getInstance();
-
-        AuthService_ authService = new AuthService_(facebookService, CacheManager
-                .getGenericCache());
-        GCMService gcmService = new GCMService(bus);
-
-        bootstrapPresenter = new BootstrapPresenterImpl(locationService, facebookService, authService, gcmService);
-    }
-
     private void setupIntroViewPager()
     {
         introScrolled = false;

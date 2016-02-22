@@ -1,4 +1,4 @@
-package reaper.android.app.service;
+package reaper.android.app.service._new;
 
 import android.util.Pair;
 
@@ -9,6 +9,7 @@ import reaper.android.app.api.auth.request.CreateNewSessionApiRequest;
 import reaper.android.app.api.auth.request.ValidateSessionApiRequest;
 import reaper.android.app.api.auth.response.CreateNewSessionApiResponse;
 import reaper.android.app.api.core.ApiManager;
+import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.CacheKeys;
 import reaper.android.app.model.User;
@@ -21,11 +22,28 @@ import timber.log.Timber;
 
 public class AuthService_
 {
+    private static AuthService_ instance;
+
+    public static void init(FacebookService_ facebookService, GenericCache genericCache)
+    {
+        instance = new AuthService_(facebookService, genericCache);
+    }
+
+    public static AuthService_ getInstance()
+    {
+        if (instance == null)
+        {
+            throw new IllegalStateException("[AuthService Not Initialized]");
+        }
+
+        return instance;
+    }
+
     private AuthApi authApi;
     private FacebookService_ facebookService;
     private GenericCache genericCache;
 
-    public AuthService_(FacebookService_ facebookService, GenericCache genericCache)
+    private AuthService_(FacebookService_ facebookService, GenericCache genericCache)
     {
         this.facebookService = facebookService;
         this.genericCache = genericCache;
@@ -51,6 +69,12 @@ public class AuthService_
                     }
                 })
                 .subscribeOn(Schedulers.newThread());
+    }
+
+    public void logout()
+    {
+        facebookService.logout();
+        CacheManager.clearAllCaches();
     }
 
     /* Helper Methods */

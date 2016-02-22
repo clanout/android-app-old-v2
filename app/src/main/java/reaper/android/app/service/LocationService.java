@@ -23,6 +23,7 @@ import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Location;
+import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.UserLocationRefreshTrigger;
 import reaper.android.common.analytics.AnalyticsHelper;

@@ -36,7 +36,7 @@ import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.FacebookService;
-import reaper.android.app.service.GCMService;
+import reaper.android.app.service._new.GcmService_;
 import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
@@ -57,7 +57,7 @@ import reaper.android.common.communicator.Communicator;
 public class MainActivity extends AppCompatActivity {
     private android.app.FragmentManager fragmentManager;
     private Bus bus;
-    private GCMService gcmService;
+    private GcmService_ gcmService;
     private EventService eventService;
     private UserService userService;
     private LocationService locationService;
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         bus.register(this);
         isBusRegistered = true;
 
-        gcmService = new GCMService(bus);
+        gcmService = GcmService_.getInstance();
         eventService = new EventService(bus);
         userService = new UserService(bus);
         locationService = new LocationService(bus);
