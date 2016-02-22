@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GenericCacheKeys;
 
 public abstract class ApiRequest
 {
@@ -14,6 +14,6 @@ public abstract class ApiRequest
     protected ApiRequest()
     {
         GenericCache cache = CacheManager.getGenericCache();
-        this.sessionCookie = cache.get(CacheKeys.SESSION_ID);
+        this.sessionCookie = cache.get(GenericCacheKeys.SESSION_ID);
     }
 }

@@ -2,7 +2,6 @@ package reaper.android.common.gcm;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
@@ -14,7 +13,7 @@ import reaper.android.app.api.gcm.request.GCmRegisterUserApiRequest;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.gcm.GcmRegistrationCompleteTrigger;
@@ -52,8 +51,8 @@ public class RegistrationIntentService extends IntentService
         }
         catch (Exception e)
         {
-            genericCache.delete(CacheKeys.GCM_TOKEN);
-            genericCache.put(CacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
+            genericCache.delete(GenericCacheKeys.GCM_TOKEN);
+            genericCache.put(GenericCacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
 
         }
         bus.post(new GcmRegistrationCompleteTrigger());
@@ -80,8 +79,8 @@ public class RegistrationIntentService extends IntentService
                     @Override
                     public void onError(Throwable e)
                     {
-                        genericCache.delete(CacheKeys.GCM_TOKEN);
-                        genericCache.put(CacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
+                        genericCache.delete(GenericCacheKeys.GCM_TOKEN);
+                        genericCache.put(GenericCacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
                     }
 
                     @Override
@@ -90,13 +89,13 @@ public class RegistrationIntentService extends IntentService
                         if (response.getStatus() == 200)
                         {
                             AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.GCM_TOKEN_SENT_TO_SERVER, "");
-                            genericCache.put(CacheKeys.GCM_TOKEN, token);
-                            genericCache.put(CacheKeys.GCM_TOKEN_SENT_TO_SERVER, true);
+                            genericCache.put(GenericCacheKeys.GCM_TOKEN, token);
+                            genericCache.put(GenericCacheKeys.GCM_TOKEN_SENT_TO_SERVER, true);
                         }
                         else
                         {
-                            genericCache.delete(CacheKeys.GCM_TOKEN);
-                            genericCache.put(CacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
+                            genericCache.delete(GenericCacheKeys.GCM_TOKEN);
+                            genericCache.put(GenericCacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
                         }
                     }
                 });

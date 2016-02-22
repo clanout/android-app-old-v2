@@ -10,8 +10,8 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.Location;
 import reaper.android.app.service.EventService;
-import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.ui.util.DateTimeUtil;
 import rx.Subscriber;
 import rx.Subscription;
@@ -34,7 +34,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     {
         userService = new UserService(bus);
         eventService = new EventService(bus);
-        userLocation = new LocationService(bus).getUserLocation();
+        userLocation = LocationService_.getInstance().getCurrentLocation();
 
         subscriptions = new CompositeSubscription();
     }

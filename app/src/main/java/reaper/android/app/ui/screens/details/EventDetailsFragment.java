@@ -55,7 +55,7 @@ import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BundleKeys;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
@@ -226,7 +226,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
 
                 if (presenter != null)
                 {
-                    if (genericCache.get(CacheKeys.READ_CONTACT_PERMISSION_DENIED) == null)
+                    if (genericCache.get(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED) == null)
                     {
                         handleReadContactsPermission();
                     }
@@ -827,7 +827,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
 
                                 Log.d("APP", "2 ---- permission denied");
 
-                                genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
+                                genericCache.put(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
                                 navigateToInviteScreen(event);
                             }
 
@@ -876,7 +876,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
             public void onClick(DialogInterface dialog, int which)
             {
 
-                genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
+                genericCache.put(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
                 navigateToInviteScreen(event);
             }
         });

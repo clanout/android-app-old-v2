@@ -9,12 +9,12 @@ import java.util.List;
 
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.Location;
 import reaper.android.app.service.EventService;
-import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.service._new.LocationService_;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -43,7 +43,7 @@ public class EventsPresenterImpl implements EventsPresenter
         eventService = new EventService(bus);
         userService = new UserService(bus);
         cache = CacheManager.getGenericCache();
-        userLocation = new LocationService(bus).getUserLocation();
+        userLocation = LocationService_.getInstance().getCurrentLocation();
         subscriptions = new CompositeSubscription();
 
         if (events == null)
@@ -123,7 +123,7 @@ public class EventsPresenterImpl implements EventsPresenter
 
         Subscription subscription = eventService
                 ._refreshEvents(userLocation.getZone(), eventIds, cache
-                        .get(CacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.class))
+                        .get(GenericCacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.class))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Event>>()
                 {

@@ -10,7 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,18 +25,23 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
-import reaper.android.app.config.BundleKeys;
+import reaper.android.app.model.Event;
+import reaper.android.app.service.EventService;
 import reaper.android.app.service._new.AuthService_;
 import reaper.android.app.service._new.FacebookService_;
 import reaper.android.app.service._new.GcmService_;
 import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.service._new.LocationService_;
+import reaper.android.app.ui._core.BaseActivity;
+import reaper.android.app.ui.screens.FlowEntry;
 import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.app.ui.screens.launch.mvp.bootstrap.BootstrapPresenter;
 import reaper.android.app.ui.screens.launch.mvp.bootstrap.BootstrapPresenterImpl;
@@ -46,18 +50,34 @@ import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginPresenter;
 import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginPresenterImpl;
 import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginView;
 import reaper.android.app.ui.util.SnackbarFactory;
+import reaper.android.common.communicator.Communicator;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 
 
-public class LauncherActivity extends AppCompatActivity implements
+public class LauncherActivity extends BaseActivity implements
         FacebookCallback<LoginResult>,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         FacebookLoginView,
         BootstrapView
 {
+    private static final String ARG_FLOW_ENTRY = "arg_flow_entry";
+    private static final String ARG_EVENT_ID = "arg_event_id";
+
+    public static Intent callingIntent(Context context, @FlowEntry int flowEntry, String eventId)
+    {
+        Intent intent = new Intent(context, LauncherActivity.class);
+
+        intent.putExtra(ARG_FLOW_ENTRY, flowEntry);
+        intent.putExtra(ARG_EVENT_ID, eventId);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        return intent;
+    }
+
+
     FacebookLoginPresenter facebookLoginPresenter;
 
     BootstrapPresenter bootstrapPresenter;
@@ -135,8 +155,9 @@ public class LauncherActivity extends AppCompatActivity implements
         gcmService = GcmService_.getInstance();
 
         /* Presenters */
+        EventService eventService = new EventService(Communicator.getInstance().getBus());
         facebookLoginPresenter = new FacebookLoginPresenterImpl(authService, facebookService);
-        bootstrapPresenter = new BootstrapPresenterImpl(locationService, authService, gcmService);
+        bootstrapPresenter = new BootstrapPresenterImpl(locationService, authService, gcmService, eventService);
     }
 
     @Override
@@ -214,9 +235,9 @@ public class LauncherActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void proceed()
+    public void proceed(List<Event> events)
     {
-        gotoMainActivity();
+        gotoMainActivity(events);
         finish();
     }
 
@@ -530,81 +551,14 @@ public class LauncherActivity extends AppCompatActivity implements
         alertDialog.show();
     }
 
-    private void closeApp()
+    private void gotoMainActivity(List<Event> events)
     {
-        finish();
-        System.exit(0);
-    }
+        Intent sourceIntent = getIntent();
 
-    // TODO : Refactor
-    private void gotoMainActivity()
-    {
-        Intent intent = new Intent(this, MainActivity.class);
+        @FlowEntry int flowEntry = sourceIntent.getIntExtra(ARG_FLOW_ENTRY, FlowEntry.HOME);
+        String eventId = sourceIntent.getStringExtra(ARG_EVENT_ID);
+        ArrayList<Event> eventList = (ArrayList<Event>) events;
 
-        String shouldGoToNotificationFragment = getIntent()
-                .getStringExtra(BundleKeys.SHOULD_GO_TO_NOTIFICATION_FRAGMENT);
-
-        if (shouldGoToNotificationFragment != null)
-        {
-            if (shouldGoToNotificationFragment.equals("yes"))
-            {
-                intent.putExtra(BundleKeys.SHOULD_GO_TO_NOTIFICATION_FRAGMENT, "yes");
-                startActivity(intent);
-                finish();
-            }
-        }
-        else
-        {
-            String shouldGoToDetailsFragment = getIntent()
-                    .getStringExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT);
-            if (shouldGoToDetailsFragment == null)
-            {
-                shouldGoToDetailsFragment = "no";
-                intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
-
-            }
-            else
-            {
-                if (shouldGoToDetailsFragment.equals("yes"))
-                {
-                    CacheManager.getNotificationCache().clearAll();
-
-                    String eventId = getIntent().getStringExtra("event_id");
-                    intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
-                    intent.putExtra("event_id", eventId);
-
-                    if (getIntent().getBooleanExtra(BundleKeys.POPUP_STATUS_DIALOG, false))
-                    {
-                        intent.putExtra(BundleKeys.POPUP_STATUS_DIALOG, true);
-                    }
-                    else
-                    {
-                        intent.putExtra(BundleKeys.POPUP_STATUS_DIALOG, false);
-                    }
-
-                    String shouldGoToChatFragment = getIntent()
-                            .getStringExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT);
-
-                    if (shouldGoToChatFragment == null)
-                    {
-                        shouldGoToChatFragment = "no";
-                        intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, shouldGoToChatFragment);
-                    }
-                    else
-                    {
-
-                        intent.putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, shouldGoToChatFragment);
-                    }
-                }
-                else
-                {
-                    intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, shouldGoToDetailsFragment);
-                }
-            }
-
-        }
-
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        startActivity(MainActivity.callingIntent(this, flowEntry, eventId, eventList));
     }
 }

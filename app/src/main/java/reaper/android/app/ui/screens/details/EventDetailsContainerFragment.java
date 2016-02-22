@@ -33,7 +33,7 @@ import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
@@ -168,7 +168,7 @@ public class EventDetailsContainerFragment extends BaseFragment
         super.onResume();
 
         setActionBarTitle();
-        genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EVENT_DETAILS_CONTAINER);
+        genericCache.put(GenericCacheKeys.ACTIVE_FRAGMENT, BackstackTags.EVENT_DETAILS_CONTAINER);
 
         bus.register(this);
 
@@ -256,14 +256,14 @@ public class EventDetailsContainerFragment extends BaseFragment
     private void handleInAppRating()
     {
 
-        if (genericCache.get(CacheKeys.HAS_GIVEN_FEEDBACK) == null)
+        if (genericCache.get(GenericCacheKeys.HAS_GIVEN_FEEDBACK) == null)
         {
             int timesAppOpened;
 
             try
             {
                 timesAppOpened = Integer
-                        .parseInt(genericCache.get(CacheKeys.TIMES_APPLICATION_OPENED));
+                        .parseInt(genericCache.get(GenericCacheKeys.TIMES_APPLICATION_OPENED));
             }
             catch (Exception e)
             {
@@ -378,7 +378,7 @@ public class EventDetailsContainerFragment extends BaseFragment
 
                                userService.shareFeedback(type, comment);
 
-                               genericCache.put(CacheKeys.HAS_GIVEN_FEEDBACK, true);
+                               genericCache.put(GenericCacheKeys.HAS_GIVEN_FEEDBACK, true);
                                wantToCloseDialog = true;
                            }
 

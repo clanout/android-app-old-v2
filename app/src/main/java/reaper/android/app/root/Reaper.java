@@ -24,7 +24,7 @@ import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.core.DatabaseManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
 import reaper.android.app.service.UserService;
@@ -158,7 +158,7 @@ public class Reaper extends Application
         try
         {
             timesApplicationOpened = Integer
-                    .parseInt(genericCache.get(CacheKeys.TIMES_APPLICATION_OPENED));
+                    .parseInt(genericCache.get(GenericCacheKeys.TIMES_APPLICATION_OPENED));
         }
         catch (Exception e)
         {
@@ -167,7 +167,7 @@ public class Reaper extends Application
 
         timesApplicationOpened++;
 
-        genericCache.put(CacheKeys.TIMES_APPLICATION_OPENED, timesApplicationOpened);
+        genericCache.put(GenericCacheKeys.TIMES_APPLICATION_OPENED, timesApplicationOpened);
 
         String userId = userService.getActiveUserId();
         if (userId == null)

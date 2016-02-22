@@ -17,10 +17,9 @@ import java.util.List;
 import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
-import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.config.BundleKeys;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.MemoryCacheKeys;
 import reaper.android.app.model.Event;
+import reaper.android.app.ui.screens.FlowEntry;
 import reaper.android.app.ui.screens.launch.LauncherActivity;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -47,24 +46,30 @@ public class AlarmReceiver extends BroadcastReceiver
         EventCache eventCache = CacheManager.getEventCache();
 
         eventCache.getEvents().subscribeOn(Schedulers.newThread())
-                  .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<List<Event>>() {
+                  .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<List<Event>>()
+        {
             @Override
-            public void onCompleted() {
+            public void onCompleted()
+            {
 
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onError(Throwable e)
+            {
 
             }
 
             @Override
-            public void onNext(List<Event> events) {
+            public void onNext(List<Event> events)
+            {
                 List<Event> eventsToStartShortly = new ArrayList<Event>();
 
-                for (Event event : events) {
+                for (Event event : events)
+                {
 
-                    if (event.getStartTime().isBefore(DateTime.now().plusHours(1))) {
+                    if (event.getStartTime().isBefore(DateTime.now().plusHours(1)))
+                    {
 //                        buildNotification(event, context);
 
                         eventsToStartShortly.add(event);
@@ -78,48 +83,66 @@ public class AlarmReceiver extends BroadcastReceiver
 
     private void buildNotification(List<Event> events, Context context)
     {
-
-        Intent intent = new Intent(context, LauncherActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
+//        Intent intent = new Intent(context, LauncherActivity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//
         int requestCode = ("someString" + System.currentTimeMillis()).hashCode();
 
-        if(events.size() == 0 )
+        if (events.size() == 0)
+        {
+        }
+        else if (events.size() == 1)
         {
 
-        }else if(events.size() == 1) {
+            if (events.get(0) != null)
+            {
+//                intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "yes");
+//                intent.putExtra("event_id", events.get(0).getId());
+//                intent.putExtra(BundleKeys.POPUP_STATUS_DIALOG, true);
+//
+//                intent.putExtra("randomRequestCode", requestCode);
 
-            if(events.get(0) != null) {
-                intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "yes");
-                intent.putExtra("event_id", events.get(0).getId());
-                intent.putExtra(BundleKeys.POPUP_STATUS_DIALOG, true);
+//                PendingIntent pendingIntent = PendingIntent
+//                        .getActivity(context, requestCode, intent, PendingIntent.FLAG_ONE_SHOT);
 
-                intent.putExtra("randomRequestCode", requestCode);
+                String eventId = events.get(0).getId();
+                Intent launcherIntent = LauncherActivity
+                        .callingIntent(context, FlowEntry.DETAILS_WITH_STATUS_DIALOG, eventId);
 
                 PendingIntent pendingIntent = PendingIntent
-                        .getActivity(context, requestCode, intent, PendingIntent.FLAG_ONE_SHOT);
+                        .getActivity(context, requestCode, launcherIntent, PendingIntent.FLAG_ONE_SHOT);
 
-                Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                Uri defaultSoundUri = RingtoneManager
+                        .getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                         .setSmallIcon(R.mipmap.app_icon)
                         .setContentTitle(events.get(0).getTitle())
                         .setContentText(context.getResources()
-                                .getString(R.string.reminder_notification_message))
+                                               .getString(R.string.reminder_notification_message))
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
                         .setContentIntent(pendingIntent);
 
                 NotificationManager notificationManager =
-                        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                        (NotificationManager) context
+                                .getSystemService(Context.NOTIFICATION_SERVICE);
 
                 notificationManager.notify(2, notificationBuilder.build());
             }
-        }else if(events.size() > 1)
+        }
+        else if (events.size() > 1)
         {
-            intent.putExtra("randomRequestCode", requestCode);
+//            intent.putExtra("randomRequestCode", requestCode);
+
+//            PendingIntent pendingIntent = PendingIntent
+//                    .getActivity(context, requestCode, intent, PendingIntent.FLAG_ONE_SHOT);
+
+
+            Intent launcherIntent = LauncherActivity
+                    .callingIntent(context, FlowEntry.HOME, null);
 
             PendingIntent pendingIntent = PendingIntent
-                    .getActivity(context, requestCode, intent, PendingIntent.FLAG_ONE_SHOT);
+                    .getActivity(context, requestCode, launcherIntent, PendingIntent.FLAG_ONE_SHOT);
 
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
@@ -140,14 +163,20 @@ public class AlarmReceiver extends BroadcastReceiver
 
     private boolean ifAppRunningInForeground()
     {
-
-        GenericCache genericCache = CacheManager.getGenericCache();
-
-        if (genericCache.get(CacheKeys.IS_APP_IN_FOREGROUND).equalsIgnoreCase("true"))
+        try
         {
-            return true;
+            Boolean isAppInForeground = CacheManager.getMemoryCache()
+                                                    .get(MemoryCacheKeys.IS_APP_IN_FOREGROUND, Boolean.class);
+            if (isAppInForeground != null)
+            {
+                return isAppInForeground;
+            }
+            else
+            {
+                return false;
+            }
         }
-        else
+        catch (Exception e)
         {
             return false;
         }

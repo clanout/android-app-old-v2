@@ -27,13 +27,13 @@ import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
-import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
-import reaper.android.app.service.LocationService;
 import reaper.android.app.service.NotificationService;
+import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.notifications.NotificationsFetchedTrigger;
@@ -57,7 +57,6 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
     private NotificationService notificationService;
     private Bus bus;
     private EventService eventService;
-    private LocationService locationService;
     private Notification notification;
     private ItemTouchHelper itemTouchHelper;
     private List<Notification> notificationList;
@@ -94,7 +93,6 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
         bus = Communicator.getInstance().getBus();
         notificationService = new NotificationService(bus);
         eventService = new EventService(bus);
-        locationService = new LocationService(bus);
         genericCache = CacheManager.getGenericCache();
 
         notificationList = new ArrayList<>();
@@ -131,7 +129,7 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
     public void onResume() {
         super.onResume();
 
-        genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.NOTIFICATIONS);
+        genericCache.put(GenericCacheKeys.ACTIVE_FRAGMENT, BackstackTags.NOTIFICATIONS);
 
         ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_notification);
 
@@ -177,7 +175,7 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
         this.notification = notification;
 
         notificationService.deleteNotificationFromCache(notification.getId());
-        eventService.fetchEvents(locationService.getUserLocation().getZone());
+        eventService.fetchEvents(LocationService_.getInstance().getCurrentLocation().getZone());
     }
 
     private void displayBasicView() {

@@ -15,7 +15,7 @@ public class GoogleService_
     {
         if (instance == null)
         {
-            throw new IllegalStateException("[GoogleService Not Initialized]");
+            throw new IllegalStateException("[PlacesService Not Initialized]");
         }
 
         return instance;

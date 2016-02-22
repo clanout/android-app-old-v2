@@ -66,15 +66,15 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
-import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.Dimensions;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.service.EventService;
-import reaper.android.app.service.LocationService;
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationReceivedTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationsAvailableTrigger;
@@ -300,7 +300,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
             @Override
             public void onClick(View v)
             {
-                if (genericCache.get(CacheKeys.READ_CONTACT_PERMISSION_DENIED) == null)
+                if (genericCache.get(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED) == null)
                 {
 
                     Log.d("APP", "Generic cache contact permission null");
@@ -365,14 +365,15 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
         bus.register(this);
 
-        CacheManager.getGenericCache().put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.HOME);
+        CacheManager.getGenericCache().put(GenericCacheKeys.ACTIVE_FRAGMENT, BackstackTags.HOME);
 
         initView();
 
         presenter.attachView(this);
         createEventPresenter.attachView(this);
 
-        if (CacheManager.getGenericCache().get(CacheKeys.HAS_FETCHED_PENDING_INVITES) == null)
+        if (CacheManager.getGenericCache()
+                        .get(GenericCacheKeys.HAS_FETCHED_PENDING_INVITES) == null)
         {
             displayUpdatePhoneDialog();
         }
@@ -634,7 +635,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
     {
         final GenericCache genericCache = CacheManager.getGenericCache();
         final EventService eventService = new EventService(bus);
-        final LocationService locationService = new LocationService(bus);
         final UserService userService = new UserService(bus);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -685,9 +685,10 @@ public class HomeFragment extends BaseFragment implements EventsView,
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                genericCache.put(CacheKeys.HAS_FETCHED_PENDING_INVITES, true);
+                genericCache.put(GenericCacheKeys.HAS_FETCHED_PENDING_INVITES, true);
 
-                eventService.fetchEvents(locationService.getUserLocation().getZone());
+                eventService
+                        .fetchEvents(LocationService_.getInstance().getCurrentLocation().getZone());
             }
         });
 
@@ -712,8 +713,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
                            {
                                userService.updatePhoneNumber(parsedPhone);
 
-                               userService.fetchPendingInvites(parsedPhone, locationService
-                                       .getUserLocation().getZone());
+                               userService.fetchPendingInvites(parsedPhone, LocationService_.getInstance().getCurrentLocation().getZone());
 
                                SoftKeyboardHandler.hideKeyboard(getActivity(), dialogView);
 
@@ -1105,7 +1105,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
                                 Log.d("APP", "2 ---- permission denied");
 
-                                genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
+                                genericCache
+                                        .put(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
 
                                 createEvent();
                             }
@@ -1155,7 +1156,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
             public void onClick(DialogInterface dialog, int which)
             {
 
-                genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
+                genericCache.put(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
 
                 createEvent();
             }

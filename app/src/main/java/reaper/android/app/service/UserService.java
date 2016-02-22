@@ -31,7 +31,7 @@ import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.AppConstants;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.model.Friend;
 import reaper.android.app.model.PhoneContact;
@@ -79,7 +79,7 @@ public class UserService
     {
         if (activeUser == null)
         {
-            activeUser = cache.get(CacheKeys.USER, User.class);
+            activeUser = cache.get(GenericCacheKeys.USER, User.class);
         }
 
         return activeUser;
@@ -134,7 +134,7 @@ public class UserService
                      if (response.getStatus() == 200)
                      {
 
-                         cache.put(CacheKeys.MY_PHONE_NUMBER, phoneNumber);
+                         cache.put(GenericCacheKeys.MY_PHONE_NUMBER, phoneNumber);
                          bus.post(new PhoneAddedTrigger());
                      }
                      else
@@ -583,7 +583,7 @@ public class UserService
                  {
 
                      eventCache.reset(fetchPendingInvitesApiResponse.getEvents());
-                     cache.put(CacheKeys.HAS_FETCHED_PENDING_INVITES, true);
+                     cache.put(GenericCacheKeys.HAS_FETCHED_PENDING_INVITES, true);
                      bus.post(new EventsFetchTrigger(fetchPendingInvitesApiResponse.getEvents()));
                  }
              });

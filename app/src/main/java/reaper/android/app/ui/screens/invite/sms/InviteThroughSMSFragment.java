@@ -39,7 +39,7 @@ import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.PhoneContact;
@@ -366,7 +366,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         menu.findItem(R.id.action_notifications).setVisible(false);
         menu.findItem(R.id.action_status).setVisible(false);
 
-        if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null)
+        if (genericCache.get(GenericCacheKeys.MY_PHONE_NUMBER) == null)
         {
             menu.findItem(R.id.action_add_phone).setVisible(true);
             menu.findItem(R.id.action_add_phone).setIcon(addPhoneDrawable);

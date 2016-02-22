@@ -45,8 +45,8 @@ import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BundleKeys;
-import reaper.android.app.config.CacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Event;
@@ -55,8 +55,8 @@ import reaper.android.app.model.Friend;
 import reaper.android.app.model.FriendsComparator;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.FacebookService;
-import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.user.AppFriendsFetchedFromNetworkTrigger;
@@ -85,7 +85,6 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
 
     private InviteFriendsAdapter inviteFriendsAdapter;
     private UserService userService;
-    private LocationService locationService;
     private FacebookService facebookService;
     private Bus bus;
     private android.app.FragmentManager fragmentManager;
@@ -103,7 +102,8 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
     private Drawable addPhoneDrawable;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
 
         super.onCreate(savedInstanceState);
 
@@ -225,7 +225,6 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
 
         bus = Communicator.getInstance().getBus();
         userService = new UserService(bus);
-        locationService = new LocationService(bus);
         facebookService = new FacebookService(bus);
 
         genericCache = CacheManager.getGenericCache();
@@ -236,8 +235,9 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
         generateDrawables();
 
         tabTitle.setText(getResources()
-                .getString(R.string.invite_app_friends_title, locationService.getUserLocation()
-                                                                             .getZone()));
+                .getString(R.string.invite_app_friends_title, LocationService_.getInstance()
+                                                                              .getCurrentLocation()
+                                                                              .getZone()));
 
         inviteWhatsapp.setImageDrawable(whatsappDrawable);
 
@@ -281,7 +281,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
         super.onResume();
 
         bus.register(this);
-        userService.getAppFriends(locationService.getUserLocation().getZone());
+        userService.getAppFriends(LocationService_.getInstance().getCurrentLocation().getZone());
 
         search.addTextChangedListener(searchWatcher);
     }
@@ -387,7 +387,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
 
         menu.findItem(R.id.action_refresh).setIcon(refreshDrawable);
 
-        if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) == null)
+        if (genericCache.get(GenericCacheKeys.MY_PHONE_NUMBER) == null)
         {
             menu.findItem(R.id.action_add_phone).setVisible(true);
             menu.findItem(R.id.action_add_phone).setIcon(addPhoneDrawable);
@@ -474,7 +474,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
 
             Log.d("APP", "Facebook friends updated on server");
 
-            userService.getAppFriendsFromNetwork(locationService.getUserLocation().getZone());
+            userService.getAppFriendsFromNetwork(LocationService_.getInstance().getCurrentLocation().getZone());
             genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now());
         }
     }
@@ -538,7 +538,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
             visibleFriendList.add(friend);
         }
 
-        if (genericCache.get(CacheKeys.MY_PHONE_NUMBER) != null)
+        if (genericCache.get(GenericCacheKeys.MY_PHONE_NUMBER) != null)
         {
 
             userService.getPhoneContacts();
@@ -588,8 +588,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
 
             Log.d("APP", "checking permission --- true");
 
-            userService.refreshPhoneContacts(getActivity().getContentResolver(), locationService
-                    .getUserLocation().getZone());
+            userService.refreshPhoneContacts(getActivity().getContentResolver(), LocationService_.getInstance().getCurrentLocation().getZone());
 
         }
         else

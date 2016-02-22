@@ -14,9 +14,9 @@ import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.Suggestion;
 import reaper.android.app.service.EventService;
-import reaper.android.app.service.GoogleService;
-import reaper.android.app.service.LocationService;
+import reaper.android.app.service.PlacesService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.service._new.LocationService_;
 import reaper.android.common.analytics.AnalyticsHelper;
 import rx.Observable;
 import rx.Subscriber;
@@ -30,7 +30,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
 {
     /* Services */
     private EventService eventService;
-    private GoogleService googleService;
+    private PlacesService placesService;
     private Location userLocation;
     private UserService userService;
 
@@ -57,8 +57,8 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     {
         userService = new UserService(bus);
         eventService = new EventService(bus);
-        googleService = new GoogleService(bus);
-        userLocation = new LocationService(bus).getUserLocation();
+        placesService = new PlacesService();
+        userLocation = LocationService_.getInstance().getCurrentLocation();
         subscriptions = new CompositeSubscription();
         this.eventCategory = eventCategory;
 
@@ -106,7 +106,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
                     @Override
                     public void call(Subscriber<? super List<GooglePlaceAutocompleteApiResponse.Prediction>> subscriber)
                     {
-                        List<GooglePlaceAutocompleteApiResponse.Prediction> predictions = googleService
+                        List<GooglePlaceAutocompleteApiResponse.Prediction> predictions = placesService
                                 .autocomplete(userLocation.getLatitude(), userLocation
                                         .getLongitude(), s);
 
@@ -187,7 +187,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
         {
             if (suggestion.getId() != null)
             {
-                Subscription subscription = googleService
+                Subscription subscription = placesService
                         ._getPlaceDetails(suggestion.getId())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Subscriber<Location>()
@@ -315,7 +315,9 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
                     @Override
                     public void onError(Throwable e)
                     {
-                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.CREATE_EVENT_FAILURE_FROM_DETAILS, userService.getActiveUserId());
+                        AnalyticsHelper
+                                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.CREATE_EVENT_FAILURE_FROM_DETAILS, userService
+                                        .getActiveUserId());
                         isCreationInitiated = false;
                         view.displayError();
                     }
@@ -323,7 +325,9 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
                     @Override
                     public void onNext(Event event)
                     {
-                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.CREATE_EVENT_SUCCESS_FROM_DETAILS, userService.getActiveUserId());
+                        AnalyticsHelper
+                                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.CREATE_EVENT_SUCCESS_FROM_DETAILS, userService
+                                        .getActiveUserId());
                         view.navigateToInviteScreen(event);
                     }
                 });

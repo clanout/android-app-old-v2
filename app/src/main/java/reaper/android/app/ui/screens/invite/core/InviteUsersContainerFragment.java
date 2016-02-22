@@ -29,13 +29,13 @@ import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.service.EventService;
-import reaper.android.app.service.LocationService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
@@ -61,7 +61,6 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
     private FragmentManager fragmentManager;
     private EventService eventService;
     private UserService userService;
-    private LocationService locationService;
     private Bus bus;
     private GenericCache genericCache;
 
@@ -123,7 +122,6 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
         bus = Communicator.getInstance().getBus();
         eventService = new EventService(bus);
         userService = new UserService(bus);
-        locationService = new LocationService(bus);
         fragmentManager = getActivity().getFragmentManager();
 
         genericCache = CacheManager.getGenericCache();
@@ -195,7 +193,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
 
         ((MainActivity) getActivity()).getSupportActionBar().setTitle("Invite Friends");
 
-        genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.INVITE_USERS_CONTAINER);
+        genericCache.put(GenericCacheKeys.ACTIVE_FRAGMENT, BackstackTags.INVITE_USERS_CONTAINER);
         bus.register(this);
         if (!fromCreateFragment) {
             eventService.fetchEventDetails(event.getId());
@@ -262,9 +260,9 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
             }
 
 
-            if (genericCache.get(CacheKeys.HAS_SEEN_INVITE_POPUP) == null) {
+            if (genericCache.get(GenericCacheKeys.HAS_SEEN_INVITE_POPUP) == null) {
                 if (smsInviteePhoneList.size() == 0) {
-                    eventService.fetchEvents(locationService.getUserLocation().getZone());
+                    eventService.fetchEvents(LocationService_.getInstance().getCurrentLocation().getZone());
 
                 } else {
 
@@ -272,7 +270,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
                 }
             } else {
 
-                eventService.fetchEvents(locationService.getUserLocation().getZone());
+                eventService.fetchEvents(LocationService_.getInstance().getCurrentLocation().getZone());
             }
 
         }
@@ -300,9 +298,9 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                genericCache.put(CacheKeys.HAS_SEEN_INVITE_POPUP, true);
+                genericCache.put(GenericCacheKeys.HAS_SEEN_INVITE_POPUP, true);
 
-                eventService.fetchEvents(locationService.getUserLocation().getZone());
+                eventService.fetchEvents(LocationService_.getInstance().getCurrentLocation().getZone());
             }
         });
 
@@ -340,7 +338,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
     @Subscribe
     public void backPressed(BackPressedTrigger trigger) {
         if (trigger.getActiveFragment().equals(BackstackTags.INVITE_USERS_CONTAINER)) {
-            eventService.fetchEvents(locationService.getUserLocation().getZone());
+            eventService.fetchEvents(LocationService_.getInstance().getCurrentLocation().getZone());
         }
     }
 

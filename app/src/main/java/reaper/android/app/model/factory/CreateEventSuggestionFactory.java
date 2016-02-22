@@ -1,7 +1,5 @@
 package reaper.android.app.model.factory;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -13,7 +11,7 @@ import java.util.List;
 import reaper.android.app.api.core.GsonProvider;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.model.CreateEventModel;
 import reaper.android.app.model.EventCategory;
 
@@ -28,7 +26,7 @@ public class CreateEventSuggestionFactory {
 
         GenericCache genericCache = CacheManager.getGenericCache();
 
-        if(genericCache.get(CacheKeys.EVENT_SUGGESTIONS) == null)
+        if(genericCache.get(GenericCacheKeys.EVENT_SUGGESTIONS) == null)
         {
             List<CreateEventModel> eventSuggestions = new ArrayList<>();
             eventSuggestions.add(new CreateEventModel(EventCategory.CAFE, "Coffee :)"));
@@ -58,7 +56,7 @@ public class CreateEventSuggestionFactory {
             return eventSuggestions;
         }else{
 
-            String suggestionsJson = genericCache.get(CacheKeys.EVENT_SUGGESTIONS);
+            String suggestionsJson = genericCache.get(GenericCacheKeys.EVENT_SUGGESTIONS);
 
             Gson gson = GsonProvider.getGson();
 

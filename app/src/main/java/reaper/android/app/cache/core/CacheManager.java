@@ -4,6 +4,8 @@ import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.event.SQLiteEventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.generic.SQLiteGenericCache;
+import reaper.android.app.cache.memory.MemoryCache;
+import reaper.android.app.cache.memory.MemoryCacheImpl;
 import reaper.android.app.cache.notification.NotificationCache;
 import reaper.android.app.cache.notification.SQLiteNotificationCache;
 import reaper.android.app.cache.user.SQLiteUserCache;
@@ -29,6 +31,11 @@ public class CacheManager
     public static NotificationCache getNotificationCache()
     {
         return SQLiteNotificationCache.getInstance();
+    }
+
+    public static MemoryCache getMemoryCache()
+    {
+        return MemoryCacheImpl.getInstance();
     }
 
     public static void clearAllCaches()

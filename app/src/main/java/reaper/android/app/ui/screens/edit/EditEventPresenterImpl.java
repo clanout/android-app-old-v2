@@ -15,9 +15,9 @@ import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.Suggestion;
 import reaper.android.app.service.EventService;
-import reaper.android.app.service.GoogleService;
-import reaper.android.app.service.LocationService;
+import reaper.android.app.service.PlacesService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.event.EventUtils;
 import retrofit.client.Response;
@@ -35,7 +35,7 @@ public class EditEventPresenterImpl implements EditEventPresenter
 {
     /* Services */
     private EventService eventService;
-    private GoogleService googleService;
+    private PlacesService placesService;
 
     /* Data */
     private String activeUser;
@@ -64,8 +64,8 @@ public class EditEventPresenterImpl implements EditEventPresenter
     {
         eventService = new EventService(bus);
         activeUser = new UserService(bus).getActiveUserId();
-        userLocation = new LocationService(bus).getUserLocation();
-        googleService = new GoogleService(bus);
+        userLocation = LocationService_.getInstance().getCurrentLocation();
+        placesService = new PlacesService();
 
         this.originalEvent = originalEvent;
         this.originalDescription = originalEventDetails.getDescription();
@@ -231,7 +231,7 @@ public class EditEventPresenterImpl implements EditEventPresenter
                     @Override
                     public void call(Subscriber<? super List<GooglePlaceAutocompleteApiResponse.Prediction>> subscriber)
                     {
-                        List<GooglePlaceAutocompleteApiResponse.Prediction> predictions = googleService
+                        List<GooglePlaceAutocompleteApiResponse.Prediction> predictions = placesService
                                 .autocomplete(userLocation.getLatitude(), userLocation
                                         .getLongitude(), s);
 
@@ -357,7 +357,7 @@ public class EditEventPresenterImpl implements EditEventPresenter
         {
             if (suggestion.getId() != null)
             {
-                Subscription subscription = googleService
+                Subscription subscription = placesService
                         ._getPlaceDetails(suggestion.getId())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Subscriber<Location>()

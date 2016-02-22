@@ -11,7 +11,7 @@ import reaper.android.app.api.auth.response.CreateNewSessionApiResponse;
 import reaper.android.app.api.core.ApiManager;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.model.User;
 import retrofit.client.Response;
 import rx.Observable;
@@ -80,7 +80,7 @@ public class AuthService_
     /* Helper Methods */
     private Observable<Boolean> validateSession()
     {
-        final String sessionId = genericCache.get(CacheKeys.SESSION_ID);
+        final String sessionId = genericCache.get(GenericCacheKeys.SESSION_ID);
         if (sessionId == null)
         {
             return Observable.just(false);
@@ -121,7 +121,7 @@ public class AuthService_
                     @Override
                     public Pair<User, List<String>> call(User user, List<String> friends)
                     {
-                        genericCache.put(CacheKeys.USER, user);
+                        genericCache.put(GenericCacheKeys.USER, user);
 
                         return new Pair<>(user, friends);
                     }
@@ -170,14 +170,14 @@ public class AuthService_
                         if (sessionId == null)
                         {
                             // Delete User from cache
-                            genericCache.delete(CacheKeys.USER);
+                            genericCache.delete(GenericCacheKeys.USER);
 
                             return false;
                         }
                         else
                         {
                             Timber.v("[New Session Created] Session ID = " + sessionId);
-                            genericCache.put(CacheKeys.SESSION_ID, sessionId);
+                            genericCache.put(GenericCacheKeys.SESSION_ID, sessionId);
                             return true;
                         }
                     }

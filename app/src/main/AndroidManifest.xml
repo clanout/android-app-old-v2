@@ -33,20 +33,6 @@
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
 
-        <!-- OBSOLETE -->
-        <activity
-            android:name=".app.ui.activity.obsolete.FacebookActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait">
-        </activity>
-
-        <activity
-            android:name=".app.ui.activity.obsolete.LauncherActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait">
-        </activity>
-        <!-- OBSOLETE -->
-
         <activity
             android:name=".app.ui.screens.launch.LauncherActivity"
             android:label="@string/app_name"

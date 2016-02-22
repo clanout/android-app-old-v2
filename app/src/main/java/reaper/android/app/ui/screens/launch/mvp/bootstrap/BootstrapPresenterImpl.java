@@ -1,6 +1,10 @@
 package reaper.android.app.ui.screens.launch.mvp.bootstrap;
 
+import java.util.List;
+
+import reaper.android.app.model.Event;
 import reaper.android.app.model.Location;
+import reaper.android.app.service.EventService;
 import reaper.android.app.service._new.AuthService_;
 import reaper.android.app.service._new.GcmService_;
 import reaper.android.app.service._new.LocationService_;
@@ -22,15 +26,17 @@ BootstrapPresenterImpl implements BootstrapPresenter
     private LocationService_ locationService;
     private AuthService_ authService;
     private GcmService_ gcmService;
+    private EventService eventService;
 
-    private Observable<Object> bootstrapObservable;
+    private Observable<List<Event>> bootstrapObservable;
     private CompositeSubscription subscriptions;
 
-    public BootstrapPresenterImpl(LocationService_ locationService, AuthService_ authService, GcmService_ gcmService)
+    public BootstrapPresenterImpl(LocationService_ locationService, AuthService_ authService, GcmService_ gcmService, EventService eventService)
     {
         this.locationService = locationService;
         this.authService = authService;
         this.gcmService = gcmService;
+        this.eventService = eventService;
 
         subscriptions = new CompositeSubscription();
         initBootstrapObservable();
@@ -63,12 +69,11 @@ BootstrapPresenterImpl implements BootstrapPresenter
         Subscription subscription =
                 bootstrapObservable
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Subscriber<Object>()
+                        .subscribe(new Subscriber<List<Event>>()
                         {
                             @Override
                             public void onCompleted()
                             {
-                                view.proceed();
                             }
 
                             @Override
@@ -78,8 +83,9 @@ BootstrapPresenterImpl implements BootstrapPresenter
                             }
 
                             @Override
-                            public void onNext(Object o)
+                            public void onNext(List<Event> events)
                             {
+                                view.proceed(events);
                             }
                         });
 
@@ -115,10 +121,10 @@ BootstrapPresenterImpl implements BootstrapPresenter
                                     return locationService.pushUserLocation();
                                 }
                             })
-                            .flatMap(new Func1<Boolean, Observable<Object>>()
+                            .flatMap(new Func1<Boolean, Observable<List<Event>>>()
                             {
                                 @Override
-                                public Observable<Object> call(Boolean isLocationPushed)
+                                public Observable<List<Event>> call(Boolean isLocationPushed)
                                 {
                                     if (!isLocationPushed)
                                     {
@@ -126,7 +132,9 @@ BootstrapPresenterImpl implements BootstrapPresenter
                                     }
                                     else
                                     {
-                                        return Observable.empty();
+                                        return eventService
+                                                ._fetchEvents(locationService.getCurrentLocation()
+                                                                             .getZone());
                                     }
                                 }
                             })

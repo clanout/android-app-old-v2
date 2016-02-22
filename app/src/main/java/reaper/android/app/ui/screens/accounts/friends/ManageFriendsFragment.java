@@ -35,7 +35,7 @@ import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.Timestamps;
@@ -189,7 +189,7 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
 
         ((MainActivity) getActivity()).getSupportActionBar().setTitle("Block a Friend");
 
-        genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.MANAGE_FRIENDS);
+        genericCache.put(GenericCacheKeys.ACTIVE_FRAGMENT, BackstackTags.MANAGE_FRIENDS);
         bus.register(this);
         userService.getAllAppFriends();
 

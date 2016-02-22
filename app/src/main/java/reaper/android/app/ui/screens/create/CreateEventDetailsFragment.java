@@ -63,7 +63,7 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
@@ -201,7 +201,7 @@ public class CreateEventDetailsFragment extends BaseFragment
     {
         super.onResume();
 
-        CacheManager.getGenericCache().put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.CREATE);
+        CacheManager.getGenericCache().put(GenericCacheKeys.ACTIVE_FRAGMENT, BackstackTags.CREATE);
 
         etLocation.setOnFocusChangeListener(new View.OnFocusChangeListener()
         {
@@ -736,7 +736,7 @@ public class CreateEventDetailsFragment extends BaseFragment
 
                     SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
 
-                    if (genericCache.get(CacheKeys.READ_CONTACT_PERMISSION_DENIED) == null)
+                    if (genericCache.get(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED) == null)
                     {
 
                         Log.d("APP", "Generic cache contact permission null");
@@ -865,7 +865,7 @@ public class CreateEventDetailsFragment extends BaseFragment
 
                                 Log.d("APP", "2 ---- permission denied");
 
-                                genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
+                                genericCache.put(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
 
                                 createEvent();
                             }
@@ -915,7 +915,7 @@ public class CreateEventDetailsFragment extends BaseFragment
             public void onClick(DialogInterface dialog, int which)
             {
 
-                genericCache.put(CacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
+                genericCache.put(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
 
                 createEvent();
             }

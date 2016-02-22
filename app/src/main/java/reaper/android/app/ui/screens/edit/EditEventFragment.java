@@ -48,7 +48,7 @@ import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
@@ -191,7 +191,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
 
         bus.register(this);
 
-        CacheManager.getGenericCache().put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.EDIT);
+        CacheManager.getGenericCache().put(GenericCacheKeys.ACTIVE_FRAGMENT, BackstackTags.EDIT);
 
         etLocation.setOnFocusChangeListener(new View.OnFocusChangeListener()
         {

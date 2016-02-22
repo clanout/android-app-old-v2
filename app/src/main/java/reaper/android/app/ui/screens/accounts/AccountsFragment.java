@@ -28,7 +28,6 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
-import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
@@ -39,12 +38,12 @@ import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
-import reaper.android.app.config.CacheKeys;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
+import reaper.android.app.model.User;
 import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.UserService;
-import reaper.android.app.trigger.facebook.FacebookCoverPicFetchedTrigger;
 import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
@@ -142,40 +141,29 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
     public void onResume()
     {
         super.onResume();
-
         ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_account);
-
         bus.register(this);
 
-        userName.setText(userService.getActiveUserName());
-
-        if (genericCache.get(CacheKeys.USER_COVER_PIC) != null)
-        {
-
-            Picasso.with(getActivity())
-                   .load(genericCache.get(CacheKeys.USER_COVER_PIC))
-                   .placeholder(personDrawable)
-                   .fit()
-                   .centerCrop()
-                   .noFade()
-                   .into(userPic);
-
-        }
-        else
-        {
-            facebookService.getUserCoverPic();
-        }
+        User activeUser = userService.getActiveUser();
+        userName.setText(activeUser.getName());
 
         Picasso.with(getActivity())
-               .load("https://graph.facebook.com/v2.4/" + userService
-                       .getActiveUserId() + "/picture?height=1000")
+               .load(activeUser.getCoverPicUrl())
+               .placeholder(personDrawable)
+               .fit()
+               .centerCrop()
+               .noFade()
+               .into(userPic);
+
+        Picasso.with(getActivity())
+               .load(activeUser.getProfilePicUrl())
                .placeholder(personDrawable)
                .fit()
                .centerCrop()
                .noFade()
                .into(userProfilePic);
 
-        genericCache.put(CacheKeys.ACTIVE_FRAGMENT, BackstackTags.ACCOUNTS);
+        genericCache.put(GenericCacheKeys.ACTIVE_FRAGMENT, BackstackTags.ACCOUNTS);
     }
 
     @Override
@@ -340,7 +328,8 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
 
                                if (TextUtils.isEmpty(comment))
                                {
-                                   tilFeedbackMessage.setError(getString(R.string.feedback_empty_comment));
+                                   tilFeedbackMessage
+                                           .setError(getString(R.string.feedback_empty_comment));
                                    tilFeedbackMessage.setErrorEnabled(true);
                                    wantToCloseDialog = false;
                                }
@@ -450,20 +439,5 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                        }
                    });
 
-    }
-
-    @Subscribe
-    public void onCoverPicFetched(final FacebookCoverPicFetchedTrigger trigger)
-    {
-
-        genericCache.put(CacheKeys.USER_COVER_PIC, trigger.getSource());
-
-        Picasso.with(getActivity())
-               .load(trigger.getSource())
-               .placeholder(personDrawable)
-               .fit()
-               .centerCrop()
-               .noFade()
-               .into(userPic);
     }
 }
