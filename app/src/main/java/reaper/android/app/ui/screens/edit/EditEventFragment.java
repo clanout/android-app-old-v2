@@ -48,8 +48,8 @@ import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
-import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.Dimensions;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
@@ -188,6 +188,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
     public void onResume()
     {
         super.onResume();
+
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_edit);
 
         bus.register(this);
 

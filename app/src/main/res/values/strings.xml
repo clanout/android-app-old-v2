@@ -17,6 +17,7 @@
     <!-- Screen Titles -->
     <string name="title_home">@string/app_name</string>
     <string name="title_create">Create Plan</string>
+    <string name="title_edit">Edit</string>
     <string name="title_account">Account</string>
     <string name="title_notification">Notifications</string>
     <string name="title_chat">Clan Chat</string>
