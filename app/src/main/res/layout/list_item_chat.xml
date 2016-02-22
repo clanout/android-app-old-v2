@@ -28,8 +28,7 @@
                 android:layout_marginLeft="5dp"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:textColor="@color/accent"
-                />
+                android:textColor="@color/accent"/>
 
             <TextView
                 android:id="@+id/tvTextMessageInBubble"

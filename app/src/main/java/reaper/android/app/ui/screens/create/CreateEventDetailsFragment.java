@@ -63,14 +63,15 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
-import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.Dimensions;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.Suggestion;
 import reaper.android.app.root.Reaper;
 import reaper.android.app.service.UserService;
+import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.DateTimeUtil;
@@ -200,6 +201,7 @@ public class CreateEventDetailsFragment extends BaseFragment
     public void onResume()
     {
         super.onResume();
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_create);
 
         CacheManager.getGenericCache().put(GenericCacheKeys.ACTIVE_FRAGMENT, BackstackTags.CREATE);
 
@@ -280,6 +282,7 @@ public class CreateEventDetailsFragment extends BaseFragment
         if (inputTitle != null && !inputTitle.isEmpty())
         {
             etTitle.setText(inputTitle);
+            etTitle.requestFocus();
             etTitle.setSelection(etTitle.getText().length());
         }
 
@@ -865,7 +868,8 @@ public class CreateEventDetailsFragment extends BaseFragment
 
                                 Log.d("APP", "2 ---- permission denied");
 
-                                genericCache.put(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
+                                genericCache
+                                        .put(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
 
                                 createEvent();
                             }

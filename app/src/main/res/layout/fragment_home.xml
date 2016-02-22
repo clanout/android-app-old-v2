@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -27,55 +26,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
             <include layout="@layout/view_create"/>
-
-            <!--<RelativeLayout-->
-                <!--android:id="@+id/rlCreateOverlay_dummy"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="112dp"-->
-                <!--android:layout_margin="16dp"-->
-                <!--android:background="@color/white"-->
-                <!--android:padding="16dp">-->
-
-                <!--<net.steamcrafted.materialiconlib.MaterialIconView-->
-                    <!--android:id="@+id/mivSuggestionCategory_dummy"-->
-                    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_alignParentLeft="true"-->
-                    <!--android:layout_alignParentTop="true"-->
-                    <!--android:scaleType="center"-->
-                    <!--app:materialIcon="martini"-->
-                    <!--app:materialIconColor="@color/_text_subtitle"-->
-                    <!--app:materialIconSize="80dp"/>-->
-
-                <!--<TextView-->
-                    <!--android:id="@+id/tvSuggestion_dummy"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_alignParentTop="true"-->
-                    <!--android:layout_marginLeft="16dp"-->
-                    <!--android:layout_marginTop="8dp"-->
-                    <!--android:layout_toRightOf="@id/mivSuggestionCategory_dummy"-->
-                    <!--android:text="Loose Control"-->
-                    <!--android:textColor="@color/_text_title"-->
-                    <!--android:textSize="18sp"-->
-                    <!--android:textStyle="bold"/>-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_toRightOf="@+id/mivSuggestionCategory_dummy"-->
-                    <!--android:layout_alignParentBottom="true"-->
-                    <!--android:layout_marginTop="8dp"-->
-                    <!--android:layout_marginLeft="16dp"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:text="Make a Plan"-->
-                    <!--android:textColor="@color/accent"-->
-                    <!--android:textSize="16sp"-->
-                    <!--android:textStyle="bold"/>-->
-            <!--</RelativeLayout>-->
         </FrameLayout>
 
         <!-- Main Content -->
@@ -87,8 +38,8 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:background="@color/background_default">
+                android:background="@color/background_default"
+                android:orientation="vertical">
 
                 <!-- Feed -->
                 <android.support.v7.widget.RecyclerView
