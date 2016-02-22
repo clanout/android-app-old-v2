@@ -1,7 +1,5 @@
 package reaper.android.app.ui.screens.home.create;
 
-import android.util.Log;
-
 import com.squareup.otto.Bus;
 
 import org.joda.time.DateTime;
@@ -10,7 +8,6 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.Location;
 import reaper.android.app.service.EventService;
-import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.ui.util.DateTimeUtil;
 import rx.Subscriber;
@@ -24,7 +21,6 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     private CreateEventView view;
 
     /* Services */
-    private UserService userService;
     private EventService eventService;
     private Location userLocation;
 
@@ -32,7 +28,6 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
 
     public CreateEventPresenterImpl(Bus bus)
     {
-        userService = new UserService(bus);
         eventService = new EventService(bus);
         userLocation = LocationService_.getInstance().getCurrentLocation();
 
@@ -55,13 +50,8 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     @Override
     public void create(String title, EventCategory category, boolean isSecret, DateTime startTime)
     {
-
-        Log.d("APP", "inside create -- presenter");
-
         if (view == null)
         {
-            Log.d("APP", "inside create -- presenter -- view null");
-
             return;
         }
 

@@ -95,8 +95,8 @@
 
                     <ImageView
                         android:id="@+id/ivCategoryIcon"
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:layout_centerInParent="true"/>
 
                     <LinearLayout
@@ -105,7 +105,7 @@
                         android:layout_alignParentBottom="true"
                         android:background="@drawable/rect_grad"
                         android:gravity="bottom"
-                        android:padding="4dp">
+                        android:padding="8dp">
 
                         <TextView
                             android:layout_width="match_parent"
@@ -113,7 +113,7 @@
                             android:gravity="center"
                             android:text="Change"
                             android:textColor="@color/white"
-                            android:textSize="12sp"/>
+                            android:textSize="10sp"/>
 
                     </LinearLayout>
 

@@ -13,7 +13,6 @@ import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.Location;
 import reaper.android.app.service.EventService;
-import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.LocationService_;
 import rx.Subscriber;
 import rx.Subscription;
@@ -25,7 +24,6 @@ public class EventsPresenterImpl implements EventsPresenter
 {
     /* Services */
     private EventService eventService;
-    private UserService userService;
 
     /* Data */
     private GenericCache cache;
@@ -41,7 +39,6 @@ public class EventsPresenterImpl implements EventsPresenter
     public EventsPresenterImpl(Bus bus, List<Event> events)
     {
         eventService = new EventService(bus);
-        userService = new UserService(bus);
         cache = CacheManager.getGenericCache();
         userLocation = LocationService_.getInstance().getCurrentLocation();
         subscriptions = new CompositeSubscription();

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 
@@ -82,12 +84,17 @@ public class DrawableFactory
 
     public static Drawable getIconBackground(Context context, int colorResource, int cornerRadius)
     {
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setCornerRadius(TypedValue
-                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornerRadius, context.getResources()
-                                                                                  .getDisplayMetrics()));
-        drawable.setColor(ContextCompat.getColor(Reaper.getReaperContext(), colorResource));
-        return drawable;
+        ShapeDrawable circle = new ShapeDrawable(new OvalShape());
+        circle.getPaint()
+              .setColor(ContextCompat.getColor(Reaper.getReaperContext(), colorResource));
+        return circle;
+
+//        GradientDrawable drawable = new GradientDrawable();
+//        drawable.setCornerRadius(TypedValue
+//                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornerRadius, context.getResources()
+//                                                                                  .getDisplayMetrics()));
+//        drawable.setColor(ContextCompat.getColor(Reaper.getReaperContext(), colorResource));
+//        return drawable;
     }
 
     public static Drawable randomIconBackground()
@@ -106,12 +113,17 @@ public class DrawableFactory
     public static Drawable getIconBackground(EventCategory eventCategory)
     {
         int color = colorMapping.get(eventCategory);
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setCornerRadius(TypedValue
-                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, Reaper.getReaperContext()
-                                                                      .getResources()
-                                                                      .getDisplayMetrics()));
-        drawable.setColor(ContextCompat.getColor(Reaper.getReaperContext(), color));
-        return drawable;
+//        GradientDrawable drawable = new GradientDrawable();
+//        drawable.setCornerRadius(TypedValue
+//                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, Reaper.getReaperContext()
+//                                                                      .getResources()
+//                                                                      .getDisplayMetrics()));
+//        drawable.setColor(ContextCompat.getColor(Reaper.getReaperContext(), color));
+//        return drawable;
+
+        ShapeDrawable circle = new ShapeDrawable(new OvalShape());
+        circle.getPaint()
+              .setColor(ContextCompat.getColor(Reaper.getReaperContext(), color));
+        return circle;
     }
 }
