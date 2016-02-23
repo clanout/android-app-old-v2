@@ -1,6 +1,6 @@
 package reaper.android.app.model;
 
-import reaper.android.app.model.core.Model;
+import reaper.android.app.model._core.Model;
 
 /**
  * Created by harsh on 21-05-2015.

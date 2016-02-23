@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import reaper.android.app.api.core.FacebookApiManager;
+import reaper.android.app.api._core.ApiManager;
 import reaper.android.app.api.fb.FacebookApi;
 import reaper.android.app.api.fb.response.FacebookCoverPicResponse;
 import rx.Observable;
@@ -47,7 +47,7 @@ public class FacebookService_
 
     private FacebookService_()
     {
-        facebookApi = FacebookApiManager.getInstance().getApi();
+        facebookApi = ApiManager.getFacebookApi();
     }
 
     public boolean isAccessTokenValid()

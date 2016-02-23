@@ -2,7 +2,7 @@ package reaper.android.app.model;
 
 import java.util.List;
 
-import reaper.android.app.model.core.Model;
+import reaper.android.app.model._core.Model;
 
 public class EventDetails implements Model
 {

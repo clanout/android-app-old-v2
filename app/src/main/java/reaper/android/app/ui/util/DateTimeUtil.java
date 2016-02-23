@@ -13,66 +13,79 @@ import java.util.Map;
 
 public class DateTimeUtil
 {
-    public static DateTimeFormatter DAY_FORMATTER = DateTimeFormat.forPattern("EEEE");
-    public static DateTimeFormatter PREV_DAY_FORMATTER = DateTimeFormat.forPattern("dd MMM");
-    public static DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("hh:mm a");
+    private static DateTimeFormatter DAY_FORMATTER = DateTimeFormat.forPattern("EEEE");
+    private static DateTimeFormatter DAY_DATE_FORMATTER = DateTimeFormat
+            .forPattern("EEEE (dd MMM)");
+    private static DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern("dd MMM");
+    private static DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("hh:mm a");
 
-    public static final String TODAY = "Today";
-    public static final String TOMORROW = "Tomorrow";
+    private static final String TODAY = "Today";
+    private static final String TOMORROW = "Tomorrow";
 
     private DateTime now;
     private Map<String, LocalDate> dayMap;
     private List<String> days;
+    private List<String> daysAndDate;
 
     public DateTimeUtil()
     {
         now = DateTime.now();
+        dayMap = new HashMap<>();
+        days = new ArrayList<>();
+        daysAndDate = new ArrayList<>();
+
+        LocalDate date = now.toLocalDate();
+        DateTime lastSlot = now.withTime(23, 29, 0, 0);
+        boolean includeToday = true;
+        if (now.isAfter(lastSlot))
+        {
+            includeToday = false;
+        }
+
+        int i = 0;
+        while (i < 7)
+        {
+            if (i == 0)
+            {
+                if (includeToday)
+                {
+                    dayMap.put(TODAY, date);
+                    days.add(TODAY);
+
+                    String todayStr = TODAY + " (" + date.toString(DATE_FORMATTER) + ")";
+                    daysAndDate.add(todayStr);
+                }
+            }
+            else if (i == 1)
+            {
+                dayMap.put(TOMORROW, date);
+                days.add(TOMORROW);
+
+                String tomorrowStr = TOMORROW + " (" + date.toString(DATE_FORMATTER) + ")";
+                daysAndDate.add(tomorrowStr);
+            }
+            else
+            {
+                String name = date.toString(DAY_FORMATTER);
+                dayMap.put(name, date);
+                days.add(name);
+
+                daysAndDate.add(date.toString(DAY_DATE_FORMATTER));
+            }
+
+            date = date.plusDays(1);
+            i++;
+        }
     }
 
     public List<String> getDayList()
     {
-        if (dayMap == null || days == null)
-        {
-            dayMap = new HashMap<>();
-            days = new ArrayList<>();
-
-            LocalDate date = now.toLocalDate();
-            DateTime lastSlot = now.withTime(23, 29, 0, 0);
-            boolean includeToday = true;
-            if (now.isAfter(lastSlot))
-            {
-                includeToday = false;
-            }
-
-            int i = 0;
-            while (i < 7)
-            {
-                if (i == 0)
-                {
-                    if (includeToday)
-                    {
-                        dayMap.put(TODAY, date);
-                        days.add(TODAY);
-                    }
-                }
-                else if (i == 1)
-                {
-                    dayMap.put(TOMORROW, date);
-                    days.add(TOMORROW);
-                }
-                else
-                {
-                    String name = date.toString(DAY_FORMATTER);
-                    dayMap.put(name, date);
-                    days.add(name);
-                }
-
-                date = date.plusDays(1);
-                i++;
-            }
-        }
-
         return days;
+    }
+
+    public List<String> getDayAndDateList()
+    {
+        return daysAndDate;
     }
 
     public LocalDate getDate(String name)
@@ -99,7 +112,7 @@ public class DateTimeUtil
         }
         else if (date.isBefore(today))
         {
-            return date.toString(PREV_DAY_FORMATTER);
+            return date.toString(DATE_FORMATTER);
         }
         else
         {

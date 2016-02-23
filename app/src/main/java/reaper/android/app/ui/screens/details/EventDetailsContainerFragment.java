@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import reaper.android.R;
-import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;

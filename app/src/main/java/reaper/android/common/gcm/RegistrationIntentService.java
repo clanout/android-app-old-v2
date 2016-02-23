@@ -7,10 +7,10 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.squareup.otto.Bus;
 
-import reaper.android.app.api.core.ApiManager;
-import reaper.android.app.api.gcm.NotificationApi;
-import reaper.android.app.api.gcm.request.GCmRegisterUserApiRequest;
-import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.api._core.ApiManager;
+import reaper.android.app.api.notification.NotificationApi;
+import reaper.android.app.api.notification.request.GCmRegisterUserApiRequest;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.GenericCacheKeys;
@@ -64,7 +64,7 @@ public class RegistrationIntentService extends IntentService
         Bus bus = Communicator.getInstance().getBus();
         UserService userService = UserService.getInstance();
 
-        NotificationApi notificationApi = ApiManager.getInstance().getApi(NotificationApi.class);
+        NotificationApi notificationApi = ApiManager.getNotificationApi();
 
         GCmRegisterUserApiRequest request = new GCmRegisterUserApiRequest(token);
         notificationApi.registerUser(request)

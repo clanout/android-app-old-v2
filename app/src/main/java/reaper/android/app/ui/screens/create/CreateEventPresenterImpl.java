@@ -7,7 +7,7 @@ import org.joda.time.DateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import reaper.android.app.api.google.response.GooglePlaceAutocompleteApiResponse;
+import reaper.android.app.api.google_places.response.GooglePlaceAutocompleteApiResponse;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;

@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import org.joda.time.DateTime;
 
-import reaper.android.app.api.core.ApiRequest;
+import reaper.android.app.api._core.ApiRequest;
 
 public class EditEventApiRequest extends ApiRequest
 {

@@ -20,8 +20,8 @@ import org.joda.time.DateTimeZone;
 import java.util.concurrent.TimeUnit;
 
 import reaper.android.BuildConfig;
-import reaper.android.app.cache.core.CacheManager;
-import reaper.android.app.cache.core.DatabaseManager;
+import reaper.android.app.cache._core.CacheManager;
+import reaper.android.app.cache._core.DatabaseManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.GenericCacheKeys;

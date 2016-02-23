@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-import reaper.android.app.api.core.ApiResponse;
+import reaper.android.app.api._core.ApiResponse;
 import reaper.android.app.model.CreateEventModel;
 
 /**

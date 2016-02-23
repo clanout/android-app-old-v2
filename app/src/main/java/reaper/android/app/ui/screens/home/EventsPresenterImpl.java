@@ -7,7 +7,7 @@ import org.joda.time.DateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.model.Event;

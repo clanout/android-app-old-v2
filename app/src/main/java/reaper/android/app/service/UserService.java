@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import reaper.android.app.api.core.ApiManager;
+import reaper.android.app.api._core.ApiManager;
 import reaper.android.app.api.me.MeApi;
 import reaper.android.app.api.me.request.AddPhoneApiRequest;
 import reaper.android.app.api.me.request.BlockFriendsApiRequest;
@@ -26,7 +26,7 @@ import reaper.android.app.api.me.response.FetchPendingInvitesApiResponse;
 import reaper.android.app.api.me.response.GetAllAppFriendsApiResponse;
 import reaper.android.app.api.me.response.GetAppFriendsApiResponse;
 import reaper.android.app.api.me.response.GetPhoneContactsApiResponse;
-import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
@@ -85,7 +85,7 @@ public class UserService
     private UserService(Bus bus)
     {
         this.bus = bus;
-        meApi = ApiManager.getInstance().getApi(MeApi.class);
+        meApi = ApiManager.getMeApi();
         userCache = CacheManager.getUserCache();
         genericCache = CacheManager.getGenericCache();
         eventCache = CacheManager.getEventCache();
@@ -114,7 +114,7 @@ public class UserService
 
     public String getSessionId()
     {
-        if(getSessionUser() == null)
+        if (getSessionUser() == null)
         {
             return null;
         }

@@ -5,7 +5,7 @@ import android.net.Uri;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 
-import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.config.MemoryCacheKeys;
 
 public class BaseActivity extends AppCompatActivity

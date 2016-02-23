@@ -4,12 +4,12 @@ import android.util.Pair;
 
 import java.util.List;
 
+import reaper.android.app.api._core.ApiManager;
 import reaper.android.app.api.auth.AuthApi;
 import reaper.android.app.api.auth.request.CreateNewSessionApiRequest;
 import reaper.android.app.api.auth.request.ValidateSessionApiRequest;
 import reaper.android.app.api.auth.response.CreateNewSessionApiResponse;
-import reaper.android.app.api.core.ApiManager;
-import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.model.User;
 import reaper.android.app.service.UserService;
 import retrofit.client.Response;
@@ -47,7 +47,7 @@ public class AuthService_
         this.facebookService = facebookService;
         this.userService = userService;
 
-        authApi = ApiManager.getInstance().getApi(AuthApi.class);
+        authApi = ApiManager.getAuthApi();
     }
 
     public Observable<Boolean> initSession()

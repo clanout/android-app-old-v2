@@ -6,8 +6,8 @@ import org.joda.time.DateTime;
 
 import java.util.List;
 
-import reaper.android.app.api.core.GsonProvider;
-import reaper.android.app.model.core.Model;
+import reaper.android.app.api._core.GsonProvider;
+import reaper.android.app.model._core.Model;
 
 public class Event implements Model
 {

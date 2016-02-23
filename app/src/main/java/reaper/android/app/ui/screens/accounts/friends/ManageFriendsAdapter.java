@@ -5,11 +5,9 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,10 +15,8 @@ import com.squareup.picasso.Picasso;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import reaper.android.R;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.GoogleAnalyticsConstants;
@@ -81,7 +77,7 @@ public class ManageFriendsAdapter extends RecyclerView.Adapter<ManageFriendsAdap
         Friend current = friends.get(position);
 
         Picasso.with(context)
-                .load(AppConstants.FACEBOOK_END_POINT + current.getId() + "/picture?width=500")
+                .load(AppConstants.BASE_URL_FACEBOOK_API + current.getId() + "/picture?width=500")
                 .placeholder(personDrawable)
                 .transform(new CircleTransform())
                 .into(holder.userPic);

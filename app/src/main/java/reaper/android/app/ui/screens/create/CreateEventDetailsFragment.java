@@ -57,7 +57,7 @@ import java.util.List;
 
 import hotchemi.stringpicker.StringPicker;
 import reaper.android.R;
-import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
@@ -117,6 +117,7 @@ public class CreateEventDetailsFragment extends BaseFragment
     DateTimeUtil dateTimeUtil;
 
     List<String> dayList;
+    List<String> dateList;
     int selectedDay;
     LocalTime startTime;
 
@@ -308,6 +309,7 @@ public class CreateEventDetailsFragment extends BaseFragment
 
         // Start Day
         dayList = dateTimeUtil.getDayList();
+        dateList = dateTimeUtil.getDayAndDateList();
         String startDay = getArguments().getString(ARG_START_DAY);
         if (startDay != null)
         {
@@ -385,7 +387,7 @@ public class CreateEventDetailsFragment extends BaseFragment
             @Override
             public void onFocusChange(View v, boolean hasFocus)
             {
-                if(hasFocus)
+                if (hasFocus)
                 {
                     tvTitleLimit.setVisibility(View.VISIBLE);
                 }
@@ -565,7 +567,7 @@ public class CreateEventDetailsFragment extends BaseFragment
 
         final StringPicker stringPicker = (StringPicker) dialogView
                 .findViewById(R.id.dayPicker);
-        stringPicker.setValues(dayList);
+        stringPicker.setValues(dateList);
         stringPicker.setCurrent(selectedDay);
 
 
@@ -574,8 +576,8 @@ public class CreateEventDetailsFragment extends BaseFragment
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                tvDay.setText(stringPicker.getCurrentValue());
                 selectedDay = stringPicker.getCurrent();
+                tvDay.setText(dayList.get(selectedDay));
                 Timber.d("Selected Day = " + selectedDay);
                 dialog.dismiss();
             }
@@ -779,12 +781,11 @@ public class CreateEventDetailsFragment extends BaseFragment
 
     private void createEvent()
     {
-
         String eventTitle = etTitle.getText().toString();
         String eventDescription = etDesc.getText().toString();
-        DateTime start = dateTimeUtil
+        DateTime start = DateTimeUtil
                 .getDateTime(dateTimeUtil.getDate(dayList.get(selectedDay)), startTime);
-        DateTime end = dateTimeUtil.getEndTime(start);
+        DateTime end = DateTimeUtil.getEndTime(start);
 
         Event.Type type = cbType
                 .isChecked() ? Event.Type.INVITE_ONLY : Event.Type.PUBLIC;

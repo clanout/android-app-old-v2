@@ -33,7 +33,7 @@ import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import reaper.android.R;
-import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;

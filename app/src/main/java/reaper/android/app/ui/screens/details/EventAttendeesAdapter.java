@@ -100,7 +100,7 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
         public void render(EventDetails.Attendee attendee)
         {
             Picasso.with(context)
-                   .load(AppConstants.FACEBOOK_END_POINT + attendee.getId() + "/picture?width=500")
+                   .load(AppConstants.BASE_URL_FACEBOOK_API + attendee.getId() + "/picture?width=500")
                    .placeholder(personDrawable)
                    .transform(new CircleTransform())
                    .into(ivPic);

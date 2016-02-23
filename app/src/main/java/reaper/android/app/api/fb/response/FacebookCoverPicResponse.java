@@ -2,7 +2,7 @@ package reaper.android.app.api.fb.response;
 
 import com.google.gson.annotations.SerializedName;
 
-import reaper.android.app.api.core.ApiResponse;
+import reaper.android.app.api._core.ApiResponse;
 
 /**
  * Created by harsh on 02/10/15.

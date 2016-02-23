@@ -4,8 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Set;
 
-import reaper.android.app.api.core.ApiRequest;
-import reaper.android.app.api.core.GsonProvider;
+import reaper.android.app.api._core.ApiRequest;
+import reaper.android.app.api._core.GsonProvider;
 
 public class GetPhoneContactsApiRequest extends ApiRequest
 {

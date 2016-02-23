@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import reaper.android.app.api.core.ApiManager;
-import reaper.android.app.api.core.GsonProvider;
+import reaper.android.app.api._core.ApiManager;
+import reaper.android.app.api._core.GsonProvider;
 import reaper.android.app.api.event.EventApi;
 import reaper.android.app.api.event.request.CreateEventApiRequest;
 import reaper.android.app.api.event.request.DeleteEventApiRequest;
@@ -35,7 +35,7 @@ import reaper.android.app.api.event.response.EventSuggestionsApiResponse;
 import reaper.android.app.api.event.response.EventsApiResponse;
 import reaper.android.app.api.event.response.FetchNewEventsAndUpdatesApiResponse;
 import reaper.android.app.api.event.response.GetEventSuggestionApiResponse;
-import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
@@ -79,7 +79,7 @@ public class EventService
         this.bus = bus;
         userService = UserService.getInstance();
         gcmService = GcmService_.getInstance();
-        eventApi = ApiManager.getInstance().getApi(EventApi.class);
+        eventApi = ApiManager.getEventApi();
         eventCache = CacheManager.getEventCache();
         genericCache = CacheManager.getGenericCache();
     }

@@ -2,10 +2,10 @@ package reaper.android.app.service;
 
 import java.util.ArrayList;
 
-import reaper.android.app.api.core.GoogleApiManager;
-import reaper.android.app.api.google.GooglePlacesApi;
-import reaper.android.app.api.google.response.GooglePlaceAutocompleteApiResponse;
-import reaper.android.app.api.google.response.GooglePlaceDetailsApiResponse;
+import reaper.android.app.api._core.ApiManager;
+import reaper.android.app.api.google_places.GooglePlacesApi;
+import reaper.android.app.api.google_places.response.GooglePlaceAutocompleteApiResponse;
+import reaper.android.app.api.google_places.response.GooglePlaceDetailsApiResponse;
 import reaper.android.app.model.Location;
 import reaper.android.app.service._new.LocationService_;
 import rx.Observable;
@@ -18,7 +18,7 @@ public class PlacesService
 
     public PlacesService()
     {
-        googlePlacesApi = GoogleApiManager.getInstance().getPlacesApi();
+        googlePlacesApi = ApiManager.getGooglePlacesApi();
     }
 
     public ArrayList<GooglePlaceAutocompleteApiResponse.Prediction> autocomplete(Double latitude, Double longitude, String input)

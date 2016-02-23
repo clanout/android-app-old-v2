@@ -2,7 +2,7 @@ package reaper.android.app.api.event.request;
 
 import com.google.gson.annotations.SerializedName;
 
-import reaper.android.app.api.core.ApiRequest;
+import reaper.android.app.api._core.ApiRequest;
 import reaper.android.app.model.Event;
 
 public class RsvpUpdateApiRequest extends ApiRequest

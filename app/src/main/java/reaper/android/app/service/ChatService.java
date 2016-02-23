@@ -11,7 +11,7 @@ import org.jivesoftware.smackx.muc.MUCNotJoinedException;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
 
-import reaper.android.app.api.core.ApiManager;
+import reaper.android.app.api._core.ApiManager;
 import reaper.android.app.api.event.EventApi;
 import reaper.android.app.api.event.request.SendChatNotificationApiRequest;
 import retrofit.client.Response;
@@ -27,7 +27,7 @@ public class ChatService
     public ChatService(Bus bus)
     {
         this.bus = bus;
-        this.eventApi = ApiManager.getInstance().getApi(EventApi.class);
+        this.eventApi = ApiManager.getEventApi();
     }
 
     public void fetchHistory(MultiUserChat chat, String nickName, String userId, long timeout, int maxStanzas) throws SmackException.NotConnectedException, XMPPException.XMPPErrorException, SmackException.NoResponseException, MUCNotJoinedException

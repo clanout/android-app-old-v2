@@ -7,7 +7,7 @@ import org.joda.time.DateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import reaper.android.app.api.google.response.GooglePlaceAutocompleteApiResponse;
+import reaper.android.app.api.google_places.response.GooglePlaceAutocompleteApiResponse;
 import reaper.android.app.config.ExceptionMessages;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
@@ -19,7 +19,7 @@ import reaper.android.app.service.PlacesService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.ui.util.DateTimeUtil;
-import reaper.android.app.ui.util.event.EventUtils;
+import reaper.android.app.ui.util.EventUtils;
 import retrofit.client.Response;
 import rx.Observable;
 import rx.Subscriber;

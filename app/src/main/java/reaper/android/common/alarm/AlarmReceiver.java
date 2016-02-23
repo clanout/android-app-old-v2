@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
-import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.config.MemoryCacheKeys;
 import reaper.android.app.model.Event;

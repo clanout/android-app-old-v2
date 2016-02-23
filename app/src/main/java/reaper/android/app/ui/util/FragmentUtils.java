@@ -15,12 +15,4 @@ public class FragmentUtils
         fragmentTransaction.commit();
         manager.executePendingTransactions();
     }
-
-    public static void clearBackStack(FragmentManager manager)
-    {
-        for (int i = 0; i < manager.getBackStackEntryCount(); ++i)
-        {
-            manager.popBackStack();
-        }
-    }
 }

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
@@ -16,8 +16,7 @@ import reaper.android.app.model.EventAttendeeComparator;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
-import reaper.android.app.ui.util.event.EventUtils;
-import reaper.android.app.ui.util.event.EventUtilsConstants;
+import reaper.android.app.ui.util.EventUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import rx.Subscriber;
 import rx.Subscription;
@@ -258,7 +257,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     @Override
     public void onEdit()
     {
-        if (EventUtils.canEdit(event, userId) == EventUtilsConstants.CAN_EDIT)
+        if (EventUtils.isOrganiser(event, userId))
         {
             view.navigateToEditScreen(event, eventDetails);
         }
@@ -388,7 +387,8 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
 
     private void displayDetails(EventDetails eventDetails)
     {
-        Timber.v(">>>> DISPLAY DETAILS : " + event.getTitle() + " : " + eventDetails.getDescription());
+        Timber.v(">>>> DISPLAY DETAILS : " + event.getTitle() + " : " + eventDetails
+                .getDescription());
 
         this.eventDetails = eventDetails;
         view.displayDescription(eventDetails.getDescription());

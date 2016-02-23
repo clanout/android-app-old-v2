@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,14 +21,12 @@ import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import reaper.android.R;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
 import reaper.android.app.trigger.user.ManageAppFriendsTrigger;
-import reaper.android.app.trigger.user.ManagePhoneContactsTrigger;
 import reaper.android.app.ui.util.CircleTransform;
 
 /**
@@ -92,7 +89,7 @@ public class InviteFriendsAdapter extends RecyclerView.Adapter<InviteFriendsAdap
         holder.userPic.setVisibility(View.VISIBLE);
 
         Picasso.with(context)
-                .load(AppConstants.FACEBOOK_END_POINT + current.getId() + "/picture?width=500")
+                .load(AppConstants.BASE_URL_FACEBOOK_API + current.getId() + "/picture?width=500")
                 .placeholder(personDrawable)
                 .transform(new CircleTransform())
                 .into(holder.userPic);

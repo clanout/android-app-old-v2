@@ -1,6 +1,11 @@
 package reaper.android.app.service._new;
 
+import android.content.Intent;
+import android.net.Uri;
+
 import com.google.android.gms.common.api.GoogleApiClient;
+
+import reaper.android.app.model.Location;
 
 public class GoogleService_
 {
@@ -72,5 +77,12 @@ public class GoogleService_
         }
 
         this.googleApiClient = googleApiClient;
+    }
+
+    public Intent getGoogleMapsIntent(Location location)
+    {
+        return new Intent(android.content.Intent.ACTION_VIEW,
+                Uri.parse("http://maps.google.com/maps?daddr="
+                        + location.getLatitude() + "," + location.getLongitude()));
     }
 }

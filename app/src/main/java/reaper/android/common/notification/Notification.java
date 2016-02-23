@@ -1,13 +1,11 @@
 package reaper.android.common.notification;
 
-import android.util.Log;
-
 import org.joda.time.DateTime;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import reaper.android.app.api.core.GsonProvider;
+import reaper.android.app.api._core.GsonProvider;
 
 public class Notification
 {

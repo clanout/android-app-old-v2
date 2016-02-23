@@ -1,7 +1,6 @@
 package reaper.android.common.notification;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
 
@@ -10,7 +9,7 @@ import org.joda.time.DateTime;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-import reaper.android.app.api.core.GsonProvider;
+import reaper.android.app.api._core.GsonProvider;
 import timber.log.Timber;
 
 public class NotificationFactory

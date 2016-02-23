@@ -1,6 +1,6 @@
 package reaper.android.app.config;
 
-public class GenericCacheKeys
+public final class GenericCacheKeys
 {
     // Session User
     public static final String SESSION_USER = "session_user";
@@ -23,4 +23,8 @@ public class GenericCacheKeys
     // Event Suggestions
     public static final String EVENT_SUGGESTIONS = "event_suggestions";
     public static final String EVENT_SUGGESTIONS_UPDATE_TIMESTAMP = "event_suggestions_update_timestamp";
+
+    private GenericCacheKeys()
+    {
+    }
 }

@@ -2,7 +2,7 @@ package reaper.android.app.api.me.request;
 
 import com.google.gson.annotations.SerializedName;
 
-import reaper.android.app.api.core.ApiRequest;
+import reaper.android.app.api._core.ApiRequest;
 
 public class UserZoneUpdatedApiRequest extends ApiRequest
 {

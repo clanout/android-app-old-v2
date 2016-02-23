@@ -4,8 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-import reaper.android.app.api.core.ApiRequest;
-import reaper.android.app.api.core.GsonProvider;
+import reaper.android.app.api._core.ApiRequest;
+import reaper.android.app.api._core.GsonProvider;
 
 /**
  * Created by harsh on 27/09/15.

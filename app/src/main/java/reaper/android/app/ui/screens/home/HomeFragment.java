@@ -60,7 +60,7 @@ import java.util.List;
 
 import hotchemi.stringpicker.StringPicker;
 import reaper.android.R;
-import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
@@ -134,6 +134,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
     DateTimeUtil dateTimeUtil;
     List<String> dayList;
+    List<String> dateList;
     int selectedDay;
     LocalTime startTime;
 
@@ -237,6 +238,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
         tvTitleLimit.setText(String.valueOf(AppConstants.TITLE_LENGTH_LIMIT));
 
         dayList = dateTimeUtil.getDayList();
+        dateList = dateTimeUtil.getDayAndDateList();
         selectedDay = 0;
         tvDay.setText(dayList.get(selectedDay));
 
@@ -340,7 +342,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
             @Override
             public void onFocusChange(View v, boolean hasFocus)
             {
-                if(hasFocus)
+                if (hasFocus)
                 {
                     tvTitleLimit.setVisibility(View.VISIBLE);
                 }
@@ -782,7 +784,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
         final StringPicker stringPicker = (StringPicker) dialogView
                 .findViewById(R.id.dayPicker);
-        stringPicker.setValues(dayList);
+        stringPicker.setValues(dateList);
         stringPicker.setCurrent(selectedDay);
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
@@ -790,8 +792,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                tvDay.setText(stringPicker.getCurrentValue());
                 selectedDay = stringPicker.getCurrent();
+                tvDay.setText(dayList.get(selectedDay));
                 Timber.d("Selected Day = " + selectedDay);
                 dialog.dismiss();
             }

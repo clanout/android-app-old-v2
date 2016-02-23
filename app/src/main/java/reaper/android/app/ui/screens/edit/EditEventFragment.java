@@ -44,7 +44,7 @@ import java.util.List;
 
 import hotchemi.stringpicker.StringPicker;
 import reaper.android.R;
-import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.Dimensions;
@@ -108,6 +108,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
     DateTimeUtil dateTimeUtil;
 
     List<String> dayList;
+    List<String> dateList;
     int selectedDay;
     LocalTime startTime;
     boolean isFinalized;
@@ -278,7 +279,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
 
         final StringPicker stringPicker = (StringPicker) dialogView
                 .findViewById(R.id.dayPicker);
-        stringPicker.setValues(dayList);
+        stringPicker.setValues(dateList);
         stringPicker.setCurrent(selectedDay);
 
 
@@ -287,8 +288,8 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                tvDay.setText(stringPicker.getCurrentValue());
                 selectedDay = stringPicker.getCurrent();
+                tvDay.setText(dayList.get(selectedDay));
                 Timber.d("Selected Day = " + selectedDay);
                 dialog.dismiss();
             }
@@ -342,6 +343,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
         tvDay.setText(dateTimeUtil.formatDate(event.getStartTime().toLocalDate()));
 
         dayList = dateTimeUtil.getDayList();
+        dateList = dateTimeUtil.getDayAndDateList();
         selectedDay = -1;
 
         // Location

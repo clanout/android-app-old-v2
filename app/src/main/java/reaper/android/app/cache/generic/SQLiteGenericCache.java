@@ -9,9 +9,9 @@ import com.google.gson.Gson;
 import java.util.HashMap;
 import java.util.Map;
 
-import reaper.android.app.api.core.GsonProvider;
-import reaper.android.app.cache.core.DatabaseManager;
-import reaper.android.app.cache.core.SQLiteCacheContract;
+import reaper.android.app.api._core.GsonProvider;
+import reaper.android.app.cache._core.DatabaseManager;
+import reaper.android.app.cache._core.SQLiteCacheContract;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;

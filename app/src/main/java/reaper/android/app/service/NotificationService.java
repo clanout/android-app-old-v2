@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
-import reaper.android.app.api.core.ApiManager;
+import reaper.android.app.api._core.ApiManager;
 import reaper.android.app.api.event.EventApi;
 import reaper.android.app.api.event.request.FetchEventApiRequest;
 import reaper.android.app.api.event.response.FetchEventApiResponse;
-import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.notification.NotificationCache;
 import reaper.android.app.cache.user.UserCache;
@@ -57,7 +57,7 @@ public class NotificationService
 
     public NotificationService(Bus bus)
     {
-        this.eventApi = ApiManager.getInstance().getApi(EventApi.class);
+        this.eventApi = ApiManager.getEventApi();
         eventCache = CacheManager.getEventCache();
         notificationCache = CacheManager.getNotificationCache();
         userCache = CacheManager.getUserCache();

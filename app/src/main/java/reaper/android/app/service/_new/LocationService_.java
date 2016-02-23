@@ -16,7 +16,7 @@ import com.google.android.gms.location.LocationServices;
 import java.util.List;
 import java.util.Locale;
 
-import reaper.android.app.api.core.ApiManager;
+import reaper.android.app.api._core.ApiManager;
 import reaper.android.app.api.me.MeApi;
 import reaper.android.app.api.me.request.UserZoneUpdatedApiRequest;
 import reaper.android.app.model.Location;
@@ -68,7 +68,7 @@ public class LocationService_
         this.context = context;
         this.locationManager = locationManager;
         this.googleService = googleService;
-        this.meApi = ApiManager.getInstance().getApi(MeApi.class);
+        this.meApi = ApiManager.getMeApi();
     }
 
     public boolean isLocationPermissionGranted()

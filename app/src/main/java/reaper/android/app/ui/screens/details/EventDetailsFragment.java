@@ -50,7 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
-import reaper.android.app.cache.core.CacheManager;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BundleKeys;
@@ -62,6 +62,7 @@ import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
 import reaper.android.app.service.UserService;
+import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.edit.EditEventFragment;
@@ -83,11 +84,8 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     private static final int FLAG_DEFAULT = 0;
     public static final int FLAG_LAST_MINUTE_STATUS = 1;
 
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat
-            .forPattern("hh:mm a");
-
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat
-            .forPattern("dd MMM");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat
+            .forPattern("hh:mm a, dd MMM (EEEE)");
 
     /* UI Elements */
     View llCategoryIconContainer;
@@ -288,8 +286,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                 break;
         }
 
-        tvTime.setText(event.getStartTime().toString(TIME_FORMATTER).toUpperCase() + ", " + event
-                .getStartTime().toString(DATE_FORMATTER));
+        tvTime.setText(event.getStartTime().toString(DATE_TIME_FORMATTER));
 
         final Location location = event.getLocation();
         if (location.getName() == null || location.getName().isEmpty())
@@ -314,10 +311,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                             GoogleAnalyticsConstants.EVENT_DETAILS_LOCATION_CLICKED,
                             userService.getSessionUserId());
 
-                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                            Uri.parse("http://maps.google.com/maps?daddr="
-                                    + location.getLatitude() + "," + location.getLongitude()));
-                    startActivity(intent);
+                    startActivity(GoogleService_.getInstance().getGoogleMapsIntent(location));
                 }
             });
         }
@@ -341,7 +335,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                         .build();
 
         Picasso.with(getActivity())
-               .load(AppConstants.FACEBOOK_END_POINT + userId + "/picture?width=500")
+               .load(AppConstants.BASE_URL_FACEBOOK_API + userId + "/picture?width=500")
                .placeholder(placeHolder)
                .transform(new CircleTransform())
                .into(ivPic);
@@ -826,7 +820,8 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
 
                                 Log.d("APP", "2 ---- permission denied");
 
-                                genericCache.put(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
+                                genericCache
+                                        .put(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
                                 navigateToInviteScreen(event);
                             }
 
