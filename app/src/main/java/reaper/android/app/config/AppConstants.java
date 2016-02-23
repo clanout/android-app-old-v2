@@ -25,4 +25,7 @@ public class AppConstants
     public static final String APP_LINK = "www.clanout.com"; // TODO -- change link
 
     public static final int TITLE_LENGTH_LIMIT = 30;
+
+    // Expiry Times
+    public static final int EXPIRY_DAYS_EVENT_SUGGESTIONS = 7;
 }

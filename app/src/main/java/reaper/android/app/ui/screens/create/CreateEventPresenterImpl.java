@@ -55,7 +55,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
 
     public CreateEventPresenterImpl(Bus bus, EventCategory eventCategory)
     {
-        userService = new UserService(bus);
+        userService = UserService.getInstance();
         eventService = new EventService(bus);
         placesService = new PlacesService();
         userLocation = LocationService_.getInstance().getCurrentLocation();
@@ -317,7 +317,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
                     {
                         AnalyticsHelper
                                 .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.CREATE_EVENT_FAILURE_FROM_DETAILS, userService
-                                        .getActiveUserId());
+                                        .getSessionUserId());
                         isCreationInitiated = false;
                         view.displayError();
                     }
@@ -327,7 +327,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
                     {
                         AnalyticsHelper
                                 .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.CREATE_EVENT_SUCCESS_FROM_DETAILS, userService
-                                        .getActiveUserId());
+                                        .getSessionUserId());
                         view.navigateToInviteScreen(event);
                     }
                 });

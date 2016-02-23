@@ -2,7 +2,6 @@ package reaper.android.app.ui.screens.notifications;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -42,6 +41,7 @@ import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 import reaper.android.common.notification.Notification;
@@ -245,7 +245,7 @@ public class NotificationFragment extends BaseFragment implements NotificationCl
         if (events.contains(activeEvent)) {
             activePosition = events.indexOf(activeEvent);
         } else {
-            Snackbar.make(getView(), R.string.error_event_not_found, Snackbar.LENGTH_LONG).show();
+            SnackbarFactory.create(getActivity(), R.string.error_event_not_found);
             return;
         }
 

@@ -121,7 +121,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
 
         bus = Communicator.getInstance().getBus();
         eventService = new EventService(bus);
-        userService = new UserService(bus);
+        userService = UserService.getInstance();
         fragmentManager = getActivity().getFragmentManager();
 
         genericCache = CacheManager.getGenericCache();
@@ -250,13 +250,13 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
             if (invitedAppFriends.size() != 0) {
                 eventService.inviteUsers(event.getId(), invitedAppFriends);
 
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.FACEBOOK_FRIENDS_INVITED, "user - " + userService.getActiveUserId() + " event - " + event.getId() + " invitee count - " + invitedAppFriends.size());
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.FACEBOOK_FRIENDS_INVITED, "user - " + userService.getSessionUserId() + " event - " + event.getId() + " invitee count - " + invitedAppFriends.size());
             }
 
             if (smsInviteePhoneList.size() != 0) {
                 eventService.inviteThroughSMS(event.getId(), smsInviteePhoneList);
 
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.PHONE_CONTACTS_INVITED_THROUGH_SMS, "user - " + userService.getActiveUserId() + " event - " + event.getId() + " invitee count - " + smsInviteePhoneList.size());
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.PHONE_CONTACTS_INVITED_THROUGH_SMS, "user - " + userService.getSessionUserId() + " event - " + event.getId() + " invitee count - " + smsInviteePhoneList.size());
             }
 
 

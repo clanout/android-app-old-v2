@@ -31,8 +31,8 @@ import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.AppConstants;
-import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.model.Friend;
 import reaper.android.app.model.PhoneContact;
 import reaper.android.app.model.User;
@@ -46,6 +46,7 @@ import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.trigger.user.PhoneAddedTrigger;
 import reaper.android.app.trigger.user.PhoneContactsFetchedTrigger;
 import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.common.communicator.Communicator;
 import retrofit.client.Response;
 import rx.Observable;
 import rx.Subscriber;
@@ -56,58 +57,93 @@ import rx.schedulers.Schedulers;
 
 public class UserService
 {
-    private static final String TAG = "UserService";
+    private static UserService instance;
+
+    public static void init()
+    {
+        instance = new UserService(Communicator.getInstance().getBus());
+    }
+
+    public static UserService getInstance()
+    {
+        if (instance == null)
+        {
+            throw new IllegalStateException("[UserService Not Initialized]");
+        }
+
+        return instance;
+    }
 
     private Bus bus;
     private MeApi meApi;
     private UserCache userCache;
-    private GenericCache cache;
+    private GenericCache genericCache;
     private EventCache eventCache;
 
     private User activeUser;
 
-    public UserService(Bus bus)
+    private UserService(Bus bus)
     {
         this.bus = bus;
         meApi = ApiManager.getInstance().getApi(MeApi.class);
         userCache = CacheManager.getUserCache();
-        cache = CacheManager.getGenericCache();
+        genericCache = CacheManager.getGenericCache();
         eventCache = CacheManager.getEventCache();
     }
 
-    public User getActiveUser()
+    public void setSessionUser(User user)
+    {
+        if (user == null)
+        {
+            throw new IllegalStateException("[Session User null]");
+        }
+
+        activeUser = user;
+        genericCache.put(GenericCacheKeys.SESSION_USER, user);
+    }
+
+    public User getSessionUser()
     {
         if (activeUser == null)
         {
-            activeUser = cache.get(GenericCacheKeys.USER, User.class);
+            activeUser = genericCache.get(GenericCacheKeys.SESSION_USER, User.class);
         }
 
         return activeUser;
     }
 
-    public String getActiveUserId()
+    public String getSessionId()
     {
-        if (getActiveUser() == null)
+        if(getSessionUser() == null)
         {
             return null;
         }
 
-        return getActiveUser().getId();
+        return getSessionUser().getSessionId();
     }
 
-    public String getActiveUserName()
+    public String getSessionUserId()
     {
-        if (getActiveUser() == null)
+        if (getSessionUser() == null)
         {
             return null;
         }
 
-        return getActiveUser().getName();
+        return getSessionUser().getId();
+    }
+
+    public String getSessionUserName()
+    {
+        if (getSessionUser() == null)
+        {
+            return null;
+        }
+
+        return getSessionUser().getName();
     }
 
     public void updatePhoneNumber(final String phoneNumber)
     {
-
         AddPhoneApiRequest request = new AddPhoneApiRequest(phoneNumber);
 
         meApi.updatePhoneNumber(request)
@@ -134,7 +170,7 @@ public class UserService
                      if (response.getStatus() == 200)
                      {
 
-                         cache.put(GenericCacheKeys.MY_PHONE_NUMBER, phoneNumber);
+                         genericCache.put(GenericCacheKeys.MY_PHONE_NUMBER, phoneNumber);
                          bus.post(new PhoneAddedTrigger());
                      }
                      else
@@ -583,7 +619,7 @@ public class UserService
                  {
 
                      eventCache.reset(fetchPendingInvitesApiResponse.getEvents());
-                     cache.put(GenericCacheKeys.HAS_FETCHED_PENDING_INVITES, true);
+                     genericCache.put(GenericCacheKeys.HAS_FETCHED_PENDING_INVITES, true);
                      bus.post(new EventsFetchTrigger(fetchPendingInvitesApiResponse.getEvents()));
                  }
              });

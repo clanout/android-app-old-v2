@@ -13,7 +13,6 @@ import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
@@ -27,10 +26,10 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
     private GcmService_ gcmService;
     private EventService eventService;
 
-    private Observable<List<Event>> bootstrapObservable;
     private CompositeSubscription subscriptions;
 
-    public BootstrapPresenterImpl(LocationService_ locationService, AuthService_ authService, GcmService_ gcmService, EventService eventService)
+    public BootstrapPresenterImpl(LocationService_ locationService, AuthService_ authService,
+                                  GcmService_ gcmService, EventService eventService)
     {
         this.locationService = locationService;
         this.authService = authService;
@@ -38,7 +37,6 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
         this.eventService = eventService;
 
         subscriptions = new CompositeSubscription();
-        initBootstrapObservable();
     }
 
     @Override
@@ -46,6 +44,7 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
     {
         this.view = view;
 
+        this.view.showLoading();
         if (locationService.isLocationPermissionGranted())
         {
             if (locationService.isLocationServiceAvailable())
@@ -73,7 +72,7 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
     private void init()
     {
         Subscription subscription =
-                bootstrapObservable
+                getBootstrapObservable()
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Subscriber<List<Event>>()
                         {
@@ -98,72 +97,59 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
         subscriptions.add(subscription);
     }
 
-    private void initBootstrapObservable()
+    private Observable<List<Event>> getBootstrapObservable()
     {
-        if (bootstrapObservable == null)
-        {
-            bootstrapObservable =
-                    Observable
-                            .zip(getSessionObservable(), getLocationObservable(), new Func2<Boolean, Location, Location>()
-                            {
-                                @Override
-                                public Location call(Boolean isSessionInitialized, Location location)
-                                {
-                                    if (isSessionInitialized && location != null)
-                                    {
-                                        return location;
-                                    }
-                                    else
-                                    {
-                                        throw new IllegalStateException();
-                                    }
-                                }
-                            })
-                            .flatMap(new Func1<Location, Observable<Boolean>>()
-                            {
-                                @Override
-                                public Observable<Boolean> call(Location location)
-                                {
-                                    return locationService.pushUserLocation();
-                                }
-                            })
-                            .flatMap(new Func1<Boolean, Observable<List<Event>>>()
-                            {
-                                @Override
-                                public Observable<List<Event>> call(Boolean isLocationPushed)
-                                {
-                                    if (!isLocationPushed)
-                                    {
-                                        throw new IllegalStateException();
-                                    }
-                                    else
-                                    {
-                                        return eventService
-                                                ._fetchEvents(locationService.getCurrentLocation()
-                                                                             .getZone());
-                                    }
-                                }
-                            })
-                            .doOnCompleted(new Action0()
-                            {
-                                @Override
-                                public void call()
-                                {
-                                    // Register WIth GCM
-                                    gcmService.register();
-                                }
-                            })
-                            .doOnError(new Action1<Throwable>()
-                            {
-                                @Override
-                                public void call(Throwable throwable)
-                                {
-                                    authService.logout();
-                                }
-                            })
-                            .subscribeOn(Schedulers.newThread())
-                            .cache();
-        }
+        return Observable
+                .zip(getSessionObservable(), getLocationObservable(), new Func2<Boolean, Location, Location>()
+                {
+                    @Override
+                    public Location call(Boolean isSessionInitialized, Location location)
+                    {
+                        if (isSessionInitialized && location != null)
+                        {
+                            return location;
+                        }
+                        else
+                        {
+                            throw new IllegalStateException("[Bootstrap Error] session/fetch_location failed");
+                        }
+                    }
+                })
+                .flatMap(new Func1<Location, Observable<Boolean>>()
+                {
+                    @Override
+                    public Observable<Boolean> call(Location location)
+                    {
+                        return locationService.pushUserLocation();
+                    }
+                })
+                .flatMap(new Func1<Boolean, Observable<List<Event>>>()
+                {
+                    @Override
+                    public Observable<List<Event>> call(Boolean isLocationPushed)
+                    {
+                        if (!isLocationPushed)
+                        {
+                            throw new IllegalStateException("[Bootstrap Error] location push failed");
+                        }
+                        else
+                        {
+                            return eventService
+                                    ._fetchEvents(locationService.getCurrentLocation()
+                                                                 .getZone());
+                        }
+                    }
+                })
+                .doOnCompleted(new Action0()
+                {
+                    @Override
+                    public void call()
+                    {
+                        // Register With GCM
+                        gcmService.register();
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
     }
 
     private Observable<Location> getLocationObservable()

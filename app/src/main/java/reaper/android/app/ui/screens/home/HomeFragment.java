@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -91,6 +90,7 @@ import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
@@ -234,6 +234,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
         dateTimeUtil = new DateTimeUtil();
 
+        tvTitleLimit.setText(String.valueOf(AppConstants.TITLE_LENGTH_LIMIT));
+
         dayList = dateTimeUtil.getDayList();
         selectedDay = 0;
         tvDay.setText(dayList.get(selectedDay));
@@ -332,6 +334,22 @@ public class HomeFragment extends BaseFragment implements EventsView,
         });
 
         tvTitleLimit.setText(String.valueOf(AppConstants.TITLE_LENGTH_LIMIT));
+
+        etTitle.setOnFocusChangeListener(new View.OnFocusChangeListener()
+        {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus)
+            {
+                if(hasFocus)
+                {
+                    tvTitleLimit.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    tvTitleLimit.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
         etTitle.addTextChangedListener(new TextWatcher()
         {
@@ -635,7 +653,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
     {
         final GenericCache genericCache = CacheManager.getGenericCache();
         final EventService eventService = new EventService(bus);
-        final UserService userService = new UserService(bus);
+        final UserService userService = UserService.getInstance();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(false);
@@ -713,7 +731,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
                            {
                                userService.updatePhoneNumber(parsedPhone);
 
-                               userService.fetchPendingInvites(parsedPhone, LocationService_.getInstance().getCurrentLocation().getZone());
+                               userService.fetchPendingInvites(parsedPhone, LocationService_
+                                       .getInstance().getCurrentLocation().getZone());
 
                                SoftKeyboardHandler.hideKeyboard(getActivity(), dialogView);
 
@@ -951,8 +970,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
             createProgressDialog.dismiss();
         }
 
-        Snackbar.make(getView(), R.string.error_no_title, Snackbar.LENGTH_LONG)
-                .show();
+        SnackbarFactory.create(getActivity(), R.string.error_no_title);
     }
 
     @Override
@@ -963,8 +981,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
             createProgressDialog.dismiss();
         }
 
-        Snackbar.make(getView(), "Start time cannot be before the current time", Snackbar.LENGTH_LONG)
-                .show();
+        SnackbarFactory.create(getActivity(), R.string.error_invalid_start_time);
     }
 
     @Override
@@ -982,8 +999,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
             createProgressDialog.dismiss();
         }
 
-        Snackbar.make(getView(), "Unable to make your plan", Snackbar.LENGTH_LONG)
-                .show();
+        SnackbarFactory.create(getActivity(), R.string.error_default);
     }
 
     @Override

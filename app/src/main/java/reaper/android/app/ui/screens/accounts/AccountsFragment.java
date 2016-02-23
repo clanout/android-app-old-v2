@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -42,13 +41,13 @@ import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.User;
 import reaper.android.app.service.AccountsService;
-import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
@@ -65,7 +64,6 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
 
     private FragmentManager fragmentManager;
     private UserService userService;
-    private FacebookService facebookService;
     private Bus bus;
 
     private GenericCache genericCache;
@@ -107,8 +105,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
 
         fragmentManager = getActivity().getFragmentManager();
         bus = Communicator.getInstance().getBus();
-        userService = new UserService(bus);
-        facebookService = new FacebookService(bus);
+        userService = UserService.getInstance();
 
         genericCache = CacheManager.getGenericCache();
 
@@ -144,7 +141,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_account);
         bus.register(this);
 
-        User activeUser = userService.getActiveUser();
+        User activeUser = userService.getSessionUser();
         userName.setText(activeUser.getName());
 
         Picasso.with(getActivity())
@@ -218,7 +215,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
 
             AnalyticsHelper
                     .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.UPDATE_PHONE_CLICKED_ACCOUNTS_FRAGMENT, userService
-                            .getActiveUserId());
+                            .getSessionUserId());
 
             displayUpdatePhoneDialog();
         }
@@ -231,12 +228,12 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
 
                 AnalyticsHelper
                         .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.WHATSAPP_INVITE_CLICKED_ACCOUNTS_FRAGMENT, userService
-                                .getActiveUserId());
+                                .getSessionUserId());
 
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, userService
-                        .getActiveUserName() + AppConstants.WHATSAPP_INVITATION_MESSAGE + AppConstants.APP_LINK);
+                        .getSessionUserName() + AppConstants.WHATSAPP_INVITATION_MESSAGE + AppConstants.APP_LINK);
                 sendIntent.setType("text/plain");
                 sendIntent.setPackage("com.whatsapp");
                 startActivity(sendIntent);
@@ -244,15 +241,14 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
             }
             else
             {
-                Snackbar.make(getView(), R.string.error_no_watsapp, Snackbar.LENGTH_LONG)
-                        .show();
+                SnackbarFactory.create(getActivity(), R.string.error_no_watsapp);
             }
         }
         else if (position == 3)
         {
             AnalyticsHelper
                     .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.SHARE_FEEDBACK_CLICKED, userService
-                            .getActiveUserId());
+                            .getSessionUserId());
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setCancelable(true);
@@ -337,7 +333,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                                {
                                    AnalyticsHelper
                                            .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.FEEDBACK_SHARED, userService
-                                                   .getActiveUserId());
+                                                   .getSessionUserId());
 
                                    userService.shareFeedback(type, comment);
                                    wantToCloseDialog = true;
@@ -354,7 +350,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
         {
             AnalyticsHelper
                     .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.FAQ_CLICKED_ACCOUNTS_FRAGMENT, userService
-                            .getActiveUserId());
+                            .getSessionUserId());
         }
     }
 
@@ -424,7 +420,7 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
                            {
                                AnalyticsHelper
                                        .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.PHONE_NUMBER_UPDATED, userService
-                                               .getActiveUserId());
+                                               .getSessionUserId());
 
                                userService.updatePhoneNumber(parsedPhone);
                                SoftKeyboardHandler.hideKeyboard(getActivity(), dialogView);

@@ -63,7 +63,7 @@ public class EditEventPresenterImpl implements EditEventPresenter
     public EditEventPresenterImpl(Bus bus, Event originalEvent, EventDetails originalEventDetails)
     {
         eventService = new EventService(bus);
-        activeUser = new UserService(bus).getActiveUserId();
+        activeUser = UserService.getInstance().getSessionUserId();
         userLocation = LocationService_.getInstance().getCurrentLocation();
         placesService = new PlacesService();
 

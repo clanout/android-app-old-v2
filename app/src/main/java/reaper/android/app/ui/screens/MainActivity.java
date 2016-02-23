@@ -61,7 +61,7 @@ public class MainActivity extends BaseActivity
         }
 
         intent.putExtra(ARG_FLOW_ENTRY, flowEntry);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         return intent;
     }
@@ -92,7 +92,7 @@ public class MainActivity extends BaseActivity
         isBusRegistered = true;
 
         eventService = new EventService(bus);
-        userService = new UserService(bus);
+        userService = UserService.getInstance();
         facebookService = new FacebookService(bus);
         fragmentManager = getFragmentManager();
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -148,8 +148,8 @@ public class MainActivity extends BaseActivity
         super.onPause();
         AnalyticsHelper
                 .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.APP_CLOSED, "user - " + userService
-                        .getActiveUserId() + " time - " + DateTime.now(DateTimeZone.UTC)
-                                                                  .toString());
+                        .getSessionUserId() + " time - " + DateTime.now(DateTimeZone.UTC)
+                                                                   .toString());
     }
 
     @Override

@@ -15,7 +15,7 @@ public class GoogleService_
     {
         if (instance == null)
         {
-            throw new IllegalStateException("[PlacesService Not Initialized]");
+            throw new IllegalStateException("[GoogleService Not Initialized]");
         }
 
         return instance;
@@ -23,11 +23,42 @@ public class GoogleService_
 
     private GoogleApiClient googleApiClient;
 
+    public boolean isGoogleApiClientSet()
+    {
+        return googleApiClient != null;
+    }
+
+    public boolean isConnected()
+    {
+        try
+        {
+            return googleApiClient.isConnected();
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
+
+    public void connect()
+    {
+        if (googleApiClient == null)
+        {
+            throw new IllegalStateException("[GoogleApiClient not initialized]");
+        }
+
+        googleApiClient.connect();
+    }
+
     public GoogleApiClient getGoogleApiClient()
     {
-        if (googleApiClient == null || !googleApiClient.isConnected())
+        if (googleApiClient == null)
         {
-            throw new IllegalStateException("[GoogleApiClient Not Initialized]");
+            throw new IllegalStateException("[GoogleApiClient not initialized]");
+        }
+        else if (!googleApiClient.isConnected())
+        {
+            throw new IllegalStateException("[GoogleApiClient not connected]");
         }
 
         return googleApiClient;
@@ -35,24 +66,11 @@ public class GoogleService_
 
     public void setGoogleApiClient(GoogleApiClient googleApiClient)
     {
-        if (googleApiClient == null || !googleApiClient.isConnected())
+        if (googleApiClient == null)
         {
-            throw new IllegalStateException("[GoogleApiClient Not Initialized]");
+            throw new IllegalStateException("[Cannot set null GoogleApiClient]");
         }
 
         this.googleApiClient = googleApiClient;
-    }
-
-    public void disconnect()
-    {
-        if (googleApiClient != null)
-        {
-            if (googleApiClient.isConnected())
-            {
-                googleApiClient.disconnect();
-            }
-
-            googleApiClient = null;
-        }
     }
 }

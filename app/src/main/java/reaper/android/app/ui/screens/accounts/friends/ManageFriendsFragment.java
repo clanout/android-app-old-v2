@@ -119,7 +119,7 @@ public class ManageFriendsFragment extends BaseFragment implements BlockListComm
         visibleFriendList = new ArrayList<>();
 
         bus = Communicator.getInstance().getBus();
-        userService = new UserService(bus);
+        userService = UserService.getInstance();
         facebookService = new FacebookService(bus);
         genericCache = CacheManager.getGenericCache();
 

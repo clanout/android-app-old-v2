@@ -2,9 +2,7 @@ package reaper.android.app.api.core;
 
 import com.google.gson.annotations.SerializedName;
 
-import reaper.android.app.cache.core.CacheManager;
-import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.config.GenericCacheKeys;
+import reaper.android.app.service.UserService;
 
 public abstract class ApiRequest
 {
@@ -13,7 +11,6 @@ public abstract class ApiRequest
 
     protected ApiRequest()
     {
-        GenericCache cache = CacheManager.getGenericCache();
-        this.sessionCookie = cache.get(GenericCacheKeys.SESSION_ID);
+        this.sessionCookie = UserService.getInstance().getSessionId();
     }
 }

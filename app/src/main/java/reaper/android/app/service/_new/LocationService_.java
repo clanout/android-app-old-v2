@@ -91,169 +91,176 @@ public class LocationService_
 
     public Observable<Location> fetchCurrentLocation()
     {
-        return Observable
-                .create(new Observable.OnSubscribe<android.location.Location>()
-                {
-                    @Override
-                    public void call(Subscriber<? super android.location.Location> subscriber)
+        if (location != null)
+        {
+            return Observable.just(location);
+        }
+        else
+        {
+            return Observable
+                    .create(new Observable.OnSubscribe<android.location.Location>()
                     {
-                        try
+                        @Override
+                        public void call(Subscriber<? super android.location.Location> subscriber)
                         {
-                            //noinspection MissingPermission
-                            if (!LocationServices.FusedLocationApi
-                                    .getLocationAvailability(googleService.getGoogleApiClient())
-                                    .isLocationAvailable())
+                            try
                             {
-                                Timber.v("[FusedLocationApi] Last Known Location Unavailable");
-                                subscriber.onNext(null);
-                                subscriber.onCompleted();
-                            }
-                            else
-                            {
-                                Timber.v("[FusedLocationApi] Last Known Location Available");
                                 //noinspection MissingPermission
-                                android.location.Location location = LocationServices.FusedLocationApi
-                                        .getLastLocation(googleService.getGoogleApiClient());
+                                if (!LocationServices.FusedLocationApi
+                                        .getLocationAvailability(googleService.getGoogleApiClient())
+                                        .isLocationAvailable())
+                                {
+                                    Timber.v("[FusedLocationApi] Last Known Location Unavailable");
+                                    subscriber.onNext(null);
+                                    subscriber.onCompleted();
+                                }
+                                else
+                                {
+                                    Timber.v("[FusedLocationApi] Last Known Location Available");
+                                    //noinspection MissingPermission
+                                    android.location.Location location = LocationServices.FusedLocationApi
+                                            .getLastLocation(googleService.getGoogleApiClient());
 
-                                subscriber.onNext(location);
-                                subscriber.onCompleted();
+                                    subscriber.onNext(location);
+                                    subscriber.onCompleted();
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                subscriber.onError(e);
                             }
                         }
-                        catch (Exception e)
-                        {
-                            subscriber.onError(e);
-                        }
-                    }
-                })
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .flatMap(new Func1<android.location.Location, Observable<android.location.Location>>()
-                {
-                    @Override
-                    public Observable<android.location.Location> call(android.location.Location location)
+                    })
+                    .subscribeOn(Schedulers.newThread())
+                    .flatMap(new Func1<android.location.Location, Observable<android.location.Location>>()
                     {
-                        if (location != null)
+                        @Override
+                        public Observable<android.location.Location> call(android.location.Location location)
                         {
-                            return Observable.just(location);
-                        }
-                        else
-                        {
-                            //noinspection MissingPermission
-                            location = locationManager
-                                    .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                            if (location == null)
+                            if (location != null)
                             {
-                                Timber.v("[LocationManager] Last Known Location Unavailable");
+                                return Observable.just(location);
                             }
                             else
                             {
-                                Timber.v("[LocationManager] Last Known Location Available");
-                            }
-
-                            return Observable.just(location);
-                        }
-                    }
-                })
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .flatMap(new Func1<android.location.Location, Observable<android.location.Location>>()
-                {
-                    @Override
-                    public Observable<android.location.Location> call(android.location.Location location)
-                    {
-                        if (location != null)
-                        {
-                            return Observable.just(location);
-                        }
-
-                        Timber.v("[FusedLocationApi] Refreshing Location ...");
-
-                        return Observable
-                                .create(new Observable.OnSubscribe<android.location.Location>()
+                                //noinspection MissingPermission
+                                location = locationManager
+                                        .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                                if (location == null)
                                 {
-                                    @Override
-                                    public void call(final Subscriber<? super android.location.Location> subscriber)
-                                    {
-                                        LocationRequest locationRequest = new LocationRequest();
-                                        locationRequest
-                                                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+                                    Timber.v("[LocationManager] Last Known Location Unavailable");
+                                }
+                                else
+                                {
+                                    Timber.v("[LocationManager] Last Known Location Available");
+                                }
 
-                                        locationListener = new LocationListener()
-                                        {
-                                            @Override
-                                            public void onLocationChanged(android.location.Location location)
-                                            {
-                                                Timber.v("[FusedLocationApi] Received Updated Location");
-                                                subscriber.onNext(location);
-                                                subscriber.onCompleted();
-                                            }
-                                        };
-
-                                        //noinspection MissingPermission
-                                        LocationServices.FusedLocationApi
-                                                .requestLocationUpdates(googleService
-                                                        .getGoogleApiClient(), locationRequest, locationListener);
-                                    }
-                                });
-                    }
-                })
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .map(new Func1<android.location.Location, Location>()
-                {
-                    @Override
-                    public Location call(android.location.Location googleApiLocation)
-                    {
-                        if (locationListener != null)
-                        {
-                            LocationServices.FusedLocationApi
-                                    .removeLocationUpdates(googleService
-                                            .getGoogleApiClient(), locationListener);
-
-                            Timber.v("[FusedLocationApi] Closed Location Listener");
+                                return Observable.just(location);
+                            }
                         }
-
-                        try
+                    })
+                    .subscribeOn(Schedulers.newThread())
+                    .flatMap(new Func1<android.location.Location, Observable<android.location.Location>>()
+                    {
+                        @Override
+                        public Observable<android.location.Location> call(android.location.Location location)
                         {
-                            Geocoder gcd = new Geocoder(context, Locale.getDefault());
-                            List<Address> addresses = null;
-                            addresses = gcd
-                                    .getFromLocation(googleApiLocation
-                                            .getLatitude(), googleApiLocation
-                                            .getLongitude(), 1);
-
-                            if (addresses == null || addresses.size() == 0)
+                            if (location != null)
                             {
-                                throw new IllegalStateException();
+                                return Observable.just(location);
                             }
 
-                            String zone = addresses.get(0).getLocality();
+                            Timber.v("[FusedLocationApi] Refreshing Location ...");
 
-                            Location location = new Location();
-                            location.setLongitude(googleApiLocation.getLongitude());
-                            location.setLatitude(googleApiLocation.getLatitude());
-                            location.setZone(zone);
+                            return Observable
+                                    .create(new Observable.OnSubscribe<android.location.Location>()
+                                    {
+                                        @Override
+                                        public void call(final Subscriber<? super android.location.Location> subscriber)
+                                        {
+                                            LocationRequest locationRequest = new LocationRequest();
+                                            locationRequest
+                                                    .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
-                            return location;
+                                            locationListener = new LocationListener()
+                                            {
+                                                @Override
+                                                public void onLocationChanged(android.location.Location location)
+                                                {
+                                                    Timber.v("[FusedLocationApi] Received Updated Location");
+                                                    subscriber.onNext(location);
+                                                    subscriber.onCompleted();
+                                                }
+                                            };
+
+                                            //noinspection MissingPermission
+                                            LocationServices.FusedLocationApi
+                                                    .requestLocationUpdates(googleService
+                                                            .getGoogleApiClient(), locationRequest, locationListener);
+                                        }
+                                    });
                         }
-                        catch (Exception e)
-                        {
-                            Timber.e("[Location fetch error] " + e.getMessage());
-                            return null;
-                        }
-                    }
-                })
-                .doOnNext(new Action1<Location>()
-                {
-                    @Override
-                    public void call(Location location)
+                    })
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .map(new Func1<android.location.Location, Location>()
                     {
-                        if (location != null)
+                        @Override
+                        public Location call(android.location.Location googleApiLocation)
                         {
-                            Timber.v("Location : " + location.toString());
-                        }
+                            if (locationListener != null)
+                            {
+                                LocationServices.FusedLocationApi
+                                        .removeLocationUpdates(googleService
+                                                .getGoogleApiClient(), locationListener);
 
-                        LocationService_.this.location = location;
-                    }
-                })
-                .subscribeOn(Schedulers.newThread());
+                                Timber.v("[FusedLocationApi] Closed Location Listener");
+                            }
+
+                            try
+                            {
+                                Geocoder gcd = new Geocoder(context, Locale.getDefault());
+                                List<Address> addresses = null;
+                                addresses = gcd
+                                        .getFromLocation(googleApiLocation
+                                                .getLatitude(), googleApiLocation
+                                                .getLongitude(), 1);
+
+                                if (addresses == null || addresses.size() == 0)
+                                {
+                                    throw new IllegalStateException();
+                                }
+
+                                String zone = addresses.get(0).getLocality();
+
+                                Location location = new Location();
+                                location.setLongitude(googleApiLocation.getLongitude());
+                                location.setLatitude(googleApiLocation.getLatitude());
+                                location.setZone(zone);
+
+                                return location;
+                            }
+                            catch (Exception e)
+                            {
+                                Timber.e("[Location fetch error] " + e.getMessage());
+                                return null;
+                            }
+                        }
+                    })
+                    .doOnNext(new Action1<Location>()
+                    {
+                        @Override
+                        public void call(Location location)
+                        {
+                            if (location != null)
+                            {
+                                Timber.v("Location : " + location.toString());
+                            }
+
+                            LocationService_.this.location = location;
+                        }
+                    })
+                    .subscribeOn(Schedulers.newThread());
+        }
     }
 
     public Location getCurrentLocation()

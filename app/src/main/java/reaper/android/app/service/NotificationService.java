@@ -62,7 +62,7 @@ public class NotificationService
         notificationCache = CacheManager.getNotificationCache();
         userCache = CacheManager.getUserCache();
         this.bus = bus;
-        this.userService = new UserService(bus);
+        this.userService = UserService.getInstance();
     }
 
     public void handleNotification(Notification notification)
@@ -110,7 +110,7 @@ public class NotificationService
     private void handleNewStatusUpdateNotification(final Notification notification)
     {
 
-        if (!(notification.getArgs().get("user_id").equals(userService.getActiveUserId())))
+        if (!(notification.getArgs().get("user_id").equals(userService.getSessionUserId())))
         {
             notificationCache.put(notification).observeOn(Schedulers.newThread())
                              .subscribe(new Subscriber<Object>()
@@ -148,7 +148,7 @@ public class NotificationService
     private void handleNewChatMessageNotification(final Notification notification)
     {
 
-        if (!(notification.getArgs().get("user_id").equals(userService.getActiveUserId())))
+        if (!(notification.getArgs().get("user_id").equals(userService.getSessionUserId())))
         {
             notificationCache.put(notification).observeOn(Schedulers.newThread())
                              .subscribe(new Subscriber<Object>()
@@ -241,7 +241,7 @@ public class NotificationService
                                                  {
                                                      if (!(notification.getArgs().get("user_id")
                                                                        .equals(userService
-                                                                               .getActiveUserId())))
+                                                                               .getSessionUserId())))
                                                      {
                                                          boolean isLocationUpdated = Boolean
                                                                  .parseBoolean(notification
@@ -335,7 +335,7 @@ public class NotificationService
     {
         eventCache.delete(notification.getEventId());
 
-        if (!(notification.getArgs().get("user_id").equals(userService.getActiveUserId())))
+        if (!(notification.getArgs().get("user_id").equals(userService.getSessionUserId())))
         {
             notificationCache.put(notification).observeOn(Schedulers.newThread())
                              .subscribe(new Subscriber<Object>()

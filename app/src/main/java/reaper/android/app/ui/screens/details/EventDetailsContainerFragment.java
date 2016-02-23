@@ -116,7 +116,7 @@ public class EventDetailsContainerFragment extends BaseFragment
         setHasOptionsMenu(true);
 
         bus = Communicator.getInstance().getBus();
-        userService = new UserService(bus);
+        userService = UserService.getInstance();
         genericCache = CacheManager.getGenericCache();
 
         pagerAdapter = new EventDetailsPagerAdapter(getChildFragmentManager(), events, activePosition, shouldPopupStatusDialog);
@@ -154,7 +154,7 @@ public class EventDetailsContainerFragment extends BaseFragment
         {
             if (ChatHelper.getXmppConnection() == null)
             {
-                ChatHelper.init(userService.getActiveUserId());
+                ChatHelper.init(userService.getSessionUserId());
             }
         }
         catch (IOException | XMPPException | SmackException ignored)
@@ -374,7 +374,7 @@ public class EventDetailsContainerFragment extends BaseFragment
 
                                AnalyticsHelper
                                        .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.FEEDBACK_SHARED, userService
-                                               .getActiveUserId());
+                                               .getSessionUserId());
 
                                userService.shareFeedback(type, comment);
 

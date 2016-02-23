@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -39,8 +38,8 @@ import reaper.android.R;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
-import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.ErrorCode;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.PhoneContact;
 import reaper.android.app.model.PhoneContactComparator;
@@ -50,6 +49,7 @@ import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.AllPhoneContactsForSMSFetchedTrigger;
 import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
@@ -126,7 +126,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         super.onActivityCreated(savedInstanceState);
 
         bus = Communicator.getInstance().getBus();
-        userService = new UserService(bus);
+        userService = UserService.getInstance();
         inviteWhatsapp.setOnClickListener(this);
         addPhone.setOnClickListener(this);
         givePermission.setOnClickListener(this);
@@ -321,7 +321,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
         AnalyticsHelper
                 .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_LOAD_PHONEBOOK, userService
-                        .getActiveUserId());
+                        .getSessionUserId());
 
         mainContent.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
@@ -398,7 +398,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         {
             AnalyticsHelper
                     .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.UPDATE_PHONE_CLICKED_INVITE_SMS_FRAGMENT, userService
-                            .getActiveUserId());
+                            .getSessionUserId());
 
             displayUpdatePhoneDialog();
         }
@@ -407,7 +407,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
             AnalyticsHelper
                     .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.WHATSAPP_INVITATION_INVITE_THROUGH_SMS_FRAGMENT, userService
-                            .getActiveUserId());
+                            .getSessionUserId());
 
             boolean isWhatsappInstalled = AccountsService
                     .appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
@@ -416,15 +416,14 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, userService
-                        .getActiveUserName() + AppConstants.WHATSAPP_INVITATION_MESSAGE + AppConstants.APP_LINK);
+                        .getSessionUserName() + AppConstants.WHATSAPP_INVITATION_MESSAGE + AppConstants.APP_LINK);
                 sendIntent.setType("text/plain");
                 sendIntent.setPackage("com.whatsapp");
                 startActivity(sendIntent);
             }
             else
             {
-                Snackbar.make(getView(), R.string.error_no_watsapp, Snackbar.LENGTH_LONG)
-                        .show();
+                SnackbarFactory.create(getActivity(), R.string.error_no_watsapp);
             }
         }
         else if (view.getId() == R.id.tvGivePermission)
@@ -585,7 +584,7 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
                         {
                             AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK,
                                     GoogleAnalyticsConstants.PHONE_NUMBER_UPDATED, userService
-                                            .getActiveUserId());
+                                            .getSessionUserId());
 
                             userService.updatePhoneNumber(parsedPhone);
 

@@ -44,7 +44,8 @@ public class RegistrationIntentService extends IntentService
             synchronized (TAG)
             {
                 InstanceID instanceID = InstanceID.getInstance(this);
-                String token = instanceID.getToken(AppConstants.GCM_SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+                String token = instanceID
+                        .getToken(AppConstants.GCM_SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
 
                 sendTokenToServer(token);
             }
@@ -61,43 +62,46 @@ public class RegistrationIntentService extends IntentService
     private void sendTokenToServer(final String token)
     {
         Bus bus = Communicator.getInstance().getBus();
-        UserService userService = new UserService(bus);
+        UserService userService = UserService.getInstance();
 
         NotificationApi notificationApi = ApiManager.getInstance().getApi(NotificationApi.class);
 
         GCmRegisterUserApiRequest request = new GCmRegisterUserApiRequest(token);
         notificationApi.registerUser(request)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.newThread())
-                .subscribe(new Subscriber<Response>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
-                    }
+                       .subscribeOn(Schedulers.newThread())
+                       .observeOn(Schedulers.newThread())
+                       .subscribe(new Subscriber<Response>()
+                       {
+                           @Override
+                           public void onCompleted()
+                           {
+                           }
 
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                        genericCache.delete(GenericCacheKeys.GCM_TOKEN);
-                        genericCache.put(GenericCacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
-                    }
+                           @Override
+                           public void onError(Throwable e)
+                           {
+                               genericCache.delete(GenericCacheKeys.GCM_TOKEN);
+                               genericCache.put(GenericCacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
+                           }
 
-                    @Override
-                    public void onNext(Response response)
-                    {
-                        if (response.getStatus() == 200)
-                        {
-                            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.GCM_TOKEN_SENT_TO_SERVER, "");
-                            genericCache.put(GenericCacheKeys.GCM_TOKEN, token);
-                            genericCache.put(GenericCacheKeys.GCM_TOKEN_SENT_TO_SERVER, true);
-                        }
-                        else
-                        {
-                            genericCache.delete(GenericCacheKeys.GCM_TOKEN);
-                            genericCache.put(GenericCacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
-                        }
-                    }
-                });
+                           @Override
+                           public void onNext(Response response)
+                           {
+                               if (response.getStatus() == 200)
+                               {
+                                   AnalyticsHelper
+                                           .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.GCM_TOKEN_SENT_TO_SERVER, "");
+                                   genericCache.put(GenericCacheKeys.GCM_TOKEN, token);
+                                   genericCache
+                                           .put(GenericCacheKeys.GCM_TOKEN_SENT_TO_SERVER, true);
+                               }
+                               else
+                               {
+                                   genericCache.delete(GenericCacheKeys.GCM_TOKEN);
+                                   genericCache
+                                           .put(GenericCacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
+                               }
+                           }
+                       });
     }
 }

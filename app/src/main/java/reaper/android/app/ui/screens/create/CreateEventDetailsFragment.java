@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
@@ -77,6 +76,7 @@ import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
@@ -149,7 +149,7 @@ public class CreateEventDetailsFragment extends BaseFragment
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.CREATE_FRAGMENT);
 
         bus = Communicator.getInstance().getBus();
-        userService = new UserService(bus);
+        userService = UserService.getInstance();
         genericCache = CacheManager.getGenericCache();
 
         EventCategory category = (EventCategory) getArguments().getSerializable(ARG_CATEGORY);
@@ -262,7 +262,7 @@ public class CreateEventDetailsFragment extends BaseFragment
 
         etLocation.setOnFocusChangeListener(null);
         etLocation.addTextChangedListener(null);
-
+        SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
     }
 
     @Override
@@ -284,6 +284,14 @@ public class CreateEventDetailsFragment extends BaseFragment
             etTitle.setText(inputTitle);
             etTitle.requestFocus();
             etTitle.setSelection(etTitle.getText().length());
+
+            int remaining = AppConstants.TITLE_LENGTH_LIMIT - etTitle.getText().length();
+            tvTitleLimit.setText(String.valueOf(remaining));
+            tvTitleLimit.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            tvTitleLimit.setText(String.valueOf(AppConstants.TITLE_LENGTH_LIMIT));
         }
 
         // Type
@@ -372,7 +380,21 @@ public class CreateEventDetailsFragment extends BaseFragment
             }
         });
 
-        tvTitleLimit.setText(String.valueOf(AppConstants.TITLE_LENGTH_LIMIT));
+        etTitle.setOnFocusChangeListener(new View.OnFocusChangeListener()
+        {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus)
+            {
+                if(hasFocus)
+                {
+                    tvTitleLimit.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    tvTitleLimit.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
         etTitle.addTextChangedListener(new TextWatcher()
         {
@@ -469,8 +491,7 @@ public class CreateEventDetailsFragment extends BaseFragment
             createProgressDialog.dismiss();
         }
 
-        Snackbar.make(getView(), "Title cannot be empty", Snackbar.LENGTH_LONG)
-                .show();
+        SnackbarFactory.create(getActivity(), R.string.error_no_title);
     }
 
     @Override
@@ -481,8 +502,7 @@ public class CreateEventDetailsFragment extends BaseFragment
             createProgressDialog.dismiss();
         }
 
-        Snackbar.make(getView(), "Start time cannot be before the current time", Snackbar.LENGTH_LONG)
-                .show();
+        SnackbarFactory.create(getActivity(), R.string.error_invalid_start_time);
     }
 
     @Override
@@ -509,8 +529,7 @@ public class CreateEventDetailsFragment extends BaseFragment
             createProgressDialog.dismiss();
         }
 
-        Snackbar.make(getView(), "Unable to make your plan", Snackbar.LENGTH_LONG)
-                .show();
+        SnackbarFactory.create(getActivity(), R.string.error_default);
     }
 
     private void displayEventTypePopUp()
@@ -775,7 +794,7 @@ public class CreateEventDetailsFragment extends BaseFragment
 
         AnalyticsHelper
                 .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.CREATE_EVENT_CLICKED_FROM_DETAILS, userService
-                        .getActiveUserId());
+                        .getSessionUserId());
 
     }
 

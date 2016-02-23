@@ -37,6 +37,7 @@
     <string name="error_default">Looks like we messed up. While we fix this issue, go feed your dog.</string>
     <string name="error_facebook_login">Facebook login failed. Please try again.</string>
     <string name="error_no_title">Please enter a clan name</string>
+    <string name="error_invalid_start_time">Start time cannot be before the current time</string>
     <string name="error_rsvp_update">RSVP update failed. Please try again Later</string>
     <string name="error_edit_finalized">Organizer finalized the details</string>
     <string name="error_event_not_found">Unable to locate this clan</string>
@@ -46,7 +47,12 @@
     <string name="error_chat_not_fetched"> Unable to load conversations. Refresh.</string>
     <string name="error_no_watsapp">WhatsApp is not installed on this device</string>
 
-    <!-- Intro Screens -->
+    <!-- Splash Screen -->
+    <string name="bootstrap_error_action">Try Again</string>
+    <string name="location_off_action">Turn on GPS</string>
+    <string name="location_off_message">Your location helps us connect you with your nearby friends.
+        Cautious? Once inside, make a secret clan.</string>
+    <!-- Intro -->
     <string name="intro_title_1">Explore and Join</string>
     <string name="intro_title_2">Privacy in Check</string>
     <string name="intro_title_3">All Friends at One Place</string>
@@ -119,13 +125,6 @@
     <string name="facebook_permission_dialog_message">Allow access to your basic profile information, email and friend list. This is required to connect you with your facebook friends on Clanout</string>
     <string name="facebook_permission_dialog_positive_button">Allow</string>
     <string name="facebook_permission_dialog_negative_button">Close App</string>
-
-    <!-- Location Permission Dialog -->
-    <string name="location_off_title">Turn on GPS</string>
-    <string name="location_off_message">Cautious? Once inside, make a secret clan.
-        Your location helps us connect you with your nearby friends.</string>
-    <string name="location_off_positive_button">Go To Settings</string>
-    <string name="location_off_negative_button">Close App</string>
 
     <!-- Fetch Pending Invites Dialog -->
     <string name="fetch_pending_invites_title">Pending Invites</string>

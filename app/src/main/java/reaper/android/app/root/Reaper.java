@@ -10,7 +10,6 @@ import com.facebook.stetho.Stetho;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.karumi.dexter.Dexter;
-import com.squareup.leakcanary.LeakCanary;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.ThreadEnforcer;
@@ -31,7 +30,6 @@ import reaper.android.app.config.Timestamps;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
-import reaper.android.app.ui.activity.NoInternetActivity;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 import rx.Observable;
@@ -75,7 +73,7 @@ public class Reaper extends Application
     {
         super.onCreate();
 
-        LeakCanary.install(this);
+//        LeakCanary.install(this);
 
         init();
         connectivityHandler();
@@ -120,8 +118,8 @@ public class Reaper extends Application
                     {
                         if (isConnected && !isConnectedNow)
                         {
-                            startActivity(NoInternetActivity
-                                    .callingIntent(getApplicationContext()));
+//                            startActivity(NoInternetActivity
+//                                    .callingIntent(getApplicationContext()));
                         }
 
                         isConnected = isConnectedNow;
@@ -149,7 +147,10 @@ public class Reaper extends Application
 
         DatabaseManager.init(this);
 
-        userService = new UserService(bus);
+        /* User Service */
+        UserService.init();
+        userService = UserService.getInstance();
+
         genericCache = CacheManager.getGenericCache();
 
         handleTimesApplicationOpened();
@@ -172,7 +173,7 @@ public class Reaper extends Application
 
         genericCache.put(GenericCacheKeys.TIMES_APPLICATION_OPENED, timesApplicationOpened);
 
-        String userId = userService.getActiveUserId();
+        String userId = userService.getSessionUserId();
         if (userId == null)
         {
             userId = "0";

@@ -40,24 +40,23 @@
                 android:layout_gravity="center_horizontal"/>
 
             <LinearLayout
-                android:id="@+id/llPermission"
+                android:id="@+id/llAction"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvActionMessage"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_margin="16dp"
-                    android:gravity="center_horizontal"
-                    android:text="@string/permission_location_message"/>
+                    android:gravity="center_horizontal"/>
 
                 <TextView
-                    android:id="@+id/tvPermissionAction"
+                    android:id="@+id/tvAction"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="@string/permission_goto_settings"
                     android:textColor="@color/accent"
                     android:textStyle="bold"/>
 

@@ -10,9 +10,8 @@ import reaper.android.app.api.auth.request.ValidateSessionApiRequest;
 import reaper.android.app.api.auth.response.CreateNewSessionApiResponse;
 import reaper.android.app.api.core.ApiManager;
 import reaper.android.app.cache.core.CacheManager;
-import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.model.User;
+import reaper.android.app.service.UserService;
 import retrofit.client.Response;
 import rx.Observable;
 import rx.functions.Func1;
@@ -24,9 +23,9 @@ public class AuthService_
 {
     private static AuthService_ instance;
 
-    public static void init(FacebookService_ facebookService, GenericCache genericCache)
+    public static void init(FacebookService_ facebookService, UserService userService)
     {
-        instance = new AuthService_(facebookService, genericCache);
+        instance = new AuthService_(facebookService, userService);
     }
 
     public static AuthService_ getInstance()
@@ -41,12 +40,13 @@ public class AuthService_
 
     private AuthApi authApi;
     private FacebookService_ facebookService;
-    private GenericCache genericCache;
+    private UserService userService;
 
-    private AuthService_(FacebookService_ facebookService, GenericCache genericCache)
+    private AuthService_(FacebookService_ facebookService, UserService userService)
     {
         this.facebookService = facebookService;
-        this.genericCache = genericCache;
+        this.userService = userService;
+
         authApi = ApiManager.getInstance().getApi(AuthApi.class);
     }
 
@@ -80,7 +80,7 @@ public class AuthService_
     /* Helper Methods */
     private Observable<Boolean> validateSession()
     {
-        final String sessionId = genericCache.get(GenericCacheKeys.SESSION_ID);
+        final String sessionId = userService.getSessionId();
         if (sessionId == null)
         {
             return Observable.just(false);
@@ -115,69 +115,86 @@ public class AuthService_
     private Observable<Boolean> createSession()
     {
         return Observable
-                .zip(facebookService.getUser(), facebookService
-                        .getFriends(), new Func2<User, List<String>, Pair<User, List<String>>>()
+                .zip(facebookService.getFriends(), facebookService
+                        .getCoverPicUrl(), new Func2<List<String>, String, Pair<List<String>, String>>()
                 {
                     @Override
-                    public Pair<User, List<String>> call(User user, List<String> friends)
+                    public Pair<List<String>, String> call(List<String> friends, String coverPicUrl)
                     {
-                        genericCache.put(GenericCacheKeys.USER, user);
-
-                        return new Pair<>(user, friends);
+                        return new Pair<>(friends, coverPicUrl);
                     }
                 })
-                .flatMap(new Func1<Pair<User, List<String>>, Observable<CreateNewSessionApiResponse>>()
+                .flatMap(new Func1<Pair<List<String>, String>, Observable<Pair<CreateNewSessionApiResponse, String>>>()
                 {
                     @Override
-                    public Observable<CreateNewSessionApiResponse> call(Pair<User, List<String>> userData)
+                    public Observable<Pair<CreateNewSessionApiResponse, String>> call(Pair<List<String>, String> facebookData)
                     {
-                        User user = userData.first;
-                        List<String> friends = userData.second;
+                        List<String> friends = facebookData.first;
+                        final String coverPicUrl = facebookData.second;
+                        String accessToken = facebookService.getAccessToken();
 
-                        CreateNewSessionApiRequest request = new CreateNewSessionApiRequest(
-                                user.getFirstname(),
-                                user.getLastname(),
-                                user.getGender(),
-                                user.getId(),
-                                user.getEmail(),
-                                friends);
-
-                        return authApi.createNewSession(request);
+                        CreateNewSessionApiRequest request = new CreateNewSessionApiRequest(accessToken, friends);
+                        return authApi
+                                .createNewSession(request)
+                                .map(new Func1<CreateNewSessionApiResponse, Pair<CreateNewSessionApiResponse, String>>()
+                                {
+                                    @Override
+                                    public Pair<CreateNewSessionApiResponse, String> call(CreateNewSessionApiResponse response)
+                                    {
+                                        return new Pair<>(response, coverPicUrl);
+                                    }
+                                });
                     }
                 })
-                .map(new Func1<CreateNewSessionApiResponse, String>()
+                .map(new Func1<Pair<CreateNewSessionApiResponse, String>, User>()
                 {
                     @Override
-                    public String call(CreateNewSessionApiResponse response)
+                    public User call(Pair<CreateNewSessionApiResponse, String> userData)
                     {
-                        return response.getSessionId();
+                        CreateNewSessionApiResponse response = userData.first;
+                        String coverPicUrl = userData.second;
+
+                        User user = new User();
+                        user.setSessionId(response.getSessionId());
+                        user.setNewUser(response.isNewUser());
+                        user.setId(response.getUserId());
+                        user.setFirstname(response.getFirstname());
+                        user.setLastname(response.getLastname());
+                        user.setEmail(response.getEmail());
+                        user.setMobileNumber(response.getMobileNumber());
+                        user.setGender(response.getGender());
+
+                        user.setProfilePicUrl(facebookService
+                                .getProfilePicUrl(user.getId()));
+                        user.setCoverPicUrl(coverPicUrl);
+
+                        return user;
                     }
                 })
-                .onErrorReturn(new Func1<Throwable, String>()
+                .onErrorReturn(new Func1<Throwable, User>()
                 {
                     @Override
-                    public String call(Throwable e)
+                    public User call(Throwable e)
                     {
                         Timber.e("[Unable to create session] " + e.getMessage());
                         return null;
                     }
                 })
-                .map(new Func1<String, Boolean>()
+                .map(new Func1<User, Boolean>()
                 {
                     @Override
-                    public Boolean call(String sessionId)
+                    public Boolean call(User user)
                     {
-                        if (sessionId == null)
+                        if (user == null)
                         {
-                            // Delete User from cache
-                            genericCache.delete(GenericCacheKeys.USER);
-
+                            // Clear all cache (session creation failed)
+                            CacheManager.clearAllCaches();
                             return false;
                         }
                         else
                         {
-                            Timber.v("[New Session Created] Session ID = " + sessionId);
-                            genericCache.put(GenericCacheKeys.SESSION_ID, sessionId);
+                            Timber.v("[New Session Created] Session ID = " + user.getSessionId());
+                            userService.setSessionUser(user);
                             return true;
                         }
                     }

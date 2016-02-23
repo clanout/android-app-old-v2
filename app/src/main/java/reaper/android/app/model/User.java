@@ -5,13 +5,47 @@ import reaper.android.app.model.core.Model;
 
 public class User implements Model
 {
+    private String sessionId;
+    private boolean isNewUser;
+
     private String id;
     private String firstname;
     private String lastname;
     private String email;
+    private String mobileNumber;
     private String gender;
     private String profilePicUrl;
     private String coverPicUrl;
+
+    public boolean isNewUser()
+    {
+        return isNewUser;
+    }
+
+    public void setNewUser(boolean newUser)
+    {
+        isNewUser = newUser;
+    }
+
+    public String getSessionId()
+    {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId)
+    {
+        this.sessionId = sessionId;
+    }
+
+    public String getMobileNumber()
+    {
+        return mobileNumber;
+    }
+
+    public void setMobileNumber(String mobileNumber)
+    {
+        this.mobileNumber = mobileNumber;
+    }
 
     public String getId()
     {

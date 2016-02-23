@@ -8,7 +8,6 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -67,6 +66,7 @@ import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
@@ -136,7 +136,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EDIT_EVENT_FRAGMENT);
 
         bus = Communicator.getInstance().getBus();
-        userService = new UserService(bus);
+        userService = UserService.getInstance();
 
         event = (Event) getArguments().getSerializable(ARG_EVENT);
         EventDetails eventDetails = (EventDetails) getArguments()
@@ -499,8 +499,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
             progressDialog.dismiss();
         }
 
-        Snackbar.make(getView(), R.string.error_edit_finalized, Snackbar.LENGTH_LONG)
-                .show();
+        SnackbarFactory.create(getActivity(), R.string.error_edit_finalized);
     }
 
     @Override
@@ -511,8 +510,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
             progressDialog.dismiss();
         }
 
-        Snackbar.make(getView(), R.string.error_default, Snackbar.LENGTH_LONG)
-                .show();
+        SnackbarFactory.create(getActivity(), R.string.error_default);
     }
 
     @Override
@@ -645,7 +643,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
 
                             AnalyticsHelper
                                     .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_UNFINALIZED, userService
-                                            .getActiveUserId());
+                                            .getSessionUserId());
                         }
                     });
 
@@ -686,7 +684,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
 
                             AnalyticsHelper
                                     .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_FINALIZED, userService
-                                            .getActiveUserId());
+                                            .getSessionUserId());
                         }
                     });
 
@@ -736,7 +734,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
 
                         AnalyticsHelper
                                 .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_DELETED, userService
-                                        .getActiveUserId());
+                                        .getSessionUserId());
                     }
                 });
 
@@ -764,7 +762,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
 
         AnalyticsHelper
                 .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.EVENT_EDITED, userService
-                        .getActiveUserId());
+                        .getSessionUserId());
     }
 
     @Override
@@ -772,7 +770,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
     {
         AnalyticsHelper
                 .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.SUGGESTION_CLICKED_EDIT, userService
-                        .getActiveUserId());
+                        .getSessionUserId());
 
         presenter.selectSuggestion(suggestion);
     }

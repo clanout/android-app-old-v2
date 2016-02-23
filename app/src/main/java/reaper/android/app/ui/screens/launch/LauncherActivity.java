@@ -34,9 +34,9 @@ import java.util.concurrent.TimeUnit;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
-import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
+import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.AuthService_;
 import reaper.android.app.service._new.FacebookService_;
 import reaper.android.app.service._new.GcmService_;
@@ -112,19 +112,22 @@ public class LauncherActivity extends BaseActivity implements
     @Bind(R.id.loading)
     ProgressBar loading;
 
-    @Bind(R.id.llPermission)
-    View llPermission;
+    @Bind(R.id.llAction)
+    View llAction;
 
-    @Bind(R.id.tvPermissionAction)
-    TextView tvPermissionAction;
+    @Bind(R.id.tvActionMessage)
+    TextView tvActionMessage;
+
+    @Bind(R.id.tvAction)
+    TextView tvAction;
 
     /* Fields */
     CallbackManager facebookCallbackManager;
-    GoogleApiClient googleApiClient;
 
     GoogleService_ googleService;
     FacebookService_ facebookService;
     LocationService_ locationService;
+    UserService userService;
     AuthService_ authService;
     GcmService_ gcmService;
 
@@ -157,8 +160,11 @@ public class LauncherActivity extends BaseActivity implements
         LocationService_.init(getApplicationContext(), locationManager, googleService);
         locationService = LocationService_.getInstance();
 
+        /* User Service */
+        userService = UserService.getInstance();
+
         /* Auth Service */
-        AuthService_.init(facebookService, CacheManager.getGenericCache());
+        AuthService_.init(facebookService, userService);
         authService = AuthService_.getInstance();
 
         /* Gcm Service */
@@ -184,7 +190,6 @@ public class LauncherActivity extends BaseActivity implements
         super.onStop();
         facebookLoginPresenter.detachView();
         bootstrapPresenter.detachView();
-        googleService.disconnect();
     }
 
     @Override
@@ -206,11 +211,11 @@ public class LauncherActivity extends BaseActivity implements
                 if (PermissionHandler
                         .isRationalRequired(this, PermissionHandler.Permissions.LOCATION))
                 {
-                    loading.setVisibility(View.GONE);
-                    llPermission.setVisibility(View.VISIBLE);
+                    showBootstrapAction();
 
-                    tvPermissionAction.setText(R.string.permission_request_again);
-                    tvPermissionAction.setOnClickListener(new View.OnClickListener()
+                    tvActionMessage.setText(R.string.permission_location_message);
+                    tvAction.setText(R.string.permission_request_again);
+                    tvAction.setOnClickListener(new View.OnClickListener()
                     {
                         @Override
                         public void onClick(View v)
@@ -222,11 +227,11 @@ public class LauncherActivity extends BaseActivity implements
                 }
                 else
                 {
-                    loading.setVisibility(View.GONE);
-                    llPermission.setVisibility(View.VISIBLE);
+                    showBootstrapAction();
 
-                    tvPermissionAction.setText(R.string.permission_goto_settings);
-                    tvPermissionAction.setOnClickListener(new View.OnClickListener()
+                    tvActionMessage.setText(R.string.permission_location_message);
+                    tvAction.setText(R.string.permission_goto_settings);
+                    tvAction.setOnClickListener(new View.OnClickListener()
                     {
                         @Override
                         public void onClick(View v)
@@ -238,7 +243,6 @@ public class LauncherActivity extends BaseActivity implements
             }
             else
             {
-                displayBootstrapView();
                 bootstrapPresenter.attachView(this);
             }
         }
@@ -277,15 +281,22 @@ public class LauncherActivity extends BaseActivity implements
 
     /* View Methods (BootstrapView) */
     @Override
+    public void showLoading()
+    {
+        loading.setVisibility(View.VISIBLE);
+        llAction.setVisibility(View.GONE);
+    }
+
+    @Override
     public void handleLocationPermissions()
     {
         if (PermissionHandler.isRationalRequired(this, PermissionHandler.Permissions.LOCATION))
         {
-            loading.setVisibility(View.GONE);
-            llPermission.setVisibility(View.VISIBLE);
+            showBootstrapAction();
 
-            tvPermissionAction.setText(R.string.permission_request_again);
-            tvPermissionAction.setOnClickListener(new View.OnClickListener()
+            tvActionMessage.setText(R.string.permission_location_message);
+            tvAction.setText(R.string.permission_request_again);
+            tvAction.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)
@@ -305,13 +316,35 @@ public class LauncherActivity extends BaseActivity implements
     @Override
     public void displayLocationServiceUnavailableMessage()
     {
-        displayLocationServiceDialog();
+        showBootstrapAction();
+
+        tvActionMessage.setText(R.string.location_off_message);
+        tvAction.setText(R.string.location_off_action);
+        tvAction.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            }
+        });
     }
 
     @Override
     public void displayError()
     {
-        SnackbarFactory.create(this, R.string.error_default);
+        showBootstrapAction();
+
+        tvActionMessage.setText(R.string.error_default);
+        tvAction.setText(R.string.bootstrap_error_action);
+        tvAction.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                bootstrapPresenter.attachView(LauncherActivity.this);
+            }
+        });
     }
 
     @Override
@@ -352,24 +385,24 @@ public class LauncherActivity extends BaseActivity implements
     /* Google Play Services */
     private void setupGooglePlayService()
     {
-        if (googleApiClient == null)
+        if (!googleService.isGoogleApiClientSet())
         {
-            googleApiClient = new GoogleApiClient.Builder(this)
+            GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
+
+            googleService.setGoogleApiClient(googleApiClient);
         }
 
-        if (!googleApiClient.isConnected())
+        if (!googleService.isConnected())
         {
-            googleApiClient.connect();
+            googleService.connect();
 
         }
         else
         {
-            googleService.setGoogleApiClient(googleApiClient);
-
             facebookLoginPresenter.attachView(this);
         }
     }
@@ -377,8 +410,6 @@ public class LauncherActivity extends BaseActivity implements
     @Override
     public void onConnected(@Nullable Bundle bundle)
     {
-        googleService.setGoogleApiClient(googleApiClient);
-
         facebookLoginPresenter.attachView(this);
     }
 
@@ -509,9 +540,6 @@ public class LauncherActivity extends BaseActivity implements
 
     private void displayBootstrapView()
     {
-        loading.setVisibility(View.VISIBLE);
-        llPermission.setVisibility(View.GONE);
-
         llFb.setVisibility(View.GONE);
         rlBootstrap.setVisibility(View.VISIBLE);
     }
@@ -522,6 +550,12 @@ public class LauncherActivity extends BaseActivity implements
         rlBootstrap.setVisibility(View.GONE);
 
         setupIntroViewPager();
+    }
+
+    private void showBootstrapAction()
+    {
+        loading.setVisibility(View.GONE);
+        llAction.setVisibility(View.VISIBLE);
     }
 
     private void displayPlayServicesErrorDialog()
@@ -591,44 +625,6 @@ public class LauncherActivity extends BaseActivity implements
                         closeApp();
                     }
                 });
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
-
-    private void displayLocationServiceDialog()
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        @SuppressLint("InflateParams")
-        View dialogView = getLayoutInflater().inflate(R.layout.alert_dialog_default, null);
-        builder.setView(dialogView);
-
-        TextView tvTitle = (TextView) dialogView.findViewById(R.id.tvTitle);
-        TextView tvMessage = (TextView) dialogView.findViewById(R.id.tvMessage);
-
-        tvTitle.setText(R.string.location_off_title);
-        tvMessage.setText(R.string.location_off_message);
-
-        builder.setCancelable(false);
-
-        builder.setPositiveButton(R.string.location_off_positive_button, new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i)
-            {
-                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-            }
-        });
-
-        builder.setNegativeButton(R.string.location_off_negative_button, new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i)
-            {
-                closeApp();
-            }
-        });
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();

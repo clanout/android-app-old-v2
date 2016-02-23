@@ -38,6 +38,7 @@ import reaper.android.app.api.event.response.GetEventSuggestionApiResponse;
 import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.ExceptionMessages;
 import reaper.android.app.config.GenericCacheKeys;
@@ -76,7 +77,7 @@ public class EventService
     public EventService(Bus bus)
     {
         this.bus = bus;
-        userService = new UserService(bus);
+        userService = UserService.getInstance();
         gcmService = GcmService_.getInstance();
         eventApi = ApiManager.getInstance().getApi(EventApi.class);
         eventCache = CacheManager.getEventCache();
@@ -229,7 +230,7 @@ public class EventService
                     {
                         Collections.sort(eventDetails
                                 .getAttendees(), new EventAttendeeComparator(userService
-                                .getActiveUserId()));
+                                .getSessionUserId()));
                         bus.post(new EventDetailsFetchTrigger(eventDetails));
                     }
                 });
@@ -375,7 +376,7 @@ public class EventService
                     public List<Event> call(List<Event> events)
                     {
                         Collections.sort(events, new EventComparator.Relevance(userService
-                                .getActiveUserId()));
+                                .getSessionUserId()));
                         return events;
                     }
                 });
@@ -456,7 +457,7 @@ public class EventService
                     public List<Event> call(List<Event> events)
                     {
                         Collections.sort(events, new EventComparator.Relevance(userService
-                                .getActiveUserId()));
+                                .getSessionUserId()));
                         return events;
                     }
                 })
@@ -710,6 +711,82 @@ public class EventService
 
             }
         });
+    }
+
+    public Observable<Boolean> updateEventSuggestions()
+    {
+        return Observable
+                .create(new Observable.OnSubscribe<Boolean>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Boolean> subscriber)
+                    {
+                        boolean isSuggestionsAvailable = genericCache
+                                .get(GenericCacheKeys.EVENT_SUGGESTIONS) != null;
+
+                        DateTime lastUpdated = genericCache
+                                .get(GenericCacheKeys.EVENT_SUGGESTIONS_UPDATE_TIMESTAMP, DateTime.class);
+                        boolean isExpired = lastUpdated
+                                .plusDays(AppConstants.EXPIRY_DAYS_EVENT_SUGGESTIONS)
+                                .isBefore(DateTime.now());
+
+                        if (isSuggestionsAvailable && !isExpired)
+                        {
+                            subscriber.onNext(true);
+                        }
+                        else
+                        {
+                            subscriber.onNext(false);
+                        }
+                        subscriber.onCompleted();
+                    }
+                })
+                .flatMap(new Func1<Boolean, Observable<Boolean>>()
+                {
+                    @Override
+                    public Observable<Boolean> call(Boolean isAvailable)
+                    {
+                        if (isAvailable)
+                        {
+                            return Observable.just(true);
+                        }
+                        else
+                        {
+                            return eventApi
+                                    .getEventSuggestions(new GetEventSuggestionsApiRequest())
+                                    .onErrorReturn(new Func1<Throwable, GetEventSuggestionApiResponse>()
+                                    {
+                                        @Override
+                                        public GetEventSuggestionApiResponse call(Throwable throwable)
+                                        {
+                                            return null;
+                                        }
+                                    })
+                                    .map(new Func1<GetEventSuggestionApiResponse, Boolean>()
+                                    {
+                                        @Override
+                                        public Boolean call(GetEventSuggestionApiResponse response)
+                                        {
+                                            if (response == null)
+                                            {
+                                                return false;
+                                            }
+                                            else
+                                            {
+                                                genericCache
+                                                        .put(GenericCacheKeys.EVENT_SUGGESTIONS, response
+                                                                .getEventSuggestions());
+                                                genericCache
+                                                        .put(GenericCacheKeys.EVENT_SUGGESTIONS_UPDATE_TIMESTAMP, DateTime
+                                                                .now());
+                                                return true;
+                                            }
+                                        }
+                                    });
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
     }
 
     public void getEventSuggestions()

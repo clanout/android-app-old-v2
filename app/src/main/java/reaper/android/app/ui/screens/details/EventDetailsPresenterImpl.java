@@ -57,9 +57,9 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
         eventCache = CacheManager.getEventCache();
         subscriptions = new CompositeSubscription();
 
-        UserService userService = new UserService(bus);
-        userId = userService.getActiveUserId();
-        userName = userService.getActiveUserName();
+        UserService userService = UserService.getInstance();
+        userId = userService.getSessionUserId();
+        userName = userService.getSessionUserName();
     }
 
     @Override

@@ -16,12 +16,9 @@ import java.util.Set;
 import reaper.android.app.api.core.FacebookApiManager;
 import reaper.android.app.api.fb.FacebookApi;
 import reaper.android.app.api.fb.response.FacebookCoverPicResponse;
-import reaper.android.app.api.fb.response.FacebookProfileResponse;
-import reaper.android.app.model.User;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 public class FacebookService_
@@ -56,19 +53,8 @@ public class FacebookService_
     public boolean isAccessTokenValid()
     {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
-
-        if (accessToken == null)
-        {
-            return false;
-        }
-
-        if (accessToken.isExpired())
-        {
-            return false;
-        }
-
-        return accessToken.getDeclinedPermissions().size() == 0;
-
+        return accessToken != null && !accessToken.isExpired() && accessToken
+                .getDeclinedPermissions().size() == 0;
     }
 
     public void logout()
@@ -98,37 +84,24 @@ public class FacebookService_
         return accessToken.getDeclinedPermissions();
     }
 
-    public Observable<User> getUser()
+    public Observable<String> getCoverPicUrl()
     {
-        return Observable
-                .zip(getProfile(), getCoverPicUrl(), new Func2<FacebookProfileResponse, String, User>()
+        return facebookApi
+                .getCoverPic()
+                .map(new Func1<FacebookCoverPicResponse, String>()
                 {
                     @Override
-                    public User call(FacebookProfileResponse profile, String coverPicUrl)
+                    public String call(FacebookCoverPicResponse response)
                     {
-                        if (profile == null || coverPicUrl == null)
-                        {
-                            return null;
-                        }
-                        else
-                        {
-                            User user = new User();
-
-                            user.setId(profile.getId());
-                            user.setFirstname(profile.getFirstname());
-                            user.setLastname(profile.getLastname());
-                            user.setEmail(profile.getEmail());
-                            user.setGender(profile.getGender());
-
-                            String profilePicUrl = PROFILE_PIC_URL.replace("$$$", user.getId());
-                            user.setProfilePicUrl(profilePicUrl);
-
-                            user.setCoverPicUrl(coverPicUrl);
-
-                            return user;
-                        }
+                        return response.getCover().getSource();
                     }
-                });
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
+
+    public String getProfilePicUrl(String userId)
+    {
+        return PROFILE_PIC_URL.replace("$$$", userId);
     }
 
     public Observable<List<String>> getFriends()
@@ -252,30 +225,6 @@ public class FacebookService_
                         }
 
                 )
-                .subscribeOn(Schedulers.newThread());
-    }
-
-
-    /* Helper Methods */
-    private Observable<String> getCoverPicUrl()
-    {
-        return facebookApi
-                .getCoverPic()
-                .map(new Func1<FacebookCoverPicResponse, String>()
-                {
-                    @Override
-                    public String call(FacebookCoverPicResponse response)
-                    {
-                        return response.getCover().getSource();
-                    }
-                })
-                .subscribeOn(Schedulers.newThread());
-    }
-
-    private Observable<FacebookProfileResponse> getProfile()
-    {
-        return facebookApi
-                .getProfile()
                 .subscribeOn(Schedulers.newThread());
     }
 }

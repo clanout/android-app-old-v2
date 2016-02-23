@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -55,8 +54,8 @@ import reaper.android.app.cache.core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BundleKeys;
-import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.Dimensions;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
@@ -70,6 +69,7 @@ import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
@@ -213,7 +213,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
         super.onActivityCreated(savedInstanceState);
 
         bus = Communicator.getInstance().getBus();
-        userService = new UserService(bus);
+        userService = UserService.getInstance();
         genericCache = CacheManager.getGenericCache();
 
         initRecyclerView();
@@ -312,7 +312,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                     AnalyticsHelper.sendEvents(
                             GoogleAnalyticsConstants.BUTTON_CLICK,
                             GoogleAnalyticsConstants.EVENT_DETAILS_LOCATION_CLICKED,
-                            userService.getActiveUserId());
+                            userService.getSessionUserId());
 
                     Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
                             Uri.parse("http://maps.google.com/maps?daddr="
@@ -386,7 +386,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     @Override
     public void displayRsvpError()
     {
-        Snackbar.make(getView(), R.string.error_rsvp_update, Snackbar.LENGTH_LONG).show();
+        SnackbarFactory.create(getActivity(), R.string.error_rsvp_update);
     }
 
     @Override
@@ -449,7 +449,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     {
         AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.GENERAL,
                 GoogleAnalyticsConstants.INVITATION_RESPONSE_DIALOG_OPENED,
-                userService.getActiveUserId());
+                userService.getSessionUserId());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
@@ -496,8 +496,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
                     {
                         presenter.setStatus(message.getText().toString());
 
-                        Snackbar.make(getView(), R.string.invitation_response_sent, Snackbar.LENGTH_LONG)
-                                .show();
+                        SnackbarFactory.create(getActivity(), R.string.invitation_response_sent);
                         dialog.dismiss();
                     }
                 }
@@ -673,7 +672,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     @Override
     public void displayEventFinalizedMessage()
     {
-        Snackbar.make(getView(), R.string.error_edit_finalized, Snackbar.LENGTH_LONG).show();
+        SnackbarFactory.create(getActivity(), R.string.error_edit_finalized);
     }
 
     @Override
