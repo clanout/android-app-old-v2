@@ -13,11 +13,11 @@
         android:text="@string/feedback_title"/>
 
     <RadioGroup
-        android:id="@+id/rg_share_feedback"
+        android:id="@+id/rgFeedbackType"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:checkedButton="@+id/rb_share_feedback_bug">
+        android:checkedButton="@+id/rbBug">
 
         <RadioButton
             android:id="@+id/rb_share_feedback_bug"
@@ -26,13 +26,13 @@
             android:text="@string/label_feedback_report"/>
 
         <RadioButton
-            android:id="@+id/rb_share_feedback_new_feature"
+            android:id="@+id/rbFeature"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/label_feedback_feature"/>
 
         <RadioButton
-            android:id="@+id/rb_share_feedback_other"
+            android:id="@+id/rbOthers"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/label_feedback_other"/>
@@ -46,9 +46,10 @@
         android:hint="@string/label_feedback_comment">
 
         <EditText
-            android:id="@+id/et_alert_dialog_share_feedback_comment"
+            android:id="@+id/etComment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:inputType="textAutoComplete"/>
 
     </android.support.design.widget.TextInputLayout>
 

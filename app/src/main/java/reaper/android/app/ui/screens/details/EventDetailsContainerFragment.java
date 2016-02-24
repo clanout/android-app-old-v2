@@ -1,23 +1,15 @@
 package reaper.android.app.ui.screens.details;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.RadioGroup;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -39,8 +31,9 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
-import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.app.ui._core.BaseFragment;
+import reaper.android.app.ui.dialog.FeedbackDialog;
+import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
@@ -67,7 +60,8 @@ public class EventDetailsContainerFragment extends BaseFragment
     private UserService userService;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.EVENT_DETAILS_CONTAINER_FRAGMENT);
     }
@@ -255,11 +249,9 @@ public class EventDetailsContainerFragment extends BaseFragment
 
     private void handleInAppRating()
     {
-
         if (genericCache.get(GenericCacheKeys.HAS_GIVEN_FEEDBACK) == null)
         {
             int timesAppOpened;
-
             try
             {
                 timesAppOpened = Integer
@@ -272,9 +264,7 @@ public class EventDetailsContainerFragment extends BaseFragment
 
             if (timesAppOpened > 10)
             {
-
                 double random = Math.random();
-
                 if (random < 0.1)
                 {
                     displayShareFeedbackDialog();
@@ -285,108 +275,21 @@ public class EventDetailsContainerFragment extends BaseFragment
 
     private void displayShareFeedbackDialog()
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setCancelable(true);
-
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.alert_dialog_share_feedback, null);
-        builder.setView(dialogView);
-
-        final EditText commentMessage = (EditText) dialogView
-                .findViewById(R.id.et_alert_dialog_share_feedback_comment);
-        final RadioGroup radioGroup = (RadioGroup) dialogView.findViewById(R.id.rg_share_feedback);
-        final TextInputLayout tilFeedbackMessage = (TextInputLayout) dialogView
-                .findViewById(R.id.tilFeedbackMessage);
-
-        commentMessage.addTextChangedListener(new TextWatcher()
+        FeedbackDialog.show(getActivity(), new FeedbackDialog.Listener()
         {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            public void onSuccess(int feedbackType, String comment)
             {
-
+                AnalyticsHelper
+                        .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.FEEDBACK_SHARED, userService
+                                .getSessionUserId());
+                genericCache.put(GenericCacheKeys.HAS_GIVEN_FEEDBACK, true);
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count)
-            {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s)
-            {
-                tilFeedbackMessage.setError("");
-                tilFeedbackMessage.setErrorEnabled(false);
-            }
-        });
-
-        builder.setPositiveButton(R.string.feedback_positive_button, new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i)
+            public void onCancel()
             {
             }
         });
-
-        builder.setNegativeButton(R.string.feedback_remind_button, new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                dialog.dismiss();
-            }
-        });
-
-        final AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                   .setOnClickListener(new View.OnClickListener()
-                   {
-                       @Override
-                       public void onClick(View view)
-                       {
-                           int type = 0;
-                           switch (radioGroup.getCheckedRadioButtonId())
-                           {
-                               case R.id.rb_share_feedback_bug:
-                                   type = 0;
-                                   break;
-                               case R.id.rb_share_feedback_new_feature:
-                                   type = 1;
-                                   break;
-                               case R.id.rb_share_feedback_other:
-                                   type = 2;
-                                   break;
-                           }
-
-                           String comment = commentMessage.getText().toString();
-                           Boolean wantToCloseDialog = false;
-
-                           if (TextUtils.isEmpty(comment))
-                           {
-                               tilFeedbackMessage.setError(getString(R.string.feedback_empty_comment));
-                               tilFeedbackMessage.setErrorEnabled(true);
-                               wantToCloseDialog = false;
-                           }
-                           else
-                           {
-
-                               AnalyticsHelper
-                                       .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.FEEDBACK_SHARED, userService
-                                               .getSessionUserId());
-
-                               userService.shareFeedback(type, comment);
-
-                               genericCache.put(GenericCacheKeys.HAS_GIVEN_FEEDBACK, true);
-                               wantToCloseDialog = true;
-                           }
-
-                           if (wantToCloseDialog)
-                           {
-                               alertDialog.dismiss();
-                           }
-                       }
-                   });
     }
 }

@@ -78,7 +78,7 @@ import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationReceivedTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationsAvailableTrigger;
 import reaper.android.app.ui._core.BaseFragment;
-import reaper.android.app.ui.screens.accounts.AccountsFragment;
+import reaper.android.app.ui.screens.accounts.AccountActivity;
 import reaper.android.app.ui.screens.create.CreateEventDetailsFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.create.CreateEventPresenter;
@@ -599,7 +599,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem)
                 {
-                    FragmentUtils.changeFragment(getFragmentManager(), new AccountsFragment());
+                    startActivity(AccountActivity.callingIntent(getActivity()));
                     return true;
                 }
             });

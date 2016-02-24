@@ -42,6 +42,7 @@ public class FacebookService_
 
     public static List<String> PERMISSIONS = Arrays.asList("email", "user_friends");
     private static final String PROFILE_PIC_URL = "https://graph.facebook.com/v2.4/$$$/picture?height=1000";
+    private static final String FRIEND_PIC_URL = "https://graph.facebook.com/v2.4/$$$/picture?width=500";
 
     private FacebookApi facebookApi;
 
@@ -99,9 +100,14 @@ public class FacebookService_
                 .subscribeOn(Schedulers.newThread());
     }
 
-    public String getProfilePicUrl(String userId)
+    public static String getProfilePicUrl(String userId)
     {
         return PROFILE_PIC_URL.replace("$$$", userId);
+    }
+
+    public static String getFriendPicUrl(String userId)
+    {
+        return FRIEND_PIC_URL.replace("$$$", userId);
     }
 
     public Observable<List<String>> getFriends()

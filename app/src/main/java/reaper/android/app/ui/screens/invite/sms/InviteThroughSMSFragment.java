@@ -1,6 +1,5 @@
 package reaper.android.app.ui.screens.invite.sms;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -9,7 +8,6 @@ import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -37,20 +35,18 @@ import java.util.List;
 import reaper.android.R;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.PhoneContact;
 import reaper.android.app.model.PhoneContactComparator;
-import reaper.android.app.service.AccountsService;
+import reaper.android.app.service._new.AccountsService_;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.AllPhoneContactsForSMSFetchedTrigger;
 import reaper.android.app.ui._core.BaseFragment;
-import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.app.ui.dialog.UpdateMobileDialog;
 import reaper.android.app.ui.util.SnackbarFactory;
-import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.communicator.Communicator;
 
@@ -84,7 +80,8 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
     private Menu menu;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
 
         super.onCreate(savedInstanceState);
 
@@ -409,17 +406,10 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
                     .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.WHATSAPP_INVITATION_INVITE_THROUGH_SMS_FRAGMENT, userService
                             .getSessionUserId());
 
-            boolean isWhatsappInstalled = AccountsService
-                    .appInstalledOrNot("com.whatsapp", getActivity().getPackageManager());
-            if (isWhatsappInstalled)
+            AccountsService_ accountsService = AccountsService_.getInstance();
+            if (accountsService.isWhatsAppInstalled(getActivity()))
             {
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, userService
-                        .getSessionUserName() + AppConstants.WHATSAPP_INVITATION_MESSAGE + AppConstants.APP_LINK);
-                sendIntent.setType("text/plain");
-                sendIntent.setPackage("com.whatsapp");
-                startActivity(sendIntent);
+                startActivity(accountsService.getWhatsAppIntent());
             }
             else
             {
@@ -519,89 +509,19 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
 
     private void displayUpdatePhoneDialog()
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setCancelable(true);
-
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        final View dialogView = inflater.inflate(R.layout.alert_dialog_add_phone, null);
-        builder.setView(dialogView);
-
-        final EditText phoneNumber = (EditText) dialogView
-                .findViewById(R.id.etMobileNumber);
-
-        final TextView tvInvalidPhoneError = (TextView) dialogView
-                .findViewById(R.id.tvInvalidPhoneError);
-
-        phoneNumber.addTextChangedListener(new TextWatcher()
+        UpdateMobileDialog.show(getActivity(), new UpdateMobileDialog.Listener()
         {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            public void onSuccess(String mobileNumber)
             {
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK,
+                        GoogleAnalyticsConstants.PHONE_NUMBER_UPDATED, userService
+                                .getSessionUserId());
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count)
-            {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s)
-            {
-                tvInvalidPhoneError.setVisibility(View.INVISIBLE);
+                menu.findItem(R.id.action_add_phone).setVisible(false);
+                displayLoadingView();
+                userService.fetchAllPhoneContacts(getActivity().getContentResolver());
             }
         });
-
-        builder.setPositiveButton(R.string.add_phone_positive_button, new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-
-            }
-        });
-
-        final AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-
-        alertDialog
-                .getButton(AlertDialog.BUTTON_POSITIVE)
-                .setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        Boolean wantToCloseDialog = false;
-                        String parsedPhone = PhoneUtils.parsePhone(phoneNumber.getText()
-                                                                              .toString(), AppConstants.DEFAULT_COUNTRY_CODE);
-                        if (parsedPhone == null)
-                        {
-                            tvInvalidPhoneError.setVisibility(View.VISIBLE);
-                            wantToCloseDialog = false;
-                        }
-                        else
-                        {
-                            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK,
-                                    GoogleAnalyticsConstants.PHONE_NUMBER_UPDATED, userService
-                                            .getSessionUserId());
-
-                            userService.updatePhoneNumber(parsedPhone);
-
-                            menu.findItem(R.id.action_add_phone).setVisible(false);
-                            displayLoadingView();
-                            userService.fetchAllPhoneContacts(getActivity().getContentResolver());
-
-                            SoftKeyboardHandler.hideKeyboard(getActivity(), dialogView);
-                            wantToCloseDialog = true;
-                        }
-
-                        if (wantToCloseDialog)
-                        {
-                            alertDialog.dismiss();
-                        }
-                    }
-                });
-
     }
 }

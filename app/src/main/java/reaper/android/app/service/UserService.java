@@ -38,12 +38,10 @@ import reaper.android.app.model.PhoneContact;
 import reaper.android.app.model.User;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
-import reaper.android.app.trigger.user.AllAppFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.AllPhoneContactsForSMSFetchedTrigger;
 import reaper.android.app.trigger.user.AppFriendsFetchedFromNetworkTrigger;
 import reaper.android.app.trigger.user.AppFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
-import reaper.android.app.trigger.user.PhoneAddedTrigger;
 import reaper.android.app.trigger.user.PhoneContactsFetchedTrigger;
 import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.communicator.Communicator;
@@ -154,29 +152,61 @@ public class UserService
                  @Override
                  public void onCompleted()
                  {
+                 }
+
+                 @Override
+                 public void onError(Throwable e)
+                 {
+                 }
+
+                 @Override
+                 public void onNext(Response response)
+                 {
+                     activeUser.setMobileNumber(phoneNumber);
+                     genericCache.put(GenericCacheKeys.SESSION_USER, activeUser);
+                 }
+             });
+    }
+
+    public Observable<List<Friend>> getAllFriends()
+    {
+        GetAllAppFriendsApiRequest request = new GetAllAppFriendsApiRequest();
+
+        return meApi.getAllAppFriends(request)
+                    .map(new Func1<GetAllAppFriendsApiResponse, List<Friend>>()
+                    {
+                        @Override
+                        public List<Friend> call(GetAllAppFriendsApiResponse getAllAppFriendsApiResponse)
+                        {
+                            return getAllAppFriendsApiResponse.getFriends();
+                        }
+                    })
+                    .subscribeOn(Schedulers.newThread());
+    }
+
+    public void sendBlockRequests(List<String> blockList, List<String> unblockList)
+    {
+        BlockFriendsApiRequest request = new BlockFriendsApiRequest(blockList, unblockList);
+        meApi.blockFriends(request)
+             .subscribeOn(Schedulers.newThread())
+             .subscribe(new Subscriber<Response>()
+             {
+                 @Override
+                 public void onCompleted()
+                 {
 
                  }
 
                  @Override
                  public void onError(Throwable e)
                  {
-
-                     bus.post(new GenericErrorTrigger(ErrorCode.PHONE_ADD_FAILURE, (Exception) e));
                  }
 
                  @Override
                  public void onNext(Response response)
                  {
-                     if (response.getStatus() == 200)
-                     {
-
-                         genericCache.put(GenericCacheKeys.MY_PHONE_NUMBER, phoneNumber);
-                         bus.post(new PhoneAddedTrigger());
-                     }
-                     else
-                     {
-                         bus.post(new GenericErrorTrigger(ErrorCode.PHONE_ADD_FAILURE, null));
-                     }
+                     userCache.deleteFriends();
+                     eventCache.deleteAll();
                  }
              });
     }
@@ -277,43 +307,6 @@ public class UserService
                 });
     }
 
-    public void getAllAppFriends()
-    {
-        GetAllAppFriendsApiRequest request = new GetAllAppFriendsApiRequest();
-
-        meApi.getAllAppFriends(request)
-             .map(new Func1<GetAllAppFriendsApiResponse, List<Friend>>()
-             {
-                 @Override
-                 public List<Friend> call(GetAllAppFriendsApiResponse getAllAppFriendsApiResponse)
-                 {
-                     return getAllAppFriendsApiResponse.getFriends();
-                 }
-             })
-             .subscribeOn(Schedulers.newThread())
-             .observeOn(AndroidSchedulers.mainThread())
-             .subscribe(new Subscriber<List<Friend>>()
-             {
-                 @Override
-                 public void onCompleted()
-                 {
-
-                 }
-
-                 @Override
-                 public void onError(Throwable e)
-                 {
-                     bus.post(new GenericErrorTrigger(ErrorCode.USER_ALL_APP_FRIENDS_FETCH_FAILURE, (Exception) e));
-                 }
-
-                 @Override
-                 public void onNext(List<Friend> friends)
-                 {
-                     bus.post(new AllAppFriendsFetchedTrigger(friends));
-                 }
-             });
-    }
-
     public void getPhoneContacts()
     {
         userCache.getContacts()
@@ -387,35 +380,6 @@ public class UserService
                  {
 
                      bus.post(new PhoneContactsFetchedTrigger(contacts));
-                 }
-             });
-    }
-
-    public void sendBlockRequests(List<String> blockList, List<String> unblockList)
-    {
-        BlockFriendsApiRequest request = new BlockFriendsApiRequest(blockList, unblockList);
-
-        meApi.blockFriends(request)
-             .subscribeOn(Schedulers.newThread())
-             .observeOn(AndroidSchedulers.mainThread())
-             .subscribe(new Subscriber<Response>()
-             {
-                 @Override
-                 public void onCompleted()
-                 {
-
-                 }
-
-                 @Override
-                 public void onError(Throwable e)
-                 {
-                 }
-
-                 @Override
-                 public void onNext(Response response)
-                 {
-                     userCache.deleteFriends();
-                     eventCache.deleteAll();
                  }
              });
     }

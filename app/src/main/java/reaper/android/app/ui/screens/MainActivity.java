@@ -27,7 +27,6 @@ import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.ui._core.BaseActivity;
-import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
@@ -185,14 +184,6 @@ public class MainActivity extends BaseActivity
         else if (activeFragment.equals(BackstackTags.ACCOUNTS))
         {
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
-        }
-        else if (activeFragment.equals(BackstackTags.MANAGE_FRIENDS))
-        {
-            FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
-        }
-        else if (activeFragment.equals(BackstackTags.FAQ))
-        {
-            FragmentUtils.changeFragment(fragmentManager, new AccountsFragment());
         }
         else if (activeFragment.equals(BackstackTags.INVITE_USERS_CONTAINER))
         {

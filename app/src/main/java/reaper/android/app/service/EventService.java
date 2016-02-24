@@ -105,6 +105,82 @@ public class EventService
         return event.getEndTime().isBefore(DateTime.now());
     }
 
+    public Observable<Boolean> updateEventSuggestions()
+    {
+        return Observable
+                .create(new Observable.OnSubscribe<Boolean>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Boolean> subscriber)
+                    {
+                        boolean isSuggestionsAvailable = genericCache
+                                .get(GenericCacheKeys.EVENT_SUGGESTIONS) != null;
+
+                        DateTime lastUpdated = genericCache
+                                .get(GenericCacheKeys.EVENT_SUGGESTIONS_UPDATE_TIMESTAMP, DateTime.class);
+                        boolean isExpired = lastUpdated
+                                .plusDays(AppConstants.EXPIRY_DAYS_EVENT_SUGGESTIONS)
+                                .isBefore(DateTime.now());
+
+                        if (isSuggestionsAvailable && !isExpired)
+                        {
+                            subscriber.onNext(true);
+                        }
+                        else
+                        {
+                            subscriber.onNext(false);
+                        }
+                        subscriber.onCompleted();
+                    }
+                })
+                .flatMap(new Func1<Boolean, Observable<Boolean>>()
+                {
+                    @Override
+                    public Observable<Boolean> call(Boolean isAvailable)
+                    {
+                        if (isAvailable)
+                        {
+                            return Observable.just(true);
+                        }
+                        else
+                        {
+                            return eventApi
+                                    .getEventSuggestions(new GetEventSuggestionsApiRequest())
+                                    .onErrorReturn(new Func1<Throwable, GetEventSuggestionApiResponse>()
+                                    {
+                                        @Override
+                                        public GetEventSuggestionApiResponse call(Throwable throwable)
+                                        {
+                                            return null;
+                                        }
+                                    })
+                                    .map(new Func1<GetEventSuggestionApiResponse, Boolean>()
+                                    {
+                                        @Override
+                                        public Boolean call(GetEventSuggestionApiResponse response)
+                                        {
+                                            if (response == null)
+                                            {
+                                                return false;
+                                            }
+                                            else
+                                            {
+                                                genericCache
+                                                        .put(GenericCacheKeys.EVENT_SUGGESTIONS, response
+                                                                .getEventSuggestions());
+                                                genericCache
+                                                        .put(GenericCacheKeys.EVENT_SUGGESTIONS_UPDATE_TIMESTAMP, DateTime
+                                                                .now());
+                                                return true;
+                                            }
+                                        }
+                                    });
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
+
     public void fetchEvents(final String zone)
     {
         final long startTime = System.currentTimeMillis();
@@ -733,82 +809,6 @@ public class EventService
 
             }
         });
-    }
-
-    public Observable<Boolean> updateEventSuggestions()
-    {
-        return Observable
-                .create(new Observable.OnSubscribe<Boolean>()
-                {
-                    @Override
-                    public void call(Subscriber<? super Boolean> subscriber)
-                    {
-                        boolean isSuggestionsAvailable = genericCache
-                                .get(GenericCacheKeys.EVENT_SUGGESTIONS) != null;
-
-                        DateTime lastUpdated = genericCache
-                                .get(GenericCacheKeys.EVENT_SUGGESTIONS_UPDATE_TIMESTAMP, DateTime.class);
-                        boolean isExpired = lastUpdated
-                                .plusDays(AppConstants.EXPIRY_DAYS_EVENT_SUGGESTIONS)
-                                .isBefore(DateTime.now());
-
-                        if (isSuggestionsAvailable && !isExpired)
-                        {
-                            subscriber.onNext(true);
-                        }
-                        else
-                        {
-                            subscriber.onNext(false);
-                        }
-                        subscriber.onCompleted();
-                    }
-                })
-                .flatMap(new Func1<Boolean, Observable<Boolean>>()
-                {
-                    @Override
-                    public Observable<Boolean> call(Boolean isAvailable)
-                    {
-                        if (isAvailable)
-                        {
-                            return Observable.just(true);
-                        }
-                        else
-                        {
-                            return eventApi
-                                    .getEventSuggestions(new GetEventSuggestionsApiRequest())
-                                    .onErrorReturn(new Func1<Throwable, GetEventSuggestionApiResponse>()
-                                    {
-                                        @Override
-                                        public GetEventSuggestionApiResponse call(Throwable throwable)
-                                        {
-                                            return null;
-                                        }
-                                    })
-                                    .map(new Func1<GetEventSuggestionApiResponse, Boolean>()
-                                    {
-                                        @Override
-                                        public Boolean call(GetEventSuggestionApiResponse response)
-                                        {
-                                            if (response == null)
-                                            {
-                                                return false;
-                                            }
-                                            else
-                                            {
-                                                genericCache
-                                                        .put(GenericCacheKeys.EVENT_SUGGESTIONS, response
-                                                                .getEventSuggestions());
-                                                genericCache
-                                                        .put(GenericCacheKeys.EVENT_SUGGESTIONS_UPDATE_TIMESTAMP, DateTime
-                                                                .now());
-                                                return true;
-                                            }
-                                        }
-                                    });
-                        }
-                    }
-                })
-                .subscribeOn(Schedulers.newThread());
     }
 
     public void getEventSuggestions()

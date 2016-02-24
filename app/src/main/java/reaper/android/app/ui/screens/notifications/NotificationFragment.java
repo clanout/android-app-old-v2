@@ -1,6 +1,5 @@
 package reaper.android.app.ui.screens.notifications;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -79,16 +78,10 @@ public class NotificationFragment extends BaseFragment implements
     }
 
     @Override
-    public void onAttach(Context context)
-    {
-        super.onAttach(context);
-        screen = (NotificationScreen) context;
-    }
-
-    @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+        screen = (NotificationScreen) getActivity();
         initRecyclerView();
     }
 

@@ -1,6 +1,7 @@
 package reaper.android.app.model;
 
 import reaper.android.app.model._core.Model;
+import reaper.android.app.service._new.FacebookService_;
 
 public class Friend implements Model
 {
@@ -10,11 +11,13 @@ public class Friend implements Model
     private boolean isBlocked;
     private boolean isChecked;
 
-    public boolean isChecked() {
+    public boolean isChecked()
+    {
         return isChecked;
     }
 
-    public void setIsChecked(boolean isChecked) {
+    public void setIsChecked(boolean isChecked)
+    {
         this.isChecked = isChecked;
     }
 
@@ -26,6 +29,11 @@ public class Friend implements Model
     public void setId(String id)
     {
         this.id = id;
+    }
+
+    public String getProfilePicUrl()
+    {
+        return FacebookService_.getFriendPicUrl(id);
     }
 
     public String getName()

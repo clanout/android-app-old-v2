@@ -19,6 +19,7 @@
     <string name="title_create">Create Plan</string>
     <string name="title_edit">Edit</string>
     <string name="title_account">Account</string>
+    <string name="title_friends">Manage Friends</string>
     <string name="title_notification">Notifications</string>
     <string name="title_chat">Clan Chat</string>
 
@@ -46,6 +47,9 @@
     <string name="error_chat_not_sent"> Unable to send message. Resend.</string>
     <string name="error_chat_not_fetched"> Unable to load conversations. Refresh.</string>
     <string name="error_no_watsapp">WhatsApp is not installed on this device</string>
+
+    <!-- Common Strings -->
+    <string name="label_search_friends">Search Friends</string>
 
     <!-- Splash Screen -->
     <string name="bootstrap_error_action">Try Again</string>
@@ -101,6 +105,11 @@
     <!-- Account Screen -->
     <string name="no_facebook_friends">Nothing to show here :)</string>
     <string name="message_blocked_friends">Blocked friends cannot invite you or see what clans you have joined.</string>
+    <string name="account_menu_block">Block a friend</string>
+    <string name="account_menu_phone">Update Mobile Number</string>
+    <string name="account_menu_whatsapp">WhatsApp Invite</string>
+    <string name="account_menu_feedback">Help Us Improve</string>
+    <string name="account_menu_help">Help/FAQ</string>
 
     <!-- Notifications -->
     <string name="no_notifications">No Notifications</string>
@@ -134,13 +143,13 @@
 
     <!-- Add Phone Dialog -->
     <string name="add_phone_title">Update Mobile Number</string>
-    <string name="add_phone_message">Enter number to enable invitations from friends who have your contact number</string>
+    <string name="add_phone_message">Enter number to enable invitations from friends who have your mobile number</string>
     <string name="add_phone_positive_button">Update</string>
 
     <!-- Feedback Dialog -->
     <string name="feedback_title">Feedback</string>
     <string name="feedback_positive_button">Submit</string>
-    <string name="feedback_remind_button">Remind Later</string>
+    <string name="feedback_remind_button">Not Now</string>
     <string name="label_feedback_comment">Comment</string>
     <string name="feedback_empty_comment">Please provide a comment</string>
     <string name="label_feedback_report">Report a bug</string>

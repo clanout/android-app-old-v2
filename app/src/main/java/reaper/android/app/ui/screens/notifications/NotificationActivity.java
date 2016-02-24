@@ -41,6 +41,7 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
     {
         super.onCreate(savedInstanceState);
 
+        /* Setup UI */
         setContentView(R.layout.activity_notification);
         ButterKnife.bind(this);
 
@@ -60,7 +61,6 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
     @Override
     public void onBackPressed()
     {
-        super.onBackPressed();
         navigateToHomeScreen();
     }
 

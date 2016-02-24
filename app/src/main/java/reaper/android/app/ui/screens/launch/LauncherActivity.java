@@ -138,7 +138,7 @@ public class LauncherActivity extends BaseActivity implements
     {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_launcher_);
+        setContentView(R.layout.activity_launcher);
         ButterKnife.bind(this);
 
         /* Init View */
@@ -562,7 +562,7 @@ public class LauncherActivity extends BaseActivity implements
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         @SuppressLint("InflateParams")
-        View dialogView = getLayoutInflater().inflate(R.layout.alert_dialog_default, null);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_default, null);
         builder.setView(dialogView);
 
         TextView tvTitle = (TextView) dialogView.findViewById(R.id.tvTitle);
@@ -592,7 +592,7 @@ public class LauncherActivity extends BaseActivity implements
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         @SuppressLint("InflateParams")
-        View dialogView = getLayoutInflater().inflate(R.layout.alert_dialog_default, null);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_default, null);
         builder.setView(dialogView);
 
         TextView tvTitle = (TextView) dialogView.findViewById(R.id.tvTitle);

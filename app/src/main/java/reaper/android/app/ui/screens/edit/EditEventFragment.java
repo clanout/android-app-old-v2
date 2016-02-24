@@ -627,7 +627,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
                     builder.setCancelable(true);
 
                     LayoutInflater layoutInflater = getActivity().getLayoutInflater();
-                    View dialogView = layoutInflater.inflate(R.layout.alert_dialog_default, null);
+                    View dialogView = layoutInflater.inflate(R.layout.dialog_default, null);
                     builder.setView(dialogView);
 
                     TextView tvTitle = (TextView) dialogView.findViewById(R.id.tvTitle);
@@ -668,7 +668,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
                     builder.setCancelable(true);
 
                     LayoutInflater layoutInflater = getActivity().getLayoutInflater();
-                    View dialogView = layoutInflater.inflate(R.layout.alert_dialog_default, null);
+                    View dialogView = layoutInflater.inflate(R.layout.dialog_default, null);
                     builder.setView(dialogView);
 
                     TextView tvTitle = (TextView) dialogView.findViewById(R.id.tvTitle);
@@ -718,7 +718,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
                 builder.setCancelable(true);
 
                 LayoutInflater layoutInflater = getActivity().getLayoutInflater();
-                View dialogView = layoutInflater.inflate(R.layout.alert_dialog_default, null);
+                View dialogView = layoutInflater.inflate(R.layout.dialog_default, null);
                 builder.setView(dialogView);
 
                 TextView tvTitle = (TextView) dialogView.findViewById(R.id.tvTitle);
