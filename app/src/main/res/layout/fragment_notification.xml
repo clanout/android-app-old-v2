@@ -1,47 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/tb_fragment_notifications"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/primary"
-            app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-    </android.support.design.widget.AppBarLayout>
-
-    <LinearLayout
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvNotifications"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center_vertical|center_horizontal"
-        android:orientation="vertical">
+        android:background="@color/background_default"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_fragment_notificatiosn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/background_default"
-            android:paddingBottom="8dp"
-            android:paddingTop="8dp"/>
+    <TextView
+        android:id="@+id/tvNoNotifications"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/no_notifications"
+        android:textColor="@color/text_subtitle"
+        android:textSize="16sp"/>
 
-        <TextView
-            android:id="@+id/tv_fragemnt_notification_no_notifications"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_subtitle"
-            android:textSize="16sp"/>
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"/>
 
-    </LinearLayout>
-
-</LinearLayout>
+</RelativeLayout>
