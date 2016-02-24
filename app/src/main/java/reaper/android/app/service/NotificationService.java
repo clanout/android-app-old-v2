@@ -11,8 +11,6 @@ import android.util.Log;
 
 import com.squareup.otto.Bus;
 
-import org.joda.time.DateTime;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,15 +23,11 @@ import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.notification.NotificationCache;
 import reaper.android.app.cache.user.UserCache;
-import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.MemoryCacheKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.root.Reaper;
-import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationReceivedTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationsAvailableTrigger;
-import reaper.android.app.trigger.notifications.NewNotificationsNotAvailableTrigger;
-import reaper.android.app.trigger.notifications.NotificationsFetchedTrigger;
 import reaper.android.app.ui.screens.FlowEntry;
 import reaper.android.app.ui.screens.launch.LauncherActivity;
 import reaper.android.common.communicator.Communicator;
@@ -701,95 +695,6 @@ public class NotificationService
                        .subscribeOn(Schedulers.newThread());
     }
 
-    public void fetchAllNotifications()
-    {
-        notificationCache.getAll().observeOn(AndroidSchedulers.mainThread())
-                         .subscribe(new Subscriber<List<Notification>>()
-                         {
-                             @Override
-                             public void onCompleted()
-                             {
-                             }
-
-                             @Override
-                             public void onError(Throwable e)
-                             {
-                                 bus.post(new GenericErrorTrigger(ErrorCode.NOTIFICATIONS_FETCH_FAILURE, (Exception) e));
-                             }
-
-                             @Override
-                             public void onNext(final List<Notification> notifications)
-                             {
-
-                                 eventCache.getEvents()
-                                           .subscribeOn(Schedulers.newThread())
-                                           .observeOn(AndroidSchedulers.mainThread())
-                                           .subscribe(new Subscriber<List<Event>>()
-                                           {
-
-                                               @Override
-                                               public void onCompleted()
-                                               {
-
-                                               }
-
-                                               @Override
-                                               public void onError(Throwable e)
-                                               {
-
-                                               }
-
-                                               @Override
-                                               public void onNext(List<Event> events)
-                                               {
-
-                                                   List<Notification> filteredNotifications = new ArrayList<Notification>();
-
-                                                   for (Notification notification : notifications)
-                                                   {
-                                                       String eventId = notification.getEventId();
-
-                                                       if (eventId == null || eventId.isEmpty())
-                                                       {
-
-                                                           Log.d("APP", "event id empty");
-                                                           filteredNotifications.add(notification);
-                                                       }
-                                                       else
-                                                       {
-
-                                                           Event event = new Event();
-                                                           event.setId(eventId);
-
-                                                           if (events.contains(event))
-                                                           {
-
-                                                               Log.d("APP", "contains");
-
-                                                               if (events.get(events.indexOf(event))
-                                                                         .getEndTime()
-                                                                         .getMillis() > DateTime
-                                                                       .now().getMillis())
-                                                               {
-
-                                                                   Log.d("APP", "adding");
-                                                                   filteredNotifications
-                                                                           .add(notification);
-                                                               }
-                                                           }
-                                                       }
-                                                   }
-
-                                                   Log.d("APP", "size --- " + filteredNotifications
-                                                           .size());
-                                                   bus.post(new NotificationsFetchedTrigger(filteredNotifications));
-
-                                               }
-                                           });
-                             }
-                         });
-    }
-
     public void deleteAllNotificationsFromCache()
     {
         notificationCache.clear().observeOn(Schedulers.newThread())
@@ -883,15 +788,11 @@ public class NotificationService
                              }
 
                              @Override
-                             public void onNext(Boolean aBoolean)
+                             public void onNext(Boolean isAvailable)
                              {
-                                 if (aBoolean)
+                                 if (isAvailable)
                                  {
                                      bus.post(new NewNotificationsAvailableTrigger());
-                                 }
-                                 else
-                                 {
-                                     bus.post(new NewNotificationsNotAvailableTrigger());
                                  }
                              }
                          });
