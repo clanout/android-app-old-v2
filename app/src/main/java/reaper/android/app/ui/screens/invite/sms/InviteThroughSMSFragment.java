@@ -47,7 +47,7 @@ import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.AllPhoneContactsForSMSFetchedTrigger;
-import reaper.android.app.ui.screens.core.BaseFragment;
+import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;

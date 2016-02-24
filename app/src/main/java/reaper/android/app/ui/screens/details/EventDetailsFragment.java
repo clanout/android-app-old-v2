@@ -64,7 +64,7 @@ import reaper.android.app.model.Location;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.ui.screens.chat.ChatFragment;
-import reaper.android.app.ui.screens.core.BaseFragment;
+import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.edit.EditEventFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.CircleTransform;

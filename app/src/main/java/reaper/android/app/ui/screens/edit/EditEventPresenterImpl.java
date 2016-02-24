@@ -62,7 +62,7 @@ public class EditEventPresenterImpl implements EditEventPresenter
 
     public EditEventPresenterImpl(Bus bus, Event originalEvent, EventDetails originalEventDetails)
     {
-        eventService = new EventService(bus);
+        eventService = EventService.getInstance();
         activeUser = UserService.getInstance().getSessionUserId();
         userLocation = LocationService_.getInstance().getCurrentLocation();
         placesService = new PlacesService();
@@ -555,6 +555,6 @@ public class EditEventPresenterImpl implements EditEventPresenter
 
     private Observable<List<Event>> getEventListObservable()
     {
-        return eventService._fetchEvents(userLocation.getZone());
+        return eventService._fetchEvents();
     }
 }

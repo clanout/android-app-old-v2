@@ -10,32 +10,23 @@
     android:paddingRight="16dp"
     android:paddingTop="8dp">
 
-    <!--<LinearLayout-->
-        <!--android:id="@+id/llNotificationIconContainer"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:background="@color/category_icon_five"-->
-        <!--android:gravity="center_vertical|center_horizontal"-->
-        <!--android:padding="8dp">-->
-
-        <ImageView
-            android:id="@+id/iv_list_item_notifications"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center"
-            android:padding="8dp"/>
-
-    <!--</LinearLayout>-->
-
+    <ImageView
+        android:id="@+id/ivIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:background="@color/grey"
+        android:padding="8dp"/>
 
     <TextView
-        android:id="@+id/tv_list_item_notifications"
+        android:id="@+id/tvMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginLeft="16dp"
-        android:layout_toRightOf="@+id/iv_list_item_notifications"
-        android:maxLines="2"/>
+        android:layout_toRightOf="@+id/ivIcon"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:text="Dummy notification text"/>
 
 </RelativeLayout>

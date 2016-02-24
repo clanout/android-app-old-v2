@@ -44,7 +44,7 @@ import reaper.android.app.service.AccountsService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.app.ui.screens.accounts.friends.ManageFriendsFragment;
-import reaper.android.app.ui.screens.core.BaseFragment;
+import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.app.ui.util.SnackbarFactory;
@@ -69,8 +69,6 @@ public class AccountsFragment extends BaseFragment implements AccountsAdapter.Ac
     private GenericCache genericCache;
 
     private AccountsAdapter accountsAdapter;
-
-    // TODO -- X invited you to join ---- event details screen -- onClick invite icon
 
     @Override
     public void onCreate(Bundle savedInstanceState)

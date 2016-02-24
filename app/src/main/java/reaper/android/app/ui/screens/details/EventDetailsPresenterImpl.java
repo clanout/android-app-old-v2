@@ -52,7 +52,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     {
         this.flag = flag;
         this.event = event;
-        eventService = new EventService(bus);
+        eventService = EventService.getInstance();
         eventCache = CacheManager.getEventCache();
         subscriptions = new CompositeSubscription();
 

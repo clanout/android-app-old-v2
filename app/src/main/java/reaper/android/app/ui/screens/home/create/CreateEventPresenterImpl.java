@@ -28,7 +28,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
 
     public CreateEventPresenterImpl(Bus bus)
     {
-        eventService = new EventService(bus);
+        eventService = EventService.getInstance();
         userLocation = LocationService_.getInstance().getCurrentLocation();
 
         subscriptions = new CompositeSubscription();

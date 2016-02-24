@@ -19,7 +19,7 @@ public class ListenerServiceGcm extends GcmListenerService
     public ListenerServiceGcm()
     {
         bus = Communicator.getInstance().getBus();
-        notificationService = new NotificationService(bus);
+        notificationService = NotificationService.getInstance();
     }
 
     @Override

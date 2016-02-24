@@ -62,7 +62,7 @@ import reaper.android.app.trigger.user.AppFriendsFetchedFromNetworkTrigger;
 import reaper.android.app.trigger.user.AppFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.app.trigger.user.PhoneContactsFetchedTrigger;
-import reaper.android.app.ui.screens.core.BaseFragment;
+import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.invite.core.InviteFriendsAdapter;
 import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.app.ui.util.SnackbarFactory;

@@ -134,9 +134,7 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
                         }
                         else
                         {
-                            return eventService
-                                    ._fetchEvents(locationService.getCurrentLocation()
-                                                                 .getZone());
+                            return eventService._fetchEvents();
                         }
                     }
                 })

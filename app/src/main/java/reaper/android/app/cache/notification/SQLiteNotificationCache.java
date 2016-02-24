@@ -269,7 +269,6 @@ public class SQLiteNotificationCache implements NotificationCache
                             boolean isAvailable = false;
 
                             SQLiteDatabase db = databaseManager.openConnection();
-                            ;
 
                             Cursor cursor = db
                                     .rawQuery(SQLiteCacheContract.Notification.SQL_COUNT_NEW, null);

@@ -71,7 +71,7 @@ import reaper.android.app.model.Suggestion;
 import reaper.android.app.root.Reaper;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui.screens.MainActivity;
-import reaper.android.app.ui.screens.core.BaseFragment;
+import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.DrawableFactory;

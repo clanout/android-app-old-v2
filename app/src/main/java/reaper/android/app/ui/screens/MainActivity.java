@@ -31,7 +31,7 @@ import reaper.android.app.ui.screens.accounts.AccountsFragment;
 import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
-import reaper.android.app.ui.screens.notifications.NotificationFragment;
+import reaper.android.app.ui.screens.notifications.NotificationActivity;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.chat.ChatHelper;
@@ -91,7 +91,7 @@ public class MainActivity extends BaseActivity
         bus.register(this);
         isBusRegistered = true;
 
-        eventService = new EventService(bus);
+        eventService = EventService.getInstance();
         userService = UserService.getInstance();
         facebookService = new FacebookService(bus);
         fragmentManager = getFragmentManager();
@@ -260,7 +260,8 @@ public class MainActivity extends BaseActivity
 
     private void navigateToNotificationsFragment()
     {
-        FragmentUtils.changeFragment(getFragmentManager(), new NotificationFragment());
+        startActivity(NotificationActivity.callingIntent(this, true));
+        finish();
     }
 
     private void navigateToChatFragment(ArrayList<Event> eventList, String eventId)

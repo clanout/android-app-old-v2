@@ -42,7 +42,7 @@ import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.user.ManageAppFriendsTrigger;
 import reaper.android.app.trigger.user.ManageSMSInviteeTrigger;
 import reaper.android.app.ui.screens.MainActivity;
-import reaper.android.app.ui.screens.core.BaseFragment;
+import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
@@ -120,7 +120,7 @@ public class InviteUsersContainerFragment extends BaseFragment implements View.O
         generateDrawables();
 
         bus = Communicator.getInstance().getBus();
-        eventService = new EventService(bus);
+        eventService = EventService.getInstance();
         userService = UserService.getInstance();
         fragmentManager = getActivity().getFragmentManager();
 

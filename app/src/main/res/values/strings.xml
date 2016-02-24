@@ -103,7 +103,7 @@
     <string name="message_blocked_friends">Blocked friends cannot invite you or see what clans you have joined.</string>
 
     <!-- Notifications -->
-    <string name="no_notifications">Nothing to show here</string>
+    <string name="no_notifications">No Notifications</string>
     <string name="notifications_fetch_failure">Unable to load notifications</string>
     <string name="reminder_notification_message">1 hour to go. Giddy up!</string>
 

@@ -38,7 +38,7 @@ public class EventsPresenterImpl implements EventsPresenter
 
     public EventsPresenterImpl(Bus bus, List<Event> events)
     {
-        eventService = new EventService(bus);
+        eventService = EventService.getInstance();
         cache = CacheManager.getGenericCache();
         userLocation = LocationService_.getInstance().getCurrentLocation();
         subscriptions = new CompositeSubscription();
@@ -61,7 +61,7 @@ public class EventsPresenterImpl implements EventsPresenter
         if (events.isEmpty())
         {
             Subscription subscription = eventService
-                    ._fetchEvents(userLocation.getZone())
+                    ._fetchEvents()
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Subscriber<List<Event>>()

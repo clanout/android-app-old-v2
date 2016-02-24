@@ -59,7 +59,7 @@ import reaper.android.app.root.Reaper;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.ui.screens.MainActivity;
-import reaper.android.app.ui.screens.core.BaseFragment;
+import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.create.LocationSuggestionAdapter;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;

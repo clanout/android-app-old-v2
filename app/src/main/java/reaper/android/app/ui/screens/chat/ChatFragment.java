@@ -56,8 +56,8 @@ import reaper.android.app.trigger.chat.XmppConnectionAuthenticatedTrigger;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
+import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.MainActivity;
-import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.SnackbarFactory;
@@ -173,7 +173,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener
         bus = Communicator.getInstance().getBus();
         userService = UserService.getInstance();
         chatService = new ChatService(bus);
-        eventService = new EventService(bus);
+        eventService = EventService.getInstance();
         fragmentManager = getActivity().getFragmentManager();
 
         genericCache = CacheManager.getGenericCache();
@@ -355,7 +355,8 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener
                 try
                 {
                     chatService.fetchHistory(multiUserChat, userService
-                            .getSessionUserName() + "_" + userService.getSessionUserId(), userService
+                            .getSessionUserName() + "_" + userService
+                            .getSessionUserId(), userService
                             .getSessionUserId(), connection.getPacketReplyTimeout(), maxStanzas);
                 }
                 catch (Exception e)
@@ -426,7 +427,8 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener
         try
         {
             chatService
-                    .fetchHistory(multiUserChat, userService.getSessionUserName() + "_" + userService
+                    .fetchHistory(multiUserChat, userService
+                            .getSessionUserName() + "_" + userService
                             .getSessionUserId(), userService.getSessionUserId(), connection
                             .getPacketReplyTimeout(), 20);
         }

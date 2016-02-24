@@ -40,7 +40,7 @@ import reaper.android.app.model.EventCategory;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.ui.screens.MainActivity;
-import reaper.android.app.ui.screens.core.BaseFragment;
+import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;

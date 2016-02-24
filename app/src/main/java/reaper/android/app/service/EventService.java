@@ -50,9 +50,11 @@ import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.Suggestion;
 import reaper.android.app.service._new.GcmService_;
+import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventDetailsFetchTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
+import reaper.android.common.communicator.Communicator;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import rx.Observable;
@@ -65,23 +67,42 @@ import rx.schedulers.Schedulers;
 
 public class EventService
 {
+    private static EventService instance;
+
+    public static EventService getInstance()
+    {
+        if (instance == null)
+        {
+            instance = new EventService();
+        }
+
+        return instance;
+    }
+
     private static final String TAG = "EventService";
 
     private Bus bus;
     private UserService userService;
+    private LocationService_ locationService;
     private GcmService_ gcmService;
     private EventApi eventApi;
     private EventCache eventCache;
     private GenericCache genericCache;
 
-    public EventService(Bus bus)
+    private EventService()
     {
-        this.bus = bus;
+        this.bus = Communicator.getInstance().getBus();
         userService = UserService.getInstance();
         gcmService = GcmService_.getInstance();
         eventApi = ApiManager.getEventApi();
         eventCache = CacheManager.getEventCache();
         genericCache = CacheManager.getGenericCache();
+        locationService = LocationService_.getInstance();
+    }
+
+    public boolean isExpired(Event event)
+    {
+        return event.getEndTime().isBefore(DateTime.now());
     }
 
     public void fetchEvents(final String zone)
@@ -311,8 +332,9 @@ public class EventService
                 });
     }
 
-    public Observable<List<Event>> _fetchEvents(final String zone)
+    public Observable<List<Event>> _fetchEvents()
     {
+        final String zone = locationService.getCurrentLocation().getZone();
         return eventCache
                 .getEvents()
                 .flatMap(new Func1<List<Event>, Observable<List<Event>>>()
@@ -361,7 +383,7 @@ public class EventService
                             List<Event> filteredEvents = new ArrayList<Event>();
                             for (Event event : events)
                             {
-                                if (event.getEndTime().isAfterNow())
+                                if (!isExpired(event))
                                 {
                                     filteredEvents.add(event);
                                 }

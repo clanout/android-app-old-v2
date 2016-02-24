@@ -36,11 +36,13 @@ import reaper.android.app.trigger.notifications.NewNotificationsNotAvailableTrig
 import reaper.android.app.trigger.notifications.NotificationsFetchedTrigger;
 import reaper.android.app.ui.screens.FlowEntry;
 import reaper.android.app.ui.screens.launch.LauncherActivity;
+import reaper.android.common.communicator.Communicator;
 import reaper.android.common.notification.Notification;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 /**
@@ -48,6 +50,20 @@ import rx.schedulers.Schedulers;
  */
 public class NotificationService
 {
+    private static NotificationService instance;
+
+    public static NotificationService getInstance()
+    {
+        if (instance == null)
+        {
+            instance = new NotificationService();
+        }
+
+        return instance;
+    }
+
+    private EventService eventService;
+
     private EventApi eventApi;
     private EventCache eventCache;
     private NotificationCache notificationCache;
@@ -55,14 +71,52 @@ public class NotificationService
     private UserService userService;
     private Bus bus;
 
-    public NotificationService(Bus bus)
+    private NotificationService()
     {
         this.eventApi = ApiManager.getEventApi();
         eventCache = CacheManager.getEventCache();
         notificationCache = CacheManager.getNotificationCache();
         userCache = CacheManager.getUserCache();
-        this.bus = bus;
+        this.bus = Communicator.getInstance().getBus();
         this.userService = UserService.getInstance();
+        eventService = EventService.getInstance();
+    }
+
+    public Observable<List<Notification>> fetchNotifications()
+    {
+        return Observable
+                .zip(notificationCache.getAll(), eventService
+                        ._fetchEvents(), new Func2<List<Notification>, List<Event>, List<Notification>>()
+                {
+                    @Override
+                    public List<Notification> call(List<Notification> notifications, List<Event> events)
+                    {
+                        List<Notification> filtered = new ArrayList<Notification>();
+
+                        for (Notification notification : notifications)
+                        {
+                            String eventId = notification.getEventId();
+
+                            if (eventId == null || eventId.isEmpty())
+                            {
+                                filtered.add(notification);
+                            }
+                            else
+                            {
+                                Event event = new Event();
+                                event.setId(eventId);
+
+                                if (events.contains(event))
+                                {
+                                    filtered.add(notification);
+                                }
+                            }
+                        }
+
+                        return filtered;
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
     }
 
     public void handleNotification(Notification notification)

@@ -77,15 +77,15 @@ import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationReceivedTrigger;
 import reaper.android.app.trigger.notifications.NewNotificationsAvailableTrigger;
+import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.accounts.AccountsFragment;
-import reaper.android.app.ui.screens.core.BaseFragment;
 import reaper.android.app.ui.screens.create.CreateEventDetailsFragment;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.create.CreateEventPresenter;
 import reaper.android.app.ui.screens.home.create.CreateEventPresenterImpl;
 import reaper.android.app.ui.screens.home.create.CreateEventView;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
-import reaper.android.app.ui.screens.notifications.NotificationFragment;
+import reaper.android.app.ui.screens.notifications.NotificationActivity;
 import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
@@ -398,7 +398,20 @@ public class HomeFragment extends BaseFragment implements EventsView,
             displayUpdatePhoneDialog();
         }
 
-        NotificationService notificationService = new NotificationService(bus);
+        /* Notification Icon */
+        notificationIcon = MaterialDrawableBuilder
+                .with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.BELL)
+                .setColor(ContextCompat
+                        .getColor(getActivity(), R.color.white))
+                .setSizeDp(36)
+                .build();
+
+        if (notification != null)
+        {
+            notification.setIcon(notificationIcon);
+        }
+        NotificationService notificationService = NotificationService.getInstance();
         notificationService.areNewNotificationsAvailable();
     }
 
@@ -567,8 +580,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
                     @Override
                     public boolean onMenuItemClick(MenuItem item)
                     {
-                        FragmentUtils
-                                .changeFragment(getFragmentManager(), new NotificationFragment());
+                        startActivity(NotificationActivity.callingIntent(getActivity(), false));
                         return true;
                     }
                 });
@@ -654,7 +666,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
     private void displayUpdatePhoneDialog()
     {
         final GenericCache genericCache = CacheManager.getGenericCache();
-        final EventService eventService = new EventService(bus);
+        final EventService eventService = EventService.getInstance();
         final UserService userService = UserService.getInstance();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

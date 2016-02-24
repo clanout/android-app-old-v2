@@ -53,7 +53,6 @@ import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginPresenter;
 import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginPresenterImpl;
 import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginView;
 import reaper.android.app.ui.util.SnackbarFactory;
-import reaper.android.common.communicator.Communicator;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -172,7 +171,7 @@ public class LauncherActivity extends BaseActivity implements
         gcmService = GcmService_.getInstance();
 
         /* Presenters */
-        EventService eventService = new EventService(Communicator.getInstance().getBus());
+        EventService eventService = EventService.getInstance();
         facebookLoginPresenter = new FacebookLoginPresenterImpl(authService, facebookService);
         bootstrapPresenter = new BootstrapPresenterImpl(locationService, authService, gcmService, eventService);
     }
