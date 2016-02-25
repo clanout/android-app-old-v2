@@ -1,208 +1,178 @@
 package reaper.android.app.ui.screens.chat;
 
 import android.content.Context;
-import android.view.Gravity;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.model.ChatMessage;
 
-
-/**
- * Created by harsh on 21-05-2015.
- */
-public class ChatAdapter extends BaseAdapter
+public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
+    private static final int CHAT_ME = 0;
+    private static final int CHAT_OTHERS = 1;
 
-    private List<ChatMessage> chatMessageList;
+    private static DateTimeFormatter TIMESTAMP_FORMATTER = DateTimeFormat
+            .forPattern("HH:mm, dd MMM");
+
     private Context context;
+    private List<ChatMessage> chatMessages;
+    private String sessionUserId;
 
-    public ChatAdapter(List<ChatMessage> chatMessageList, Context context)
+    public ChatAdapter(Context context, String sessionUserId)
     {
-        this.chatMessageList = chatMessageList;
         this.context = context;
+        this.sessionUserId = sessionUserId;
+        chatMessages = new ArrayList<>();
     }
 
-    @Override
-    public int getCount()
+    public boolean addMessage(ChatMessage chatMessage)
     {
-        if (chatMessageList == null)
+        int index = getInsertIndex(chatMessage);
+        boolean shouldScroll = index == 0;
+
+        chatMessages.add(index, chatMessage);
+
+        if (index != 0)
         {
-            return 0;
+            notifyDataSetChanged();
         }
         else
         {
-            return chatMessageList.size();
+            notifyItemInserted(1);
+        }
+
+        return shouldScroll;
+    }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    {
+        if (viewType == CHAT_ME)
+        {
+            View view = LayoutInflater
+                    .from(context)
+                    .inflate(R.layout.item_chat_me, parent, false);
+            return new MyChatViewHolder(view);
+        }
+        else
+        {
+            View view = LayoutInflater
+                    .from(context)
+                    .inflate(R.layout.item_chat_others, parent, false);
+            return new OthersChatViewHolder(view);
         }
     }
 
     @Override
-    public ChatMessage getItem(int position)
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position)
     {
-        if (chatMessageList != null)
+        if (getItemViewType(position) == CHAT_ME)
         {
-            return chatMessageList.get(position);
+            ((MyChatViewHolder) holder).render(chatMessages.get(position));
         }
         else
         {
-            return null;
+            ((OthersChatViewHolder) holder).render(chatMessages.get(position));
         }
     }
 
-    @Override
-    public long getItemId(int position)
+    private int getInsertIndex(ChatMessage chatMessage)
     {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent)
-    {
-        ChatViewHolder chatViewHolder = new ChatViewHolder();
-        ChatMessage chatMessageCurrent = chatMessageList.get(position);
-        ChatMessage chatMessagePrevious = null;
-
-        if (position != 0)
+        int len = chatMessages.size();
+        for (int i = 0; i < len; i++)
         {
-            chatMessagePrevious = chatMessageList.get(position - 1);
-        }
-
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        if (convertView == null)
-        {
-            convertView = inflater.inflate(R.layout.list_item_chat, null);
-            chatViewHolder = createViewHolder(convertView);
-            convertView.setTag(chatViewHolder);
-        }
-        else
-        {
-            chatViewHolder = (ChatViewHolder) convertView.getTag();
-        }
-        boolean isMe = chatMessageCurrent.isMe();
-        setAlignment(chatViewHolder, isMe);
-
-        if (chatMessagePrevious == null)
-        {
-            if(isMe) {
-                chatViewHolder.infoOutside.setVisibility(View.GONE);
-            }else{
-                chatViewHolder.infoOutside.setVisibility(View.VISIBLE);
-            }
-            chatViewHolder.messageInside.setText(chatMessageCurrent.getMessage());
-            chatViewHolder.infoOutside.setText(chatMessageCurrent.getSenderName());
-
-        }
-        else
-        {
-            if (chatMessageCurrent.getSenderId().equals(chatMessagePrevious.getSenderId()))
+            ChatMessage current = chatMessages.get(i);
+            if (current.getTimestamp().isBefore(chatMessage.getTimestamp()))
             {
-                chatViewHolder.infoOutside.setVisibility(View.GONE);
-                chatViewHolder.messageInside.setText(chatMessageCurrent.getMessage());
+                return i;
+            }
+        }
+
+        return len;
+    }
+
+    @Override
+    public int getItemCount()
+    {
+        return chatMessages.size();
+    }
+
+    @Override
+    public int getItemViewType(int position)
+    {
+        return chatMessages.get(position).getSenderId().equals(sessionUserId)
+                ? CHAT_ME : CHAT_OTHERS;
+    }
+
+    public class MyChatViewHolder extends RecyclerView.ViewHolder
+    {
+        @Bind(R.id.tvChatMessage)
+        TextView tvChatMessage;
+
+        @Bind(R.id.tvTimestamp)
+        TextView tvTimestamp;
+
+        public MyChatViewHolder(View itemView)
+        {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        public void render(ChatMessage chatMessage)
+        {
+            tvChatMessage.setText(chatMessage.getMessage());
+            tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER));
+        }
+    }
+
+    public class OthersChatViewHolder extends RecyclerView.ViewHolder
+    {
+        @Bind(R.id.tvName)
+        TextView tvName;
+
+        @Bind(R.id.tvChatMessage)
+        TextView tvChatMessage;
+
+        @Bind(R.id.tvTimestamp)
+        TextView tvTimestamp;
+
+        public OthersChatViewHolder(View itemView)
+        {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        public void render(ChatMessage chatMessage)
+        {
+            int currentIndex = chatMessages.indexOf(chatMessage);
+            int nextIndex = currentIndex + 1;
+            boolean isNameInvisible = nextIndex < chatMessages.size()
+                    && chatMessages.get(nextIndex).getSenderId().equals(chatMessage.getSenderId());
+
+            if (isNameInvisible)
+            {
+                tvName.setVisibility(View.GONE);
             }
             else
             {
-                if(isMe) {
-                    chatViewHolder.infoOutside.setVisibility(View.GONE);
-                }else{
-                    chatViewHolder.infoOutside.setVisibility(View.VISIBLE);
-                }
-                chatViewHolder.messageInside.setText(chatMessageCurrent.getMessage());
-                chatViewHolder.infoOutside.setText(chatMessageCurrent.getSenderName());
-
+                tvName.setText(chatMessage.getSenderName());
+                tvName.setVisibility(View.VISIBLE);
             }
+
+            tvChatMessage.setText(chatMessage.getMessage());
+            tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER));
         }
-        return convertView;
-    }
-
-    private void setAlignment(ChatViewHolder chatViewHolder, boolean isMe)
-    {
-        if (!isMe)
-        {
-            chatViewHolder.contentWithBackground.setBackgroundResource(R.drawable.bg_chat);
-
-            LinearLayout.LayoutParams layoutParams =
-                    (LinearLayout.LayoutParams) chatViewHolder.contentWithBackground.getLayoutParams();
-            layoutParams.gravity = Gravity.LEFT;
-            chatViewHolder.contentWithBackground.setLayoutParams(layoutParams);
-
-            RelativeLayout.LayoutParams lp =
-                    (RelativeLayout.LayoutParams) chatViewHolder.content.getLayoutParams();
-            lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
-            lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-            chatViewHolder.content.setLayoutParams(lp);
-
-            layoutParams = (LinearLayout.LayoutParams) chatViewHolder.messageInside.getLayoutParams();
-            layoutParams.gravity = Gravity.LEFT;
-            chatViewHolder.messageInside.setLayoutParams(layoutParams);
-
-            layoutParams = (LinearLayout.LayoutParams) chatViewHolder.infoOutside.getLayoutParams();
-            layoutParams.gravity = Gravity.LEFT;
-            chatViewHolder.infoOutside.setLayoutParams(layoutParams);
-        }
-        else
-        {
-
-            chatViewHolder.contentWithBackground.setBackgroundResource(R.drawable.bg_chat_me);
-
-            LinearLayout.LayoutParams layoutParams =
-                    (LinearLayout.LayoutParams) chatViewHolder.contentWithBackground.getLayoutParams();
-            layoutParams.gravity = Gravity.RIGHT;
-            chatViewHolder.contentWithBackground.setLayoutParams(layoutParams);
-
-            RelativeLayout.LayoutParams lp =
-                    (RelativeLayout.LayoutParams) chatViewHolder.content.getLayoutParams();
-            lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
-            lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            chatViewHolder.content.setLayoutParams(lp);
-
-            layoutParams = (LinearLayout.LayoutParams) chatViewHolder.messageInside.getLayoutParams();
-            layoutParams.gravity = Gravity.RIGHT;
-            chatViewHolder.messageInside.setLayoutParams(layoutParams);
-
-            layoutParams = (LinearLayout.LayoutParams) chatViewHolder.infoOutside.getLayoutParams();
-            layoutParams.gravity = Gravity.RIGHT;
-            chatViewHolder.infoOutside.setLayoutParams(layoutParams);
-        }
-    }
-
-    public void add(ChatMessage message)
-    {
-        chatMessageList.add(message);
-    }
-
-    public void add(List<ChatMessage> messages)
-    {
-        chatMessageList.addAll(messages);
-    }
-
-    public void clear()
-    {
-        chatMessageList = new ArrayList<>();
-    }
-
-    private ChatViewHolder createViewHolder(View v)
-    {
-        ChatViewHolder holder = new ChatViewHolder();
-        holder.messageInside = (TextView) v.findViewById(R.id.tvTextMessageInBubble);
-        holder.infoOutside = (TextView) v.findViewById(R.id.tvTextContentName);
-        holder.content = (LinearLayout) v.findViewById(R.id.llListItemChat);
-        holder.contentWithBackground = (LinearLayout) v.findViewById(R.id.llChatContentWithBackground);
-        return holder;
-    }
-
-    private static class ChatViewHolder
-    {
-        public TextView messageInside, infoOutside;
-        public LinearLayout content, contentWithBackground;
     }
 }

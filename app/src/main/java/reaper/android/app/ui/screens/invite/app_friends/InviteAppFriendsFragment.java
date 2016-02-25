@@ -43,15 +43,15 @@ import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
-import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
-import reaper.android.app.model.FriendsComparator;
-import reaper.android.app.service._new.AccountsService_;
+import reaper.android.app.model.util.FriendsComparator;
+import reaper.android.app.model.User;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.LocationService_;
+import reaper.android.app.service._new.WhatsappService_;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.user.AppFriendsFetchedFromNetworkTrigger;
@@ -383,7 +383,8 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
 
         menu.findItem(R.id.action_refresh).setIcon(refreshDrawable);
 
-        if (genericCache.get(GenericCacheKeys.MY_PHONE_NUMBER) == null)
+        User sessionUser = userService.getSessionUser();
+        if (sessionUser != null && sessionUser.getMobileNumber() != null)
         {
             menu.findItem(R.id.action_add_phone).setVisible(true);
             menu.findItem(R.id.action_add_phone).setIcon(addPhoneDrawable);
@@ -472,7 +473,7 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
 
             userService.getAppFriendsFromNetwork(LocationService_.getInstance().getCurrentLocation()
                                                                  .getZone());
-            genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now());
+            genericCache.put(GenericCacheKeys.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now());
         }
     }
 
@@ -535,11 +536,10 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
             visibleFriendList.add(friend);
         }
 
-        if (genericCache.get(GenericCacheKeys.MY_PHONE_NUMBER) != null)
+        User sessionUser = userService.getSessionUser();
+        if (sessionUser != null && sessionUser.getMobileNumber() != null)
         {
-
             userService.getPhoneContacts();
-
         }
         else
         {
@@ -674,14 +674,14 @@ public class InviteAppFriendsFragment extends BaseFragment implements View.OnCli
                     .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.WHATSAPP_INVITATION_INVITE_FACEBOOK_FRAGMENT, userService
                             .getSessionUserId());
 
-            AccountsService_ accountsService = AccountsService_.getInstance();
+            WhatsappService_ accountsService = WhatsappService_.getInstance();
             if (accountsService.isWhatsAppInstalled(getActivity()))
             {
                 startActivity(accountsService.getWhatsAppIntent());
             }
             else
             {
-                SnackbarFactory.create(getActivity(), R.string.error_no_watsapp);
+                SnackbarFactory.create(getActivity(), R.string.error_no_whatsapp);
             }
         }
 

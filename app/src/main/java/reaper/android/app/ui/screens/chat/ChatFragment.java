@@ -1,187 +1,211 @@
 package reaper.android.app.ui.screens.chat;
 
-import android.app.FragmentManager;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.squareup.otto.Bus;
-import com.squareup.otto.Subscribe;
+import com.jcodecraeer.xrecyclerview.ProgressStyle;
+import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
 import net.steamcrafted.materialiconlib.MaterialIconView;
 
-import org.jivesoftware.smack.AbstractXMPPConnection;
-import org.jivesoftware.smack.MessageListener;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smackx.muc.MultiUserChat;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import reaper.android.R;
-import reaper.android.app.cache._core.CacheManager;
-import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.config.BackstackTags;
-import reaper.android.app.config.BundleKeys;
-import reaper.android.app.config.ErrorCode;
-import reaper.android.app.config.GenericCacheKeys;
-import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.ChatMessage;
-import reaper.android.app.model.Event;
-import reaper.android.app.service.ChatService;
-import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
-import reaper.android.app.service._new.LocationService_;
-import reaper.android.app.trigger.chat.GotXmppConnectionTrigger;
-import reaper.android.app.trigger.chat.XmppConnectionAuthenticatedTrigger;
-import reaper.android.app.trigger.common.BackPressedTrigger;
-import reaper.android.app.trigger.common.GenericErrorTrigger;
-import reaper.android.app.trigger.event.EventsFetchTrigger;
+import reaper.android.app.service._new.ChatService_;
 import reaper.android.app.ui._core.BaseFragment;
-import reaper.android.app.ui.screens.MainActivity;
-import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
-import reaper.android.app.ui.util.FragmentUtils;
+import reaper.android.app.ui.screens.chat.mvp.ChatPresenter;
+import reaper.android.app.ui.screens.chat.mvp.ChatPresenterImpl;
+import reaper.android.app.ui.screens.chat.mvp.ChatView;
 import reaper.android.app.ui.util.SnackbarFactory;
-import reaper.android.common.analytics.AnalyticsHelper;
-import reaper.android.common.chat.ChatHelper;
-import reaper.android.common.communicator.Communicator;
 
-
-/**
- * Created by harsh on 21-05-2015.
- */
-public class ChatFragment extends BaseFragment implements View.OnClickListener
+public class ChatFragment extends BaseFragment implements ChatView
 {
+    private static final String ARG_EVENT_ID = "arg_event_id";
 
-    private EditText typeMessage;
-    private MaterialIconView send;
-    private ListView listView;
-    private TextView noSessionMessage;
-    private LinearLayout mainContent, loading;
-    private ProgressBar progressBar;
-    private MenuItem loadHistory;
+    public static ChatFragment newInstance(String eventId)
+    {
+        ChatFragment fragment = new ChatFragment();
 
-    private ChatAdapter chatAdapter;
-    private List<ChatMessage> chatMessageList;
-    private String eventId;
-    private String eventName;
-    private boolean isMessageSent;
+        Bundle args = new Bundle();
+        args.putString(ARG_EVENT_ID, eventId);
+        fragment.setArguments(args);
 
-    private AbstractXMPPConnection connection;
-    private MultiUserChat multiUserChat;
-    private UserService userService;
-    private ChatService chatService;
-    private EventService eventService;
-    private FragmentManager fragmentManager;
-    private Bus bus;
+        return fragment;
+    }
 
-    private GenericCache genericCache;
+    ChatScreen screen;
 
-    private int loadHistoryClickCount = 1;
+    ChatPresenter presenter;
 
-    private MessageListener messageListener;
-    private Toolbar toolbar;
+    /* UI Elements */
+    @Bind(R.id.llError)
+    View llError;
 
-    private long loadHistoryLastClickedTime = 0;
+    @Bind(R.id.llChat)
+    View llChat;
 
-    private TextWatcher chatWatcher;
+    @Bind(R.id.rvChat)
+    XRecyclerView rvChat;
 
-    private String stanzaId;
+    @Bind(R.id.tvRetry)
+    TextView tvRetry;
 
+    @Bind(R.id.etChatMessage)
+    EditText etChatMessage;
+
+    @Bind(R.id.mivSend)
+    MaterialIconView mivSend;
+
+    LinearLayoutManager linearLayoutManager;
+    ChatAdapter chatAdapter;
+    TextWatcher chatWatcher;
+
+    /* Lifecycle Methods */
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
+    public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.CHAT_FRAGMENT);
+        /* Presenter */
+        String eventId = getArguments().getString(ARG_EVENT_ID);
+        presenter = new ChatPresenterImpl(ChatService_.getInstance(), UserService
+                .getInstance(), eventId);
     }
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
-
-        typeMessage = (EditText) view.findViewById(R.id.et_chat_fragment_type_message_chat);
-        send = (MaterialIconView) view.findViewById(R.id.ib_fragment_chat_send);
-        listView = (ListView) view.findViewById(R.id.lv_chat_fragment);
-        noSessionMessage = (TextView) view.findViewById(R.id.tv_fragment_chat_no_session);
-        mainContent = (LinearLayout) view.findViewById(R.id.ll_fragment_chat_main_content);
-        loading = (LinearLayout) view.findViewById(R.id.ll_fragment_chat_loading);
-        toolbar = (Toolbar) view.findViewById(R.id.tb_fragment_chat);
-        progressBar = (ProgressBar) view.findViewById(R.id.pb_fragment_chat);
-
+        ButterKnife.bind(this, view);
         return view;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+        screen = (ChatScreen) getActivity();
 
-        ((MainActivity) getActivity()).setSupportActionBar(toolbar);
-        setHasOptionsMenu(true);
-        ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        initRecyclerView();
+        initChatBox();
+    }
 
-        renderLoadingView();
-        progressBar.getIndeterminateDrawable().setColorFilter(ContextCompat
-                .getColor(getActivity(), R.color.accent), PorterDuff.Mode.SRC_IN);
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        presenter.attachView(this);
+    }
 
-        send.setOnClickListener(this);
+    @Override
+    public void onStop()
+    {
+        super.onStop();
 
-        send.setColor(ContextCompat.getColor(getActivity(), R.color.light_grey));
+        etChatMessage.removeTextChangedListener(chatWatcher);
+        chatWatcher = null;
 
-        Bundle bundle = getArguments();
-        if (bundle == null)
+        tvRetry.setOnClickListener(null);
+
+        presenter.detachView();
+    }
+
+    /* View Methods */
+    @Override
+    public void displayMessage(ChatMessage chatMessage)
+    {
+        boolean shouldScroll = chatAdapter.addMessage(chatMessage);
+        if (shouldScroll)
         {
-
-            renderNoSessionView();
+            linearLayoutManager.scrollToPosition(0);
         }
 
-        eventId = (String) bundle.get(BundleKeys.CHAT_FRAGMENT_EVENT_ID);
-        if (eventId == null || eventId.isEmpty())
+        llChat.setVisibility(View.VISIBLE);
+        llError.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void displaySendMessageFailureError()
+    {
+        SnackbarFactory.create(getActivity(), R.string.error_chat_not_sent);
+    }
+
+    @Override
+    public void displayError()
+    {
+        tvRetry.setOnClickListener(new View.OnClickListener()
         {
+            @Override
+            public void onClick(View v)
+            {
+                if (presenter != null)
+                {
+                    presenter.retry();
+                }
+            }
+        });
 
-            renderNoSessionView();
-        }
+        llError.setVisibility(View.VISIBLE);
+        llChat.setVisibility(View.GONE);
+    }
 
-        eventName = (String) bundle.get(BundleKeys.CHAT_FRAGMENT_EVENT_NAME);
-        if (eventName == null)
+    @Override
+    public void onHistoryLoaded()
+    {
+        rvChat.loadMoreComplete();
+    }
+
+    @Override
+    public void displayNoMoreHistory()
+    {
+        rvChat.noMoreLoading();
+    }
+
+    /* Helper Methods */
+    private void initRecyclerView()
+    {
+        linearLayoutManager = new LinearLayoutManager(getActivity());
+        linearLayoutManager.setReverseLayout(true);
+        rvChat.setLayoutManager(linearLayoutManager);
+
+        chatAdapter = new ChatAdapter(getActivity(), UserService.getInstance().getSessionUserId());
+        rvChat.setAdapter(chatAdapter);
+
+        rvChat.setPullRefreshEnabled(false);
+        rvChat.setLaodingMoreProgressStyle(ProgressStyle.BallPulse);
+        rvChat.setLoadingListener(new XRecyclerView.LoadingListener()
         {
+            @Override
+            public void onRefresh()
+            {
+            }
 
-            renderNoSessionView();
-        }
+            @Override
+            public void onLoadMore()
+            {
+                if (presenter != null)
+                {
+                    presenter.loadMore();
+                }
+            }
+        });
+    }
 
-        bus = Communicator.getInstance().getBus();
-        userService = UserService.getInstance();
-        chatService = new ChatService(bus);
-        eventService = EventService.getInstance();
-        fragmentManager = getActivity().getFragmentManager();
-
-        genericCache = CacheManager.getGenericCache();
-
-        isMessageSent = false;
-
-        chatMessageList = new ArrayList<>();
-
+    private void initChatBox()
+    {
         chatWatcher = new TextWatcher()
         {
             @Override
@@ -194,464 +218,39 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener
             public void onTextChanged(CharSequence s, int start, int before, int count)
             {
 
-                if (s.length() > 0)
-                {
-                    send.setColor(ContextCompat.getColor(getActivity(), R.color.accent));
-                }
-                else
-                {
-                    send.setColor(ContextCompat.getColor(getActivity(), R.color.light_grey));
-                }
             }
 
             @Override
             public void afterTextChanged(Editable s)
             {
-
+                if (s.length() > 0)
+                {
+                    mivSend.setColor(ContextCompat.getColor(getActivity(), R.color.accent));
+                }
+                else
+                {
+                    mivSend.setColor(ContextCompat.getColor(getActivity(), R.color.light_grey));
+                }
             }
         };
+        etChatMessage.addTextChangedListener(chatWatcher);
 
-
-        listView.setOnScrollListener(new AbsListView.OnScrollListener()
+        mivSend.setColor(ContextCompat.getColor(getActivity(), R.color.light_grey));
+        mivSend.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState)
+            public void onClick(View v)
             {
-
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
-            {
-
-                Log.d("APP", "list size --- " + chatMessageList
-                        .size() + " click count --- " + loadHistoryClickCount);
-
-                if (chatMessageList.size() >= 20 * loadHistoryClickCount)
+                String message = etChatMessage.getText().toString();
+                if (!TextUtils.isEmpty(message))
                 {
-                    Log.d("APP", "1st condition successful");
-                    if (firstVisibleItem == 0)
+                    etChatMessage.setText("");
+                    if (presenter != null)
                     {
-                        Log.d("APP", "2nd condition successful ---- first visible item ---- " + firstVisibleItem);
-                        loadHistory.setVisible(true);
-
-                        Log.d("APP", "both success --- " + loadHistory
-                                .toString() + " title --- " + loadHistory.getTitle());
-                    }
-                    else
-                    {
-                        Log.d("APP", "2nd condition not successful ---- first visible item ---- " + firstVisibleItem);
-                        loadHistory.setVisible(false);
+                        presenter.send(message);
                     }
                 }
-                else
-                {
-
-                    if (loadHistory != null)
-                    {
-                        loadHistory.setVisible(false);
-                    }
-
-                    Log.d("APP", "1st condition not successful ---- first visible item ---- " + firstVisibleItem);
-                }
             }
         });
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-
-        ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_chat);
-
-        bus.register(this);
-
-        try
-        {
-            ChatHelper.getXmppConnection();
-        }
-        catch (Exception e)
-        {
-
-            Log.d("APP", "error -- exception getXmppConnection" + e.getMessage());
-
-            AnalyticsHelper
-                    .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_GET_XMPP_CONNECTION, userService
-                            .getSessionUserId());
-
-            renderNoSessionView();
-        }
-
-        genericCache.put(GenericCacheKeys.ACTIVE_FRAGMENT, BackstackTags.CHAT);
-
-        typeMessage.addTextChangedListener(chatWatcher);
-    }
-
-    private void renderNoSessionView()
-    {
-        mainContent.setVisibility(View.GONE);
-        loading.setVisibility(View.GONE);
-        noSessionMessage.setVisibility(View.VISIBLE);
-        noSessionMessage.setText(R.string.error_chat_not_fetched);
-        return;
-    }
-
-    private void renderChatView()
-    {
-        mainContent.setVisibility(View.VISIBLE);
-        noSessionMessage.setVisibility(View.GONE);
-        loading.setVisibility(View.GONE);
-    }
-
-    private void initChatAdapter()
-    {
-        chatAdapter = new ChatAdapter(new ArrayList<ChatMessage>(), getActivity());
-        listView.setAdapter(chatAdapter);
-    }
-
-    private void renderLoadingView()
-    {
-        mainContent.setVisibility(View.GONE);
-        noSessionMessage.setVisibility(View.GONE);
-        loading.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        menu.clear();
-        inflater.inflate(R.menu.action_chat, menu);
-
-        loadHistory = menu.findItem(R.id.action_load_history_chat);
-        loadHistory.setVisible(false);
-
-        Log.d("APP", "onCreateOptionsMenu --- " + loadHistory
-                .toString() + " title --- " + loadHistory.getTitle());
-
-        loadHistory.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
-            @Override
-            public boolean onMenuItemClick(MenuItem item)
-            {
-
-                if ((SystemClock.elapsedRealtime() - loadHistoryLastClickedTime) < 1000)
-                {
-                    return true;
-                }
-
-                loadHistoryLastClickedTime = SystemClock.elapsedRealtime();
-                item.setEnabled(false);
-
-                loadHistoryClickCount++;
-
-                chatMessageList = new ArrayList<>();
-                chatAdapter.clear();
-
-                int maxStanzas = 20 * loadHistoryClickCount;
-
-                try
-                {
-                    chatService.fetchHistory(multiUserChat, userService
-                            .getSessionUserName() + "_" + userService
-                            .getSessionUserId(), userService
-                            .getSessionUserId(), connection.getPacketReplyTimeout(), maxStanzas);
-                }
-                catch (Exception e)
-                {
-
-                    AnalyticsHelper
-                            .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_LOAD_CHAT_HISTORY, userService
-                                    .getSessionUserId());
-
-                    renderNoSessionView();
-                }
-                item.setEnabled(true);
-
-                return true;
-            }
-        });
-    }
-
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-    }
-
-    @Override
-    public void onPause()
-    {
-        super.onPause();
-
-        if (messageListener != null)
-        {
-            multiUserChat.removeMessageListener(messageListener);
-            messageListener = null;
-        }
-
-        typeMessage.removeTextChangedListener(chatWatcher);
-    }
-
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-        bus.unregister(this);
-    }
-
-    public void displayMessage(final ChatMessage message)
-    {
-        getActivity().runOnUiThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-
-                chatAdapter.add(message);
-                chatAdapter.notifyDataSetChanged();
-                scroll();
-            }
-        });
-    }
-
-    private void scroll()
-    {
-        listView.setSelection(listView.getCount() - 1);
-    }
-
-    private void renderHistory()
-    {
-        try
-        {
-            chatService
-                    .fetchHistory(multiUserChat, userService
-                            .getSessionUserName() + "_" + userService
-                            .getSessionUserId(), userService.getSessionUserId(), connection
-                            .getPacketReplyTimeout(), 20);
-        }
-        catch (Exception e)
-        {
-
-            AnalyticsHelper
-                    .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_LOAD_CHAT_HISTORY, userService
-                            .getSessionUserId());
-
-            renderNoSessionView();
-        }
-    }
-
-    @Override
-    public void onClick(View v)
-    {
-        if (v.getId() == R.id.ib_fragment_chat_send)
-        {
-
-            Log.d("APP", "start--- " + System.currentTimeMillis() + "");
-
-            String message = typeMessage.getText().toString();
-            if (TextUtils.isEmpty(message))
-            {
-                return;
-            }
-
-
-            try
-            {
-
-                StringBuilder stringBuilder = new StringBuilder(userService.getSessionUserId());
-                stringBuilder.append(eventId);
-                stringBuilder.append(System.currentTimeMillis());
-
-                stanzaId = stringBuilder.toString();
-                ChatMessage chatMessage = new ChatMessage();
-                chatMessage.setMessage(message);
-                chatMessage.setSenderId(userService.getSessionUserId());
-                chatMessage.setMe(true);
-                chatMessage.setSenderName(userService.getSessionUserName());
-                chatMessage.setId(stanzaId);
-                displayMessage(chatMessage);
-                Log.d("APP", "end -- " + System.currentTimeMillis() + "");
-
-                AnalyticsHelper
-                        .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.CHAT_MESSAGE_SENDING_ATTEMPT, userService
-                                .getSessionUserId());
-                Message messagePacket = new Message();
-                messagePacket.setBody(message);
-                messagePacket.setStanzaId(stanzaId);
-
-
-                chatMessageList.add(chatMessage);
-
-                chatService.postMessage(multiUserChat, messagePacket, userService
-                        .getSessionUserName() + "_" + userService.getSessionUserId(), connection
-                        .getPacketReplyTimeout());
-            }
-            catch (Exception e)
-            {
-
-                AnalyticsHelper
-                        .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_SEND_CHAT_MESSAGE, userService
-                                .getSessionUserId());
-
-                typeMessage.setText(message);
-                SnackbarFactory.create(getActivity(), R.string.error_chat_not_sent);
-                return;
-            }
-
-            isMessageSent = true;
-
-            typeMessage.setText("");
-
-        }
-    }
-
-    @Subscribe
-    public void xmppConnectionAuthenticated(XmppConnectionAuthenticatedTrigger trigger)
-    {
-        try
-        {
-            ChatHelper.getXmppConnection();
-        }
-        catch (Exception e)
-        {
-
-            AnalyticsHelper
-                    .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.COULD_NOT_GET_XMPP_CONNECTION, userService
-                            .getSessionUserId());
-
-            renderNoSessionView();
-        }
-
-    }
-
-    @Subscribe
-    public void gotXmppConnection(GotXmppConnectionTrigger trigger)
-    {
-        connection = trigger.getConnection();
-        getActivity().runOnUiThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                renderChatView();
-
-                multiUserChat = chatService.getMultiUserChat(connection, eventId);
-
-                if (multiUserChat == null)
-                {
-                    renderNoSessionView();
-                    return;
-                }
-                else
-                {
-                    chatMessageList = new ArrayList<>();
-                    messageListener = new MessageListener()
-                    {
-                        @Override
-                        public void processMessage(Message message)
-                        {
-                            ChatMessage newMessage = new ChatMessage();
-                            newMessage.setId(message.getStanzaId());
-
-                            String[] fromUser = message.getFrom().split("/");
-
-                            if (fromUser[1].equals("clanout"))
-                            {
-                                newMessage.setMessage(message.getBody());
-                                newMessage.setSenderName("clanout");
-                                newMessage.setSenderId("clanout");
-                                newMessage.setMe(false);
-
-                            }
-                            else
-                            {
-                                String[] userDetails = fromUser[1].split("_");
-                                newMessage.setMessage(message.getBody());
-                                newMessage.setSenderName(userDetails[0]);
-                                newMessage.setSenderId(userDetails[1]);
-
-                                if (userService.getSessionUserId().equals(userDetails[1]))
-                                {
-                                    newMessage.setMe(true);
-                                }
-                                else
-                                {
-                                    newMessage.setMe(false);
-                                }
-
-                            }
-
-                            if (!(newMessage.getId().equals(stanzaId)))
-                            {
-                                chatMessageList.add(newMessage);
-                                displayMessage(newMessage);
-                            }
-
-                        }
-                    };
-                    multiUserChat.addMessageListener(messageListener);
-                }
-
-                initChatAdapter();
-                chatAdapter.clear();
-                renderHistory();
-            }
-        });
-    }
-
-    @Subscribe
-    public void onXmppConnectionNull(GenericErrorTrigger trigger)
-    {
-        if (trigger.getErrorCode() == ErrorCode.XMPP_CONNECTION_NULL)
-        {
-            ChatHelper.init(userService.getSessionUserId());
-        }
-    }
-
-
-    @Subscribe
-    public void backPressed(BackPressedTrigger trigger)
-    {
-        if (trigger.getActiveFragment().equals(BackstackTags.CHAT))
-        {
-            eventService.fetchEvents(LocationService_.getInstance().getCurrentLocation().getZone());
-        }
-    }
-
-    @Subscribe
-    public void onEventsFetched(EventsFetchTrigger trigger)
-    {
-        List<Event> events = trigger.getEvents();
-
-        Event activeEvent = new Event();
-        activeEvent.setId(eventId);
-
-        int activePosition = events.indexOf(activeEvent);
-
-        if (isMessageSent)
-        {
-            chatService.sendChatNotification(eventId, eventName);
-        }
-
-        EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, (ArrayList<Event>) events);
-        bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
-        eventDetailsContainerFragment.setArguments(bundle);
-        FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        if (item.getItemId() == android.R.id.home)
-        {
-
-            ((MainActivity) getActivity()).onBackPressed();
-        }
-        return super.onOptionsItemSelected(item);
     }
 }

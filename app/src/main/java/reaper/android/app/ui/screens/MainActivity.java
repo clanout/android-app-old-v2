@@ -20,20 +20,18 @@ import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
-import reaper.android.app.config.Timestamps;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.ui._core.BaseActivity;
-import reaper.android.app.ui.screens.chat.ChatFragment;
+import reaper.android.app.ui.screens.chat.ChatActivity;
 import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.screens.notifications.NotificationActivity;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
-import reaper.android.common.chat.ChatHelper;
 import reaper.android.common.communicator.Communicator;
 
 public class MainActivity extends BaseActivity
@@ -46,7 +44,7 @@ public class MainActivity extends BaseActivity
     {
         Intent intent = new Intent(context, MainActivity.class);
 
-        if (flowEntry == FlowEntry.DETAILS || flowEntry == FlowEntry.DETAILS_WITH_STATUS_DIALOG || flowEntry == FlowEntry.CHAT)
+        if (flowEntry == FlowEntry.DETAILS || flowEntry == FlowEntry.DETAILS_WITH_STATUS_DIALOG)
         {
             if (eventId == null || eventId.isEmpty() || events == null || events.isEmpty())
             {
@@ -56,6 +54,17 @@ public class MainActivity extends BaseActivity
             {
                 intent.putExtra(ARG_EVENT_ID, eventId);
                 intent.putExtra(ARG_EVENT_LIST, events);
+            }
+        }
+        else if (flowEntry == FlowEntry.CHAT)
+        {
+            if (eventId == null || eventId.isEmpty())
+            {
+                flowEntry = FlowEntry.HOME;
+            }
+            else
+            {
+                intent.putExtra(ARG_EVENT_ID, eventId);
             }
         }
 
@@ -104,7 +113,7 @@ public class MainActivity extends BaseActivity
         }
 
         DateTime lastFacebookFriendsRefreshTimestamp = genericCache
-                .get(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.class);
+                .get(GenericCacheKeys.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.class);
 
         if (lastFacebookFriendsRefreshTimestamp != null)
         {
@@ -164,8 +173,6 @@ public class MainActivity extends BaseActivity
     protected void onDestroy()
     {
         super.onDestroy();
-
-        ChatHelper.disconnectConnection();
     }
 
     @Override
@@ -181,10 +188,6 @@ public class MainActivity extends BaseActivity
         {
             finish();
         }
-        else if (activeFragment.equals(BackstackTags.ACCOUNTS))
-        {
-            FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
-        }
         else if (activeFragment.equals(BackstackTags.INVITE_USERS_CONTAINER))
         {
             bus.post(new BackPressedTrigger(BackstackTags.INVITE_USERS_CONTAINER));
@@ -196,10 +199,6 @@ public class MainActivity extends BaseActivity
         else if (activeFragment.equals(BackstackTags.EDIT))
         {
             bus.post(new BackPressedTrigger(BackstackTags.EDIT));
-        }
-        else if (activeFragment.equals(BackstackTags.CHAT))
-        {
-            bus.post(new BackPressedTrigger(BackstackTags.CHAT));
         }
         else if (activeFragment.equals(BackstackTags.CREATE))
         {
@@ -235,7 +234,7 @@ public class MainActivity extends BaseActivity
                 break;
 
             case FlowEntry.CHAT:
-                navigateToChatFragment(eventList, eventId);
+                navigateToChatFragment(eventId);
                 break;
         }
     }
@@ -247,28 +246,14 @@ public class MainActivity extends BaseActivity
 
     private void navigateToNotificationsFragment()
     {
-        startActivity(NotificationActivity.callingIntent(this, true));
+        startActivity(NotificationActivity.callingIntent(this));
         finish();
     }
 
-    private void navigateToChatFragment(ArrayList<Event> eventList, String eventId)
+    private void navigateToChatFragment(String eventId)
     {
-        Event activeEvent = new Event();
-        activeEvent.setId(eventId);
-        int activePosition = 0;
-        if (eventList.contains(activeEvent))
-        {
-            activePosition = eventList.indexOf(activeEvent);
-        }
-        String eventName = eventList.get(activePosition).getTitle();
-
-        ChatFragment chatFragment = new ChatFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_ID, eventId);
-        bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_NAME, eventName);
-        chatFragment.setArguments(bundle);
-
-        FragmentUtils.changeFragment(getFragmentManager(), chatFragment);
+        startActivity(ChatActivity.callingIntent(this, eventId));
+        finish();
     }
 
     private void navigateToDetailsFragment(ArrayList<Event> eventList, String eventId, boolean isDialogShown)

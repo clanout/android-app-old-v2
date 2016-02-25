@@ -1,6 +1,8 @@
-package reaper.android.app.model;
+package reaper.android.app.model.util;
 
 import java.util.Comparator;
+
+import reaper.android.app.model.PhoneContact;
 
 /**
  * Created by harsh on 26/09/15.

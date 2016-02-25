@@ -2,9 +2,6 @@ package reaper.android.app.config;
 
 public class BundleKeys
 {
-    public static final String CHAT_FRAGMENT_EVENT_ID = "event_id";
-    public static final String CHAT_FRAGMENT_EVENT_NAME = "event_name";
-
     public static final String INVITE_USERS_CONTAINER_FRAGMENT_EVENT = "event";
     public static final String INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT = "from_create_fragment";
 

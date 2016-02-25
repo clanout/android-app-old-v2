@@ -23,19 +23,19 @@
             android:id="@+id/rb_share_feedback_bug"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/label_feedback_report"/>
+            android:text="@string/feedback_type_report"/>
 
         <RadioButton
             android:id="@+id/rbFeature"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/label_feedback_feature"/>
+            android:text="@string/feedback_type_feature"/>
 
         <RadioButton
             android:id="@+id/rbOthers"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/label_feedback_other"/>
+            android:text="@string/feedback_type_other"/>
     </RadioGroup>
 
     <android.support.design.widget.TextInputLayout
@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="@string/label_feedback_comment">
+        android:hint="@string/feedback_comment">
 
         <EditText
             android:id="@+id/etComment"

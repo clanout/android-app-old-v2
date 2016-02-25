@@ -53,7 +53,6 @@ public class RegistrationIntentService extends IntentService
         catch (Exception e)
         {
             genericCache.delete(GenericCacheKeys.GCM_TOKEN);
-            genericCache.put(GenericCacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
 
         }
         bus.post(new GcmRegistrationCompleteTrigger());
@@ -81,7 +80,6 @@ public class RegistrationIntentService extends IntentService
                            public void onError(Throwable e)
                            {
                                genericCache.delete(GenericCacheKeys.GCM_TOKEN);
-                               genericCache.put(GenericCacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
                            }
 
                            @Override
@@ -92,14 +90,10 @@ public class RegistrationIntentService extends IntentService
                                    AnalyticsHelper
                                            .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.GCM_TOKEN_SENT_TO_SERVER, "");
                                    genericCache.put(GenericCacheKeys.GCM_TOKEN, token);
-                                   genericCache
-                                           .put(GenericCacheKeys.GCM_TOKEN_SENT_TO_SERVER, true);
                                }
                                else
                                {
                                    genericCache.delete(GenericCacheKeys.GCM_TOKEN);
-                                   genericCache
-                                           .put(GenericCacheKeys.GCM_TOKEN_SENT_TO_SERVER, false);
                                }
                            }
                        });

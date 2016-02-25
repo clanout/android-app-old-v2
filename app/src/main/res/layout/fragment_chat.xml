@@ -1,98 +1,93 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
-
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/tb_fragment_chat"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/primary"
-            app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-    </android.support.design.widget.AppBarLayout>
-
-
-    <TextView
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:id="@+id/tv_fragment_chat_no_session"
-    android:gravity="center_vertical|center_horizontal"/>
+    android:orientation="vertical">
 
+    <!-- Error -->
     <LinearLayout
-        android:id="@+id/ll_fragment_chat_loading"
+        android:id="@+id/llError"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center_vertical|center_horizontal">
-    <ProgressBar
-        android:id="@+id/pb_fragment_chat"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        />
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="@string/error_chat_not_fetched"/>
+
+        <TextView
+            android:id="@+id/tvRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/retry"
+            android:textColor="@color/accent"
+            android:textStyle="bold"/>
     </LinearLayout>
 
+    <!-- Chat -->
     <LinearLayout
-        android:id="@+id/ll_fragment_chat_main_content"
+        android:id="@+id/llChat"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:background="#ECEFF1">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <ListView
-            android:id="@+id/lv_chat_fragment"
+        <!-- Chat Messages -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="4dp"
-            android:layout_weight="1"
-            android:divider="@null"
-            android:listSelector="@android:color/transparent"
-            android:transcriptMode="alwaysScroll"/>
+            android:layout_weight="1">
 
-    </LinearLayout>
+            <com.jcodecraeer.xrecyclerview.XRecyclerView
+                android:id="@+id/rvChat"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="4dp"
-        android:paddingBottom="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:background="@color/white">
 
-        <EditText
-            android:id="@+id/et_chat_fragment_type_message_chat"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="40dp"
-            android:autoText="true"
-            android:textSize="16sp"
-            android:hint="Write a Message"
-            android:maxLines="5"
-            android:textColor="@color/text_title"
-            android:layout_gravity="bottom"
-            android:background="@android:color/transparent"/>
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/divider"/>
 
-        <net.steamcrafted.materialiconlib.MaterialIconView
-            android:id="@+id/ib_fragment_chat_send"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:scaleType="center"
-            app:materialIcon="send"
-            app:materialIconColor="@color/accent"
-            app:materialIconSize="36dp"
-            />
 
+        <!-- New Chat Message -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/etChatMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="64dp"
+                android:layout_marginTop="16dp"
+                android:background="@android:color/transparent"
+                android:hint="@string/chat_message_label"
+                android:inputType="textShortMessage"
+                android:maxLines="2"/>
+
+            <net.steamcrafted.materialiconlib.MaterialIconView
+                android:id="@+id/mivSend"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="16dp"
+                android:scaleType="center"
+                app:materialIcon="send"
+                app:materialIconColor="@color/accent"
+                app:materialIconSize="36dp"/>
+        </RelativeLayout>
     </LinearLayout>
 </LinearLayout>

@@ -1,6 +1,8 @@
-package reaper.android.app.model;
+package reaper.android.app.model.util;
 
 import java.util.Comparator;
+
+import reaper.android.app.model.EventDetails;
 
 public class EventAttendeeComparator implements Comparator<EventDetails.Attendee>
 {

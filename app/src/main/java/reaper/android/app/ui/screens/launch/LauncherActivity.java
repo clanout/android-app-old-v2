@@ -335,7 +335,7 @@ public class LauncherActivity extends BaseActivity implements
         showBootstrapAction();
 
         tvActionMessage.setText(R.string.error_default);
-        tvAction.setText(R.string.bootstrap_error_action);
+        tvAction.setText(R.string.try_again);
         tvAction.setOnClickListener(new View.OnClickListener()
         {
             @Override

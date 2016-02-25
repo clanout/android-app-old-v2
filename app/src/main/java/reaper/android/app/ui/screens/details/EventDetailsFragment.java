@@ -63,8 +63,8 @@ import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.GoogleService_;
-import reaper.android.app.ui.screens.chat.ChatFragment;
 import reaper.android.app.ui._core.BaseFragment;
+import reaper.android.app.ui.screens.chat.ChatActivity;
 import reaper.android.app.ui.screens.edit.EditEventFragment;
 import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
 import reaper.android.app.ui.util.CircleTransform;
@@ -649,12 +649,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     @Override
     public void navigateToChatScreen(String eventId, String eventTitle)
     {
-        ChatFragment chatFragment = new ChatFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_ID, eventId);
-        bundle.putString(BundleKeys.CHAT_FRAGMENT_EVENT_NAME, eventTitle);
-        chatFragment.setArguments(bundle);
-        FragmentUtils.changeFragment(getActivity().getFragmentManager(), chatFragment);
+        startActivity(ChatActivity.callingIntent(getActivity(), eventId));
     }
 
     @Override

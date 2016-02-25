@@ -1,6 +1,9 @@
-package reaper.android.app.model;
+package reaper.android.app.model.util;
 
 import java.util.Comparator;
+
+import reaper.android.app.model.Event;
+import reaper.android.app.model.Location;
 
 public class EventComparator
 {

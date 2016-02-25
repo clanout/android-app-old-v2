@@ -13,7 +13,6 @@ import android.view.View;
 import reaper.android.R;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.config.MemoryCacheKeys;
-import timber.log.Timber;
 
 public class BaseActivity extends AppCompatActivity
 {
@@ -99,13 +98,11 @@ public class BaseActivity extends AppCompatActivity
 
     protected void setScreenTitle(@StringRes int title)
     {
-        Timber.v(">>>> here 1");
         if (getSupportActionBar() == null)
         {
             return;
         }
 
-        Timber.v(">>>> here 2");
         getSupportActionBar().setTitle(title);
     }
 

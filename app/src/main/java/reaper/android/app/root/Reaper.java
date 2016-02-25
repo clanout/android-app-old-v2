@@ -26,8 +26,9 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
-import reaper.android.app.config.Timestamps;
 import reaper.android.app.service.UserService;
+import reaper.android.app.service._new.ChatService_;
+import reaper.android.app.service._new.WhatsappService_;
 import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
 import reaper.android.common.analytics.AnalyticsHelper;
@@ -71,13 +72,102 @@ public class Reaper extends Application
     @Override
     public void onCreate()
     {
+        Timber.v(">>>> Reaper.onCreate()");
         super.onCreate();
-
-//        LeakCanary.install(this);
 
         init();
         connectivityHandler();
         Stetho.initializeWithDefaults(this);
+    }
+
+    protected void init()
+    {
+        Timber.v(">>>> Reaper.init()");
+        instance = this;
+
+        FacebookSdk.sdkInitialize(this);
+        Dexter.initialize(this);
+
+        if (BuildConfig.DEBUG)
+        {
+            Timber.plant(new Timber.DebugTree());
+        }
+
+        bus = new Bus(ThreadEnforcer.ANY);
+        bus.register(this);
+        Communicator.init(bus);
+
+        DatabaseManager.init(this);
+        initServices();
+
+        genericCache = CacheManager.getGenericCache();
+
+        handleTimesApplicationOpened();
+    }
+
+    private void initServices()
+    {
+        Timber.v(">>>> Reaper.initServices()");
+
+        /* User Service */
+        UserService.init();
+        userService = UserService.getInstance();
+
+        /* Chat Service */
+        Timber.v(">>>> Chat Init Start");
+        ChatService_.init(userService);
+//        testChat();
+
+        /* WhatsApp Service */
+        WhatsappService_.init(userService);
+    }
+
+    private void handleTimesApplicationOpened()
+    {
+        int timesApplicationOpened;
+        try
+        {
+            timesApplicationOpened = Integer
+                    .parseInt(genericCache.get(GenericCacheKeys.TIMES_APPLICATION_OPENED));
+        }
+        catch (Exception e)
+        {
+            timesApplicationOpened = 0;
+        }
+
+        timesApplicationOpened++;
+
+        genericCache.put(GenericCacheKeys.TIMES_APPLICATION_OPENED, timesApplicationOpened);
+
+        String userId = userService.getSessionUserId();
+        if (userId == null)
+        {
+            userId = "0";
+        }
+
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.APP_LAUNCHED, "user - " + userId + " time - " + DateTime
+                        .now(DateTimeZone.UTC)
+                        .toString());
+    }
+
+    @Subscribe
+    public void onFacebookFriendsIdFetched(FacebookFriendsIdFetchedTrigger trigger)
+    {
+        if (trigger.isPolling())
+        {
+            userService.updateFacebookFriends(trigger.getFriendsIdList(), trigger.isPolling());
+        }
+    }
+
+    @Subscribe
+    public void onFacebookFriendsUpdatedOnServer(FacebookFriendsUpdatedOnServerTrigger trigger)
+    {
+        if (trigger.isPolling())
+        {
+            genericCache.put(GenericCacheKeys.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime
+                    .now());
+        }
     }
 
     private void connectivityHandler()
@@ -128,78 +218,47 @@ public class Reaper extends Application
 
     }
 
-    protected void init()
+    private void testChat()
     {
-        instance = this;
-
-        FacebookSdk.sdkInitialize(this);
-
-        Dexter.initialize(this);
-
-        if (BuildConfig.DEBUG)
-        {
-            Timber.plant(new Timber.DebugTree());
-        }
-
-        bus = new Bus(ThreadEnforcer.ANY);
-        bus.register(this);
-        Communicator.init(bus);
-
-        DatabaseManager.init(this);
-
-        /* User Service */
-        UserService.init();
-        userService = UserService.getInstance();
-
-        genericCache = CacheManager.getGenericCache();
-
-        handleTimesApplicationOpened();
-    }
-
-    private void handleTimesApplicationOpened()
-    {
-        int timesApplicationOpened;
-        try
-        {
-            timesApplicationOpened = Integer
-                    .parseInt(genericCache.get(GenericCacheKeys.TIMES_APPLICATION_OPENED));
-        }
-        catch (Exception e)
-        {
-            timesApplicationOpened = 0;
-        }
-
-        timesApplicationOpened++;
-
-        genericCache.put(GenericCacheKeys.TIMES_APPLICATION_OPENED, timesApplicationOpened);
-
-        String userId = userService.getSessionUserId();
-        if (userId == null)
-        {
-            userId = "0";
-        }
-
-        AnalyticsHelper
-                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.APP_LAUNCHED, "user - " + userId + " time - " + DateTime
-                        .now(DateTimeZone.UTC)
-                        .toString());
-    }
-
-    @Subscribe
-    public void onFacebookFriendsIdFetched(FacebookFriendsIdFetchedTrigger trigger)
-    {
-        if (trigger.isPolling())
-        {
-            userService.updateFacebookFriends(trigger.getFriendsIdList(), trigger.isPolling());
-        }
-    }
-
-    @Subscribe
-    public void onFacebookFriendsUpdatedOnServer(FacebookFriendsUpdatedOnServerTrigger trigger)
-    {
-        if (trigger.isPolling())
-        {
-            genericCache.put(Timestamps.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.now());
-        }
+//        final ChatService_ chatService = ChatService_.getInstance();
+//
+//        chatService
+//                .isHealthy()
+//                .flatMap(new Func1<Boolean, Observable<ChatMessage>>()
+//                {
+//                    @Override
+//                    public Observable<ChatMessage> call(Boolean isHealthy)
+//                    {
+//                        if (!isHealthy)
+//                        {
+//                            throw new IllegalStateException(">>>> Chat Not Healthy");
+//                        }
+//                        else
+//                        {
+//                            return chatService.joinChat(null);
+//                        }
+//                    }
+//                })
+//                .subscribeOn(Schedulers.newThread())
+//                .subscribe(new Subscriber<ChatMessage>()
+//                {
+//                    @Override
+//                    public void onCompleted()
+//                    {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e)
+//                    {
+//                        e.printStackTrace();
+//                    }
+//
+//                    @Override
+//                    public void onNext(ChatMessage chatMessage)
+//                    {
+//
+//                    }
+//                });
     }
 }

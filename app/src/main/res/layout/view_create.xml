@@ -103,7 +103,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_alignParentBottom="true"
-                        android:background="@drawable/rect_grad"
+                        android:background="@drawable/category_icon_overlay"
                         android:gravity="bottom"
                         android:padding="8dp">
 

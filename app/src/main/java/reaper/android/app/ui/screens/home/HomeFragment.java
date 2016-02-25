@@ -580,7 +580,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
                     @Override
                     public boolean onMenuItemClick(MenuItem item)
                     {
-                        startActivity(NotificationActivity.callingIntent(getActivity(), false));
+                        startActivity(NotificationActivity.callingIntent(getActivity()));
                         return true;
                     }
                 });

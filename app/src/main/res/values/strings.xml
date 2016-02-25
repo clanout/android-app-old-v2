@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Clanout</string>
 
+    <!-- WhatsApp Message -->
+    <string name="whatsapp_message" formatted="false">%s wants to clan out with you. Join %s at %s</string>
+
     <!-- Facebook SDK -->
     <string name="facebook_app_id">711701748936592</string>
 
@@ -45,22 +48,42 @@
     <string name="error_invalid_phone">Please enter a valid phone number</string>
     <string name="error_facebook_friends">Unable to show your friends. Refresh.</string>
     <string name="error_chat_not_sent"> Unable to send message. Resend.</string>
-    <string name="error_chat_not_fetched"> Unable to load conversations. Refresh.</string>
-    <string name="error_no_watsapp">WhatsApp is not installed on this device</string>
+    <string name="error_chat_not_fetched"> Unable to load conversations.</string>
+    <string name="error_no_whatsapp">WhatsApp is not installed on this device</string>
+    <string name="error_notifications">Unable to load notifications</string>
 
     <!-- Common Strings -->
-    <string name="label_search_friends">Search Friends</string>
+    <string name="retry">Retry</string>
+    <string name="try_again">Try Again</string>
+    <string name="search_friends">Search Friends</string>
+    <string name="no_facebook_friends">Nothing to show here :)</string>
 
     <!-- Splash Screen -->
-    <string name="bootstrap_error_action">Try Again</string>
     <string name="location_off_action">Turn on GPS</string>
     <string name="location_off_message">Your location helps us connect you with your nearby friends.
         Cautious? Once inside, make a secret clan.</string>
-    <!-- Intro -->
     <string name="intro_title_1">Explore and Join</string>
     <string name="intro_title_2">Privacy in Check</string>
     <string name="intro_title_3">All Friends at One Place</string>
     <string name="intro_title_4">Clan Chat</string>
+
+    <!-- Account Screen -->
+    <string name="account_menu_block">Block a friend</string>
+    <string name="account_menu_phone">Update Mobile Number</string>
+    <string name="account_menu_whatsapp">WhatsApp Invite</string>
+    <string name="account_menu_feedback">Help Us Improve</string>
+    <string name="account_menu_help">Help/FAQ</string>
+
+    <!-- Manage Friends Screen -->
+    <string name="friends_block_info_message">Blocked friends cannot invite you or see what clans you have joined.</string>
+
+    <!-- Notifications -->
+    <string name="notifications_empty">No Notifications</string>
+
+    <!-- Chat Screen -->
+    <string name="chat_message_label">Write a Message</string>
+    <string name="listview_loading">Loading older messages …</string>
+    <string name="nomore_loading"></string>
 
     <!-- Home Screen -->
     <string name="home_no_events">No active clans</string>
@@ -102,18 +125,6 @@
     <string name="add_phone_number">Clanout is exciting with your friends around. Add your number to instantly connect with your nearby phonebook friends.\n\nClanOut won\'t share your personal information with anyone</string>
     <string name="read_contacts_permission_required_message">You\'ll not be able to invite friends from your phonebook to your plans. We do not store your phonebook information.</string>
 
-    <!-- Account Screen -->
-    <string name="no_facebook_friends">Nothing to show here :)</string>
-    <string name="message_blocked_friends">Blocked friends cannot invite you or see what clans you have joined.</string>
-    <string name="account_menu_block">Block a friend</string>
-    <string name="account_menu_phone">Update Mobile Number</string>
-    <string name="account_menu_whatsapp">WhatsApp Invite</string>
-    <string name="account_menu_feedback">Help Us Improve</string>
-    <string name="account_menu_help">Help/FAQ</string>
-
-    <!-- Notifications -->
-    <string name="no_notifications">No Notifications</string>
-    <string name="notifications_fetch_failure">Unable to load notifications</string>
     <string name="reminder_notification_message">1 hour to go. Giddy up!</string>
 
     <!-- Permission Defaults -->
@@ -150,11 +161,11 @@
     <string name="feedback_title">Feedback</string>
     <string name="feedback_positive_button">Submit</string>
     <string name="feedback_remind_button">Not Now</string>
-    <string name="label_feedback_comment">Comment</string>
+    <string name="feedback_comment">Comment</string>
     <string name="feedback_empty_comment">Please provide a comment</string>
-    <string name="label_feedback_report">Report a bug</string>
-    <string name="label_feedback_feature">Suggest a new feature</string>
-    <string name="label_feedback_other">Other</string>
+    <string name="feedback_type_report">Report a bug</string>
+    <string name="feedback_type_feature">Suggest a new feature</string>
+    <string name="feedback_type_other">Other</string>
 
     <!-- Status Dialog -->
     <string name="status_dialog_title">Status</string>

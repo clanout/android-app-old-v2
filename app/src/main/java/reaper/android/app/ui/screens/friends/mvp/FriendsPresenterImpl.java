@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import reaper.android.app.model.Friend;
-import reaper.android.app.model.FriendsComparator;
+import reaper.android.app.model.util.FriendsComparator;
 import reaper.android.app.service.UserService;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;

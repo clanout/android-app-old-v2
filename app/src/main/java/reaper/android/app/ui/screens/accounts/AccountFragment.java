@@ -20,7 +20,7 @@ import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import reaper.android.R;
 import reaper.android.app.model.User;
-import reaper.android.app.service._new.AccountsService_;
+import reaper.android.app.service._new.WhatsappService_;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.dialog.FeedbackDialog;
@@ -123,14 +123,14 @@ public class AccountFragment extends BaseFragment
     @OnClick(R.id.llWhatsAppInvite)
     public void onWhatsAppInviteClicked()
     {
-        AccountsService_ accountsService = AccountsService_.getInstance();
+        WhatsappService_ accountsService = WhatsappService_.getInstance();
         if (accountsService.isWhatsAppInstalled(getActivity()))
         {
             startActivity(accountsService.getWhatsAppIntent());
         }
         else
         {
-            SnackbarFactory.create(getActivity(), R.string.error_no_watsapp);
+            SnackbarFactory.create(getActivity(), R.string.error_no_whatsapp);
         }
     }
 

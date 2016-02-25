@@ -1,4 +1,4 @@
-package reaper.android.app.ui.screens.notifications;
+package reaper.android.app.ui.screens.chat;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -9,22 +9,27 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.view.MenuItem;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
-import reaper.android.app.model.Event;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui.screens.FlowEntry;
 import reaper.android.app.ui.screens.MainActivity;
 
-public class NotificationActivity extends BaseActivity implements NotificationScreen
+public class ChatActivity extends BaseActivity implements ChatScreen
 {
-    public static Intent callingIntent(Context context)
+    private static final String ARG_EVENT_ID = "arg_event_id";
+
+    public static Intent callingIntent(Context context, String eventId)
     {
-        return new Intent(context, NotificationActivity.class);
+        if (eventId == null)
+        {
+            throw new IllegalArgumentException("event_id cannot be null");
+        }
+
+        Intent intent = new Intent(context, ChatActivity.class);
+        intent.putExtra(ARG_EVENT_ID, eventId);
+        return intent;
     }
 
     /* UI Elements */
@@ -38,26 +43,27 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
         super.onCreate(savedInstanceState);
 
         /* Setup UI */
-        setContentView(R.layout.activity_notification);
+        setContentView(R.layout.activity_chat);
         ButterKnife.bind(this);
 
         /* Toolbar Setup */
         setActionBar(appBarLayout);
         showActionBar();
-        setScreenTitle(R.string.title_notification);
+        setScreenTitle(R.string.title_chat);
         setActionBarBackVisibility(true);
 
         /* Notification View */
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content, NotificationFragment.newInstance());
+        fragmentTransaction.replace(R.id.content, ChatFragment
+                .newInstance(getIntent().getStringExtra(ARG_EVENT_ID)));
         fragmentTransaction.commit();
     }
 
     @Override
     public void onBackPressed()
     {
-        navigateToHomeScreen();
+        navigateToDetailsScreen();
     }
 
     @Override
@@ -65,35 +71,20 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
     {
         if (item.getItemId() == android.R.id.home)
         {
-            navigateToHomeScreen();
+            navigateToDetailsScreen();
         }
         return super.onOptionsItemSelected(item);
     }
 
     /* Screen Methods */
     @Override
-    public void navigateToHomeScreen()
+    public void navigateToDetailsScreen()
     {
         if (isTaskRoot())
         {
+            // TODO: Change to Details screen
             startActivity(MainActivity.callingIntent(this, FlowEntry.HOME, null, null));
         }
         finish();
-    }
-
-    @Override
-    public void navigateToDetailsScreen(List<Event> events, String eventId)
-    {
-        // TODO : Back from details activity should lead here
-        startActivity(MainActivity
-                .callingIntent(this, FlowEntry.DETAILS, eventId, (ArrayList<Event>) events));
-        finish();
-    }
-
-    @Override
-    public void navigateToChatScreen(List<Event> events, String eventId)
-    {
-        startActivity(MainActivity
-                .callingIntent(this, FlowEntry.CHAT, eventId, null));
     }
 }

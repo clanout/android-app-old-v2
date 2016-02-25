@@ -36,12 +36,12 @@ import reaper.android.R;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.ErrorCode;
-import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.PhoneContact;
-import reaper.android.app.model.PhoneContactComparator;
-import reaper.android.app.service._new.AccountsService_;
+import reaper.android.app.model.util.PhoneContactComparator;
+import reaper.android.app.model.User;
 import reaper.android.app.service.UserService;
+import reaper.android.app.service._new.WhatsappService_;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.user.AllPhoneContactsForSMSFetchedTrigger;
 import reaper.android.app.ui._core.BaseFragment;
@@ -363,7 +363,8 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
         menu.findItem(R.id.action_notifications).setVisible(false);
         menu.findItem(R.id.action_status).setVisible(false);
 
-        if (genericCache.get(GenericCacheKeys.MY_PHONE_NUMBER) == null)
+        User sessionUser = userService.getSessionUser();
+        if (sessionUser != null && sessionUser.getMobileNumber() != null)
         {
             menu.findItem(R.id.action_add_phone).setVisible(true);
             menu.findItem(R.id.action_add_phone).setIcon(addPhoneDrawable);
@@ -406,14 +407,14 @@ public class InviteThroughSMSFragment extends BaseFragment implements View.OnCli
                     .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.WHATSAPP_INVITATION_INVITE_THROUGH_SMS_FRAGMENT, userService
                             .getSessionUserId());
 
-            AccountsService_ accountsService = AccountsService_.getInstance();
+            WhatsappService_ accountsService = WhatsappService_.getInstance();
             if (accountsService.isWhatsAppInstalled(getActivity()))
             {
                 startActivity(accountsService.getWhatsAppIntent());
             }
             else
             {
-                SnackbarFactory.create(getActivity(), R.string.error_no_watsapp);
+                SnackbarFactory.create(getActivity(), R.string.error_no_whatsapp);
             }
         }
         else if (view.getId() == R.id.tvGivePermission)

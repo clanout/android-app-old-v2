@@ -12,7 +12,7 @@ import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
-import reaper.android.app.model.EventAttendeeComparator;
+import reaper.android.app.model.util.EventAttendeeComparator;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;

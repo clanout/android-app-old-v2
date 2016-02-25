@@ -52,7 +52,7 @@ public class ApiManager
                 .setClient(new OkClient(okHttpClient))
                 .setConverter(new GsonConverter(GsonProvider.getGson()))
                 .setEndpoint(AppConstants.BASE_URL_SERVER)
-                .setLogLevel(RestAdapter.LogLevel.FULL)
+//                .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build();
 
         googlePlacesRestAdapter = new RestAdapter.Builder()
@@ -82,7 +82,7 @@ public class ApiManager
                                                                          .getToken());
                     }
                 })
-                .setLogLevel(RestAdapter.LogLevel.FULL)
+//                .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build();
     }
 

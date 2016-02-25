@@ -1,4 +1,4 @@
-package reaper.android.app.model;
+package reaper.android.app.model.util;
 
 import java.util.Comparator;
 

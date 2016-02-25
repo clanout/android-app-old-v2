@@ -1,0 +1,269 @@
+package reaper.android.app.ui.screens.chat.mvp;
+
+import org.joda.time.DateTime;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import reaper.android.app.model.ChatMessage;
+import reaper.android.app.service.UserService;
+import reaper.android.app.service._new.ChatService_;
+import rx.Observable;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
+
+public class ChatPresenterImpl implements ChatPresenter
+{
+    private ChatView view;
+    private ChatService_ chatService;
+    private UserService userService;
+    private String eventId;
+
+    private Subscription chatSubscription;
+
+    private List<ChatMessage> visibleChats;
+    private int historyCount;
+    private boolean isLoadHistoryInProgress;
+
+    public ChatPresenterImpl(ChatService_ chatService, UserService userService, String eventId)
+    {
+        this.chatService = chatService;
+        this.userService = userService;
+        this.eventId = eventId;
+
+        visibleChats = new ArrayList<>();
+        historyCount = 0;
+        isLoadHistoryInProgress = false;
+    }
+
+    @Override
+    public void attachView(ChatView view)
+    {
+        this.view = view;
+        initChat();
+    }
+
+    @Override
+    public void detachView()
+    {
+        if (chatSubscription != null && !chatSubscription.isUnsubscribed())
+        {
+            chatSubscription.unsubscribe();
+            chatSubscription = null;
+        }
+
+        chatService.leaveChat();
+        view = null;
+    }
+
+    @Override
+    public void retry()
+    {
+        initChat();
+    }
+
+    @Override
+    public void send(String message)
+    {
+        final ChatMessage chatMessage = buildChatMessage(message);
+
+        if (view != null)
+        {
+            view.displayMessage(chatMessage);
+            visibleChats.add(chatMessage);
+        }
+
+        chatService
+                .post(chatMessage)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        if (view != null)
+                        {
+                            view.displaySendMessageFailureError();
+                        }
+                    }
+
+                    @Override
+                    public void onNext(Object o)
+                    {
+                    }
+                });
+    }
+
+    @Override
+    public void loadMore()
+    {
+        isLoadHistoryInProgress = true;
+        historyCount++;
+
+        if (chatSubscription != null && !chatSubscription.isUnsubscribed())
+        {
+            chatSubscription.unsubscribe();
+            chatSubscription = null;
+        }
+
+        Observable.timer(2, TimeUnit.SECONDS)
+                  .first()
+                  .subscribeOn(Schedulers.newThread())
+                  .observeOn(AndroidSchedulers.mainThread())
+                  .subscribe(new Subscriber<Long>()
+                  {
+                      @Override
+                      public void onCompleted()
+                      {
+                          if (view != null)
+                          {
+                              isLoadHistoryInProgress = false;
+                              view.onHistoryLoaded();
+                              view.displayNoMoreHistory();
+                          }
+                      }
+
+                      @Override
+                      public void onError(Throwable e)
+                      {
+
+                      }
+
+                      @Override
+                      public void onNext(Long aLong)
+                      {
+
+                      }
+                  });
+
+        chatSubscription =
+                chatService
+                        .fetchHistory(historyCount, visibleChats)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<ChatMessage>()
+                        {
+                            @Override
+                            public void onCompleted()
+                            {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e)
+                            {
+                                e.printStackTrace();
+                                if (view != null)
+                                {
+                                    view.displayError();
+                                }
+                            }
+
+                            @Override
+                            public void onNext(ChatMessage chatMessage)
+                            {
+                                if (!visibleChats.contains(chatMessage))
+                                {
+                                    if (view != null)
+                                    {
+                                        visibleChats.add(chatMessage);
+                                        view.displayMessage(chatMessage);
+
+                                        if (isLoadHistoryInProgress)
+                                        {
+                                            isLoadHistoryInProgress = false;
+                                            view.onHistoryLoaded();
+                                        }
+                                    }
+                                }
+                            }
+                        });
+    }
+
+    /* Helper Methods */
+    private void initChat()
+    {
+        if (chatSubscription != null && !chatSubscription.isUnsubscribed())
+        {
+            chatSubscription.unsubscribe();
+            chatSubscription = null;
+        }
+
+        chatSubscription =
+                chatService
+                        .isHealthy()
+                        .flatMap(new Func1<Boolean, Observable<ChatMessage>>()
+                        {
+                            @Override
+                            public Observable<ChatMessage> call(Boolean isHealthy)
+                            {
+                                if (!isHealthy)
+                                {
+                                    throw new IllegalStateException();
+                                }
+                                else
+                                {
+                                    return chatService.joinChat(eventId);
+                                }
+                            }
+                        })
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<ChatMessage>()
+                        {
+                            @Override
+                            public void onCompleted()
+                            {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e)
+                            {
+                                if (view != null)
+                                {
+                                    view.displayError();
+                                }
+                            }
+
+                            @Override
+                            public void onNext(ChatMessage chatMessage)
+                            {
+                                if (!visibleChats.contains(chatMessage))
+                                {
+                                    if (view != null)
+                                    {
+                                        visibleChats.add(chatMessage);
+                                        view.displayMessage(chatMessage);
+                                    }
+                                }
+                            }
+                        });
+    }
+
+    public String generateMessageId()
+    {
+        return eventId + "_" + System.nanoTime();
+    }
+
+    public ChatMessage buildChatMessage(String message)
+    {
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setId(generateMessageId());
+        chatMessage.setMessage(message);
+        chatMessage.setSenderId(userService.getSessionUserId());
+        chatMessage.setSenderName(userService.getSessionUserName());
+        chatMessage.setTimestamp(DateTime.now());
+        return chatMessage;
+    }
+}

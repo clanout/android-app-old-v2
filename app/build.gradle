@@ -114,4 +114,6 @@ dependencies {
 
     // Day Picker
     compile 'com.github.hotchemi:stringpicker:0.0.2'
+
+    compile 'com.jcodecraeer:xrecyclerview:1.2.6'
 }

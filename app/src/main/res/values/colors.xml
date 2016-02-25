@@ -4,14 +4,20 @@
     <color name="primary">#E53B4A</color>
     <color name="primary_dark">#B22E3A</color>
     <color name="primary_light">#E9828B</color>
-    <color name="accent">#1C7FB2</color>
-    <!--<color name="accent">#0097a7</color>-->
+    <color name="accent">#048AFF</color>
+    <!--<color name="accent_light_blue">#04CDFF</color>-->
+    <!--<color name="accent_dark_blue">#1C7FB2</color>-->
+    <!--<color name="accent_yellow">#FFDC00</color>-->
+    <!--<color name="accent_cyan">#0097a7</color>-->
     <color name="accent_secondary">#EF9A9B</color>
 
     <!-- Fonts -->
     <color name="text_title">#AA000000</color>
     <color name="text_default">#AA222222</color>
     <color name="text_subtitle">#AA777777</color>
+    <!--<color name="text_title">#333333</color>-->
+    <!--<color name="text_default">#111111</color>-->
+    <!--<color name="text_subtitle">#666666</color>-->
 
     <!-- RSVP colors -->
     <color name="going">#4CAF50</color>

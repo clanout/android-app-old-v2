@@ -10,22 +10,20 @@ public final class AppConstants
     /* API Keys */
     public static final String GOOGLE_API_KEY = "AIzaSyDBX362r-1isovteBR3tGN3QQtDcQn-jyg";
     public static final String GOOGLE_ANALYTICS_TRACKING_KEY = "UA-67721019-1";
-
-
-    public static final String DEFAULT_COUNTRY_CODE = "91";
-
-    //GCM
     public static final String GCM_SENDER_ID = "1014674558116";
 
-    // Whatsapp Message
-    public static final String WHATSAPP_INVITATION_MESSAGE = " wants to clan out with you. Join Harsh here."; //  TODO -- change name
+    /* App Link */
+    public static final String APP_LINK = "www.clanout.com";
 
-    // App Link
-    public static final String APP_LINK = "www.clanout.com"; // TODO -- change link
+    /* Chat */
+    public static final String CHAT_SERVICE_NAME = "52.1.78.109";
+    public static final String CHAT_SERVICE_HOST = "52.1.78.109";
+    public static final int CHAT_SERVICE_PORT = 5222;
+    public static final String CHAT_POSTFIX = "@conference.52.1.78.109";
 
+    /* Others */
+    public static final String DEFAULT_COUNTRY_CODE = "91";
     public static final int TITLE_LENGTH_LIMIT = 30;
-
-    // Expiry Times
     public static final int EXPIRY_DAYS_EVENT_SUGGESTIONS = 7;
 
     private AppConstants()
