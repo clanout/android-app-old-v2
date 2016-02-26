@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.jcodecraeer.xrecyclerview.ProgressStyle;
@@ -61,6 +62,9 @@ public class ChatFragment extends BaseFragment implements ChatView
 
     @Bind(R.id.tvRetry)
     TextView tvRetry;
+
+    @Bind(R.id.loading)
+    ProgressBar loading;
 
     @Bind(R.id.etChatMessage)
     EditText etChatMessage;
@@ -153,11 +157,16 @@ public class ChatFragment extends BaseFragment implements ChatView
             {
                 if (presenter != null)
                 {
+                    tvRetry.setVisibility(View.GONE);
+                    loading.setVisibility(View.VISIBLE);
+
                     presenter.retry();
                 }
             }
         });
 
+        tvRetry.setVisibility(View.VISIBLE);
+        loading.setVisibility(View.GONE);
         llError.setVisibility(View.VISIBLE);
         llChat.setVisibility(View.GONE);
     }
@@ -165,12 +174,16 @@ public class ChatFragment extends BaseFragment implements ChatView
     @Override
     public void onHistoryLoaded()
     {
+        llChat.setVisibility(View.VISIBLE);
+        llError.setVisibility(View.GONE);
         rvChat.loadMoreComplete();
     }
 
     @Override
     public void displayNoMoreHistory()
     {
+        llChat.setVisibility(View.VISIBLE);
+        llError.setVisibility(View.GONE);
         rvChat.noMoreLoading();
     }
 

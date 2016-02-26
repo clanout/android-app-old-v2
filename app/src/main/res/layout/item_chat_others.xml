@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="4dp"
     android:layout_marginLeft="16dp"
-    android:layout_marginRight="18dp"
+    android:layout_marginRight="64dp"
     android:layout_marginTop="4dp"
     android:background="@drawable/bg_chat"
     android:minWidth="120dp"
@@ -32,9 +32,10 @@
 
     <TextView
         android:id="@+id/tvTimestamp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
+        android:gravity="right"
         android:text="22:45, Feb 25"
         android:textColor="@color/text_subtitle"
         android:textSize="8sp"/>

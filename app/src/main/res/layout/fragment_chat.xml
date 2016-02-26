@@ -20,13 +20,25 @@
             android:layout_margin="16dp"
             android:text="@string/error_chat_not_fetched"/>
 
-        <TextView
-            android:id="@+id/tvRetry"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/retry"
-            android:textColor="@color/accent"
-            android:textStyle="bold"/>
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tvRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/retry"
+                android:textColor="@color/accent"
+                android:textStyle="bold"/>
+
+            <ProgressBar
+                android:id="@+id/loading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Chat -->
@@ -53,7 +65,6 @@
             android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="16dp"
             android:background="@color/divider"/>
 
 

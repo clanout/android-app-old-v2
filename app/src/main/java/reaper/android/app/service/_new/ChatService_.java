@@ -20,6 +20,7 @@ import reaper.android.app.model.ChatMessage;
 import reaper.android.app.service.UserService;
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
@@ -61,99 +62,124 @@ public class ChatService_
     private ChatService_(UserService userService)
     {
         this.userService = userService;
-
         isHealthy = false;
-
         activeChat = null;
         chat = null;
 
-        initXmppConnection();
-        connect();
+        initConnection();
     }
 
-    public Observable<Boolean> isHealthy()
+    public Observable<Boolean> connect()
     {
         if (isHealthy)
         {
+            Timber.v("[XmppConnection already established]");
             return Observable.just(true);
         }
         else
         {
-            return getConnection()
-                    .map(new Func1<AbstractXMPPConnection, Boolean>()
+            return Observable
+                    .create(new Observable.OnSubscribe<Boolean>()
                     {
                         @Override
-                        public Boolean call(AbstractXMPPConnection connection)
+                        public void call(Subscriber<? super Boolean> subscriber)
                         {
-                            return isHealthy;
+                            try
+                            {
+                                if (!connection.isConnected())
+                                {
+                                    connection.connect();
+                                }
+
+                                if (!connection.isAuthenticated())
+                                {
+                                    connection.login();
+                                }
+
+                                Timber.v("[XmppConnection established]");
+                                isHealthy = true;
+                                subscriber.onNext(true);
+                                subscriber.onCompleted();
+                            }
+                            catch (Exception e)
+                            {
+                                Timber.v("[XmppConnection Connection Failed] " + e.getMessage());
+                                subscriber.onNext(false);
+                                subscriber.onCompleted();
+                            }
                         }
-                    });
+                    })
+                    .subscribeOn(Schedulers.io());
         }
     }
 
     public Observable<ChatMessage> joinChat(final String eventId)
     {
-        if (activeChat != null)
-        {
-            return Observable
-                    .error(new IllegalStateException("[Join Chat Failed] Please leave the old chat to join this one"));
-        }
-        else
-        {
-            return Observable
-                    .create(new Observable.OnSubscribe<Message>()
+        return Observable
+                .create(new Observable.OnSubscribe<Message>()
+                {
+                    @Override
+                    public void call(final Subscriber<? super Message> subscriber)
                     {
-                        @Override
-                        public void call(final Subscriber<? super Message> subscriber)
+                        leaveChat();
+
+                        MultiUserChatManager manager = MultiUserChatManager
+                                .getInstanceFor(connection);
+                        chat = manager
+                                .getMultiUserChat(eventId + AppConstants.CHAT_POSTFIX);
+
+                        DiscussionHistory history = new DiscussionHistory();
+                        history.setMaxStanzas(DEFAULT_HISTORY_SIZE);
+
+                        messageListener = new MessageListener()
                         {
-                            MultiUserChatManager manager = MultiUserChatManager
-                                    .getInstanceFor(connection);
-                            chat = manager.getMultiUserChat(eventId + AppConstants.CHAT_POSTFIX);
-
-                            DiscussionHistory history = new DiscussionHistory();
-                            history.setMaxStanzas(DEFAULT_HISTORY_SIZE);
-
-                            messageListener = new MessageListener()
+                            @Override
+                            public void processMessage(Message message)
                             {
-                                @Override
-                                public void processMessage(Message message)
-                                {
-                                    subscriber.onNext(message);
-                                }
-                            };
-                            chat.addMessageListener(messageListener);
-
-                            try
-                            {
-                                chat.join(getNickname(), null, history, connection
-                                        .getPacketReplyTimeout());
-                                activeChat = eventId;
+                                subscriber.onNext(message);
                             }
-                            catch (Exception e)
-                            {
-                                subscriber.onError(new Exception("[Unable to join clan chat] " + e
-                                        .getMessage()));
-                            }
-                        }
-                    })
-                    .map(new Func1<Message, ChatMessage>()
-                    {
-                        @Override
-                        public ChatMessage call(Message message)
+                        };
+                        chat.addMessageListener(messageListener);
+
+                        try
                         {
-                            return map(message);
+                            chat.join(getNickname(), null, history, connection
+                                    .getPacketReplyTimeout());
+                            activeChat = eventId;
                         }
-                    })
-                    .filter(new Func1<ChatMessage, Boolean>()
-                    {
-                        @Override
-                        public Boolean call(ChatMessage chatMessage)
+                        catch (Exception e)
                         {
-                            return chatMessage != null;
+                            subscriber
+                                    .onError(new Exception("[Unable to join clan chat] " + e
+                                            .getMessage()));
                         }
-                    })
-                    .subscribeOn(Schedulers.newThread());
-        }
+                    }
+                })
+                .doOnError(new Action1<Throwable>()
+                {
+                    @Override
+                    public void call(Throwable throwable)
+                    {
+                        throwable.printStackTrace();
+                    }
+                })
+                .map(new Func1<Message, ChatMessage>()
+                {
+                    @Override
+                    public ChatMessage call(Message message)
+                    {
+                        return map(message);
+                    }
+                })
+                .filter(new Func1<ChatMessage, Boolean>()
+                {
+                    @Override
+                    public Boolean call(ChatMessage chatMessage)
+                    {
+                        return chatMessage != null;
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
     }
 
     public Observable<ChatMessage> fetchHistory(final int historySize, final List<ChatMessage> availableMessages)
@@ -256,7 +282,7 @@ public class ChatService_
     }
 
     /* Helper Methods */
-    private void initXmppConnection()
+    private void initConnection()
     {
         try
         {
@@ -283,76 +309,31 @@ public class ChatService_
                     isHealthy = false;
                 }
             });
+
+
+            connect()
+                    .subscribe(new Subscriber<Boolean>()
+                    {
+                        @Override
+                        public void onCompleted()
+                        {
+                        }
+
+                        @Override
+                        public void onError(Throwable e)
+                        {
+                        }
+
+                        @Override
+                        public void onNext(Boolean isCnnected)
+                        {
+                        }
+                    });
         }
         catch (Exception e)
         {
-            Timber.v("[XmppConnection Creation Failed] " + e.getMessage());
+            Timber.v("[ChatService Initialization Failed] " + e.getMessage());
         }
-    }
-
-    private Observable<AbstractXMPPConnection> getConnection()
-    {
-        if (isHealthy)
-        {
-            return Observable.just(connection);
-        }
-        else
-        {
-            return Observable
-                    .create(new Observable.OnSubscribe<AbstractXMPPConnection>()
-                    {
-                        @Override
-                        public void call(Subscriber<? super AbstractXMPPConnection> subscriber)
-                        {
-                            try
-                            {
-                                if (!connection.isConnected())
-                                {
-                                    connection.connect();
-                                }
-
-                                if (!connection.isAnonymous())
-                                {
-                                    connection.login();
-                                }
-
-                                subscriber.onNext(connection);
-                                subscriber.onCompleted();
-                            }
-                            catch (Exception e)
-                            {
-                                subscriber.onError(e);
-                            }
-                        }
-                    })
-                    .subscribeOn(Schedulers.io());
-        }
-    }
-
-    private void connect()
-    {
-        Timber.v("[XmppConnection] Establishing connection... ");
-        getConnection()
-                .subscribe(new Subscriber<AbstractXMPPConnection>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
-                        Timber.v("[XmppConnection Established]");
-                        isHealthy = true;
-                    }
-
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                        Timber.v("[XmppConnection Connection Failed] " + e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(AbstractXMPPConnection connection)
-                    {
-                    }
-                });
     }
 
     private ChatMessage map(Message message)

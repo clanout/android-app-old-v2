@@ -58,6 +58,8 @@ public class ChatPresenterImpl implements ChatPresenter
 
         chatService.leaveChat();
         view = null;
+
+        // TODO : Send chat notification
     }
 
     @Override
@@ -116,7 +118,7 @@ public class ChatPresenterImpl implements ChatPresenter
             chatSubscription = null;
         }
 
-        Observable.timer(2, TimeUnit.SECONDS)
+        Observable.timer(1, TimeUnit.SECONDS)
                   .first()
                   .subscribeOn(Schedulers.newThread())
                   .observeOn(AndroidSchedulers.mainThread())
@@ -201,19 +203,19 @@ public class ChatPresenterImpl implements ChatPresenter
 
         chatSubscription =
                 chatService
-                        .isHealthy()
+                        .connect()
                         .flatMap(new Func1<Boolean, Observable<ChatMessage>>()
                         {
                             @Override
-                            public Observable<ChatMessage> call(Boolean isHealthy)
+                            public Observable<ChatMessage> call(Boolean isConnected)
                             {
-                                if (!isHealthy)
+                                if (isConnected)
                                 {
-                                    throw new IllegalStateException();
+                                    return chatService.joinChat(eventId);
                                 }
                                 else
                                 {
-                                    return chatService.joinChat(eventId);
+                                    throw new IllegalStateException();
                                 }
                             }
                         })
@@ -230,6 +232,7 @@ public class ChatPresenterImpl implements ChatPresenter
                             @Override
                             public void onError(Throwable e)
                             {
+                                e.printStackTrace();
                                 if (view != null)
                                 {
                                     view.displayError();

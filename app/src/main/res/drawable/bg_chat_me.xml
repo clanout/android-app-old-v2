@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/cover_pic_overlay"/>
+    <solid android:color="@color/primary_light"/>
+    <!--<solid android:color="#ea626e"/>-->
     <corners android:radius="6dp"/>
 </shape>

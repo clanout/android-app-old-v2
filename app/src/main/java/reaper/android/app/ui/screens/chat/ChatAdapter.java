@@ -24,7 +24,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int CHAT_OTHERS = 1;
 
     private static DateTimeFormatter TIMESTAMP_FORMATTER = DateTimeFormat
-            .forPattern("HH:mm, dd MMM");
+            .forPattern("dd MMM, HH:mm");
+
+    private static DateTimeFormatter TIMESTAMP_FORMATTER_TIME_ONLY = DateTimeFormat
+            .forPattern("HH:mm");
 
     private Context context;
     private List<ChatMessage> chatMessages;
@@ -132,8 +135,30 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         public void render(ChatMessage chatMessage)
         {
+            int currentIndex = chatMessages.indexOf(chatMessage);
+            int nextIndex = currentIndex + 1;
+            if (nextIndex < chatMessages.size())
+            {
+                ChatMessage previousMessage = chatMessages.get(nextIndex);
+                boolean isDateInvisible = previousMessage.getTimestamp().toLocalDate()
+                                                         .equals(chatMessage.getTimestamp()
+                                                                            .toLocalDate());
+                if (isDateInvisible)
+                {
+                    tvTimestamp.setText(chatMessage.getTimestamp()
+                                                   .toString(TIMESTAMP_FORMATTER_TIME_ONLY));
+                }
+                else
+                {
+                    tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER));
+                }
+            }
+            else
+            {
+                tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER));
+            }
+
             tvChatMessage.setText(chatMessage.getMessage());
-            tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER));
         }
     }
 
@@ -158,21 +183,44 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         {
             int currentIndex = chatMessages.indexOf(chatMessage);
             int nextIndex = currentIndex + 1;
-            boolean isNameInvisible = nextIndex < chatMessages.size()
-                    && chatMessages.get(nextIndex).getSenderId().equals(chatMessage.getSenderId());
 
-            if (isNameInvisible)
+            if (nextIndex < chatMessages.size())
             {
-                tvName.setVisibility(View.GONE);
+                ChatMessage previousMessage = chatMessages.get(nextIndex);
+                boolean isNameInvisible = previousMessage.getSenderId()
+                                                         .equals(chatMessage.getSenderId());
+                boolean isDateInvisible = previousMessage.getTimestamp().toLocalDate()
+                                                         .equals(chatMessage.getTimestamp()
+                                                                            .toLocalDate());
+
+                if (isNameInvisible)
+                {
+                    tvName.setVisibility(View.GONE);
+                }
+                else
+                {
+                    tvName.setText(chatMessage.getSenderName());
+                    tvName.setVisibility(View.VISIBLE);
+                }
+
+                if (isDateInvisible)
+                {
+                    tvTimestamp.setText(chatMessage.getTimestamp()
+                                                   .toString(TIMESTAMP_FORMATTER_TIME_ONLY));
+                }
+                else
+                {
+                    tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER));
+                }
             }
             else
             {
+                tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER));
                 tvName.setText(chatMessage.getSenderName());
                 tvName.setVisibility(View.VISIBLE);
             }
 
             tvChatMessage.setText(chatMessage.getMessage());
-            tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER));
         }
     }
 }
