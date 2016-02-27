@@ -1,15 +1,11 @@
 package reaper.android.app.ui.screens.edit;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -20,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -39,7 +34,6 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import hotchemi.stringpicker.StringPicker;
 import reaper.android.R;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.model.Event;
@@ -53,6 +47,7 @@ import reaper.android.app.service.PlacesService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.ui._core.BaseFragment;
+import reaper.android.app.ui.dialog.DayPickerDialog;
 import reaper.android.app.ui.dialog.DefaultDialog;
 import reaper.android.app.ui.screens.edit.mvp.EditEventPresenter;
 import reaper.android.app.ui.screens.edit.mvp.EditEventPresenterImpl;
@@ -631,49 +626,22 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
 
     private void displayDayPickerDialog()
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setCancelable(false);
-
-        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
-        View dialogView = layoutInflater.inflate(R.layout.dialog_day_picker, null);
-        builder.setView(dialogView);
-
-        final StringPicker stringPicker = (StringPicker) dialogView
-                .findViewById(R.id.dayPicker);
-        stringPicker.setValues(dateList);
-        stringPicker.setCurrent(selectedDay);
-
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+        DayPickerDialog.show(getActivity(), dateList, selectedDay, new DayPickerDialog.Listener()
         {
             @Override
-            public void onClick(DialogInterface dialog, int which)
+            public void onDaySelected(int position)
             {
-                selectedDay = stringPicker.getCurrent();
+                selectedDay = position;
                 tvDay.setText(dayList.get(selectedDay));
 
-                if(presenter != null)
+                if (presenter != null)
                 {
-                    LocalDate startDate = dateTimeUtil
-                            .getDate(dayList.get(selectedDay));
-                    presenter.updateTime(DateTimeUtil
-                            .getDateTime(startDate, startTime));
+                    LocalDate startDate = dateTimeUtil.getDate(dayList.get(selectedDay));
+                    presenter.updateTime(DateTimeUtil.getDateTime(startDate, startTime));
                 }
 
-                dialog.dismiss();
             }
         });
-
-        AlertDialog alertDialog = builder.create();
-
-        /* Set Width */
-        Rect displayRectangle = new Rect();
-        Window window = getActivity().getWindow();
-        window.getDecorView().getWindowVisibleDisplayFrame(displayRectangle);
-        int width = (int) (displayRectangle.width() * 0.80f);
-        alertDialog.getWindow().setLayout(width, LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
-
-        alertDialog.show();
     }
 
     private void displayDeleteDialog()

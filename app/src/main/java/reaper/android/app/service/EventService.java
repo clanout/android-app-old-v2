@@ -1,7 +1,5 @@
 package reaper.android.app.service;
 
-import com.squareup.otto.Bus;
-
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -47,7 +45,6 @@ import reaper.android.app.model.LocationSuggestion;
 import reaper.android.app.model.util.EventComparator;
 import reaper.android.app.service._new.GcmService_;
 import reaper.android.app.service._new.LocationService_;
-import reaper.android.app.communication.Communicator;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import rx.Observable;
@@ -77,9 +74,6 @@ public class EventService
         return instance;
     }
 
-    private static final String TAG = "EventService";
-
-    private Bus bus;
     private UserService userService;
     private LocationService_ locationService;
     private GcmService_ gcmService;
@@ -89,8 +83,6 @@ public class EventService
 
     private EventService(UserService userService, GcmService_ gcmService, LocationService_ locationService)
     {
-        this.bus = Communicator.getInstance().getBus();
-
         eventApi = ApiManager.getEventApi();
         eventCache = CacheManager.getEventCache();
         genericCache = CacheManager.getGenericCache();
@@ -200,7 +192,8 @@ public class EventService
                     @Override
                     public void call(List<Event> events)
                     {
-                        genericCache.put(GenericCacheKeys.FEED_LAST_UPDATE_TIMESTAMP, DateTime.now());
+                        genericCache
+                                .put(GenericCacheKeys.FEED_LAST_UPDATE_TIMESTAMP, DateTime.now());
                         eventCache.reset(events);
                     }
                 })
@@ -272,7 +265,8 @@ public class EventService
                                     {
                                         List<String> friends = new ArrayList<>();
                                         int friendCount = 0;
-                                        for (EventDetails.Attendee attendee : eventDetails.getAttendees())
+                                        for (EventDetails.Attendee attendee : eventDetails
+                                                .getAttendees())
                                         {
                                             if (attendee.isFriend())
                                             {
@@ -542,7 +536,8 @@ public class EventService
     }
 
     /* Location Suggestions */
-    public Observable<List<LocationSuggestion>> _fetchLocationSuggestions(EventCategory eventCategory, double latitude, double longitude)
+    public Observable<List<LocationSuggestion>> _fetchLocationSuggestions(EventCategory eventCategory,
+                                                                          double latitude, double longitude)
     {
         LocationSuggestionsApiRequest request = new LocationSuggestionsApiRequest(eventCategory,
                 String.valueOf(latitude),
@@ -694,6 +689,42 @@ public class EventService
         });
     }
 
+    /* Create */
+    public Observable<Event> _create(String title, Event.Type eventType, EventCategory eventCategory,
+                                     String description, Location placeLocation, DateTime startTime, DateTime endTime)
+    {
+        CreateEventApiRequest request = new CreateEventApiRequest(title, eventType, eventCategory, description, placeLocation
+                .getName(), placeLocation.getZone(), placeLocation.getLatitude(), placeLocation
+                .getLongitude(), startTime, endTime);
+
+        return eventApi
+                .createEvent(request)
+                .map(new Func1<CreateEventApiResponse, Event>()
+                {
+                    @Override
+                    public Event call(CreateEventApiResponse createEventApiResponse)
+                    {
+                        return createEventApiResponse.getEvent();
+                    }
+                })
+                .doOnNext(new Action1<Event>()
+                {
+                    @Override
+                    public void call(Event event)
+                    {
+                        eventCache.save(event);
+
+                        if (genericCache.get(GenericCacheKeys.GCM_TOKEN) != null)
+                        {
+                            gcmService.subscribeTopic(genericCache
+                                    .get(GenericCacheKeys.GCM_TOKEN), event
+                                    .getId());
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
+
     /* Helper Methods */
     private boolean isExpired(Event event)
     {
@@ -796,7 +827,8 @@ public class EventService
                     @Override
                     public void call(List<Event> events)
                     {
-                        genericCache.put(GenericCacheKeys.FEED_LAST_UPDATE_TIMESTAMP, DateTime.now());
+                        genericCache
+                                .put(GenericCacheKeys.FEED_LAST_UPDATE_TIMESTAMP, DateTime.now());
                         eventCache.reset(events);
                     }
                 })
@@ -808,40 +840,6 @@ public class EventService
                         Collections.sort(events, new EventComparator.Relevance(userService
                                 .getSessionUserId()));
                         return events;
-                    }
-                })
-                .subscribeOn(Schedulers.newThread());
-    }
-
-    public Observable<Event> _create(String title, Event.Type eventType, EventCategory eventCategory, String description, Location placeLocation, DateTime startTime, DateTime endTime)
-    {
-        CreateEventApiRequest request = new CreateEventApiRequest(title, eventType, eventCategory, description, placeLocation
-                .getName(), placeLocation.getZone(), placeLocation.getLatitude(), placeLocation
-                .getLongitude(), startTime, endTime);
-
-        return eventApi
-                .createEvent(request)
-                .map(new Func1<CreateEventApiResponse, Event>()
-                {
-                    @Override
-                    public Event call(CreateEventApiResponse createEventApiResponse)
-                    {
-                        return createEventApiResponse.getEvent();
-                    }
-                })
-                .doOnNext(new Action1<Event>()
-                {
-                    @Override
-                    public void call(Event event)
-                    {
-                        eventCache.save(event);
-
-                        if (genericCache.get(GenericCacheKeys.GCM_TOKEN) != null)
-                        {
-                            gcmService.subscribeTopic(genericCache
-                                    .get(GenericCacheKeys.GCM_TOKEN), event
-                                    .getId());
-                        }
                     }
                 })
                 .subscribeOn(Schedulers.newThread());

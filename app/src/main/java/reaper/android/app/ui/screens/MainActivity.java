@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import reaper.android.R;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.config.BackstackTags;
+import reaper.android.app.communication.Communicator;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
@@ -29,7 +29,6 @@ import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.screens.notifications.NotificationActivity;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
-import reaper.android.app.communication.Communicator;
 
 public class MainActivity extends BaseActivity
 {
@@ -156,20 +155,7 @@ public class MainActivity extends BaseActivity
     @Override
     public void onBackPressed()
     {
-        String activeFragment = genericCache.get(GenericCacheKeys.ACTIVE_FRAGMENT);
-
-        if (activeFragment == null)
-        {
-            super.onBackPressed();
-        }
-        else if (activeFragment.equals(BackstackTags.HOME))
-        {
-            finish();
-        }
-        else if (activeFragment.equals(BackstackTags.CREATE))
-        {
-            FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
-        }
+        finish();
     }
 
     private void handleIntent()

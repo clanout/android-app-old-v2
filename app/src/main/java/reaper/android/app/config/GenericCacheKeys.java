@@ -15,9 +15,8 @@ public final class GenericCacheKeys
     /* Feed */
     public static final String FEED_LAST_UPDATE_TIMESTAMP = "last_update_timestamp";
 
-    public static final String ACTIVE_FRAGMENT = "active_fragment";
+    /* Pending Invites */
     public static final String HAS_FETCHED_PENDING_INVITES = "has_fetched_pending_invites";
-    public static final String READ_CONTACT_PERMISSION_DENIED = "read_contact_permission_denied";
 
     private GenericCacheKeys()
     {

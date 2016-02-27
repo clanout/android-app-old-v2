@@ -59,7 +59,6 @@ public class UserService
         return instance;
     }
 
-    private Bus bus;
     private UserApi userApi;
     private UserCache userCache;
     private GenericCache genericCache;
@@ -71,7 +70,6 @@ public class UserService
 
     private UserService(LocationService_ locationService, PhonebookService_ phonebookService, Bus bus)
     {
-        this.bus = bus;
         this.locationService = locationService;
         this.phonebookService = phonebookService;
 

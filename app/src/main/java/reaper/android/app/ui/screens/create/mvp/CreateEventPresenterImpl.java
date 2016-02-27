@@ -1,28 +1,20 @@
-package reaper.android.app.ui.screens.create;
-
-import com.squareup.otto.Bus;
+package reaper.android.app.ui.screens.create.mvp;
 
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import reaper.android.app.api.google_places.response.GooglePlaceAutocompleteApiResponse;
-import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.LocationSuggestion;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.PlacesService;
-import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.LocationService_;
-import reaper.android.common.analytics.AnalyticsHelper;
-import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -31,8 +23,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     /* Services */
     private EventService eventService;
     private PlacesService placesService;
-    private Location userLocation;
-    private UserService userService;
+    private LocationService_ locationService;
 
     /* Subscriptions */
     private CompositeSubscription subscriptions;
@@ -45,35 +36,28 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     private boolean isLocationFetchInProgress;
     private boolean isCreationInitiated;
 
+    private EventCategory eventCategory;
+    private Location location;
+
     private String title;
     private Event.Type type;
-    private EventCategory eventCategory;
     private String description;
     private DateTime startTime;
     private DateTime endTime;
-    private Location location;
 
-    public CreateEventPresenterImpl(Bus bus, EventCategory eventCategory)
+    public CreateEventPresenterImpl(EventService eventService, LocationService_ locationService, PlacesService placesService)
     {
-        userService = UserService.getInstance();
-        eventService = EventService.getInstance();
-        placesService = PlacesService.getInstance();
-        userLocation = LocationService_.getInstance().getCurrentLocation();
-        subscriptions = new CompositeSubscription();
-        this.eventCategory = eventCategory;
+        this.eventService = eventService;
+        this.locationService = locationService;
+        this.placesService = placesService;
 
-        if (this.eventCategory == null)
-        {
-            this.eventCategory = EventCategory.GENERAL;
-        }
+        subscriptions = new CompositeSubscription();
     }
 
     @Override
     public void attachView(CreateEventView view)
     {
         this.view = view;
-
-        fetchSuggestions();
     }
 
     @Override
@@ -91,7 +75,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     }
 
     @Override
-    public void autocomplete(final String s)
+    public void autocomplete(final String input)
     {
         if (isAutocompleteInProgress)
         {
@@ -100,66 +84,33 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
 
         isAutocompleteInProgress = true;
 
-        Subscription subscription = Observable
-                .create(new Observable.OnSubscribe<List<GooglePlaceAutocompleteApiResponse.Prediction>>()
-                {
-                    @Override
-                    public void call(Subscriber<? super List<GooglePlaceAutocompleteApiResponse.Prediction>> subscriber)
-                    {
-                        List<GooglePlaceAutocompleteApiResponse.Prediction> predictions = placesService
-                                .autocomplete(userLocation.getLatitude(), userLocation
-                                        .getLongitude(), s);
-
-                        subscriber.onNext(predictions);
-                        subscriber.onCompleted();
-                    }
-                })
-                .map(new Func1<List<GooglePlaceAutocompleteApiResponse.Prediction>, List<LocationSuggestion>>()
-                {
-                    @Override
-                    public List<LocationSuggestion> call(List<GooglePlaceAutocompleteApiResponse.Prediction> predictions)
-                    {
-                        List<LocationSuggestion> locationSuggestions = new ArrayList<LocationSuggestion>();
-                        int count = 0;
-                        for (GooglePlaceAutocompleteApiResponse.Prediction prediction : predictions)
+        Location userLocation = locationService.getCurrentLocation();
+        Subscription subscription =
+                placesService
+                        ._autocomplete(userLocation.getLatitude(), userLocation
+                                .getLongitude(), input)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<List<LocationSuggestion>>()
                         {
-                            if (count == 5)
+                            @Override
+                            public void onCompleted()
                             {
-                                break;
+                                isAutocompleteInProgress = false;
                             }
 
-                            LocationSuggestion locationSuggestion = new LocationSuggestion();
-                            locationSuggestion.setId(prediction.getPlaceId());
-                            locationSuggestion.setName(prediction.getDescription());
-                            locationSuggestions.add(locationSuggestion);
-                            count++;
-                        }
+                            @Override
+                            public void onError(Throwable e)
+                            {
 
-                        return locationSuggestions;
-                    }
-                })
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<LocationSuggestion>>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
-                        isAutocompleteInProgress = false;
-                    }
+                            }
 
-                    @Override
-                    public void onError(Throwable e)
-                    {
-
-                    }
-
-                    @Override
-                    public void onNext(List<LocationSuggestion> suggestions)
-                    {
-                        view.displaySuggestions(suggestions);
-                    }
-                });
+                            @Override
+                            public void onNext(List<LocationSuggestion> suggestions)
+                            {
+                                view.displaySuggestions(suggestions);
+                            }
+                        });
         subscriptions.add(subscription);
     }
 
@@ -168,6 +119,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     {
         isLocationFetchInProgress = true;
 
+        final Location userLocation = locationService.getCurrentLocation();
         if (locationSuggestion.getLatitude() != null && locationSuggestion.getLongitude() != null)
         {
             location = new Location();
@@ -251,6 +203,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     @Override
     public void setLocationName(String locationName)
     {
+        Location userLocation = locationService.getCurrentLocation();
         location = new Location();
         location.setZone(userLocation.getZone());
         location.setName(locationName);
@@ -297,6 +250,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
 
         if (location == null)
         {
+            Location userLocation = locationService.getCurrentLocation();
             location = new Location();
             location.setZone(userLocation.getZone());
         }
@@ -315,9 +269,6 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
                     @Override
                     public void onError(Throwable e)
                     {
-                        AnalyticsHelper
-                                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.CREATE_EVENT_FAILURE_FROM_DETAILS, userService
-                                        .getSessionUserId());
                         isCreationInitiated = false;
                         view.displayError();
                     }
@@ -325,10 +276,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
                     @Override
                     public void onNext(Event event)
                     {
-                        AnalyticsHelper
-                                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.CREATE_EVENT_SUCCESS_FROM_DETAILS, userService
-                                        .getSessionUserId());
-                        view.navigateToInviteScreen(event);
+                        view.navigateToInviteScreen(event.getId());
                     }
                 });
 
@@ -337,6 +285,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
 
     private void fetchSuggestions()
     {
+        Location userLocation = locationService.getCurrentLocation();
         Subscription subscription = eventService
                 ._fetchLocationSuggestions(eventCategory, userLocation.getLatitude(), userLocation
                         .getLongitude())

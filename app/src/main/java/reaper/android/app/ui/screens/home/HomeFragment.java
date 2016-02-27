@@ -54,7 +54,6 @@ import reaper.android.app.communication.Communicator;
 import reaper.android.app.communication.NewNotificationReceivedTrigger;
 import reaper.android.app.communication.NewNotificationsAvailableTrigger;
 import reaper.android.app.config.AppConstants;
-import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
@@ -65,7 +64,7 @@ import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.accounts.AccountActivity;
-import reaper.android.app.ui.screens.create.CreateEventDetailsFragment;
+import reaper.android.app.ui.screens.create.CreateActivity;
 import reaper.android.app.ui.screens.details.EventDetailsActivity;
 import reaper.android.app.ui.screens.home.create.CreateEventPresenter;
 import reaper.android.app.ui.screens.home.create.CreateEventPresenterImpl;
@@ -74,7 +73,6 @@ import reaper.android.app.ui.screens.invite.InviteActivity;
 import reaper.android.app.ui.screens.notifications.NotificationActivity;
 import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.DrawableFactory;
-import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
@@ -275,13 +273,15 @@ public class HomeFragment extends BaseFragment implements EventsView,
             @Override
             public void onClick(View v)
             {
-                FragmentUtils.changeFragment(getFragmentManager(),
-                        CreateEventDetailsFragment.newInstance(
-                                etTitle.getText().toString(),
-                                selectedCategory,
-                                cbType.isChecked(),
-                                dayList.get(selectedDay),
-                                startTime));
+
+                startActivity(CreateActivity.callingIntent(
+                        getActivity(),
+                        etTitle.getText().toString(),
+                        selectedCategory,
+                        cbType.isChecked(),
+                        dayList.get(selectedDay),
+                        startTime));
+                getActivity().finish();
             }
         });
 
@@ -332,8 +332,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
         super.onResume();
 
         bus.register(this);
-
-        CacheManager.getGenericCache().put(GenericCacheKeys.ACTIVE_FRAGMENT, BackstackTags.HOME);
 
         initView();
 

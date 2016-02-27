@@ -60,7 +60,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/ll_dialog_fragment_create_event_movie"
+                    android:id="@+id/llMovie"
                     android:layout_width="52dp"
                     android:layout_height="52dp"
                     android:layout_gravity="center_horizontal|center_vertical"
@@ -68,7 +68,6 @@
                     android:orientation="vertical">
 
                     <net.steamcrafted.materialiconlib.MaterialIconView
-                        android:id="@+id/miv_movie"
                         xmlns:app="http://schemas.android.com/apk/res-auto"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
@@ -94,7 +93,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/ll_dialog_fragment_create_event_shopping"
+                    android:id="@+id/llShopping"
                     android:layout_width="52dp"
                     android:layout_height="52dp"
                     android:layout_gravity="center_horizontal|center_vertical"
@@ -102,7 +101,6 @@
                     android:orientation="vertical">
 
                     <net.steamcrafted.materialiconlib.MaterialIconView
-                        android:id="@+id/miv_shopping"
                         xmlns:app="http://schemas.android.com/apk/res-auto"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
@@ -136,7 +134,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/ll_dialog_fragment_create_event_sports"
+                    android:id="@+id/llSports"
                     android:layout_width="52dp"
                     android:layout_height="52dp"
                     android:layout_gravity="center_horizontal|center_vertical"
@@ -144,7 +142,6 @@
                     android:orientation="vertical">
 
                     <net.steamcrafted.materialiconlib.MaterialIconView
-                        android:id="@+id/miv_sports"
                         xmlns:app="http://schemas.android.com/apk/res-auto"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
@@ -170,7 +167,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/ll_dialog_fragment_create_event_eat_out"
+                    android:id="@+id/llEatOut"
                     android:layout_width="52dp"
                     android:layout_height="52dp"
                     android:layout_gravity="center_horizontal|center_vertical"
@@ -178,7 +175,6 @@
                     android:orientation="vertical">
 
                     <net.steamcrafted.materialiconlib.MaterialIconView
-                        android:id="@+id/miv_eat_out"
                         xmlns:app="http://schemas.android.com/apk/res-auto"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
@@ -204,7 +200,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/ll_dialog_fragment_create_event_indoors"
+                    android:id="@+id/llIndoors"
                     android:layout_width="52dp"
                     android:layout_height="52dp"
                     android:layout_gravity="center_horizontal|center_vertical"
@@ -212,7 +208,6 @@
                     android:orientation="vertical">
 
                     <net.steamcrafted.materialiconlib.MaterialIconView
-                        android:id="@+id/miv_indoors"
                         xmlns:app="http://schemas.android.com/apk/res-auto"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
@@ -238,8 +233,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="center_horizontal"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -248,7 +242,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/ll_dialog_fragment_create_event_drinks"
+                    android:id="@+id/llDrinks"
                     android:layout_width="52dp"
                     android:layout_height="52dp"
                     android:layout_gravity="center_horizontal|center_vertical"
@@ -256,7 +250,6 @@
                     android:orientation="vertical">
 
                     <net.steamcrafted.materialiconlib.MaterialIconView
-                        android:id="@+id/miv_drinks"
                         xmlns:app="http://schemas.android.com/apk/res-auto"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
@@ -282,7 +275,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/ll_dialog_fragment_create_event_outdoors"
+                    android:id="@+id/llOutdoors"
                     android:layout_width="52dp"
                     android:layout_height="52dp"
                     android:layout_gravity="center_horizontal|center_vertical"
@@ -290,7 +283,6 @@
                     android:orientation="vertical">
 
                     <net.steamcrafted.materialiconlib.MaterialIconView
-                        android:id="@+id/miv_outdoors"
                         xmlns:app="http://schemas.android.com/apk/res-auto"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
@@ -316,7 +308,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/ll_dialog_fragment_create_event_general"
+                    android:id="@+id/llGeneral"
                     android:layout_width="52dp"
                     android:layout_height="52dp"
                     android:layout_gravity="center_horizontal|center_vertical"
@@ -324,7 +316,6 @@
                     android:orientation="vertical">
 
                     <net.steamcrafted.materialiconlib.MaterialIconView
-                        android:id="@+id/miv_general"
                         xmlns:app="http://schemas.android.com/apk/res-auto"
                         android:layout_width="36dp"
                         android:layout_height="36dp"

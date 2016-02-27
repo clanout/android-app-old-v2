@@ -1,19 +1,12 @@
 package reaper.android.app.ui.screens.create;
 
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -22,16 +15,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.squareup.otto.Bus;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -43,75 +32,38 @@ import org.joda.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import hotchemi.stringpicker.StringPicker;
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import reaper.android.R;
-import reaper.android.app.cache._core.CacheManager;
-import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.communication.Communicator;
 import reaper.android.app.config.AppConstants;
-import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.Dimensions;
-import reaper.android.app.config.GenericCacheKeys;
-import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.LocationSuggestion;
 import reaper.android.app.root.Reaper;
-import reaper.android.app.service.UserService;
+import reaper.android.app.service.EventService;
+import reaper.android.app.service.PlacesService;
+import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.ui._core.BaseFragment;
-import reaper.android.app.ui.screens.MainActivity;
-import reaper.android.app.ui.screens.invite.InviteActivity;
+import reaper.android.app.ui.dialog.DayPickerDialog;
+import reaper.android.app.ui.dialog.EventCategorySelectionDialog;
+import reaper.android.app.ui.dialog.EventTypeInfoDialog;
+import reaper.android.app.ui.screens.create.mvp.CreateEventPresenter;
+import reaper.android.app.ui.screens.create.mvp.CreateEventPresenterImpl;
+import reaper.android.app.ui.screens.create.mvp.CreateEventView;
 import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
-import reaper.android.common.analytics.AnalyticsHelper;
-import timber.log.Timber;
 
-public class CreateEventDetailsFragment extends BaseFragment
-        implements LocationSuggestionAdapter.SuggestionClickListener,
-        CreateEventView
+public class CreateEventDetailsFragment extends BaseFragment implements
+        CreateEventView, LocationSuggestionAdapter.SuggestionClickListener
 {
     private static final String ARG_TITLE = "arg_title";
     private static final String ARG_CATEGORY = "arg_category";
     private static final String ARG_IS_SECRET = "arg_is_secret";
     private static final String ARG_START_DAY = "arg_start_day";
     private static final String ARG_START_TIME = "arg_start_time";
-
-    Bus bus;
-    CreateEventPresenter presenter;
-    UserService userService;
-
-    /* UI Elements */
-    ScrollView parent;
-    Toolbar toolbar;
-    EditText etTitle;
-    TextView tvTitleLimit;
-    View llCategoryIconContainer;
-    ImageView ivCategoryIcon;
-    EditText etDesc;
-    CheckBox cbType;
-    View mivInfo;
-    TextView tvTime;
-    TextView tvDay;
-    EditText etLocation;
-    RecyclerView rvLocationSuggestions;
-
-    ProgressDialog createProgressDialog;
-
-    /* Data */
-    DateTimeUtil dateTimeUtil;
-
-    List<String> dayList;
-    List<String> dateList;
-    int selectedDay;
-    LocalTime startTime;
-
-    EventCategory selectedCategory;
-
-    boolean isLocationUpdating;
-    private GenericCache genericCache;
-
 
     public static CreateEventDetailsFragment newInstance(String title, EventCategory category,
                                                          boolean isSecret, String startDay, LocalTime startTime)
@@ -128,46 +80,82 @@ public class CreateEventDetailsFragment extends BaseFragment
         return fragment;
     }
 
+    CreateScreen screen;
+
+    CreateEventPresenter presenter;
+
+    /* UI Elements */
+    @Bind(R.id.svCreate)
+    ScrollView svCreate;
+
+    @Bind(R.id.etTitle)
+    EditText etTitle;
+
+    @Bind(R.id.tvTitleLimit)
+    TextView tvTitleLimit;
+
+    @Bind(R.id.llCategoryIconContainer)
+    View llCategoryIconContainer;
+
+    @Bind(R.id.ivCategoryIcon)
+    ImageView ivCategoryIcon;
+
+    @Bind(R.id.etDescription)
+    EditText etDescription;
+
+    @Bind(R.id.cbType)
+    CheckBox cbType;
+
+    @Bind(R.id.mivInfo)
+    View mivInfo;
+
+    @Bind(R.id.tvTime)
+    TextView tvTime;
+
+    @Bind(R.id.tvDay)
+    TextView tvDay;
+
+    @Bind(R.id.etLocation)
+    EditText etLocation;
+
+    @Bind(R.id.rvLocationSuggestions)
+    RecyclerView rvLocationSuggestions;
+
+    ProgressDialog createProgressDialog;
+
+    /* Data */
+    DateTimeUtil dateTimeUtil;
+    List<String> dayList;
+    List<String> dateList;
+    int selectedDay;
+    LocalTime startTime;
+
+    EventCategory selectedCategory;
+
+    boolean isLocationUpdating;
+
+    /* Lifecycle Methods */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.CREATE_FRAGMENT);
+        setHasOptionsMenu(true);
 
-        bus = Communicator.getInstance().getBus();
-        userService = UserService.getInstance();
-        genericCache = CacheManager.getGenericCache();
+        /* Presenter */
+        EventService eventService = EventService.getInstance();
+        LocationService_ locationService = LocationService_.getInstance();
+        PlacesService placesService = PlacesService.getInstance();
 
-        EventCategory category = (EventCategory) getArguments().getSerializable(ARG_CATEGORY);
-        if (category == null)
-        {
-            category = EventCategory.GENERAL;
-        }
-
-        presenter = new CreateEventPresenterImpl(bus, category);
+        presenter = new CreateEventPresenterImpl(eventService, locationService, placesService);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.fragment_create_details_, container, false);
-
-        parent = (ScrollView) view.findViewById(R.id.sv_createEvent);
-        toolbar = (Toolbar) view.findViewById(R.id.tb_createEvent);
-        etTitle = (EditText) view.findViewById(R.id.etTitle);
-        tvTitleLimit = (TextView) view.findViewById(R.id.tvTitleLimit);
-        llCategoryIconContainer = view.findViewById(R.id.llCategoryIconContainer);
-        ivCategoryIcon = (ImageView) view.findViewById(R.id.ivCategoryIcon);
-        etDesc = (EditText) view.findViewById(R.id.etDesc);
-        cbType = (CheckBox) view.findViewById(R.id.cbType);
-        mivInfo = view.findViewById(R.id.mivInfo);
-        tvTime = (TextView) view.findViewById(R.id.tvTime);
-        tvDay = (TextView) view.findViewById(R.id.tvDay);
-        etLocation = (EditText) view.findViewById(R.id.etLocation);
-        rvLocationSuggestions = (RecyclerView) view.findViewById(R.id.rvLocationSuggestions);
-
+        View view = inflater.inflate(R.layout.fragment_create_details, container, false);
+        ButterKnife.bind(this, view);
         return view;
     }
 
@@ -175,12 +163,10 @@ public class CreateEventDetailsFragment extends BaseFragment
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        setHasOptionsMenu(true);
+        screen = (CreateScreen) getActivity();
 
         initView();
+        initLocationBox();
         initRecyclerView();
     }
 
@@ -188,57 +174,6 @@ public class CreateEventDetailsFragment extends BaseFragment
     public void onResume()
     {
         super.onResume();
-        ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_create);
-
-        CacheManager.getGenericCache().put(GenericCacheKeys.ACTIVE_FRAGMENT, BackstackTags.CREATE);
-
-        etLocation.setOnFocusChangeListener(new View.OnFocusChangeListener()
-        {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus)
-            {
-                if (hasFocus)
-                {
-                    parent.scrollTo(0, rvLocationSuggestions.getBottom());
-                }
-            }
-        });
-
-        etLocation.addTextChangedListener(new TextWatcher()
-        {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after)
-            {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count)
-            {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s)
-            {
-                parent.scrollTo(0, rvLocationSuggestions.getBottom());
-
-                if (!isLocationUpdating)
-                {
-                    if (s.length() == 0)
-                    {
-                        presenter.changeCategory(selectedCategory);
-                    }
-                    else if (s.length() >= 3)
-                    {
-                        presenter.autocomplete(s.toString());
-                    }
-
-                    presenter.setLocationName(s.toString());
-                }
-            }
-        });
-
         presenter.attachView(this);
     }
 
@@ -249,15 +184,141 @@ public class CreateEventDetailsFragment extends BaseFragment
 
         etLocation.setOnFocusChangeListener(null);
         etLocation.addTextChangedListener(null);
-        SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
     }
 
     @Override
-    public void onStop()
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
-        super.onStop();
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.action_create, menu);
 
-        presenter.detachView();
+        Drawable drawable = MaterialDrawableBuilder
+                .with(Reaper.getReaperContext())
+                .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
+                .setColor(Color.WHITE)
+                .build();
+
+        menu.findItem(R.id.action_create).setIcon(drawable);
+
+        menu.findItem(R.id.action_create)
+            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+            {
+                @Override
+                public boolean onMenuItemClick(MenuItem item)
+                {
+                    SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+                    createEvent();
+                    return true;
+                }
+            });
+    }
+
+    /* Listeners */
+    @Override
+    public void onSuggestionClicked(LocationSuggestion locationSuggestion)
+    {
+        if (presenter != null)
+        {
+            presenter.selectSuggestion(locationSuggestion);
+        }
+    }
+
+    /* View Methods */
+    @Override
+    public void displaySuggestions(List<LocationSuggestion> locationSuggestions)
+    {
+        rvLocationSuggestions.setAdapter(new LocationSuggestionAdapter(locationSuggestions, this));
+
+        if (locationSuggestions.isEmpty())
+        {
+            rvLocationSuggestions.setVisibility(View.GONE);
+        }
+        else
+        {
+            rvLocationSuggestions.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void setLocation(String locationName)
+    {
+        isLocationUpdating = true;
+        etLocation.setText(locationName);
+        etLocation.setSelection(etLocation.length());
+        isLocationUpdating = false;
+
+        SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+
+        presenter.changeCategory(selectedCategory);
+    }
+
+    @Override
+    public void showLoading()
+    {
+        createProgressDialog = ProgressDialog
+                .show(getActivity(), "Creating your clan", "Please wait ...");
+    }
+
+    @Override
+    public void displayEmptyTitleError()
+    {
+        if (createProgressDialog != null)
+        {
+            createProgressDialog.dismiss();
+        }
+
+        SnackbarFactory.create(getActivity(), R.string.error_no_title);
+    }
+
+    @Override
+    public void displayInvalidTimeError()
+    {
+        if (createProgressDialog != null)
+        {
+            createProgressDialog.dismiss();
+        }
+
+        SnackbarFactory.create(getActivity(), R.string.error_invalid_start_time);
+    }
+
+    @Override
+    public void navigateToInviteScreen(String eventId)
+    {
+        if (createProgressDialog != null)
+        {
+            createProgressDialog.dismiss();
+        }
+
+        screen.navigateToInviteScreen(eventId);
+    }
+
+    @Override
+    public void displayError()
+    {
+        if (createProgressDialog != null)
+        {
+            createProgressDialog.dismiss();
+        }
+
+        SnackbarFactory.create(getActivity(), R.string.error_default);
+    }
+
+    /* Helper Methods */
+    private void createEvent()
+    {
+        String eventTitle = etTitle.getText().toString();
+        String eventDescription = etDescription.getText().toString();
+        DateTime start = DateTimeUtil
+                .getDateTime(dateTimeUtil.getDate(dayList.get(selectedDay)), startTime);
+        DateTime end = DateTimeUtil.getEndTime(start);
+
+        Event.Type type = cbType.isChecked() ? Event.Type.INVITE_ONLY : Event.Type.PUBLIC;
+
+        if (presenter != null)
+        {
+            presenter.create(eventTitle, type, eventDescription, start, end);
+        }
+
     }
 
     private void initView()
@@ -282,7 +343,7 @@ public class CreateEventDetailsFragment extends BaseFragment
         }
 
         // Type
-        boolean isSecret = getArguments().getBoolean(ARG_IS_SECRET);
+        boolean isSecret = getArguments().getBoolean(ARG_IS_SECRET, false);
         cbType.setChecked(isSecret);
 
         // Start Time
@@ -320,24 +381,7 @@ public class CreateEventDetailsFragment extends BaseFragment
             @Override
             public void onClick(View v)
             {
-                TimePickerDialog dialog = TimePickerDialog
-                        .newInstance(
-                                new TimePickerDialog.OnTimeSetListener()
-                                {
-                                    @Override
-                                    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute)
-                                    {
-                                        startTime = new LocalTime(hourOfDay, minute);
-                                        tvTime.setText(dateTimeUtil.formatTime(startTime));
-                                    }
-                                },
-                                startTime.getHourOfDay(),
-                                startTime.getMinuteOfHour(),
-                                false);
-
-                dialog.dismissOnPause(true);
-                dialog.vibrate(false);
-                dialog.show(getFragmentManager(), "TimePicker");
+                displayTimePicker();
             }
         });
 
@@ -355,7 +399,7 @@ public class CreateEventDetailsFragment extends BaseFragment
             @Override
             public void onClick(View v)
             {
-                displayEventTypePopUp();
+                displayEventTypeDescriptionDialog();
             }
         });
 
@@ -364,7 +408,7 @@ public class CreateEventDetailsFragment extends BaseFragment
             @Override
             public void onClick(View v)
             {
-                displayCategoryChangeDialog();
+                displayCategorySelectionDialog();
             }
         });
 
@@ -389,6 +433,115 @@ public class CreateEventDetailsFragment extends BaseFragment
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after)
             {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                int remaining = AppConstants.TITLE_LENGTH_LIMIT - s.length();
+                tvTitleLimit.setText(String.valueOf(remaining));
+            }
+        });
+    }
+
+    private void initRecyclerView()
+    {
+        rvLocationSuggestions.setLayoutManager(new LinearLayoutManager(getActivity()));
+        rvLocationSuggestions
+                .setAdapter(new LocationSuggestionAdapter(new ArrayList<LocationSuggestion>(), this));
+
+        rvLocationSuggestions.setVisibility(View.GONE);
+    }
+
+    private void displayEventTypeDescriptionDialog()
+    {
+        EventTypeInfoDialog.show(getActivity());
+    }
+
+    private void displayTimePicker()
+    {
+        TimePickerDialog dialog = TimePickerDialog
+                .newInstance(
+                        new TimePickerDialog.OnTimeSetListener()
+                        {
+                            @Override
+                            public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute)
+                            {
+                                startTime = new LocalTime(hourOfDay, minute);
+                                tvTime.setText(dateTimeUtil.formatTime(startTime));
+                            }
+                        },
+                        startTime.getHourOfDay(),
+                        startTime.getMinuteOfHour(),
+                        false);
+
+        dialog.dismissOnPause(true);
+        dialog.vibrate(false);
+        dialog.show(getFragmentManager(), "TimePicker");
+    }
+
+    private void displayDayPicker()
+    {
+        DayPickerDialog.show(getActivity(), dateList, selectedDay, new DayPickerDialog.Listener()
+        {
+            @Override
+            public void onDaySelected(int position)
+            {
+                selectedDay = position;
+                tvDay.setText(dayList.get(selectedDay));
+            }
+        });
+    }
+
+    private void displayCategorySelectionDialog()
+    {
+        EventCategorySelectionDialog.show(getActivity(), new EventCategorySelectionDialog.Listener()
+        {
+            @Override
+            public void onCategorySelected(EventCategory category)
+            {
+                changeCategory(category);
+            }
+        });
+    }
+
+    private void changeCategory(EventCategory category)
+    {
+        selectedCategory = category;
+        ivCategoryIcon.setImageDrawable(DrawableFactory
+                .get(selectedCategory, Dimensions.EVENT_ICON_SIZE));
+        llCategoryIconContainer.setBackground(DrawableFactory.getIconBackground(selectedCategory));
+
+        if (presenter != null)
+        {
+            presenter.changeCategory(category);
+        }
+    }
+
+    private void initLocationBox()
+    {
+        etLocation.setOnFocusChangeListener(new View.OnFocusChangeListener()
+        {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus)
+            {
+                if (hasFocus)
+                {
+                    svCreate.scrollTo(0, rvLocationSuggestions.getBottom());
+                }
+            }
+        });
+
+        etLocation.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
 
             }
 
@@ -401,378 +554,27 @@ public class CreateEventDetailsFragment extends BaseFragment
             @Override
             public void afterTextChanged(Editable s)
             {
-                int remaining = AppConstants.TITLE_LENGTH_LIMIT - s.length();
-                tvTitleLimit.setText(String.valueOf(remaining));
-            }
-        });
-    }
+                svCreate.scrollTo(0, rvLocationSuggestions.getBottom());
 
-    private void changeCategory(EventCategory category)
-    {
-        selectedCategory = category;
-        ivCategoryIcon.setImageDrawable(DrawableFactory
-                .get(selectedCategory, Dimensions.EVENT_ICON_SIZE));
-        llCategoryIconContainer
-                .setBackground(DrawableFactory.getIconBackground(selectedCategory));
-
-        presenter.changeCategory(category);
-    }
-
-    private void initRecyclerView()
-    {
-        rvLocationSuggestions.setLayoutManager(new LinearLayoutManager(getActivity()));
-        rvLocationSuggestions
-                .setAdapter(new LocationSuggestionAdapter(new ArrayList<LocationSuggestion>(), this));
-
-        rvLocationSuggestions.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onSuggestionClicked(LocationSuggestion locationSuggestion)
-    {
-        presenter.selectSuggestion(locationSuggestion);
-    }
-
-    /* View Methods */
-    @Override
-    public void displaySuggestions(List<LocationSuggestion> locationSuggestions)
-    {
-        rvLocationSuggestions.setAdapter(new LocationSuggestionAdapter(locationSuggestions, this));
-
-        if (locationSuggestions.isEmpty())
-        {
-            rvLocationSuggestions.setVisibility(View.GONE);
-        }
-        else
-        {
-            rvLocationSuggestions.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void setLocation(String locationName)
-    {
-        isLocationUpdating = true;
-        etLocation.setText(locationName);
-        etLocation.setSelection(etLocation.length());
-        isLocationUpdating = false;
-
-        InputMethodManager imm = (InputMethodManager) getActivity()
-                .getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(etTitle.getWindowToken(), 0);
-
-        presenter.changeCategory(selectedCategory);
-    }
-
-    @Override
-    public void showLoading()
-    {
-        createProgressDialog = ProgressDialog
-                .show(getActivity(), "Creating your clan", "Please wait ...");
-    }
-
-    @Override
-    public void displayEmptyTitleError()
-    {
-        if (createProgressDialog != null)
-        {
-            createProgressDialog.dismiss();
-        }
-
-        SnackbarFactory.create(getActivity(), R.string.error_no_title);
-    }
-
-    @Override
-    public void displayInvalidTimeError()
-    {
-        if (createProgressDialog != null)
-        {
-            createProgressDialog.dismiss();
-        }
-
-        SnackbarFactory.create(getActivity(), R.string.error_invalid_start_time);
-    }
-
-    @Override
-    public void navigateToInviteScreen(Event event)
-    {
-        if (createProgressDialog != null)
-        {
-            createProgressDialog.dismiss();
-        }
-
-        startActivity(InviteActivity.callingIntent(getActivity(), true, event.getId()));
-        getActivity().finish();
-    }
-
-    @Override
-    public void displayError()
-    {
-        if (createProgressDialog != null)
-        {
-            createProgressDialog.dismiss();
-        }
-
-        SnackbarFactory.create(getActivity(), R.string.error_default);
-    }
-
-    private void displayEventTypePopUp()
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setCancelable(false);
-
-        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
-        View dialogView = layoutInflater.inflate(R.layout.dialog_event_type, null);
-        builder.setView(dialogView);
-
-        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                dialog.dismiss();
-            }
-        });
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
-
-    private void displayDayPicker()
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setCancelable(false);
-
-        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
-        View dialogView = layoutInflater.inflate(R.layout.dialog_day_picker, null);
-        builder.setView(dialogView);
-
-        final StringPicker stringPicker = (StringPicker) dialogView
-                .findViewById(R.id.dayPicker);
-        stringPicker.setValues(dateList);
-        stringPicker.setCurrent(selectedDay);
-
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                selectedDay = stringPicker.getCurrent();
-                tvDay.setText(dayList.get(selectedDay));
-                Timber.d("Selected Day = " + selectedDay);
-                dialog.dismiss();
-            }
-        });
-
-        AlertDialog alertDialog = builder.create();
-
-        /* Set Width */
-        Rect displayRectangle = new Rect();
-        Window window = getActivity().getWindow();
-        window.getDecorView().getWindowVisibleDisplayFrame(displayRectangle);
-        int width = (int) (displayRectangle.width() * 0.80f);
-        alertDialog.getWindow().setLayout(width, LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
-
-        alertDialog.show();
-    }
-
-    private void displayCategoryChangeDialog()
-    {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setCancelable(true);
-
-        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
-        final View dialogView = layoutInflater.inflate(R.layout.alert_dialog_change_category, null);
-        builder.setView(dialogView);
-
-        final AlertDialog alertDialog = builder.create();
-
-        final LinearLayout cafe = (LinearLayout) dialogView
-                .findViewById(R.id.ll_dialog_fragment_create_event_cafe);
-        final LinearLayout movies = (LinearLayout) dialogView
-                .findViewById(R.id.ll_dialog_fragment_create_event_movie);
-        final LinearLayout eatOut = (LinearLayout) dialogView
-                .findViewById(R.id.ll_dialog_fragment_create_event_eat_out);
-        final LinearLayout sports = (LinearLayout) dialogView
-                .findViewById(R.id.ll_dialog_fragment_create_event_sports);
-        final LinearLayout outdoors = (LinearLayout) dialogView
-                .findViewById(R.id.ll_dialog_fragment_create_event_outdoors);
-        final LinearLayout indoors = (LinearLayout) dialogView
-                .findViewById(R.id.ll_dialog_fragment_create_event_indoors);
-        final LinearLayout drinks = (LinearLayout) dialogView
-                .findViewById(R.id.ll_dialog_fragment_create_event_drinks);
-        final LinearLayout shopping = (LinearLayout) dialogView
-                .findViewById(R.id.ll_dialog_fragment_create_event_shopping);
-        final LinearLayout general = (LinearLayout) dialogView
-                .findViewById(R.id.ll_dialog_fragment_create_event_general);
-
-        cafe.setBackground(DrawableFactory.getIconBackground(EventCategory.CAFE));
-        movies.setBackground(DrawableFactory.getIconBackground(EventCategory.MOVIES));
-        eatOut.setBackground(DrawableFactory.getIconBackground(EventCategory.EAT_OUT));
-        sports.setBackground(DrawableFactory.getIconBackground(EventCategory.SPORTS));
-        outdoors.setBackground(DrawableFactory.getIconBackground(EventCategory.OUTDOORS));
-        indoors.setBackground(DrawableFactory.getIconBackground(EventCategory.INDOORS));
-        drinks.setBackground(DrawableFactory.getIconBackground(EventCategory.DRINKS));
-        shopping.setBackground(DrawableFactory.getIconBackground(EventCategory.SHOPPING));
-        general.setBackground(DrawableFactory.getIconBackground(EventCategory.GENERAL));
-
-        cafe.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                changeCategory(EventCategory.CAFE);
-                alertDialog.dismiss();
-            }
-        });
-
-        movies.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                changeCategory(EventCategory.MOVIES);
-                alertDialog.dismiss();
-            }
-        });
-
-
-        eatOut.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                changeCategory(EventCategory.EAT_OUT);
-                alertDialog.dismiss();
-            }
-        });
-
-
-        sports.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                changeCategory(EventCategory.SPORTS);
-                alertDialog.dismiss();
-            }
-        });
-
-
-        outdoors.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                changeCategory(EventCategory.OUTDOORS);
-                alertDialog.dismiss();
-            }
-        });
-
-
-        indoors.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                changeCategory(EventCategory.INDOORS);
-                alertDialog.dismiss();
-            }
-        });
-
-
-        drinks.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                changeCategory(EventCategory.DRINKS);
-                alertDialog.dismiss();
-            }
-        });
-
-
-        shopping.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                changeCategory(EventCategory.SHOPPING);
-                alertDialog.dismiss();
-            }
-        });
-
-
-        general.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                changeCategory(EventCategory.GENERAL);
-                alertDialog.dismiss();
-
-            }
-        });
-
-        alertDialog.show();
-
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.action_create, menu);
-
-        Drawable drawable = MaterialDrawableBuilder
-                .with(Reaper.getReaperContext())
-                .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
-                .setColor(Color.WHITE)
-                .build();
-
-        menu.findItem(R.id.action_create).setIcon(drawable);
-
-        menu.findItem(R.id.action_create)
-            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-            {
-                @Override
-                public boolean onMenuItemClick(MenuItem item)
+                if (presenter != null)
                 {
-                    SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
-                    createEvent();
-                    return true;
+                    if (!isLocationUpdating)
+                    {
+                        if (s.length() == 0)
+                        {
+                            presenter.changeCategory(selectedCategory);
+                        }
+                        else if (s.length() >= 3)
+                        {
+                            presenter.autocomplete(s.toString());
+                        }
+
+                        presenter.setLocationName(s.toString());
+                    }
                 }
-            });
-    }
-
-    private void createEvent()
-    {
-        String eventTitle = etTitle.getText().toString();
-        String eventDescription = etDesc.getText().toString();
-        DateTime start = DateTimeUtil
-                .getDateTime(dateTimeUtil.getDate(dayList.get(selectedDay)), startTime);
-        DateTime end = DateTimeUtil.getEndTime(start);
-
-        Event.Type type = cbType
-                .isChecked() ? Event.Type.INVITE_ONLY : Event.Type.PUBLIC;
-
-        presenter
-                .create(eventTitle, type, eventDescription, start, end);
-
-        AnalyticsHelper
-                .sendEvents(GoogleAnalyticsConstants.BUTTON_CLICK, GoogleAnalyticsConstants.CREATE_EVENT_CLICKED_FROM_DETAILS, userService
-                        .getSessionUserId());
-
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        if (item.getItemId() == android.R.id.home)
-        {
-            getActivity().onBackPressed();
-        }
-        return super.onOptionsItemSelected(item);
+            }
+        });
     }
 }
+
+// TODO: Stop keyboard from automatically popping up

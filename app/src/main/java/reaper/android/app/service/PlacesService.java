@@ -36,13 +36,6 @@ public class PlacesService
         googlePlacesApi = ApiManager.getGooglePlacesApi();
     }
 
-    public ArrayList<GooglePlaceAutocompleteApiResponse.Prediction> autocomplete(Double latitude, Double longitude, String input)
-    {
-        GooglePlaceAutocompleteApiResponse response = googlePlacesApi
-                .getPlacesAutocomplete(latitude + "," + longitude, input);
-        return (ArrayList<GooglePlaceAutocompleteApiResponse.Prediction>) response.getPredictions();
-    }
-
     public Observable<List<LocationSuggestion>> _autocomplete(final Double latitude, final Double longitude, final String input)
     {
         return Observable

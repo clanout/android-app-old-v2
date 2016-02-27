@@ -1,4 +1,4 @@
-package reaper.android.app.ui.screens.create;
+package reaper.android.app.ui.screens.create.mvp;
 
 import org.joda.time.DateTime;
 
@@ -14,7 +14,7 @@ public interface CreateEventPresenter
 
     void changeCategory(EventCategory category);
 
-    void autocomplete(String s);
+    void autocomplete(String input);
 
     void selectSuggestion(LocationSuggestion locationSuggestion);
 

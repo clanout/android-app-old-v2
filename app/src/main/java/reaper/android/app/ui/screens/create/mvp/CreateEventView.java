@@ -1,8 +1,7 @@
-package reaper.android.app.ui.screens.create;
+package reaper.android.app.ui.screens.create.mvp;
 
 import java.util.List;
 
-import reaper.android.app.model.Event;
 import reaper.android.app.model.LocationSuggestion;
 
 public interface CreateEventView
@@ -17,7 +16,7 @@ public interface CreateEventView
 
     void displayInvalidTimeError();
 
-    void navigateToInviteScreen(Event event);
+    void navigateToInviteScreen(String eventId);
 
     void displayError();
 }
