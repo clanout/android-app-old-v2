@@ -1,17 +1,24 @@
 package reaper.android.app.ui.screens.invite;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +32,7 @@ import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.service._new.PhonebookService_;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui._core.PermissionHandler;
+import reaper.android.app.ui.dialog.UpdateMobileDialog;
 import reaper.android.app.ui.screens.invite.mvp.FriendInviteWrapper;
 import reaper.android.app.ui.screens.invite.mvp.InvitePresenter;
 import reaper.android.app.ui.screens.invite.mvp.InvitePresenterImpl;
@@ -82,6 +90,12 @@ public class InviteFragment extends BaseFragment implements
     @Bind(R.id.tvInviteCount)
     TextView tvInviteCount;
 
+    ProgressBar pbRefreshing;
+
+    MenuItem refresh;
+    MenuItem addPhone;
+    boolean isAddPhoneVisible;
+
     TextWatcher search;
     String locationZone;
     List<FriendInviteWrapper> friends;
@@ -92,6 +106,10 @@ public class InviteFragment extends BaseFragment implements
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+
+        isAddPhoneVisible = true;
 
         /* Presenter */
         UserService userService = UserService.getInstance();
@@ -130,7 +148,7 @@ public class InviteFragment extends BaseFragment implements
             @Override
             public void onClick(View v)
             {
-                if(presenter != null)
+                if (presenter != null)
                 {
                     presenter.sendInvitations();
                 }
@@ -156,6 +174,68 @@ public class InviteFragment extends BaseFragment implements
         presenter.detachView();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        menu.clear();
+        inflater.inflate(R.menu.menu_invite, menu);
+
+        refresh = menu.findItem(R.id.action_refresh);
+        addPhone = menu.findItem(R.id.action_add_phone);
+
+        Drawable addPhoneIcon = MaterialDrawableBuilder
+                .with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE_ANDROID)
+                .setColor(ContextCompat
+                        .getColor(getActivity(), R.color.white))
+                .setSizeDp(36)
+                .build();
+        addPhone.setIcon(addPhoneIcon);
+
+        Drawable refreshIcon = MaterialDrawableBuilder
+                .with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
+                .setColor(ContextCompat
+                        .getColor(getActivity(), R.color.white))
+                .setSizeDp(36)
+                .build();
+        refresh.setIcon(refreshIcon);
+
+        refresh.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                if (presenter != null)
+                {
+                    presenter.refresh();
+                }
+                return true;
+            }
+        });
+
+        addPhone.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                UpdateMobileDialog.show(getActivity(), new UpdateMobileDialog.Listener()
+                {
+                    @Override
+                    public void onSuccess(String mobileNumber)
+                    {
+                        addPhone.setVisible(false);
+                    }
+                });
+                return true;
+            }
+        });
+
+        addPhone.setVisible(isAddPhoneVisible);
+    }
+
     /* Permission Handling */
     @Override
     public void onPermissionGranted(@PermissionHandler.Permissions int permission)
@@ -173,7 +253,8 @@ public class InviteFragment extends BaseFragment implements
             @Override
             public void onClick(View v)
             {
-
+                PermissionHandler
+                        .requestPermission(getActivity(), PermissionHandler.Permissions.READ_CONTACTS);
             }
         });
 
@@ -188,7 +269,7 @@ public class InviteFragment extends BaseFragment implements
             @Override
             public void onClick(View v)
             {
-
+                screen.navigateToAppSettings();
             }
         });
 
@@ -216,9 +297,49 @@ public class InviteFragment extends BaseFragment implements
 
     /* View Methods */
     @Override
+    public void showAddPhoneOption()
+    {
+        isAddPhoneVisible = true;
+        if (addPhone != null)
+        {
+            addPhone.setVisible(true);
+        }
+    }
+
+    @Override
+    public void hideAddPhoneOption()
+    {
+        isAddPhoneVisible = false;
+        if (addPhone != null)
+        {
+            addPhone.setVisible(false);
+        }
+    }
+
+    @Override
     public void handleReadContactsPermission()
     {
+        if (PermissionHandler
+                .isRationalRequired(getActivity(), PermissionHandler.Permissions.READ_CONTACTS))
+        {
+            llPermission.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    PermissionHandler
+                            .requestPermission(getActivity(), PermissionHandler.Permissions.READ_CONTACTS);
+                }
+            });
 
+            VisibilityAnimationUtil.expand(llPermission, 200);
+        }
+        else
+        {
+            // Read contacts permission has not been granted yet. Request it directly.
+            PermissionHandler
+                    .requestPermission(getActivity(), PermissionHandler.Permissions.READ_CONTACTS);
+        }
     }
 
     @Override
@@ -285,6 +406,30 @@ public class InviteFragment extends BaseFragment implements
     public void navigateToDetailsScreen()
     {
         screen.navigateToDetailsScreen();
+    }
+
+    @Override
+    public void showRefreshing()
+    {
+        refresh.setActionView(R.layout.view_action_refreshing);
+        pbRefreshing = (ProgressBar) refresh.getActionView().findViewById(R.id.pbRefreshing);
+        pbRefreshing.getIndeterminateDrawable()
+                    .setColorFilter(ContextCompat.getColor(getActivity(), R.color.white),
+                            android.graphics.PorterDuff.Mode.SRC_IN);
+    }
+
+    @Override
+    public void hideRefreshing()
+    {
+        refresh.setActionView(null);
+        Drawable refreshIcon = MaterialDrawableBuilder
+                .with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
+                .setColor(ContextCompat
+                        .getColor(getActivity(), R.color.white))
+                .setSizeDp(36)
+                .build();
+        refresh.setIcon(refreshIcon);
     }
 
     /* Helper Methods */

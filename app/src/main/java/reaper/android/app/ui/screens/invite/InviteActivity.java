@@ -11,17 +11,28 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.model.Event;
+import reaper.android.app.service.EventService;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui._core.PermissionHandler;
+import reaper.android.app.ui.screens.FlowEntry;
+import reaper.android.app.ui.screens.MainActivity;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class InviteActivity extends BaseActivity implements InviteScreen
 {
+    private static final String ARG_IS_CREATE_FLOW = "arg_is_create_flow";
     private static final String ARG_EVENT_ID = "arg_event_id";
 
-    public static Intent callingIntent(Context context, String eventId)
+    public static Intent callingIntent(Context context, boolean isCreateFlow, String eventId)
     {
         if (eventId == null)
         {
@@ -29,6 +40,7 @@ public class InviteActivity extends BaseActivity implements InviteScreen
         }
 
         Intent intent = new Intent(context, InviteActivity.class);
+        intent.putExtra(ARG_IS_CREATE_FLOW, isCreateFlow);
         intent.putExtra(ARG_EVENT_ID, eventId);
         return intent;
     }
@@ -127,8 +139,51 @@ public class InviteActivity extends BaseActivity implements InviteScreen
     }
 
     @Override
+    public void navigateToAppSettings()
+    {
+        gotoAppSettings();
+    }
+
+    @Override
     public void navigateToDetailsScreen()
     {
-        finish();
+        boolean isCreateFlow = getIntent().getBooleanExtra(ARG_IS_CREATE_FLOW, false);
+        final String eventId = getIntent().getStringExtra(ARG_EVENT_ID);
+
+        if (isCreateFlow)
+        {
+            EventService.getInstance()
+                        ._fetchEvents()
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<List<Event>>()
+                        {
+                            @Override
+                            public void onCompleted()
+                            {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e)
+                            {
+
+                            }
+
+                            @Override
+                            public void onNext(List<Event> events)
+                            {
+                                Intent intent = MainActivity
+                                        .callingIntent(InviteActivity.this, FlowEntry.DETAILS, eventId, (ArrayList<Event>) events);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+        }
+        else
+        {
+            finish();
+        }
     }
 }

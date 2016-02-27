@@ -310,6 +310,18 @@ public class UserService
                                         return registeredContacts;
                                     }
                                 })
+                                .map(new Func1<List<Friend>, List<Friend>>()
+                                {
+                                    @Override
+                                    public List<Friend> call(List<Friend> friends)
+                                    {
+                                        String sessionUserId = getSessionUserId();
+                                        Friend me = new Friend();
+                                        me.setId(sessionUserId);
+                                        friends.remove(me);
+                                        return friends;
+                                    }
+                                })
                                 .doOnNext(new Action1<List<Friend>>()
                                 {
                                     @Override

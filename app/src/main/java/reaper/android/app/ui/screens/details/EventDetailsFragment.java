@@ -618,7 +618,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     @Override
     public void navigateToInviteScreen(Event event)
     {
-        startActivity(InviteActivity.callingIntent(getActivity(), event.getId()));
+        startActivity(InviteActivity.callingIntent(getActivity(), false, event.getId()));
     }
 
     @Override

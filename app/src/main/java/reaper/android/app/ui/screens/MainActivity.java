@@ -188,10 +188,6 @@ public class MainActivity extends BaseActivity
         {
             finish();
         }
-        else if (activeFragment.equals(BackstackTags.INVITE_USERS_CONTAINER))
-        {
-            bus.post(new BackPressedTrigger(BackstackTags.INVITE_USERS_CONTAINER));
-        }
         else if (activeFragment.equals(BackstackTags.EVENT_DETAILS_CONTAINER))
         {
             bus.post(new BackPressedTrigger(BackstackTags.EVENT_DETAILS_CONTAINER));

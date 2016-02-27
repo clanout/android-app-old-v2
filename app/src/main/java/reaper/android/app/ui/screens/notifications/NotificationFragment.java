@@ -105,7 +105,7 @@ public class NotificationFragment extends BaseFragment implements
         super.onCreateOptionsMenu(menu, inflater);
 
         menu.clear();
-        inflater.inflate(R.menu.action_notification, menu);
+        inflater.inflate(R.menu.menu_notification, menu);
 
         MenuItem clear = menu.findItem(R.id.action_clear);
         clear.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()

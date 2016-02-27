@@ -13,4 +13,6 @@ public interface InvitePresenter
     void select(PhonebookContactInviteWrapper contact, boolean isInvited);
 
     void sendInvitations();
+
+    void refresh();
 }

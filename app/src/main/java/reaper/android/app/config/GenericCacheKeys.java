@@ -13,7 +13,6 @@ public final class GenericCacheKeys
     public static final String HAS_FETCHED_PENDING_INVITES = "has_fetched_pending_invites";
     public static final String TIMES_APPLICATION_OPENED = "times_application_opened";
     public static final String HAS_GIVEN_FEEDBACK = "has_given_Feedback";
-    public static final String HAS_SEEN_INVITE_POPUP = "has_seen_invite_popup";
     public static final String READ_CONTACT_PERMISSION_DENIED = "read_contact_permission_denied";
     public static final String EVENT_SUGGESTIONS = "event_suggestions";
     public static final String EVENT_SUGGESTIONS_UPDATE_TIMESTAMP = "event_suggestions_update_timestamp";

@@ -4,6 +4,10 @@ import java.util.List;
 
 public interface InviteView
 {
+    void showAddPhoneOption();
+
+    void hideAddPhoneOption();
+
     void handleReadContactsPermission();
 
     void showLoading();
@@ -19,4 +23,8 @@ public interface InviteView
     void hideInviteButton();
 
     void navigateToDetailsScreen();
+
+    void showRefreshing();
+
+    void hideRefreshing();
 }

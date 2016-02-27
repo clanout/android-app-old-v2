@@ -98,6 +98,7 @@ public class EventService
         locationService = LocationService_.getInstance();
     }
 
+    /* Events */
     public Observable<List<Event>> _fetchEvents()
     {
         return _fetchEventsCache()
@@ -167,6 +168,7 @@ public class EventService
 
     }
 
+    /* Event Details */
     public Observable<EventDetails> _fetchDetails(final String eventId)
     {
         return _fetchDetailsCache(eventId)
@@ -220,6 +222,7 @@ public class EventService
                 .subscribeOn(Schedulers.newThread());
     }
 
+    /* Invite */
     public void inviteAppFriends(String eventId, List<String> friendIds)
     {
         InviteUsersApiRequest request = new InviteUsersApiRequest(eventId, friendIds);

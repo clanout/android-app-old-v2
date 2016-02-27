@@ -63,6 +63,15 @@ public class InvitePresenterImpl implements InvitePresenter
             this.view.handleReadContactsPermission();
         }
 
+        if (userService.getSessionUser().getMobileNumber() == null)
+        {
+            this.view.showAddPhoneOption();
+        }
+        else
+        {
+            this.view.hideAddPhoneOption();
+        }
+
         init();
     }
 
@@ -150,6 +159,45 @@ public class InvitePresenterImpl implements InvitePresenter
         }
     }
 
+    @Override
+    public void refresh()
+    {
+        view.showRefreshing();
+
+        Subscription subscription
+                = getRefreshObservable()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Pair<List<FriendInviteWrapper>, List<PhonebookContactInviteWrapper>>>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        view.hideRefreshing();
+                    }
+
+                    @Override
+                    public void onNext(Pair<List<FriendInviteWrapper>, List<PhonebookContactInviteWrapper>> inviteList)
+                    {
+                        List<FriendInviteWrapper> friends = inviteList.first;
+                        List<PhonebookContactInviteWrapper> phonebookContacts = inviteList.second;
+                        view.displayInviteList(locationService.getCurrentLocation().getZone(),
+                                friends, phonebookContacts);
+                        view.hideRefreshing();
+
+                        invitedFriends = new ArrayList<String>();
+                        invitedContacts = new ArrayList<String>();
+                    }
+                });
+
+        subscriptions.add(subscription);
+    }
+
     /* Helper Methods */
     private void init()
     {
@@ -211,6 +259,43 @@ public class InvitePresenterImpl implements InvitePresenter
         {
             return Observable
                     .zip(userService._fetchLocalFacebookFriends(),
+                            eventService._fetchDetails(eventId),
+                            new Func2<List<Friend>, EventDetails, Pair<List<FriendInviteWrapper>, List<PhonebookContactInviteWrapper>>>()
+                            {
+                                @Override
+                                public Pair<List<FriendInviteWrapper>, List<PhonebookContactInviteWrapper>> call(List<Friend> facebookFriends, EventDetails eventDetails)
+                                {
+                                    List<FriendInviteWrapper> facebookFriendInviteWrappers = prepareFriendInviteWrappers(eventDetails, facebookFriends);
+                                    List<PhonebookContactInviteWrapper> phonebookContactInviteWrappers = new ArrayList<>();
+                                    return new Pair<>(facebookFriendInviteWrappers, phonebookContactInviteWrappers);
+                                }
+                            });
+        }
+    }
+
+    private Observable<Pair<List<FriendInviteWrapper>, List<PhonebookContactInviteWrapper>>> getRefreshObservable()
+    {
+        if (isReadContactsPermissionGranted)
+        {
+            return Observable
+                    .zip(userService._refreshLocalAppFriends(),
+                            eventService._fetchDetails(eventId),
+                            phonebookService.fetchAllContacts(),
+                            new Func3<List<Friend>, EventDetails, List<PhonebookContact>, Pair<List<FriendInviteWrapper>, List<PhonebookContactInviteWrapper>>>()
+                            {
+                                @Override
+                                public Pair<List<FriendInviteWrapper>, List<PhonebookContactInviteWrapper>> call(List<Friend> appFriends, EventDetails eventDetails, List<PhonebookContact> phonebookContacts)
+                                {
+                                    List<FriendInviteWrapper> friendInviteWrappers = prepareFriendInviteWrappers(eventDetails, appFriends);
+                                    List<PhonebookContactInviteWrapper> phonebookContactInviteWrappers = preparePhonebookContactInviteWrappers(phonebookContacts);
+                                    return new Pair<>(friendInviteWrappers, phonebookContactInviteWrappers);
+                                }
+                            });
+        }
+        else
+        {
+            return Observable
+                    .zip(userService._fetchFacebookFriendsNetwork(false),
                             eventService._fetchDetails(eventId),
                             new Func2<List<Friend>, EventDetails, Pair<List<FriendInviteWrapper>, List<PhonebookContactInviteWrapper>>>()
                             {

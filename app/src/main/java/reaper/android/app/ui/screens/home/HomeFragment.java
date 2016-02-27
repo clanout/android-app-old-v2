@@ -1024,7 +1024,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
             createProgressDialog.dismiss();
         }
 
-        startActivity(InviteActivity.callingIntent(getActivity(), event.getId()));
+        startActivity(InviteActivity.callingIntent(getActivity(), true, event.getId()));
+        getActivity().finish();
     }
 
     private void handleReadContactsPermission()
