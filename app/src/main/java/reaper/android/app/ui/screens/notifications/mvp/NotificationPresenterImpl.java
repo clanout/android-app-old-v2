@@ -8,7 +8,9 @@ import reaper.android.app.service.EventService;
 import reaper.android.app.service.NotificationService;
 import reaper.android.common.notification.Notification;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.subscriptions.CompositeSubscription;
 
 public class NotificationPresenterImpl implements NotificationPresenter
 {
@@ -18,10 +20,14 @@ public class NotificationPresenterImpl implements NotificationPresenter
 
     private List<Notification> notifications;
 
+    private CompositeSubscription subscriptions;
+
     public NotificationPresenterImpl(NotificationService notificationService, EventService eventService)
     {
         this.notificationService = notificationService;
         this.eventService = eventService;
+
+        subscriptions = new CompositeSubscription();
     }
 
     @Override
@@ -36,6 +42,7 @@ public class NotificationPresenterImpl implements NotificationPresenter
     @Override
     public void detachView()
     {
+        subscriptions.clear();
         this.view = null;
     }
 
@@ -49,36 +56,38 @@ public class NotificationPresenterImpl implements NotificationPresenter
         {
             view.navigateToHomeScreen();
         }
+        else if (notification.getType() == Notification.CHAT)
+        {
+            view.navigateToChatScreen(eventId);
+        }
+        else
+        {
+            Subscription subscription =
+                    eventService
+                            ._fetchEvents()
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Subscriber<List<Event>>()
+                            {
+                                @Override
+                                public void onCompleted()
+                                {
+                                }
 
-        eventService
-                ._fetchEvents()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Event>>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
-                    }
+                                @Override
+                                public void onError(Throwable e)
+                                {
+                                    view.navigateToHomeScreen();
+                                }
 
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                        view.navigateToHomeScreen();
-                    }
+                                @Override
+                                public void onNext(List<Event> events)
+                                {
+                                    view.navigateToDetailsScreen(events, eventId);
+                                }
+                            });
 
-                    @Override
-                    public void onNext(List<Event> events)
-                    {
-                        if (notification.getType() == Notification.CHAT)
-                        {
-                            view.navigateToChatScreen(events, eventId);
-                        }
-                        else
-                        {
-                            view.navigateToDetailsScreen(events, eventId);
-                        }
-                    }
-                });
+            subscriptions.add(subscription);
+        }
     }
 
     @Override
@@ -103,39 +112,43 @@ public class NotificationPresenterImpl implements NotificationPresenter
     private void fetchNotifications()
     {
         view.showLoading();
-        notificationService
-                .fetchNotifications()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Notification>>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
-                        if (notifications == null || notifications.isEmpty())
-                        {
-                            notifications = new ArrayList<Notification>();
-                        }
-                    }
 
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                        view.displayNoNotificationsMessage();
-                    }
+        Subscription subscription =
+                notificationService
+                        .fetchNotifications()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<List<Notification>>()
+                        {
+                            @Override
+                            public void onCompleted()
+                            {
+                                if (notifications == null || notifications.isEmpty())
+                                {
+                                    notifications = new ArrayList<Notification>();
+                                }
+                            }
 
-                    @Override
-                    public void onNext(List<Notification> notifications)
-                    {
-                        if (notifications.isEmpty())
-                        {
-                            view.displayNoNotificationsMessage();
-                        }
-                        else
-                        {
-                            NotificationPresenterImpl.this.notifications = notifications;
-                            view.displayNotifications(notifications);
-                        }
-                    }
-                });
+                            @Override
+                            public void onError(Throwable e)
+                            {
+                                view.displayNoNotificationsMessage();
+                            }
+
+                            @Override
+                            public void onNext(List<Notification> notifications)
+                            {
+                                if (notifications.isEmpty())
+                                {
+                                    view.displayNoNotificationsMessage();
+                                }
+                                else
+                                {
+                                    NotificationPresenterImpl.this.notifications = notifications;
+                                    view.displayNotifications(notifications);
+                                }
+                            }
+                        });
+
+        subscriptions.add(subscription);
     }
 }

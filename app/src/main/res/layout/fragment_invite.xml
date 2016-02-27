@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Error -->
+    <LinearLayout
+        android:id="@+id/llError"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/error_chat_not_fetched"/>
+
+        <TextView
+            android:id="@+id/tvRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/retry"
+            android:textColor="@color/accent"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <!-- Search -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp">
+
+        <net.steamcrafted.materialiconlib.MaterialIconView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="center"
+            app:materialIcon="magnify"
+            app:materialIconColor="@color/light_grey"
+            app:materialIconSize="36dp"/>
+
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:hint="@string/search_friends"
+            android:textSize="14sp"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/light_grey"/>
+
+    <!-- Permission Box -->
+    <LinearLayout
+        android:id="@+id/llPermission"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp">
+
+            <net.steamcrafted.materialiconlib.MaterialIconView
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:scaleType="center"
+                app:materialIcon="alert"
+                app:materialIconColor="@color/yellow"
+                app:materialIconSize="36dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="16dp"
+                android:text="@string/permission_contacts_message"
+                android:textColor="@color/text_subtitle"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_grey"/>
+    </LinearLayout>
+
+    <!-- Friend and Contacts -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ProgressBar
+            android:id="@+id/loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tvMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/no_facebook_friends"
+            android:textColor="@color/text_subtitle"
+            android:textSize="16sp"
+            android:visibility="gone"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvFriends"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </RelativeLayout>
+
+    <!-- Invite Button -->
+    <RelativeLayout
+        android:id="@+id/rlInvite"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_grey"/>
+
+        <TextView
+            android:id="@+id/tvInvite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="INVITE"
+            android:textAlignment="center"
+            android:textColor="@color/primary"
+            android:textSize="14sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tvInviteCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dp"
+            android:layout_toRightOf="@id/tvInvite"
+            android:background="@drawable/bg_rounded_rect"
+            android:paddingBottom="2dp"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:paddingTop="2dp"
+            android:textSize="12sp"
+            android:text="7"
+            android:textColor="@color/text_title_inverse"/>
+
+        <!--<Button-->
+        <!--android:id="@+id/btnInvite"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@drawable/btn_event_actions"-->
+        <!--android:text="@string/label_btn_invite"-->
+        <!--android:textAlignment="center"-->
+        <!--android:textColor="@drawable/button_text_color"-->
+        <!--android:textStyle="bold"/>-->
+    </RelativeLayout>
+
+</LinearLayout>

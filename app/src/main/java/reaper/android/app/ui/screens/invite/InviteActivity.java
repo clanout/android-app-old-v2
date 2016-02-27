@@ -1,0 +1,134 @@
+package reaper.android.app.ui.screens.invite;
+
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.view.MenuItem;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import reaper.android.R;
+import reaper.android.app.ui._core.BaseActivity;
+import reaper.android.app.ui._core.PermissionHandler;
+
+public class InviteActivity extends BaseActivity implements InviteScreen
+{
+    private static final String ARG_EVENT_ID = "arg_event_id";
+
+    public static Intent callingIntent(Context context, String eventId)
+    {
+        if (eventId == null)
+        {
+            throw new IllegalArgumentException("event_id cannot be null");
+        }
+
+        Intent intent = new Intent(context, InviteActivity.class);
+        intent.putExtra(ARG_EVENT_ID, eventId);
+        return intent;
+    }
+
+    /* UI Elements */
+    @Bind(R.id.appBarLayout)
+    AppBarLayout appBarLayout;
+
+    /* Fields */
+    PermissionHandler.Listener readContactsPermissionListener;
+
+    /* Lifecycle Methods */
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        /* Setup UI */
+        setContentView(R.layout.activity_invite);
+        ButterKnife.bind(this);
+
+        /* Toolbar Setup */
+        setActionBar(appBarLayout);
+        showActionBar();
+        setScreenTitle(R.string.title_invite);
+        setActionBarBackVisibility(true);
+
+        /* Notification View */
+        String eventId = getIntent().getStringExtra(ARG_EVENT_ID);
+
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.content, InviteFragment.newInstance(eventId));
+        fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == PermissionHandler.Permissions.READ_CONTACTS)
+        {
+            if (grantResults[0] == PackageManager.PERMISSION_DENIED)
+            {
+                if (PermissionHandler
+                        .isRationalRequired(this, PermissionHandler.Permissions.READ_CONTACTS))
+                {
+                    if (readContactsPermissionListener != null)
+                    {
+                        readContactsPermissionListener
+                                .onPermissionDenied(PermissionHandler.Permissions.READ_CONTACTS);
+                    }
+                }
+                else
+                {
+                    if (readContactsPermissionListener != null)
+                    {
+                        readContactsPermissionListener
+                                .onPermissionPermanentlyDenied(PermissionHandler.Permissions.READ_CONTACTS);
+                    }
+                }
+            }
+            else
+            {
+                if (readContactsPermissionListener != null)
+                {
+                    readContactsPermissionListener
+                            .onPermissionGranted(PermissionHandler.Permissions.READ_CONTACTS);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        navigateToDetailsScreen();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == android.R.id.home)
+        {
+            navigateToDetailsScreen();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /* Screen Methods */
+    @Override
+    public void setReadContactsPermissionListener(PermissionHandler.Listener listener)
+    {
+        readContactsPermissionListener = listener;
+    }
+
+    @Override
+    public void navigateToDetailsScreen()
+    {
+        finish();
+    }
+}

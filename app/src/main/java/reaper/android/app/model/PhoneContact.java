@@ -1,37 +1,38 @@
 package reaper.android.app.model;
 
-import android.util.Log;
-
-/**
- * Created by harsh on 25/09/15.
- */
-public class PhoneContact {
-
+public class PhoneContact
+{
     private String name;
     private String phone;
     private boolean isSelected;
 
-    public boolean isSelected() {
+    public boolean isSelected()
+    {
         return isSelected;
     }
 
-    public void setIsSelected(boolean isSelected) {
+    public void setIsSelected(boolean isSelected)
+    {
         this.isSelected = isSelected;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    public String getPhone() {
+    public String getPhone()
+    {
         return phone;
     }
 
-    public void setPhone(String phone) {
+    public void setPhone(String phone)
+    {
         this.phone = phone;
     }
 

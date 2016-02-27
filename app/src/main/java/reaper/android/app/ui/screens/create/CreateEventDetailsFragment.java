@@ -61,21 +61,19 @@ import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
-import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
-import reaper.android.app.model.Suggestion;
+import reaper.android.app.model.LocationSuggestion;
 import reaper.android.app.root.Reaper;
 import reaper.android.app.service.UserService;
-import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.app.ui._core.BaseFragment;
-import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
+import reaper.android.app.ui.screens.MainActivity;
+import reaper.android.app.ui.screens.invite.InviteActivity;
 import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.DrawableFactory;
-import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
@@ -436,24 +434,24 @@ public class CreateEventDetailsFragment extends BaseFragment
     {
         rvLocationSuggestions.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvLocationSuggestions
-                .setAdapter(new LocationSuggestionAdapter(new ArrayList<Suggestion>(), this));
+                .setAdapter(new LocationSuggestionAdapter(new ArrayList<LocationSuggestion>(), this));
 
         rvLocationSuggestions.setVisibility(View.GONE);
     }
 
     @Override
-    public void onSuggestionClicked(Suggestion suggestion)
+    public void onSuggestionClicked(LocationSuggestion locationSuggestion)
     {
-        presenter.selectSuggestion(suggestion);
+        presenter.selectSuggestion(locationSuggestion);
     }
 
     /* View Methods */
     @Override
-    public void displaySuggestions(List<Suggestion> suggestions)
+    public void displaySuggestions(List<LocationSuggestion> locationSuggestions)
     {
-        rvLocationSuggestions.setAdapter(new LocationSuggestionAdapter(suggestions, this));
+        rvLocationSuggestions.setAdapter(new LocationSuggestionAdapter(locationSuggestions, this));
 
-        if (suggestions.isEmpty())
+        if (locationSuggestions.isEmpty())
         {
             rvLocationSuggestions.setVisibility(View.GONE);
         }
@@ -515,12 +513,7 @@ public class CreateEventDetailsFragment extends BaseFragment
             createProgressDialog.dismiss();
         }
 
-        InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT, event);
-        bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, true);
-        inviteUsersContainerFragment.setArguments(bundle);
-        FragmentUtils.changeFragment(getFragmentManager(), inviteUsersContainerFragment);
+        startActivity(InviteActivity.callingIntent(getActivity(), event.getId()));
     }
 
     @Override

@@ -91,7 +91,7 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
     }
 
     @Override
-    public void navigateToChatScreen(List<Event> events, String eventId)
+    public void navigateToChatScreen(String eventId)
     {
         startActivity(MainActivity
                 .callingIntent(this, FlowEntry.CHAT, eventId, null));

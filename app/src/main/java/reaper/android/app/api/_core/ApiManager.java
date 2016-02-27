@@ -9,8 +9,8 @@ import reaper.android.app.api.auth.AuthApi;
 import reaper.android.app.api.event.EventApi;
 import reaper.android.app.api.fb.FacebookApi;
 import reaper.android.app.api.google_places.GooglePlacesApi;
-import reaper.android.app.api.me.MeApi;
 import reaper.android.app.api.notification.NotificationApi;
+import reaper.android.app.api.user.UserApi;
 import reaper.android.app.config.AppConstants;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
@@ -36,7 +36,7 @@ public class ApiManager
     private RestAdapter googlePlacesRestAdapter;
 
     private AuthApi authApi;
-    private MeApi meApi;
+    private UserApi userApi;
     private EventApi eventApi;
     private NotificationApi notificationApi;
     private GooglePlacesApi googlePlacesApi;
@@ -52,7 +52,7 @@ public class ApiManager
                 .setClient(new OkClient(okHttpClient))
                 .setConverter(new GsonConverter(GsonProvider.getGson()))
                 .setEndpoint(AppConstants.BASE_URL_SERVER)
-//                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build();
 
         googlePlacesRestAdapter = new RestAdapter.Builder()
@@ -96,14 +96,14 @@ public class ApiManager
         return getInstance().authApi;
     }
 
-    public static MeApi getMeApi()
+    public static UserApi getUserApi()
     {
-        if (getInstance().meApi == null)
+        if (getInstance().userApi == null)
         {
-            getInstance().meApi = getInstance().defaultRestAdapter.create(MeApi.class);
+            getInstance().userApi = getInstance().defaultRestAdapter.create(UserApi.class);
         }
 
-        return getInstance().meApi;
+        return getInstance().userApi;
     }
 
     public static EventApi getEventApi()
@@ -130,7 +130,8 @@ public class ApiManager
     {
         if (getInstance().googlePlacesApi == null)
         {
-            getInstance().googlePlacesApi = getInstance().googlePlacesRestAdapter.create(GooglePlacesApi.class);
+            getInstance().googlePlacesApi = getInstance().googlePlacesRestAdapter
+                    .create(GooglePlacesApi.class);
         }
 
         return getInstance().googlePlacesApi;

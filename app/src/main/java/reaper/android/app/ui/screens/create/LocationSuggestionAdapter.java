@@ -9,16 +9,16 @@ import android.widget.TextView;
 import java.util.List;
 
 import reaper.android.R;
-import reaper.android.app.model.Suggestion;
+import reaper.android.app.model.LocationSuggestion;
 
 public class LocationSuggestionAdapter extends RecyclerView.Adapter<LocationSuggestionAdapter.LocationSuggestionViewHolder>
 {
     SuggestionClickListener suggestionClickListener;
-    List<Suggestion> suggestions;
+    List<LocationSuggestion> locationSuggestions;
 
-    public LocationSuggestionAdapter(List<Suggestion> suggestions, SuggestionClickListener suggestionClickListener)
+    public LocationSuggestionAdapter(List<LocationSuggestion> locationSuggestions, SuggestionClickListener suggestionClickListener)
     {
-        this.suggestions = suggestions;
+        this.locationSuggestions = locationSuggestions;
         this.suggestionClickListener = suggestionClickListener;
     }
 
@@ -33,19 +33,19 @@ public class LocationSuggestionAdapter extends RecyclerView.Adapter<LocationSugg
     @Override
     public void onBindViewHolder(LocationSuggestionViewHolder holder, int position)
     {
-        Suggestion suggestion = suggestions.get(position);
-        holder.render(suggestion);
+        LocationSuggestion locationSuggestion = locationSuggestions.get(position);
+        holder.render(locationSuggestion);
     }
 
     @Override
     public int getItemCount()
     {
-        return suggestions.size();
+        return locationSuggestions.size();
     }
 
     public interface SuggestionClickListener
     {
-        void onSuggestionClicked(Suggestion suggestion);
+        void onSuggestionClicked(LocationSuggestion locationSuggestion);
     }
 
     public class LocationSuggestionViewHolder extends RecyclerView.ViewHolder
@@ -65,14 +65,14 @@ public class LocationSuggestionAdapter extends RecyclerView.Adapter<LocationSugg
                 public void onClick(View v)
                 {
                     suggestionClickListener
-                            .onSuggestionClicked(suggestions.get(getAdapterPosition()));
+                            .onSuggestionClicked(locationSuggestions.get(getAdapterPosition()));
                 }
             });
         }
 
-        public void render(Suggestion suggestion)
+        public void render(LocationSuggestion locationSuggestion)
         {
-            name.setText(suggestion.getName());
+            name.setText(locationSuggestion.getName());
         }
     }
 }

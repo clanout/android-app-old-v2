@@ -180,9 +180,9 @@ public class NotificationFragment extends BaseFragment implements
     }
 
     @Override
-    public void navigateToChatScreen(List<Event> events, String eventId)
+    public void navigateToChatScreen(String eventId)
     {
-        screen.navigateToChatScreen(events, eventId);
+        screen.navigateToChatScreen(eventId);
     }
 
     /* Listeners */

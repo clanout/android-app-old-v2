@@ -52,7 +52,7 @@ public class ChatActivity extends BaseActivity implements ChatScreen
         setScreenTitle(R.string.title_chat);
         setActionBarBackVisibility(true);
 
-        /* Notification View */
+        /* Chat View */
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.content, ChatFragment

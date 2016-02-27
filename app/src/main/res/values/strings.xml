@@ -23,6 +23,7 @@
     <string name="title_edit">Edit</string>
     <string name="title_account">Account</string>
     <string name="title_friends">Manage Friends</string>
+    <string name="title_invite">Invite</string>
     <string name="title_notification">Notifications</string>
     <string name="title_chat">Clan Chat</string>
 
@@ -46,6 +47,7 @@
     <string name="error_edit_finalized">Organizer finalized the details</string>
     <string name="error_event_not_found">Unable to locate this clan</string>
     <string name="error_invalid_phone">Please enter a valid phone number</string>
+    <string name="error_invite">Unable to show your friends</string>
     <string name="error_facebook_friends">Unable to show your friends. Refresh.</string>
     <string name="error_chat_not_sent"> Unable to send message. Resend.</string>
     <string name="error_chat_not_fetched"> Unable to load conversations.</string>
@@ -84,6 +86,9 @@
     <string name="chat_message_label">Write a Message</string>
     <string name="listview_loading">Loading older messages …</string>
     <string name="nomore_loading"></string>
+
+    <!-- Invite Screen -->
+    <string name="invite_button_label">Invite</string>
 
     <!-- Home Screen -->
     <string name="home_no_events">No active clans</string>
@@ -133,6 +138,9 @@
 
     <!-- Location Permissions -->
     <string name="permission_location_message">Clanout helps you make plans and join clans with friends in your city. We need your location to provide you the Clanout experience. </string>
+
+    <!-- Read Contacts Permissions -->
+    <string name="permission_contacts_message">You\'ll not be able to invite friends from your phonebook to your plans. To allow read contacts permission, click on this box.</string>
 
     <!-- Play Services Error Dialog -->
     <string name="play_services_error_dialog_title">Google Play Services Error</string>

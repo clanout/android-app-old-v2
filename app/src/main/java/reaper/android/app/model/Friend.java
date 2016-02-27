@@ -1,6 +1,5 @@
 package reaper.android.app.model;
 
-import reaper.android.app.model._core.Model;
 import reaper.android.app.service._new.FacebookService_;
 
 public class Friend implements Model

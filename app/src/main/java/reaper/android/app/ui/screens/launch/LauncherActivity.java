@@ -62,6 +62,7 @@ public class LauncherActivity extends BaseActivity implements
         FacebookCallback<LoginResult>,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
+        PermissionHandler.Listener,
         FacebookLoginView,
         BootstrapView
 {
@@ -147,11 +148,9 @@ public class LauncherActivity extends BaseActivity implements
         facebookCallbackManager = CallbackManager.Factory.create();
 
         /* Google Service */
-        GoogleService_.init();
         googleService = GoogleService_.getInstance();
 
         /* Facebook Service */
-        FacebookService_.init();
         facebookService = FacebookService_.getInstance();
 
         /* Location Service */
@@ -210,41 +209,60 @@ public class LauncherActivity extends BaseActivity implements
                 if (PermissionHandler
                         .isRationalRequired(this, PermissionHandler.Permissions.LOCATION))
                 {
-                    showBootstrapAction();
-
-                    tvActionMessage.setText(R.string.permission_location_message);
-                    tvAction.setText(R.string.permission_request_again);
-                    tvAction.setOnClickListener(new View.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(View v)
-                        {
-                            PermissionHandler
-                                    .requestPermission(LauncherActivity.this, PermissionHandler.Permissions.LOCATION);
-                        }
-                    });
+                    onPermissionDenied(PermissionHandler.Permissions.LOCATION);
                 }
                 else
                 {
-                    showBootstrapAction();
-
-                    tvActionMessage.setText(R.string.permission_location_message);
-                    tvAction.setText(R.string.permission_goto_settings);
-                    tvAction.setOnClickListener(new View.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(View v)
-                        {
-                            LauncherActivity.this.gotoAppSettings();
-                        }
-                    });
+                    onPermissionPermanentlyDenied(PermissionHandler.Permissions.LOCATION);
                 }
             }
             else
             {
-                bootstrapPresenter.attachView(this);
+                onPermissionGranted(PermissionHandler.Permissions.LOCATION);
             }
         }
+    }
+
+    /* Permission Handling */
+    @Override
+    public void onPermissionGranted(@PermissionHandler.Permissions int permission)
+    {
+        bootstrapPresenter.attachView(this);
+    }
+
+    @Override
+    public void onPermissionDenied(@PermissionHandler.Permissions int permission)
+    {
+        showBootstrapAction();
+
+        tvActionMessage.setText(R.string.permission_location_message);
+        tvAction.setText(R.string.permission_request_again);
+        tvAction.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                PermissionHandler
+                        .requestPermission(LauncherActivity.this, PermissionHandler.Permissions.LOCATION);
+            }
+        });
+    }
+
+    @Override
+    public void onPermissionPermanentlyDenied(@PermissionHandler.Permissions int permission)
+    {
+        showBootstrapAction();
+
+        tvActionMessage.setText(R.string.permission_location_message);
+        tvAction.setText(R.string.permission_goto_settings);
+        tvAction.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                LauncherActivity.this.gotoAppSettings();
+            }
+        });
     }
 
     /* View Methods (FacebookLogonView) */

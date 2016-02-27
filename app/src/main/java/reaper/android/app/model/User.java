@@ -1,7 +1,6 @@
 package reaper.android.app.model;
 
 import reaper.android.app.api._core.GsonProvider;
-import reaper.android.app.model._core.Model;
 
 public class User implements Model
 {

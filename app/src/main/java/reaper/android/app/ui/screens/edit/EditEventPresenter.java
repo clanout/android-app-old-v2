@@ -2,7 +2,7 @@ package reaper.android.app.ui.screens.edit;
 
 import org.joda.time.DateTime;
 
-import reaper.android.app.model.Suggestion;
+import reaper.android.app.model.LocationSuggestion;
 
 public interface EditEventPresenter
 {
@@ -24,7 +24,7 @@ public interface EditEventPresenter
 
     void fetchSuggestions();
 
-    void selectSuggestion(Suggestion suggestion);
+    void selectSuggestion(LocationSuggestion locationSuggestion);
 
     void setLocationName(String locationName);
 

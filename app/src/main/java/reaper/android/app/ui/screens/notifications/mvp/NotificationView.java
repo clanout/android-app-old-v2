@@ -17,5 +17,5 @@ public interface NotificationView
 
     void navigateToDetailsScreen(List<Event> events, String eventId);
 
-    void navigateToChatScreen(List<Event> events, String eventId);
+    void navigateToChatScreen(String eventId);
 }

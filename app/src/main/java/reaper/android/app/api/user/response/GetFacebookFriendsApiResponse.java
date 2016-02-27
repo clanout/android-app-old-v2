@@ -1,0 +1,19 @@
+package reaper.android.app.api.user.response;
+
+import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
+
+import reaper.android.app.api._core.ApiResponse;
+import reaper.android.app.model.Friend;
+
+public class GetFacebookFriendsApiResponse extends ApiResponse
+{
+    @SerializedName("friends")
+    private List<Friend> friends;
+
+    public List<Friend> getFriends()
+    {
+        return friends;
+    }
+}

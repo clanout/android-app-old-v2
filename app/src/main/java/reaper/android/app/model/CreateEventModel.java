@@ -3,12 +3,10 @@ package reaper.android.app.model;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 
-import java.io.Serializable;
-
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.ui.util.DrawableFactory;
 
-public class CreateEventModel implements Serializable
+public class CreateEventModel implements Model
 {
     private final EventCategory category;
     private final String title;

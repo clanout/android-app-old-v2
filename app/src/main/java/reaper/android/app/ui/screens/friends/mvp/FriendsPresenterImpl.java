@@ -1,16 +1,14 @@
 package reaper.android.app.ui.screens.friends.mvp;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import reaper.android.app.model.Friend;
-import reaper.android.app.model.util.FriendsComparator;
 import reaper.android.app.service.UserService;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import timber.log.Timber;
+import rx.subscriptions.CompositeSubscription;
 
 public class FriendsPresenterImpl implements FriendsPresenter
 {
@@ -20,12 +18,16 @@ public class FriendsPresenterImpl implements FriendsPresenter
     private List<String> blockUpdates;
     private List<String> unblockUpdates;
 
+    private CompositeSubscription subscriptions;
+
     public FriendsPresenterImpl(UserService userService)
     {
         this.userService = userService;
 
         blockUpdates = new ArrayList<>();
         unblockUpdates = new ArrayList<>();
+
+        subscriptions = new CompositeSubscription();
     }
 
     @Override
@@ -43,6 +45,7 @@ public class FriendsPresenterImpl implements FriendsPresenter
             userService.sendBlockRequests(blockUpdates, unblockUpdates);
         }
 
+        subscriptions.clear();
         view = null;
     }
 
@@ -57,12 +60,10 @@ public class FriendsPresenterImpl implements FriendsPresenter
         {
             if (unblockUpdates.contains(friendId))
             {
-                Timber.v("Removed from unblock list : " + friend.getName());
                 unblockUpdates.remove(friendId);
             }
             else if (!blockUpdates.contains(friendId))
             {
-                Timber.v("Added to block list : " + friend.getName());
                 blockUpdates.add(friendId);
             }
         }
@@ -70,12 +71,10 @@ public class FriendsPresenterImpl implements FriendsPresenter
         {
             if (blockUpdates.contains(friendId))
             {
-                Timber.v("Removed from block list : " + friend.getName());
                 blockUpdates.remove(friendId);
             }
             else if (!unblockUpdates.contains(friendId))
             {
-                Timber.v("Added to unblock list : " + friend.getName());
                 unblockUpdates.add(friendId);
             }
         }
@@ -84,37 +83,32 @@ public class FriendsPresenterImpl implements FriendsPresenter
     private void fetchAllFriends()
     {
         view.showLoading();
-        userService
-                .getAllFriends()
-                .map(new Func1<List<Friend>, List<Friend>>()
-                {
-                    @Override
-                    public List<Friend> call(List<Friend> friends)
-                    {
-                        Collections.sort(friends, new FriendsComparator());
-                        return friends;
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Friend>>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
 
-                    }
+        Subscription subscription =
+                userService
+                        ._fetchFacebookFriendsNetwork(true)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<List<Friend>>()
+                        {
+                            @Override
+                            public void onCompleted()
+                            {
 
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                        view.displayError();
-                    }
+                            }
 
-                    @Override
-                    public void onNext(List<Friend> friends)
-                    {
-                        view.displayFriends(friends);
-                    }
-                });
+                            @Override
+                            public void onError(Throwable e)
+                            {
+                                view.displayError();
+                            }
+
+                            @Override
+                            public void onNext(List<Friend> friends)
+                            {
+                                view.displayFriends(friends);
+                            }
+                        });
+
+        subscriptions.add(subscription);
     }
 }

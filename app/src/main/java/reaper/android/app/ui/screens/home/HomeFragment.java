@@ -84,7 +84,7 @@ import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
 import reaper.android.app.ui.screens.home.create.CreateEventPresenter;
 import reaper.android.app.ui.screens.home.create.CreateEventPresenterImpl;
 import reaper.android.app.ui.screens.home.create.CreateEventView;
-import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
+import reaper.android.app.ui.screens.invite.InviteActivity;
 import reaper.android.app.ui.screens.notifications.NotificationActivity;
 import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.DrawableFactory;
@@ -1024,12 +1024,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
             createProgressDialog.dismiss();
         }
 
-        InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT, event);
-        bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, true);
-        inviteUsersContainerFragment.setArguments(bundle);
-        FragmentUtils.changeFragment(getFragmentManager(), inviteUsersContainerFragment);
+        startActivity(InviteActivity.callingIntent(getActivity(), event.getId()));
     }
 
     private void handleReadContactsPermission()

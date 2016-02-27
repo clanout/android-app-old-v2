@@ -4,7 +4,7 @@ import org.joda.time.DateTime;
 
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
-import reaper.android.app.model.Suggestion;
+import reaper.android.app.model.LocationSuggestion;
 
 public interface CreateEventPresenter
 {
@@ -16,7 +16,7 @@ public interface CreateEventPresenter
 
     void autocomplete(String s);
 
-    void selectSuggestion(Suggestion suggestion);
+    void selectSuggestion(LocationSuggestion locationSuggestion);
 
     void setLocationName(String locationName);
 

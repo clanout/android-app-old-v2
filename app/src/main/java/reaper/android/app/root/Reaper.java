@@ -2,6 +2,7 @@ package reaper.android.app.root;
 
 import android.app.Application;
 import android.content.Context;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
@@ -28,6 +29,9 @@ import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.ChatService_;
+import reaper.android.app.service._new.GoogleService_;
+import reaper.android.app.service._new.LocationService_;
+import reaper.android.app.service._new.PhonebookService_;
 import reaper.android.app.service._new.WhatsappService_;
 import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
@@ -109,14 +113,20 @@ public class Reaper extends Application
     {
         Timber.v(">>>> Reaper.initServices()");
 
+        /* Location Service */
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        LocationService_
+                .init(getApplicationContext(), locationManager, GoogleService_.getInstance());
+
+        /* Phonebook Service */
+        PhonebookService_.init(getApplicationContext());
+
         /* User Service */
-        UserService.init();
+        UserService.init(LocationService_.getInstance(), PhonebookService_.getInstance());
         userService = UserService.getInstance();
 
         /* Chat Service */
-        Timber.v(">>>> Chat Init Start");
         ChatService_.init(userService);
-//        testChat();
 
         /* WhatsApp Service */
         WhatsappService_.init(userService);
@@ -216,49 +226,5 @@ public class Reaper extends Application
                     }
                 });
 
-    }
-
-    private void testChat()
-    {
-//        final ChatService_ chatService = ChatService_.getInstance();
-//
-//        chatService
-//                .isHealthy()
-//                .flatMap(new Func1<Boolean, Observable<ChatMessage>>()
-//                {
-//                    @Override
-//                    public Observable<ChatMessage> call(Boolean isHealthy)
-//                    {
-//                        if (!isHealthy)
-//                        {
-//                            throw new IllegalStateException(">>>> Chat Not Healthy");
-//                        }
-//                        else
-//                        {
-//                            return chatService.joinChat(null);
-//                        }
-//                    }
-//                })
-//                .subscribeOn(Schedulers.newThread())
-//                .subscribe(new Subscriber<ChatMessage>()
-//                {
-//                    @Override
-//                    public void onCompleted()
-//                    {
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e)
-//                    {
-//                        e.printStackTrace();
-//                    }
-//
-//                    @Override
-//                    public void onNext(ChatMessage chatMessage)
-//                    {
-//
-//                    }
-//                });
     }
 }

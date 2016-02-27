@@ -11,16 +11,11 @@ public class GoogleService_
 {
     private static GoogleService_ instance;
 
-    public static void init()
-    {
-        instance = new GoogleService_();
-    }
-
     public static GoogleService_ getInstance()
     {
         if (instance == null)
         {
-            throw new IllegalStateException("[GoogleService Not Initialized]");
+            instance = new GoogleService_();
         }
 
         return instance;

@@ -2,8 +2,6 @@ package reaper.android.app.model;
 
 import java.util.List;
 
-import reaper.android.app.model._core.Model;
-
 public class EventDetails implements Model
 {
     public static class Attendee implements Model

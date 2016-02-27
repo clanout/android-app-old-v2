@@ -29,7 +29,9 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     private List<Friend> friends;
     private BlockListener blockListener;
 
-    private Drawable blockedDrawable, unblockedDrawable, personDrawable;
+    private Drawable blockedDrawable;
+    private Drawable unblockedDrawable;
+    private Drawable personDrawable;
 
     public FriendAdapter(Context context, List<Friend> friends, BlockListener blockListener)
     {

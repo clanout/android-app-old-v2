@@ -304,7 +304,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
 
         Subscription subscription =
                 eventService
-                        ._fetchEventDetailsFromCache(event.getId())
+                        ._fetchDetailsCache(event.getId())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Subscriber<EventDetails>()
                         {
@@ -334,7 +334,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     {
         Subscription subscription =
                 eventService
-                        ._fetchEventDetailsFromNetwork(event.getId())
+                        ._fetchDetailsNetwork(event.getId())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Subscriber<EventDetails>()
                         {

@@ -1,7 +1,6 @@
 package reaper.android.app.ui.screens.details;
 
 import android.Manifest;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -53,7 +52,6 @@ import reaper.android.R;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
-import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
@@ -66,7 +64,7 @@ import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.chat.ChatActivity;
 import reaper.android.app.ui.screens.edit.EditEventFragment;
-import reaper.android.app.ui.screens.invite.core.InviteUsersContainerFragment;
+import reaper.android.app.ui.screens.invite.InviteActivity;
 import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.FragmentUtils;
@@ -620,30 +618,7 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     @Override
     public void navigateToInviteScreen(Event event)
     {
-        Log.d("APP", "inside navigate to invite screen -- start");
-
-        if (event == null)
-        {
-            Log.d("APP", "inside navigate to invite screen -- event null");
-        }
-
-        InviteUsersContainerFragment inviteUsersContainerFragment = new InviteUsersContainerFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_EVENT, event);
-        bundle.putBoolean(BundleKeys.INVITE_USERS_CONTAINER_FRAGMENT_FROM_CREATE_FRAGMENT, false);
-        inviteUsersContainerFragment.setArguments(bundle);
-//        FragmentUtils
-//                .changeFragment(getActivity().getFragmentManager(), inviteUsersContainerFragment);
-
-        FragmentTransaction fragmentTransaction = getActivity().getFragmentManager()
-                                                               .beginTransaction();
-        fragmentTransaction
-                .replace(R.id.fl_main, inviteUsersContainerFragment, inviteUsersContainerFragment
-                        .getClass().getSimpleName());
-        fragmentTransaction.commitAllowingStateLoss();
-        getActivity().getFragmentManager().executePendingTransactions();
-
-        Log.d("APP", "inside navigate to invite screen -- end");
+        startActivity(InviteActivity.callingIntent(getActivity(), event.getId()));
     }
 
     @Override

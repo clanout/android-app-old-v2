@@ -172,11 +172,7 @@ public class SQLiteEventCache implements EventCache
                         }
 
                 )
-                .
-
-                        subscribeOn(Schedulers.io()
-
-                        );
+                .subscribeOn(Schedulers.io());
     }
 
     @Override

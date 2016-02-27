@@ -1,49 +1,39 @@
 package reaper.android.app.service;
 
-import android.content.ContentResolver;
-import android.database.Cursor;
-import android.provider.ContactsContract;
-import android.util.Log;
-
 import com.squareup.otto.Bus;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import reaper.android.app.api._core.ApiManager;
-import reaper.android.app.api.me.MeApi;
-import reaper.android.app.api.me.request.AddPhoneApiRequest;
-import reaper.android.app.api.me.request.BlockFriendsApiRequest;
-import reaper.android.app.api.me.request.FetchPendingInvitesApiRequest;
-import reaper.android.app.api.me.request.GetAllAppFriendsApiRequest;
-import reaper.android.app.api.me.request.GetAppFriendsApiRequest;
-import reaper.android.app.api.me.request.GetPhoneContactsApiRequest;
-import reaper.android.app.api.me.request.ShareFeedbackApiRequest;
-import reaper.android.app.api.me.request.UpdateFacebookFriendsApiRequest;
-import reaper.android.app.api.me.response.FetchPendingInvitesApiResponse;
-import reaper.android.app.api.me.response.GetAllAppFriendsApiResponse;
-import reaper.android.app.api.me.response.GetAppFriendsApiResponse;
-import reaper.android.app.api.me.response.GetPhoneContactsApiResponse;
+import reaper.android.app.api.user.UserApi;
+import reaper.android.app.api.user.request.BlockFriendsApiRequest;
+import reaper.android.app.api.user.request.FetchPendingInvitesApiRequest;
+import reaper.android.app.api.user.request.GetFacebookFriendsApiRequest;
+import reaper.android.app.api.user.request.GetRegisteredContactsApiRequest;
+import reaper.android.app.api.user.request.ShareFeedbackApiRequest;
+import reaper.android.app.api.user.request.UpdateFacebookFriendsApiRequest;
+import reaper.android.app.api.user.request.UpdateMobileAPiRequest;
+import reaper.android.app.api.user.response.FetchPendingInvitesApiResponse;
+import reaper.android.app.api.user.response.GetFacebookFriendsApiResponse;
+import reaper.android.app.api.user.response.GetRegisteredContactsApiResponse;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
-import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.model.Friend;
-import reaper.android.app.model.PhoneContact;
 import reaper.android.app.model.User;
+import reaper.android.app.model.util.FriendsComparator;
+import reaper.android.app.service._new.LocationService_;
+import reaper.android.app.service._new.PhonebookService_;
 import reaper.android.app.trigger.common.GenericErrorTrigger;
 import reaper.android.app.trigger.event.EventsFetchTrigger;
-import reaper.android.app.trigger.user.AllPhoneContactsForSMSFetchedTrigger;
-import reaper.android.app.trigger.user.AppFriendsFetchedFromNetworkTrigger;
-import reaper.android.app.trigger.user.AppFriendsFetchedTrigger;
 import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
-import reaper.android.app.trigger.user.PhoneContactsFetchedTrigger;
-import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.common.communicator.Communicator;
 import retrofit.client.Response;
 import rx.Observable;
@@ -51,15 +41,17 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 public class UserService
 {
     private static UserService instance;
 
-    public static void init()
+    public static void init(LocationService_ locationService, PhonebookService_ phonebookService)
     {
-        instance = new UserService(Communicator.getInstance().getBus());
+        instance = new UserService(locationService, phonebookService, Communicator.getInstance()
+                                                                                  .getBus());
     }
 
     public static UserService getInstance()
@@ -73,22 +65,28 @@ public class UserService
     }
 
     private Bus bus;
-    private MeApi meApi;
+    private UserApi userApi;
     private UserCache userCache;
     private GenericCache genericCache;
+    private LocationService_ locationService;
+    private PhonebookService_ phonebookService;
     private EventCache eventCache;
 
     private User activeUser;
 
-    private UserService(Bus bus)
+    private UserService(LocationService_ locationService, PhonebookService_ phonebookService, Bus bus)
     {
         this.bus = bus;
-        meApi = ApiManager.getMeApi();
+        this.locationService = locationService;
+        this.phonebookService = phonebookService;
+
+        userApi = ApiManager.getUserApi();
         userCache = CacheManager.getUserCache();
         genericCache = CacheManager.getGenericCache();
         eventCache = CacheManager.getEventCache();
     }
 
+    /* Session User */
     public void setSessionUser(User user)
     {
         if (user == null)
@@ -140,420 +138,318 @@ public class UserService
         return getSessionUser().getName();
     }
 
+    /* Update Mobile Number */
     public void updatePhoneNumber(final String phoneNumber)
     {
-        AddPhoneApiRequest request = new AddPhoneApiRequest(phoneNumber);
+        UpdateMobileAPiRequest request = new UpdateMobileAPiRequest(phoneNumber);
 
-        meApi.updatePhoneNumber(request)
-             .subscribeOn(Schedulers.newThread())
-             .observeOn(AndroidSchedulers.mainThread())
-             .subscribe(new Subscriber<Response>()
-             {
-                 @Override
-                 public void onCompleted()
-                 {
-                 }
+        userApi.updateMobile(request)
+               .subscribeOn(Schedulers.newThread())
+               .observeOn(AndroidSchedulers.mainThread())
+               .subscribe(new Subscriber<Response>()
+               {
+                   @Override
+                   public void onCompleted()
+                   {
+                   }
 
-                 @Override
-                 public void onError(Throwable e)
-                 {
-                 }
+                   @Override
+                   public void onError(Throwable e)
+                   {
+                   }
 
-                 @Override
-                 public void onNext(Response response)
-                 {
-                     activeUser.setMobileNumber(phoneNumber);
-                     genericCache.put(GenericCacheKeys.SESSION_USER, activeUser);
-                 }
-             });
+                   @Override
+                   public void onNext(Response response)
+                   {
+                       activeUser.setMobileNumber(phoneNumber);
+                       genericCache.put(GenericCacheKeys.SESSION_USER, activeUser);
+                   }
+               });
     }
 
-    public Observable<List<Friend>> getAllFriends()
-    {
-        GetAllAppFriendsApiRequest request = new GetAllAppFriendsApiRequest();
-
-        return meApi.getAllAppFriends(request)
-                    .map(new Func1<GetAllAppFriendsApiResponse, List<Friend>>()
-                    {
-                        @Override
-                        public List<Friend> call(GetAllAppFriendsApiResponse getAllAppFriendsApiResponse)
-                        {
-                            return getAllAppFriendsApiResponse.getFriends();
-                        }
-                    })
-                    .subscribeOn(Schedulers.newThread());
-    }
-
+    /* Block/Unblock Facebook Friends */
     public void sendBlockRequests(List<String> blockList, List<String> unblockList)
     {
         BlockFriendsApiRequest request = new BlockFriendsApiRequest(blockList, unblockList);
-        meApi.blockFriends(request)
-             .subscribeOn(Schedulers.newThread())
-             .subscribe(new Subscriber<Response>()
-             {
-                 @Override
-                 public void onCompleted()
-                 {
+        userApi.blockFriends(request)
+               .subscribeOn(Schedulers.newThread())
+               .subscribe(new Subscriber<Response>()
+               {
+                   @Override
+                   public void onCompleted()
+                   {
+                   }
 
-                 }
+                   @Override
+                   public void onError(Throwable e)
+                   {
+                   }
 
-                 @Override
-                 public void onError(Throwable e)
-                 {
-                 }
-
-                 @Override
-                 public void onNext(Response response)
-                 {
-                     userCache.deleteFriends();
-                     eventCache.deleteAll();
-                 }
-             });
+                   @Override
+                   public void onNext(Response response)
+                   {
+                       userCache.deleteFriends();
+                       eventCache.deleteAll();
+                   }
+               });
     }
 
-    public void getAppFriendsFromNetwork(final String zone)
+    /* Facebook Friends */
+    public Observable<List<Friend>> _fetchLocalFacebookFriends()
     {
-        meApi.getAppFriends(new GetAppFriendsApiRequest(zone))
-             .subscribeOn(Schedulers.newThread())
-             .observeOn(AndroidSchedulers.mainThread())
-             .subscribe(new Subscriber<GetAppFriendsApiResponse>()
-             {
-                 @Override
-                 public void onCompleted()
-                 {
-
-                 }
-
-                 @Override
-                 public void onError(Throwable e)
-                 {
-
-                     Log.d("APP", "onError ---- " + e.getMessage());
-
-                     bus.post(new GenericErrorTrigger(ErrorCode.APP_FRIENDS_FETCH_FROM_NETWORK_FAILURE, (Exception) e));
-                 }
-
-                 @Override
-                 public void onNext(GetAppFriendsApiResponse getAppFriendsApiResponse)
-                 {
-                     bus.post(new AppFriendsFetchedFromNetworkTrigger(getAppFriendsApiResponse
-                             .getFriends()));
-                     userCache.deleteFriends();
-                     userCache.saveFriends(getAppFriendsApiResponse.getFriends());
-                 }
-             });
-    }
-
-    public void getAppFriends(final String zone)
-    {
-        Observable<List<Friend>> friendsObservable =
-                userCache.getFriends()
-                         .flatMap(new Func1<List<Friend>, Observable<List<Friend>>>()
-                         {
-                             @Override
-                             public Observable<List<Friend>> call(List<Friend> friends)
-                             {
-                                 if (friends.isEmpty())
-                                 {
-                                     GetAppFriendsApiRequest request = new GetAppFriendsApiRequest(zone);
-                                     return meApi.getAppFriends(request)
-                                                 .map(new Func1<GetAppFriendsApiResponse, List<Friend>>()
-                                                 {
-                                                     @Override
-                                                     public List<Friend> call(GetAppFriendsApiResponse getAppFriendsApiResponse)
-                                                     {
-                                                         return getAppFriendsApiResponse
-                                                                 .getFriends();
-                                                     }
-                                                 })
-                                                 .doOnNext(new Action1<List<Friend>>()
-                                                 {
-                                                     @Override
-                                                     public void call(List<Friend> friends)
-                                                     {
-                                                         userCache.saveFriends(friends);
-                                                     }
-                                                 })
-                                                 .subscribeOn(Schedulers.newThread());
-                                 }
-                                 else
-                                 {
-                                     return Observable.just(friends);
-                                 }
-                             }
-                         });
-
-        friendsObservable
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Friend>>()
+        return _fetchLocalFacebookFriendsCache()
+                .flatMap(new Func1<List<Friend>, Observable<List<Friend>>>()
                 {
                     @Override
-                    public void onCompleted()
+                    public Observable<List<Friend>> call(List<Friend> cachedFriends)
                     {
-
+                        if (!cachedFriends.isEmpty())
+                        {
+                            return Observable.just(cachedFriends);
+                        }
+                        else
+                        {
+                            return _fetchFacebookFriendsNetwork(false);
+                        }
                     }
-
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                        bus.post(new GenericErrorTrigger(ErrorCode.USER_APP_FRIENDS_FETCH_FAILURE, (Exception) e));
-                    }
-
-                    @Override
-                    public void onNext(List<Friend> friends)
-                    {
-                        bus.post(new AppFriendsFetchedTrigger(friends));
-                    }
-                });
+                })
+                .subscribeOn(Schedulers.newThread());
     }
 
-    public void getPhoneContacts()
+    public Observable<List<Friend>> _fetchFacebookFriendsNetwork(final boolean fetchAll)
     {
-        userCache.getContacts()
-                 .observeOn(AndroidSchedulers.mainThread())
-                 .subscribe(new Subscriber<List<Friend>>()
-                 {
-                     @Override
-                     public void onCompleted()
-                     {
+        GetFacebookFriendsApiRequest request = new GetFacebookFriendsApiRequest(null);
+        if (!fetchAll)
+        {
+            String zone = locationService.getCurrentLocation().getZone();
+            request = new GetFacebookFriendsApiRequest(zone);
+        }
 
-                     }
-
-                     @Override
-                     public void onError(Throwable e)
-                     {
-                         bus.post(new GenericErrorTrigger(ErrorCode.PHONE_CONTACTS_FETCH_FAILURE, (Exception) e));
-                     }
-
-                     @Override
-                     public void onNext(List<Friend> friends)
-                     {
-                         bus.post(new PhoneContactsFetchedTrigger(friends));
-                     }
-                 });
+        return userApi.getFacebookFriends(request)
+                      .map(new Func1<GetFacebookFriendsApiResponse, List<Friend>>()
+                      {
+                          @Override
+                          public List<Friend> call(GetFacebookFriendsApiResponse response)
+                          {
+                              List<Friend> facebookFriends = response.getFriends();
+                              Collections.sort(facebookFriends, new FriendsComparator());
+                              return facebookFriends;
+                          }
+                      })
+                      .doOnNext(new Action1<List<Friend>>()
+                      {
+                          @Override
+                          public void call(List<Friend> friends)
+                          {
+                              if (!fetchAll)
+                              {
+                                  // Cache Local Friends
+                                  userCache.saveFriends(friends);
+                              }
+                          }
+                      })
+                      .subscribeOn(Schedulers.newThread());
     }
 
-    public void refreshPhoneContacts(ContentResolver contentResolver, String zone)
+    public Observable<List<Friend>> _fetchLocalFacebookFriendsCache()
     {
-
-        Set<String> allContacts = fetchAllContacts(contentResolver);
-        GetPhoneContactsApiRequest request = new GetPhoneContactsApiRequest(allContacts, zone);
-
-        meApi.getPhoneContacts(request)
-             .map(new Func1<GetPhoneContactsApiResponse, List<Friend>>()
-             {
-                 @Override
-                 public List<Friend> call(GetPhoneContactsApiResponse getPhoneContactsApiResponse)
-                 {
-
-                     return getPhoneContactsApiResponse.getPhoneContacts();
-                 }
-             })
-             .doOnNext(new Action1<List<Friend>>()
-             {
-                 @Override
-                 public void call(List<Friend> contacts)
-                 {
-
-                     userCache.saveContacts(contacts);
-                 }
-             })
-             .subscribeOn(Schedulers.newThread())
-             .observeOn(AndroidSchedulers.mainThread())
-             .subscribe(new Subscriber<List<Friend>>()
-             {
-                 @Override
-                 public void onCompleted()
-                 {
-
-                 }
-
-                 @Override
-                 public void onError(Throwable e)
-                 {
-
-                     bus.post(new GenericErrorTrigger(ErrorCode.PHONE_CONTACTS_FETCH_FAILURE, (Exception) e));
-                 }
-
-                 @Override
-                 public void onNext(List<Friend> contacts)
-                 {
-
-                     bus.post(new PhoneContactsFetchedTrigger(contacts));
-                 }
-             });
+        return userCache
+                .getFriends()
+                .subscribeOn(Schedulers.newThread());
     }
 
+    /* Registered Phonebook Contacts */
+    public Observable<List<Friend>> _fetchLocalRegisteredContacts()
+    {
+        return _fetchLocalRegisteredContactsCache()
+                .flatMap(new Func1<List<Friend>, Observable<List<Friend>>>()
+                {
+                    @Override
+                    public Observable<List<Friend>> call(List<Friend> cachedContacts)
+                    {
+                        if (!cachedContacts.isEmpty())
+                        {
+                            return Observable.just(cachedContacts);
+                        }
+                        else
+                        {
+                            return _fetchRegisteredContactsNetwork(false);
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
+
+    public Observable<List<Friend>> _fetchRegisteredContactsNetwork(final boolean fetchAll)
+    {
+        return phonebookService
+                .fetchAllNumbers()
+                .flatMap(new Func1<List<String>, Observable<List<Friend>>>()
+                {
+                    @Override
+                    public Observable<List<Friend>> call(List<String> allContacts)
+                    {
+                        GetRegisteredContactsApiRequest request = new GetRegisteredContactsApiRequest(allContacts, null);
+                        if (!fetchAll)
+                        {
+                            String zone = locationService.getCurrentLocation().getZone();
+                            request = new GetRegisteredContactsApiRequest(allContacts, zone);
+                        }
+
+                        return userApi
+                                .getRegisteredContacts(request)
+                                .map(new Func1<GetRegisteredContactsApiResponse, List<Friend>>()
+                                {
+                                    @Override
+                                    public List<Friend> call(GetRegisteredContactsApiResponse response)
+                                    {
+                                        List<Friend> registeredContacts = response
+                                                .getRegisteredContacts();
+                                        Collections
+                                                .sort(registeredContacts, new FriendsComparator());
+                                        return registeredContacts;
+                                    }
+                                })
+                                .doOnNext(new Action1<List<Friend>>()
+                                {
+                                    @Override
+                                    public void call(List<Friend> contacts)
+                                    {
+                                        if (!fetchAll)
+                                        {
+                                            // Cache local registered contacts
+                                            userCache.saveContacts(contacts);
+                                        }
+                                    }
+                                });
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
+
+    public Observable<List<Friend>> _fetchLocalRegisteredContactsCache()
+    {
+        return userCache
+                .getContacts()
+                .subscribeOn(Schedulers.newThread());
+    }
+
+    /* App Friends */
+    public Observable<List<Friend>> _fetchLocalAppFriends()
+    {
+        return Observable
+                .zip(_fetchLocalFacebookFriends(), _fetchLocalRegisteredContacts(),
+                        new Func2<List<Friend>, List<Friend>, List<Friend>>()
+                        {
+                            @Override
+                            public List<Friend> call(List<Friend> facebookFriends, List<Friend> registeredContacts)
+                            {
+                                Set<Friend> allFriends = new HashSet<Friend>();
+                                allFriends.addAll(facebookFriends);
+                                allFriends.addAll(registeredContacts);
+                                return new ArrayList<>(allFriends);
+                            }
+                        }
+                )
+                .map(new Func1<List<Friend>, List<Friend>>()
+                {
+                    @Override
+                    public List<Friend> call(List<Friend> friends)
+                    {
+                        Collections.sort(friends, new FriendsComparator());
+                        return friends;
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
+
+    public Observable<List<Friend>> _refreshLocalAppFriends()
+    {
+        return Observable
+                .zip(_fetchFacebookFriendsNetwork(false), _fetchRegisteredContactsNetwork(false),
+                        new Func2<List<Friend>, List<Friend>, List<Friend>>()
+                        {
+                            @Override
+                            public List<Friend> call(List<Friend> facebookFriends, List<Friend> registeredContacts)
+                            {
+                                Set<Friend> allFriends = new HashSet<Friend>();
+                                allFriends.addAll(facebookFriends);
+                                allFriends.addAll(registeredContacts);
+                                return new ArrayList<>(allFriends);
+                            }
+                        })
+                .map(new Func1<List<Friend>, List<Friend>>()
+                {
+                    @Override
+                    public List<Friend> call(List<Friend> friends)
+                    {
+                        Collections.sort(friends, new FriendsComparator());
+                        return friends;
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
+
+
+    /* Old */
     public void updateFacebookFriends(List<String> friendIdList, final boolean isPolling)
     {
         UpdateFacebookFriendsApiRequest request = new UpdateFacebookFriendsApiRequest(friendIdList);
 
-        meApi.updateFacebookFriends(request)
-             .subscribeOn(Schedulers.newThread())
-             .observeOn(AndroidSchedulers.mainThread())
-             .subscribe(new Subscriber<Response>()
-             {
-                 @Override
-                 public void onCompleted()
-                 {
+        userApi.updateFacebookFriends(request)
+               .subscribeOn(Schedulers.newThread())
+               .observeOn(AndroidSchedulers.mainThread())
+               .subscribe(new Subscriber<Response>()
+               {
+                   @Override
+                   public void onCompleted()
+                   {
 
-                 }
+                   }
 
-                 @Override
-                 public void onError(Throwable e)
-                 {
-                     bus.post(new GenericErrorTrigger(ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE, (Exception) e));
-                 }
+                   @Override
+                   public void onError(Throwable e)
+                   {
+                       bus.post(new GenericErrorTrigger(ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE, (Exception) e));
+                   }
 
-                 @Override
-                 public void onNext(Response response)
-                 {
-                     if (response.getStatus() == 200)
-                     {
-                         bus.post(new FacebookFriendsUpdatedOnServerTrigger(isPolling));
-                     }
-                 }
-             });
+                   @Override
+                   public void onNext(Response response)
+                   {
+                       if (response.getStatus() == 200)
+                       {
+                           bus.post(new FacebookFriendsUpdatedOnServerTrigger(isPolling));
+                       }
+                   }
+               });
     }
 
     public void shareFeedback(int type, String comment)
     {
         ShareFeedbackApiRequest request = new ShareFeedbackApiRequest(comment, type);
 
-        meApi.shareFeedback(request)
-             .subscribeOn(Schedulers.newThread())
-             .observeOn(AndroidSchedulers.mainThread())
-             .subscribe(new Subscriber<Response>()
-             {
-                 @Override
-                 public void onCompleted()
-                 {
+        userApi.shareFeedback(request)
+               .subscribeOn(Schedulers.newThread())
+               .observeOn(AndroidSchedulers.mainThread())
+               .subscribe(new Subscriber<Response>()
+               {
+                   @Override
+                   public void onCompleted()
+                   {
 
-                 }
+                   }
 
-                 @Override
-                 public void onError(Throwable e)
-                 {
-                 }
+                   @Override
+                   public void onError(Throwable e)
+                   {
+                   }
 
-                 @Override
-                 public void onNext(Response response)
-                 {
+                   @Override
+                   public void onNext(Response response)
+                   {
 
-                 }
-             });
-    }
-
-    private Set<String> fetchAllContacts(ContentResolver contentResolver)
-    {
-        Set<String> allContacts = new HashSet<>();
-
-        String defaultCountryCode = AppConstants.DEFAULT_COUNTRY_CODE;
-
-        String[] PROJECTION = new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER};
-
-        Cursor cur = contentResolver
-                .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, PROJECTION, null, null, null);
-
-        if (cur.moveToFirst())
-        {
-            do
-            {
-                String phone = PhoneUtils.sanitize(cur.getString(0), defaultCountryCode);
-                allContacts.add(phone);
-            } while (cur.moveToNext());
-        }
-
-        cur.close();
-        return allContacts;
-    }
-
-    public void fetchAllPhoneContacts(final ContentResolver contentResolver)
-    {
-
-        Observable.create(new Observable.OnSubscribe<List<PhoneContact>>()
-        {
-            @Override
-            public void call(Subscriber<? super List<PhoneContact>> subscriber)
-            {
-
-                Cursor cursor = contentResolver
-                        .query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-
-                String id = null;
-                String name = null;
-                String phone = null;
-                String sanitizedPhone = null;
-                List<PhoneContact> phoneContactList = new ArrayList<>();
-
-                if (cursor.getCount() > 0)
-                {
-                    while (cursor.moveToNext())
-                    {
-                        id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                        name = cursor.getString(cursor
-                                .getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                        if (Integer.parseInt(cursor.getString(cursor
-                                .getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0)
-                        {
-
-                            Cursor smallCursor = contentResolver
-                                    .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
-                                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                                            new String[]{id}, null);
-
-
-                            while (smallCursor.moveToNext())
-                            {
-                                phone = smallCursor.getString(smallCursor
-                                        .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                                sanitizedPhone = PhoneUtils
-                                        .sanitize(phone, AppConstants.DEFAULT_COUNTRY_CODE);
-
-                                PhoneContact phoneContact = new PhoneContact();
-                                phoneContact.setName(name);
-                                phoneContact.setPhone(sanitizedPhone);
-                                phoneContact.setIsSelected(false);
-
-                                if (!phoneContactList.contains(phoneContact))
-                                {
-                                    phoneContactList.add(phoneContact);
-                                }
-
-                            }
-                            smallCursor.close();
-                        }
-                    }
-                    cursor.close();
-                }
-
-                subscriber.onNext(phoneContactList);
-                subscriber.onCompleted();
-            }
-        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
-                  .subscribe(new Subscriber<List<PhoneContact>>()
-                  {
-                      @Override
-                      public void onCompleted()
-                      {
-
-                      }
-
-                      @Override
-                      public void onError(Throwable e)
-                      {
-
-                          bus.post(new GenericErrorTrigger(ErrorCode.PHONE_CONTACTS_FOR_SMS_FETCH_FAILURE, (Exception) e));
-                      }
-
-                      @Override
-                      public void onNext(List<PhoneContact> phoneContacts)
-                      {
-
-                          bus.post(new AllPhoneContactsForSMSFetchedTrigger(phoneContacts));
-                      }
-                  });
-
+                   }
+               });
     }
 
     public void fetchPendingInvites(String phoneNumber, String zone)
@@ -561,31 +457,31 @@ public class UserService
 
         FetchPendingInvitesApiRequest request = new FetchPendingInvitesApiRequest(phoneNumber, zone);
 
-        meApi.fetchPendingInvites(request).subscribeOn(Schedulers.newThread())
-             .observeOn(AndroidSchedulers.mainThread())
-             .subscribe(new Subscriber<FetchPendingInvitesApiResponse>()
-             {
-                 @Override
-                 public void onCompleted()
-                 {
+        userApi.fetchPendingInvites(request).subscribeOn(Schedulers.newThread())
+               .observeOn(AndroidSchedulers.mainThread())
+               .subscribe(new Subscriber<FetchPendingInvitesApiResponse>()
+               {
+                   @Override
+                   public void onCompleted()
+                   {
 
-                 }
+                   }
 
-                 @Override
-                 public void onError(Throwable e)
-                 {
+                   @Override
+                   public void onError(Throwable e)
+                   {
 
-                     bus.post(new GenericErrorTrigger(ErrorCode.EVENTS_FETCH_FAILURE, (Exception) e));
-                 }
+                       bus.post(new GenericErrorTrigger(ErrorCode.EVENTS_FETCH_FAILURE, (Exception) e));
+                   }
 
-                 @Override
-                 public void onNext(FetchPendingInvitesApiResponse fetchPendingInvitesApiResponse)
-                 {
+                   @Override
+                   public void onNext(FetchPendingInvitesApiResponse fetchPendingInvitesApiResponse)
+                   {
 
-                     eventCache.reset(fetchPendingInvitesApiResponse.getEvents());
-                     genericCache.put(GenericCacheKeys.HAS_FETCHED_PENDING_INVITES, true);
-                     bus.post(new EventsFetchTrigger(fetchPendingInvitesApiResponse.getEvents()));
-                 }
-             });
+                       eventCache.reset(fetchPendingInvitesApiResponse.getEvents());
+                       genericCache.put(GenericCacheKeys.HAS_FETCHED_PENDING_INVITES, true);
+                       bus.post(new EventsFetchTrigger(fetchPendingInvitesApiResponse.getEvents()));
+                   }
+               });
     }
 }

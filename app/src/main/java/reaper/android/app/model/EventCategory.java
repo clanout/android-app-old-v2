@@ -1,8 +1,6 @@
 package reaper.android.app.model;
 
-import java.io.Serializable;
-
-public enum EventCategory implements Serializable
+public enum EventCategory implements Model
 {
     CAFE,
     MOVIES,

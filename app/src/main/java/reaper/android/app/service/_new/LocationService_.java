@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Locale;
 
 import reaper.android.app.api._core.ApiManager;
-import reaper.android.app.api.me.MeApi;
-import reaper.android.app.api.me.request.UserZoneUpdatedApiRequest;
+import reaper.android.app.api.user.UserApi;
+import reaper.android.app.api.user.request.UpdateUserLocationApiRequest;
 import reaper.android.app.model.Location;
 import retrofit.client.Response;
 import rx.Observable;
@@ -57,7 +57,7 @@ public class LocationService_
     private Context context;
     private LocationManager locationManager;
     private GoogleService_ googleService;
-    private MeApi meApi;
+    private UserApi userApi;
 
     private Location location;
 
@@ -68,20 +68,13 @@ public class LocationService_
         this.context = context;
         this.locationManager = locationManager;
         this.googleService = googleService;
-        this.meApi = ApiManager.getMeApi();
+        this.userApi = ApiManager.getUserApi();
     }
 
     public boolean isLocationPermissionGranted()
     {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
-            return ActivityCompat
-                    .checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        }
-        else
-        {
-            return true;
-        }
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ActivityCompat
+                .checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     public boolean isLocationServiceAvailable()
@@ -275,9 +268,9 @@ public class LocationService_
             return Observable.error(new IllegalStateException("Location Null"));
         }
 
-        UserZoneUpdatedApiRequest request = new UserZoneUpdatedApiRequest(location.getZone());
-        return meApi.updateUserZone(request)
-                    .map(new Func1<Response, Boolean>()
+        UpdateUserLocationApiRequest request = new UpdateUserLocationApiRequest(location.getZone());
+        return userApi.updateUserLocation(request)
+                      .map(new Func1<Response, Boolean>()
                     {
                         @Override
                         public Boolean call(Response response)
@@ -285,7 +278,7 @@ public class LocationService_
                             return true;
                         }
                     })
-                    .onErrorReturn(new Func1<Throwable, Boolean>()
+                      .onErrorReturn(new Func1<Throwable, Boolean>()
                     {
                         @Override
                         public Boolean call(Throwable e)
@@ -294,6 +287,6 @@ public class LocationService_
                             return false;
                         }
                     })
-                    .subscribeOn(Schedulers.newThread());
+                      .subscribeOn(Schedulers.newThread());
     }
 }

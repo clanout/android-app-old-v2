@@ -54,7 +54,7 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
-import reaper.android.app.model.Suggestion;
+import reaper.android.app.model.LocationSuggestion;
 import reaper.android.app.root.Reaper;
 import reaper.android.app.service.UserService;
 import reaper.android.app.trigger.common.BackPressedTrigger;
@@ -263,7 +263,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
     {
         rvLocationSuggestions.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvLocationSuggestions
-                .setAdapter(new LocationSuggestionAdapter(new ArrayList<Suggestion>(), this));
+                .setAdapter(new LocationSuggestionAdapter(new ArrayList<LocationSuggestion>(), this));
 
         rvLocationSuggestions.setVisibility(View.GONE);
     }
@@ -464,11 +464,11 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
     }
 
     @Override
-    public void displaySuggestions(List<Suggestion> suggestions)
+    public void displaySuggestions(List<LocationSuggestion> locationSuggestions)
     {
-        rvLocationSuggestions.setAdapter(new LocationSuggestionAdapter(suggestions, this));
+        rvLocationSuggestions.setAdapter(new LocationSuggestionAdapter(locationSuggestions, this));
 
-        if (suggestions.isEmpty())
+        if (locationSuggestions.isEmpty())
         {
             rvLocationSuggestions.setVisibility(View.GONE);
         }
@@ -768,13 +768,13 @@ public class EditEventFragment extends BaseFragment implements EditEventView, Lo
     }
 
     @Override
-    public void onSuggestionClicked(Suggestion suggestion)
+    public void onSuggestionClicked(LocationSuggestion locationSuggestion)
     {
         AnalyticsHelper
                 .sendEvents(GoogleAnalyticsConstants.LIST_ITEM_CLICK, GoogleAnalyticsConstants.SUGGESTION_CLICKED_EDIT, userService
                         .getSessionUserId());
 
-        presenter.selectSuggestion(suggestion);
+        presenter.selectSuggestion(locationSuggestion);
     }
 
     private void setActionBarTitle(Event event)

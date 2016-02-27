@@ -2,8 +2,6 @@ package reaper.android.app.model;
 
 import org.joda.time.DateTime;
 
-import reaper.android.app.model._core.Model;
-
 public class ChatMessage implements Model
 {
     private String id;

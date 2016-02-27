@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 import reaper.android.app.api._core.ApiResponse;
-import reaper.android.app.model.Suggestion;
+import reaper.android.app.model.LocationSuggestion;
 
 /**
  * Created by aditya on 04/07/15.
@@ -13,9 +13,9 @@ import reaper.android.app.model.Suggestion;
 public class EventSuggestionsApiResponse extends ApiResponse
 {
     @SerializedName("recommendations")
-    private List<Suggestion> recommendations;
+    private List<LocationSuggestion> recommendations;
 
-    public List<Suggestion> getEventSuggestions(){
+    public List<LocationSuggestion> getEventSuggestions(){
         return recommendations;
     }
 }

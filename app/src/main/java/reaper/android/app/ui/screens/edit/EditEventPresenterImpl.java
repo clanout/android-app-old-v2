@@ -13,7 +13,7 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
-import reaper.android.app.model.Suggestion;
+import reaper.android.app.model.LocationSuggestion;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.PlacesService;
 import reaper.android.app.service.UserService;
@@ -239,12 +239,12 @@ public class EditEventPresenterImpl implements EditEventPresenter
                         subscriber.onCompleted();
                     }
                 })
-                .map(new Func1<List<GooglePlaceAutocompleteApiResponse.Prediction>, List<Suggestion>>()
+                .map(new Func1<List<GooglePlaceAutocompleteApiResponse.Prediction>, List<LocationSuggestion>>()
                 {
                     @Override
-                    public List<Suggestion> call(List<GooglePlaceAutocompleteApiResponse.Prediction> predictions)
+                    public List<LocationSuggestion> call(List<GooglePlaceAutocompleteApiResponse.Prediction> predictions)
                     {
-                        List<Suggestion> suggestions = new ArrayList<Suggestion>();
+                        List<LocationSuggestion> locationSuggestions = new ArrayList<LocationSuggestion>();
                         int count = 0;
                         for (GooglePlaceAutocompleteApiResponse.Prediction prediction : predictions)
                         {
@@ -253,19 +253,19 @@ public class EditEventPresenterImpl implements EditEventPresenter
                                 break;
                             }
 
-                            Suggestion suggestion = new Suggestion();
-                            suggestion.setId(prediction.getPlaceId());
-                            suggestion.setName(prediction.getDescription());
-                            suggestions.add(suggestion);
+                            LocationSuggestion locationSuggestion = new LocationSuggestion();
+                            locationSuggestion.setId(prediction.getPlaceId());
+                            locationSuggestion.setName(prediction.getDescription());
+                            locationSuggestions.add(locationSuggestion);
                             count++;
                         }
 
-                        return suggestions;
+                        return locationSuggestions;
                     }
                 })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Suggestion>>()
+                .subscribe(new Subscriber<List<LocationSuggestion>>()
                 {
                     @Override
                     public void onCompleted()
@@ -280,7 +280,7 @@ public class EditEventPresenterImpl implements EditEventPresenter
                     }
 
                     @Override
-                    public void onNext(List<Suggestion> suggestions)
+                    public void onNext(List<LocationSuggestion> suggestions)
                     {
                         view.displaySuggestions(suggestions);
                     }
@@ -296,7 +296,7 @@ public class EditEventPresenterImpl implements EditEventPresenter
                         .getLatitude(), userLocation
                         .getLongitude())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Suggestion>>()
+                .subscribe(new Subscriber<List<LocationSuggestion>>()
                 {
                     @Override
                     public void onCompleted()
@@ -307,24 +307,24 @@ public class EditEventPresenterImpl implements EditEventPresenter
                     @Override
                     public void onError(Throwable e)
                     {
-                        view.displaySuggestions(new ArrayList<Suggestion>());
+                        view.displaySuggestions(new ArrayList<LocationSuggestion>());
                     }
 
                     @Override
-                    public void onNext(List<Suggestion> suggestions)
+                    public void onNext(List<LocationSuggestion> suggestions)
                     {
-                        List<Suggestion> suggestionList = new ArrayList<Suggestion>();
+                        List<LocationSuggestion> locationSuggestionList = new ArrayList<LocationSuggestion>();
                         int count = 0;
-                        for (Suggestion suggestion : suggestions)
+                        for (LocationSuggestion suggestion : suggestions)
                         {
                             if (count == 5)
                             {
                                 break;
                             }
-                            suggestionList.add(suggestion);
+                            locationSuggestionList.add(suggestion);
                             count++;
                         }
-                        view.displaySuggestions(suggestionList);
+                        view.displaySuggestions(locationSuggestionList);
                     }
                 });
 
@@ -332,19 +332,19 @@ public class EditEventPresenterImpl implements EditEventPresenter
     }
 
     @Override
-    public void selectSuggestion(final Suggestion suggestion)
+    public void selectSuggestion(final LocationSuggestion locationSuggestion)
     {
         isLocationFetchInProgress = true;
 
-        if (suggestion.getLatitude() != null && suggestion.getLongitude() != null)
+        if (locationSuggestion.getLatitude() != null && locationSuggestion.getLongitude() != null)
         {
             isLocationUpdated = true;
 
             updatedLocation = new Location();
             updatedLocation.setZone(userLocation.getZone());
-            updatedLocation.setLatitude(suggestion.getLatitude());
-            updatedLocation.setLongitude(suggestion.getLongitude());
-            updatedLocation.setName(suggestion.getName());
+            updatedLocation.setLatitude(locationSuggestion.getLatitude());
+            updatedLocation.setLongitude(locationSuggestion.getLongitude());
+            updatedLocation.setName(locationSuggestion.getName());
             view.setLocation(updatedLocation.getName());
 
             isLocationFetchInProgress = false;
@@ -355,10 +355,10 @@ public class EditEventPresenterImpl implements EditEventPresenter
         }
         else
         {
-            if (suggestion.getId() != null)
+            if (locationSuggestion.getId() != null)
             {
                 Subscription subscription = placesService
-                        ._getPlaceDetails(suggestion.getId())
+                        ._getPlaceDetails(locationSuggestion.getId())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Subscriber<Location>()
                         {
@@ -380,7 +380,7 @@ public class EditEventPresenterImpl implements EditEventPresenter
 
                                 updatedLocation = new Location();
                                 updatedLocation.setZone(userLocation.getZone());
-                                updatedLocation.setName(suggestion.getName());
+                                updatedLocation.setName(locationSuggestion.getName());
                                 view.setLocation(updatedLocation.getName());
 
                                 isLocationFetchInProgress = false;
@@ -411,7 +411,7 @@ public class EditEventPresenterImpl implements EditEventPresenter
 
                     updatedLocation = new Location();
                     updatedLocation.setZone(userLocation.getZone());
-                    updatedLocation.setName(suggestion.getName());
+                    updatedLocation.setName(locationSuggestion.getName());
                     view.setLocation(updatedLocation.getName());
                 }
 

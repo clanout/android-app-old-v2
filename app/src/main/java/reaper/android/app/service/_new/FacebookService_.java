@@ -25,16 +25,11 @@ public class FacebookService_
 {
     public static FacebookService_ instance;
 
-    public static void init()
-    {
-        instance = new FacebookService_();
-    }
-
     public static FacebookService_ getInstance()
     {
         if (instance == null)
         {
-            throw new IllegalStateException("[FacebookService Not Initialized]");
+            instance = new FacebookService_();
         }
 
         return instance;

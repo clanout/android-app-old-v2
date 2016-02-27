@@ -7,10 +7,11 @@ import android.support.v4.app.ActivityCompat;
 
 public class PermissionHandler
 {
-    @IntDef({Permissions.LOCATION})
+    @IntDef({Permissions.LOCATION, Permissions.READ_CONTACTS})
     public @interface Permissions
     {
         int LOCATION = 1;
+        int READ_CONTACTS = 2;
     }
 
     public static boolean isRationalRequired(Activity activity, @Permissions int permission)
@@ -32,8 +33,20 @@ public class PermissionHandler
             case Permissions.LOCATION:
                 return Manifest.permission.ACCESS_COARSE_LOCATION;
 
+            case Permissions.READ_CONTACTS:
+                return Manifest.permission.READ_CONTACTS;
+
             default:
                 throw new IllegalArgumentException("Invalid Permission");
         }
+    }
+
+    public interface Listener
+    {
+        void onPermissionGranted(@Permissions int permission);
+
+        void onPermissionDenied(@Permissions int permission);
+
+        void onPermissionPermanentlyDenied(@Permissions int permission);
     }
 }
