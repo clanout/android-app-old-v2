@@ -1,4 +1,4 @@
-package reaper.android.app.ui.screens.edit;
+package reaper.android.app.ui.screens.edit.mvp;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public interface EditEventView
 
     void displayError();
 
-    void navigateToDetailsScreen(List<Event> events, int activePosition);
+    void navigateToDetailsScreen(String eventId);
 
     void navigateToHomeScreen();
 }

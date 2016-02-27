@@ -4,43 +4,41 @@ import com.squareup.otto.Bus;
 
 import org.joda.time.DateTime;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import reaper.android.app.api._core.ApiManager;
-import reaper.android.app.api._core.GsonProvider;
 import reaper.android.app.api.event.EventApi;
 import reaper.android.app.api.event.request.CreateEventApiRequest;
 import reaper.android.app.api.event.request.DeleteEventApiRequest;
 import reaper.android.app.api.event.request.EditEventApiRequest;
 import reaper.android.app.api.event.request.EventDetailsApiRequest;
-import reaper.android.app.api.event.request.EventSuggestionsApiRequest;
 import reaper.android.app.api.event.request.EventsApiRequest;
+import reaper.android.app.api.event.request.FetchEventApiRequest;
 import reaper.android.app.api.event.request.FetchNewEventsAndUpdatesApiRequest;
 import reaper.android.app.api.event.request.FinaliseEventApiRequest;
-import reaper.android.app.api.event.request.GetEventSuggestionsApiRequest;
+import reaper.android.app.api.event.request.GetCreateEventSuggestionsApiRequest;
 import reaper.android.app.api.event.request.InviteThroughSMSApiRequest;
 import reaper.android.app.api.event.request.InviteUsersApiRequest;
+import reaper.android.app.api.event.request.LocationSuggestionsApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
+import reaper.android.app.api.event.request.SendChatNotificationApiRequest;
 import reaper.android.app.api.event.request.SendInvitaionResponseApiRequest;
 import reaper.android.app.api.event.request.UpdateStatusApiRequest;
 import reaper.android.app.api.event.response.CreateEventApiResponse;
 import reaper.android.app.api.event.response.EditEventApiResponse;
 import reaper.android.app.api.event.response.EventDetailsApiResponse;
-import reaper.android.app.api.event.response.EventSuggestionsApiResponse;
 import reaper.android.app.api.event.response.EventsApiResponse;
+import reaper.android.app.api.event.response.FetchEventApiResponse;
 import reaper.android.app.api.event.response.FetchNewEventsAndUpdatesApiResponse;
-import reaper.android.app.api.event.response.GetEventSuggestionApiResponse;
+import reaper.android.app.api.event.response.GetCreateEventSuggestionsApiResponse;
+import reaper.android.app.api.event.response.LocationSuggestionsApiResponse;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.ErrorCode;
-import reaper.android.app.config.ExceptionMessages;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
@@ -67,11 +65,16 @@ public class EventService
 {
     private static EventService instance;
 
+    public static void init(UserService userService, GcmService_ gcmService, LocationService_ locationService)
+    {
+        instance = new EventService(userService, gcmService, locationService);
+    }
+
     public static EventService getInstance()
     {
         if (instance == null)
         {
-            instance = new EventService();
+            throw new IllegalStateException("[EventService Not Initialized]");
         }
 
         return instance;
@@ -87,18 +90,58 @@ public class EventService
     private EventCache eventCache;
     private GenericCache genericCache;
 
-    private EventService()
+    private EventService(UserService userService, GcmService_ gcmService, LocationService_ locationService)
     {
         this.bus = Communicator.getInstance().getBus();
-        userService = UserService.getInstance();
-        gcmService = GcmService_.getInstance();
+
         eventApi = ApiManager.getEventApi();
         eventCache = CacheManager.getEventCache();
         genericCache = CacheManager.getGenericCache();
-        locationService = LocationService_.getInstance();
+
+        this.userService = userService;
+        this.gcmService = gcmService;
+        this.locationService = locationService;
     }
 
     /* Events */
+    public Observable<Event> _fetchEvent(final String eventId)
+    {
+        return eventCache
+                .getEvent(eventId)
+                .flatMap(new Func1<Event, Observable<Event>>()
+                {
+                    @Override
+                    public Observable<Event> call(Event event)
+                    {
+                        if (event != null)
+                        {
+                            return Observable.just(event);
+                        }
+                        else
+                        {
+                            return eventApi.fetchEvent(new FetchEventApiRequest(eventId))
+                                           .map(new Func1<FetchEventApiResponse, Event>()
+                                           {
+                                               @Override
+                                               public Event call(FetchEventApiResponse response)
+                                               {
+                                                   return response.getEvent();
+                                               }
+                                           })
+                                           .doOnNext(new Action1<Event>()
+                                           {
+                                               @Override
+                                               public void call(Event event)
+                                               {
+                                                   eventCache.save(event);
+                                               }
+                                           });
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
+
     public Observable<List<Event>> _fetchEvents()
     {
         return _fetchEventsCache()
@@ -223,7 +266,7 @@ public class EventService
     }
 
     /* Invite */
-    public void inviteAppFriends(String eventId, List<String> friendIds)
+    public void _inviteAppFriends(String eventId, List<String> friendIds)
     {
         InviteUsersApiRequest request = new InviteUsersApiRequest(eventId, friendIds);
 
@@ -254,7 +297,7 @@ public class EventService
                 });
     }
 
-    public void invitePhonebookContacts(String eventId, List<String> mobileNumbers)
+    public void _invitePhonebookContacts(String eventId, List<String> mobileNumbers)
     {
         InviteThroughSMSApiRequest request = new InviteThroughSMSApiRequest(eventId, mobileNumbers);
 
@@ -283,31 +326,197 @@ public class EventService
                 });
     }
 
-    /* Helper Methods */
-    private boolean isExpired(Event event)
+    /* Edit */
+    public Observable<Integer> _editEvent(final String eventId, DateTime startTime, DateTime endTime,
+                                          Location placeLocation, String description)
     {
-        return event.getEndTime().isBeforeNow();
+        final EditEventApiRequest request = new EditEventApiRequest(placeLocation
+                .getLongitude(), description, endTime, eventId, placeLocation
+                .getLatitude(), placeLocation.getName(), placeLocation
+                .getZone(), startTime);
+
+        return eventApi.editEvent(request)
+                       .map(new Func1<EditEventApiResponse, Event>()
+                       {
+                           @Override
+                           public Event call(EditEventApiResponse response)
+                           {
+                               return response.getEvent();
+                           }
+                       })
+                       .doOnNext(new Action1<Event>()
+                       {
+                           @Override
+                           public void call(Event event)
+                           {
+                               if (event != null)
+                               {
+                                   eventCache.save(event);
+                                   eventCache.deleteDetails(event.getId());
+                               }
+                           }
+                       })
+                       .map(new Func1<Event, Integer>()
+                       {
+                           @Override
+                           public Integer call(Event event)
+                           {
+                               if (event != null)
+                               {
+                                   return 0;
+                               }
+                               else
+                               {
+                                   return -1;
+                               }
+                           }
+                       })
+                       .onErrorReturn(new Func1<Throwable, Integer>()
+                       {
+                           @Override
+                           public Integer call(Throwable throwable)
+                           {
+                               try
+                               {
+                                   RetrofitError error = (RetrofitError) throwable;
+                                   if (error.getResponse().getStatus() == 400)
+                                   {
+                                       return -2;
+                                   }
+                                   else
+                                   {
+                                       return -1;
+                                   }
+                               }
+                               catch (Exception e)
+                               {
+                                   return -1;
+                               }
+                           }
+                       })
+                       .subscribeOn(Schedulers.newThread());
     }
 
-    private List<Event> filterExpiredEvents(List<Event> events)
+    public Observable<Boolean> _finaliseEvent(final Event event, final boolean isFinalised)
     {
-        List<Event> filteredEvents = new ArrayList<Event>();
-        for (Event event : events)
-        {
-            if (!isExpired(event))
-            {
-                filteredEvents.add(event);
-            }
-        }
-
-        return filteredEvents;
+        return eventApi
+                .finaliseEvent(new FinaliseEventApiRequest(event.getId(), isFinalised))
+                .map(new Func1<Response, Boolean>()
+                {
+                    @Override
+                    public Boolean call(Response response)
+                    {
+                        return true;
+                    }
+                })
+                .onErrorReturn(new Func1<Throwable, Boolean>()
+                {
+                    @Override
+                    public Boolean call(Throwable throwable)
+                    {
+                        return false;
+                    }
+                })
+                .doOnNext(new Action1<Boolean>()
+                {
+                    @Override
+                    public void call(Boolean isSuccessful)
+                    {
+                        if (isSuccessful)
+                        {
+                            event.setIsFinalized(isFinalised);
+                            eventCache.save(event);
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
     }
 
+    public Observable<Boolean> _deleteEvent(final String eventId)
+    {
+        DeleteEventApiRequest request = new DeleteEventApiRequest(eventId);
+        return eventApi
+                .deleteEvent(request)
+                .map(new Func1<Response, Boolean>()
+                {
+                    @Override
+                    public Boolean call(Response response)
+                    {
+                        return true;
+                    }
+                })
+                .onErrorReturn(new Func1<Throwable, Boolean>()
+                {
+                    @Override
+                    public Boolean call(Throwable throwable)
+                    {
+                        return false;
+                    }
+                })
+                .doOnNext(new Action1<Boolean>()
+                {
+                    @Override
+                    public void call(Boolean isSuccessful)
+                    {
+                        if (isSuccessful)
+                        {
+                            eventCache.deleteCompletely(eventId);
 
+                            if (genericCache.get(GenericCacheKeys.GCM_TOKEN) != null)
+                            {
+                                gcmService.unsubscribeTopic(genericCache
+                                        .get(GenericCacheKeys.GCM_TOKEN), eventId);
+                            }
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
 
+    /* Chat Notification */
+    public Observable<Boolean> _sendChatNotification(String eventId, String eventName)
+    {
+        return eventApi
+                .sendChatNotification(new SendChatNotificationApiRequest(eventId, eventName))
+                .map(new Func1<Response, Boolean>()
+                {
+                    @Override
+                    public Boolean call(Response response)
+                    {
+                        return true;
+                    }
+                })
+                .onErrorReturn(new Func1<Throwable, Boolean>()
+                {
+                    @Override
+                    public Boolean call(Throwable throwable)
+                    {
+                        return false;
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
 
-    /* Old */
-    public Observable<Boolean> updateEventSuggestions()
+    /* Location Suggestions */
+    public Observable<List<LocationSuggestion>> _fetchLocationSuggestions(EventCategory eventCategory, double latitude, double longitude)
+    {
+        LocationSuggestionsApiRequest request = new LocationSuggestionsApiRequest(eventCategory,
+                String.valueOf(latitude),
+                String.valueOf(longitude));
+        return eventApi.getLocationSuggestions(request)
+                       .map(new Func1<LocationSuggestionsApiResponse, List<LocationSuggestion>>()
+                       {
+                           @Override
+                           public List<LocationSuggestion> call(LocationSuggestionsApiResponse locationSuggestionsApiResponse)
+                           {
+                               return locationSuggestionsApiResponse.getEventSuggestions();
+                           }
+                       })
+                       .subscribeOn(Schedulers.newThread());
+    }
+
+    /* Create Suggestions */
+    public Observable<Boolean> _fetchCreateSuggestions()
     {
         return Observable
                 .create(new Observable.OnSubscribe<Boolean>()
@@ -347,19 +556,19 @@ public class EventService
                         else
                         {
                             return eventApi
-                                    .getEventSuggestions(new GetEventSuggestionsApiRequest())
-                                    .onErrorReturn(new Func1<Throwable, GetEventSuggestionApiResponse>()
+                                    .getCreateEventSuggestion(new GetCreateEventSuggestionsApiRequest())
+                                    .onErrorReturn(new Func1<Throwable, GetCreateEventSuggestionsApiResponse>()
                                     {
                                         @Override
-                                        public GetEventSuggestionApiResponse call(Throwable throwable)
+                                        public GetCreateEventSuggestionsApiResponse call(Throwable throwable)
                                         {
                                             return null;
                                         }
                                     })
-                                    .map(new Func1<GetEventSuggestionApiResponse, Boolean>()
+                                    .map(new Func1<GetCreateEventSuggestionsApiResponse, Boolean>()
                                     {
                                         @Override
-                                        public Boolean call(GetEventSuggestionApiResponse response)
+                                        public Boolean call(GetCreateEventSuggestionsApiResponse response)
                                         {
                                             if (response == null)
                                             {
@@ -383,6 +592,28 @@ public class EventService
                 .subscribeOn(Schedulers.newThread());
     }
 
+    /* Helper Methods */
+    private boolean isExpired(Event event)
+    {
+        return event.getEndTime().isBeforeNow();
+    }
+
+    private List<Event> filterExpiredEvents(List<Event> events)
+    {
+        List<Event> filteredEvents = new ArrayList<Event>();
+        for (Event event : events)
+        {
+            if (!isExpired(event))
+            {
+                filteredEvents.add(event);
+            }
+        }
+
+        return filteredEvents;
+    }
+
+
+    /* Old */
     public void fetchEvents(final String zone)
     {
         final long startTime = System.currentTimeMillis();
@@ -595,23 +826,6 @@ public class EventService
                        .subscribeOn(Schedulers.newThread());
     }
 
-    public Observable<List<LocationSuggestion>> _fetchSuggestions(EventCategory eventCategory, double latitude, double longitude)
-    {
-        EventSuggestionsApiRequest request = new EventSuggestionsApiRequest(eventCategory,
-                String.valueOf(latitude),
-                String.valueOf(longitude));
-        return eventApi.getEventSuggestions(request)
-                       .map(new Func1<EventSuggestionsApiResponse, List<LocationSuggestion>>()
-                       {
-                           @Override
-                           public List<LocationSuggestion> call(EventSuggestionsApiResponse eventSuggestionsApiResponse)
-                           {
-                               return eventSuggestionsApiResponse.getEventSuggestions();
-                           }
-                       })
-                       .subscribeOn(Schedulers.newThread());
-    }
-
     public Observable<Event> _create(String title, Event.Type eventType, EventCategory eventCategory, String description, Location placeLocation, DateTime startTime, DateTime endTime)
     {
         CreateEventApiRequest request = new CreateEventApiRequest(title, eventType, eventCategory, description, placeLocation
@@ -641,116 +855,6 @@ public class EventService
                                     .get(GenericCacheKeys.GCM_TOKEN), event
                                     .getId());
                         }
-                    }
-                })
-                .subscribeOn(Schedulers.newThread());
-    }
-
-    public Observable<Response> _finaliseEvent(final Event event, final boolean isFinalised)
-    {
-        return eventApi
-                .finaliseEvent(new FinaliseEventApiRequest(event.getId(), isFinalised))
-                .doOnNext(new Action1<Response>()
-                {
-                    @Override
-                    public void call(Response response)
-                    {
-                        event.setIsFinalized(isFinalised);
-                        eventCache.save(event);
-                    }
-                })
-                .subscribeOn(Schedulers.newThread());
-    }
-
-    public Observable<Response> _deleteEvent(final String eventId)
-    {
-        DeleteEventApiRequest request = new DeleteEventApiRequest(eventId);
-
-        return eventApi
-                .deleteEvent(request)
-                .doOnNext(new Action1<Response>()
-                {
-                    @Override
-                    public void call(Response response)
-                    {
-                        if (response.getStatus() == 200)
-                        {
-                            eventCache.deleteCompletely(eventId);
-
-                            if (genericCache.get(GenericCacheKeys.GCM_TOKEN) != null)
-                            {
-                                gcmService.unsubscribeTopic(genericCache
-                                        .get(GenericCacheKeys.GCM_TOKEN), eventId);
-                            }
-                        }
-                    }
-                })
-                .subscribeOn(Schedulers.newThread());
-    }
-
-    public Observable<Event> _editEvent(final String eventId, DateTime startTime, DateTime endTime,
-                                        Location placeLocation, String description)
-    {
-        final EditEventApiRequest request = new EditEventApiRequest(placeLocation
-                .getLongitude(), description, endTime, eventId, placeLocation
-                .getLatitude(), placeLocation.getName(), placeLocation
-                .getZone(), startTime);
-
-        return Observable
-                .create(new Observable.OnSubscribe<Event>()
-                {
-                    @Override
-                    public void call(Subscriber<? super Event> subscriber)
-                    {
-                        try
-                        {
-                            Response response = eventApi.editEvent(request);
-                            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response
-                                    .getBody().in()));
-
-                            String line;
-                            StringBuilder jsonBuilder = new StringBuilder();
-
-                            while ((line = bufferedReader.readLine()) != null)
-                            {
-                                jsonBuilder.append(line).append("\n");
-                            }
-
-                            bufferedReader.close();
-                            String json = jsonBuilder.toString();
-                            Event event = GsonProvider.getGson()
-                                                      .fromJson(json, EditEventApiResponse.class)
-                                                      .getEvent();
-
-                            subscriber.onNext(event);
-
-                        }
-                        catch (RetrofitError e)
-                        {
-                            if (e.getResponse().getStatus() == 400)
-                            {
-                                subscriber.onError(new Throwable(ExceptionMessages.EVENT_LOCKED));
-                            }
-                            else
-                            {
-                                subscriber.onError(new Throwable(ExceptionMessages.BAD_REQUEST));
-                            }
-
-                        }
-                        catch (IOException e)
-                        {
-                            subscriber.onError(new Throwable(ExceptionMessages.BAD_REQUEST));
-                        }
-                        subscriber.onCompleted();
-                    }
-                })
-                .doOnNext(new Action1<Event>()
-                {
-                    @Override
-                    public void call(Event event)
-                    {
-                        eventCache.save(event);
-                        eventCache.deleteDetails(event.getId());
                     }
                 })
                 .subscribeOn(Schedulers.newThread());
@@ -817,9 +921,9 @@ public class EventService
     public void getEventSuggestions()
     {
 
-        eventApi.getEventSuggestions(new GetEventSuggestionsApiRequest())
+        eventApi.getCreateEventSuggestion(new GetCreateEventSuggestionsApiRequest())
                 .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<GetEventSuggestionApiResponse>()
+                .subscribe(new Subscriber<GetCreateEventSuggestionsApiResponse>()
                 {
 
                     @Override
@@ -835,11 +939,11 @@ public class EventService
                     }
 
                     @Override
-                    public void onNext(GetEventSuggestionApiResponse getEventSuggestionApiResponse)
+                    public void onNext(GetCreateEventSuggestionsApiResponse getCreateEventSuggestionsApiResponse)
                     {
 
                         genericCache
-                                .put(GenericCacheKeys.EVENT_SUGGESTIONS, getEventSuggestionApiResponse
+                                .put(GenericCacheKeys.EVENT_SUGGESTIONS, getCreateEventSuggestionsApiResponse
                                         .getEventSuggestions());
                     }
                 });

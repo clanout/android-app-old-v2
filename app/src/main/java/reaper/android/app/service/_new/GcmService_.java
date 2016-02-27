@@ -18,16 +18,11 @@ public class GcmService_
 {
     private static GcmService_ instance;
 
-    public static void init()
-    {
-        instance = new GcmService_();
-    }
-
     public static GcmService_ getInstance()
     {
         if (instance == null)
         {
-            throw new IllegalStateException("[GcmService_ Not Initialized]");
+            instance = new GcmService_();
         }
 
         return instance;

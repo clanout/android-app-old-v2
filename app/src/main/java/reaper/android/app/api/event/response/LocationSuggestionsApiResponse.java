@@ -10,7 +10,7 @@ import reaper.android.app.model.LocationSuggestion;
 /**
  * Created by aditya on 04/07/15.
  */
-public class EventSuggestionsApiResponse extends ApiResponse
+public class LocationSuggestionsApiResponse extends ApiResponse
 {
     @SerializedName("recommendations")
     private List<LocationSuggestion> recommendations;

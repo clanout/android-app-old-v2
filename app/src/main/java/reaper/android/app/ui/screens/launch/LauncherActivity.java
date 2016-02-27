@@ -166,7 +166,6 @@ public class LauncherActivity extends BaseActivity implements
         authService = AuthService_.getInstance();
 
         /* Gcm Service */
-        GcmService_.init();
         gcmService = GcmService_.getInstance();
 
         /* Presenters */

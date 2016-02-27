@@ -59,7 +59,7 @@ public class ChatPresenterImpl implements ChatPresenter
         chatService.leaveChat();
         view = null;
 
-        // TODO : Send chat notification
+        chatService.sendNotification(eventId);
     }
 
     @Override

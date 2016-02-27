@@ -27,8 +27,10 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
+import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.ChatService_;
+import reaper.android.app.service._new.GcmService_;
 import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.service._new.PhonebookService_;
@@ -117,6 +119,7 @@ public class Reaper extends Application
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         LocationService_
                 .init(getApplicationContext(), locationManager, GoogleService_.getInstance());
+        LocationService_ locationService = LocationService_.getInstance();
 
         /* Phonebook Service */
         PhonebookService_.init(getApplicationContext());
@@ -125,8 +128,15 @@ public class Reaper extends Application
         UserService.init(LocationService_.getInstance(), PhonebookService_.getInstance());
         userService = UserService.getInstance();
 
+        /* Gcm Service */
+        GcmService_ gcmService = GcmService_.getInstance();
+
+        /* Event Service */
+        EventService.init(userService, gcmService, locationService);
+        EventService eventService = EventService.getInstance();
+
         /* Chat Service */
-        ChatService_.init(userService);
+        ChatService_.init(userService, eventService);
 
         /* WhatsApp Service */
         WhatsappService_.init(userService);

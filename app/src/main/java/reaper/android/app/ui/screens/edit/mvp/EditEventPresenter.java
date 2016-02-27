@@ -1,4 +1,4 @@
-package reaper.android.app.ui.screens.edit;
+package reaper.android.app.ui.screens.edit.mvp;
 
 import org.joda.time.DateTime;
 
@@ -29,6 +29,4 @@ public interface EditEventPresenter
     void setLocationName(String locationName);
 
     void setDescription(String description);
-
-    void initiateEventDetailsNavigation();
 }

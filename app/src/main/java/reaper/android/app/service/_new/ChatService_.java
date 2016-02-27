@@ -17,6 +17,8 @@ import java.util.List;
 import reaper.android.app.api._core.GsonProvider;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.model.ChatMessage;
+import reaper.android.app.model.Event;
+import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import rx.Observable;
 import rx.Subscriber;
@@ -29,9 +31,9 @@ public class ChatService_
 {
     private static ChatService_ instance;
 
-    public static void init(UserService userService)
+    public static void init(UserService userService, EventService eventService)
     {
-        instance = new ChatService_(userService);
+        instance = new ChatService_(userService, eventService);
     }
 
     public static ChatService_ getInstance()
@@ -47,6 +49,7 @@ public class ChatService_
     private static final int DEFAULT_HISTORY_SIZE = 20;
 
     private UserService userService;
+    private EventService eventService;
 
     /* Xmpp connection */
     private AbstractXMPPConnection connection;
@@ -59,9 +62,10 @@ public class ChatService_
     /* Message Listener */
     private MessageListener messageListener;
 
-    private ChatService_(UserService userService)
+    private ChatService_(UserService userService, EventService eventService)
     {
         this.userService = userService;
+        this.eventService = eventService;
         isHealthy = false;
         activeChat = null;
         chat = null;
@@ -279,6 +283,39 @@ public class ChatService_
                 Timber.e("[Leave Chat Failed] " + e.getMessage());
             }
         }
+    }
+
+    public void sendNotification(final String eventId)
+    {
+        eventService
+                ._fetchEvent(eventId)
+                .flatMap(new Func1<Event, Observable<Boolean>>()
+                {
+                    @Override
+                    public Observable<Boolean> call(Event event)
+                    {
+                        return eventService._sendChatNotification(eventId, event.getTitle());
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new Subscriber<Boolean>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Timber.e("[Chat Notification Failed] " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(Boolean aBoolean)
+                    {
+                    }
+                });
     }
 
     /* Helper Methods */

@@ -1,4 +1,4 @@
-package reaper.android.app.ui.screens.create;
+package reaper.android.app.ui.screens.edit;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

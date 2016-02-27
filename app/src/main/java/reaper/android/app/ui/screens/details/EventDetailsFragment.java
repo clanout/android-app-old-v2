@@ -63,11 +63,10 @@ import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.chat.ChatActivity;
-import reaper.android.app.ui.screens.edit.EditEventFragment;
+import reaper.android.app.ui.screens.edit.EditEventActivity;
 import reaper.android.app.ui.screens.invite.InviteActivity;
 import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.DrawableFactory;
-import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.analytics.AnalyticsHelper;
@@ -642,8 +641,9 @@ public class EventDetailsFragment extends BaseFragment implements EventDetailsVi
     @Override
     public void navigateToEditScreen(Event event, EventDetails eventDetails)
     {
-        FragmentUtils.changeFragment(getActivity().getFragmentManager(), EditEventFragment
-                .newInstance(event, eventDetails));
+//        FragmentUtils.changeFragment(getActivity().getFragmentManager(), EditEventFragment
+//                .newInstance(event, eventDetails));
+        startActivity(EditEventActivity.callingIntent(getActivity(), event, eventDetails));
     }
 
     /* Helper Methods */

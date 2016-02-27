@@ -150,12 +150,12 @@ public class InvitePresenterImpl implements InvitePresenter
 
         if (!invitedFriends.isEmpty())
         {
-            eventService.inviteAppFriends(eventId, invitedFriends);
+            eventService._inviteAppFriends(eventId, invitedFriends);
         }
 
         if (!invitedContacts.isEmpty())
         {
-            eventService.invitePhonebookContacts(eventId, invitedContacts);
+            eventService._invitePhonebookContacts(eventId, invitedContacts);
         }
     }
 

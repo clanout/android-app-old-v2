@@ -192,10 +192,6 @@ public class MainActivity extends BaseActivity
         {
             bus.post(new BackPressedTrigger(BackstackTags.EVENT_DETAILS_CONTAINER));
         }
-        else if (activeFragment.equals(BackstackTags.EDIT))
-        {
-            bus.post(new BackPressedTrigger(BackstackTags.EDIT));
-        }
         else if (activeFragment.equals(BackstackTags.CREATE))
         {
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());

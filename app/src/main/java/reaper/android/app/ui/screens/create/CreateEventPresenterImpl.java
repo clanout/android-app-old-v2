@@ -57,7 +57,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     {
         userService = UserService.getInstance();
         eventService = EventService.getInstance();
-        placesService = new PlacesService();
+        placesService = PlacesService.getInstance();
         userLocation = LocationService_.getInstance().getCurrentLocation();
         subscriptions = new CompositeSubscription();
         this.eventCategory = eventCategory;
@@ -338,7 +338,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     private void fetchSuggestions()
     {
         Subscription subscription = eventService
-                ._fetchSuggestions(eventCategory, userLocation.getLatitude(), userLocation
+                ._fetchLocationSuggestions(eventCategory, userLocation.getLatitude(), userLocation
                         .getLongitude())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<LocationSuggestion>>()

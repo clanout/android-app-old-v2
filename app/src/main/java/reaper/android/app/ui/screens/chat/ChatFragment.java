@@ -83,9 +83,10 @@ public class ChatFragment extends BaseFragment implements ChatView
         super.onCreate(savedInstanceState);
 
         /* Presenter */
+        ChatService_ chatService = ChatService_.getInstance();
+        UserService userService = UserService.getInstance();
         String eventId = getArguments().getString(ARG_EVENT_ID);
-        presenter = new ChatPresenterImpl(ChatService_.getInstance(), UserService
-                .getInstance(), eventId);
+        presenter = new ChatPresenterImpl(chatService, userService, eventId);
     }
 
     @Nullable
