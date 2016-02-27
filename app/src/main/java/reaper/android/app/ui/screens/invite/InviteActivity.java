@@ -11,21 +11,12 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.view.MenuItem;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
-import reaper.android.app.model.Event;
-import reaper.android.app.service.EventService;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui._core.PermissionHandler;
-import reaper.android.app.ui.screens.FlowEntry;
-import reaper.android.app.ui.screens.MainActivity;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import reaper.android.app.ui.screens.details.EventDetailsActivity;
 
 public class InviteActivity extends BaseActivity implements InviteScreen
 {
@@ -152,38 +143,8 @@ public class InviteActivity extends BaseActivity implements InviteScreen
 
         if (isCreateFlow)
         {
-            EventService.getInstance()
-                        ._fetchEvents()
-                        .subscribeOn(Schedulers.newThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Subscriber<List<Event>>()
-                        {
-                            @Override
-                            public void onCompleted()
-                            {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e)
-                            {
-
-                            }
-
-                            @Override
-                            public void onNext(List<Event> events)
-                            {
-                                Intent intent = MainActivity
-                                        .callingIntent(InviteActivity.this, FlowEntry.DETAILS, eventId, (ArrayList<Event>) events);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(intent);
-                                finish();
-                            }
-                        });
+            startActivity(EventDetailsActivity.callingIntent(this, eventId));
         }
-        else
-        {
-            finish();
-        }
+        finish();
     }
 }

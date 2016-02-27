@@ -1,7 +1,5 @@
 package reaper.android.app.ui.screens.home;
 
-import com.squareup.otto.Bus;
-
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -36,19 +34,13 @@ public class EventsPresenterImpl implements EventsPresenter
     /* Subscriptions */
     private CompositeSubscription subscriptions;
 
-    public EventsPresenterImpl(Bus bus, List<Event> events)
+    public EventsPresenterImpl()
     {
         eventService = EventService.getInstance();
         cache = CacheManager.getGenericCache();
         userLocation = LocationService_.getInstance().getCurrentLocation();
         subscriptions = new CompositeSubscription();
-
-        if (events == null)
-        {
-            events = new ArrayList<>();
-        }
-
-        this.events = events;
+        events = new ArrayList<>();
     }
 
     @Override
@@ -120,7 +112,7 @@ public class EventsPresenterImpl implements EventsPresenter
 
         Subscription subscription = eventService
                 ._refreshEvents(userLocation.getZone(), eventIds, cache
-                        .get(GenericCacheKeys.LAST_UPDATE_TIMESTAMP, DateTime.class))
+                        .get(GenericCacheKeys.FEED_LAST_UPDATE_TIMESTAMP, DateTime.class))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Event>>()
                 {

@@ -26,11 +26,11 @@ import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.MemoryCacheKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.root.Reaper;
-import reaper.android.app.trigger.notifications.NewNotificationReceivedTrigger;
-import reaper.android.app.trigger.notifications.NewNotificationsAvailableTrigger;
+import reaper.android.app.communication.NewNotificationReceivedTrigger;
+import reaper.android.app.communication.NewNotificationsAvailableTrigger;
 import reaper.android.app.ui.screens.FlowEntry;
 import reaper.android.app.ui.screens.launch.LauncherActivity;
-import reaper.android.common.communicator.Communicator;
+import reaper.android.app.communication.Communicator;
 import reaper.android.common.notification.Notification;
 import rx.Observable;
 import rx.Subscriber;
@@ -847,8 +847,6 @@ public class NotificationService
 
                             if (shouldGoToDetailsFragment)
                             {
-//                                         intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "yes");
-//                                         intent.putExtra("event_id", notification.getEventId());
                                 intent[0] = LauncherActivity
                                         .callingIntent(context, FlowEntry.DETAILS, eventId);
 
@@ -857,20 +855,15 @@ public class NotificationService
                             {
                                 intent[0] = LauncherActivity
                                         .callingIntent(context, FlowEntry.HOME, null);
-
-//                                intent[0].putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "no");
                             }
 
                             if (shouldGoToChatFragment)
                             {
-//                                intent[0].putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, "yes");
-//                                intent[0].putExtra(BundleKeys.EVENT_NAME, eventName);
                                 intent[0] = LauncherActivity
                                         .callingIntent(context, FlowEntry.CHAT, eventId);
                             }
                             else
                             {
-//                                intent[0].putExtra(BundleKeys.SHOULD_GO_TO_CHAT_FRAGMENT, "no");
                                 intent[0] = LauncherActivity
                                         .callingIntent(context, FlowEntry.HOME, null);
                             }
@@ -878,18 +871,9 @@ public class NotificationService
                         }
                         else if (notifications.size() > 1)
                         {
-
-                            // more than one notification
-
-//                            intent[0]
-//                                    .putExtra(BundleKeys.SHOULD_GO_TO_NOTIFICATION_FRAGMENT, "yes");
-
                             intent[0] = LauncherActivity
                                     .callingIntent(context, FlowEntry.NOTIFICATIONS, null);
                         }
-
-
-//                        intent[0].putExtra("randomRequestCode", requestCode);
 
                         PendingIntent pendingIntent = PendingIntent
                                 .getActivity(Reaper

@@ -96,15 +96,6 @@ public class AlarmReceiver extends BroadcastReceiver
 
             if (events.get(0) != null)
             {
-//                intent.putExtra(BundleKeys.SHOULD_GO_TO_DETAILS_FRAGMENT, "yes");
-//                intent.putExtra("event_id", events.get(0).getId());
-//                intent.putExtra(BundleKeys.POPUP_STATUS_DIALOG, true);
-//
-//                intent.putExtra("randomRequestCode", requestCode);
-
-//                PendingIntent pendingIntent = PendingIntent
-//                        .getActivity(context, requestCode, intent, PendingIntent.FLAG_ONE_SHOT);
-
                 String eventId = events.get(0).getId();
                 Intent launcherIntent = LauncherActivity
                         .callingIntent(context, FlowEntry.DETAILS_WITH_STATUS_DIALOG, eventId);

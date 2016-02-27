@@ -9,21 +9,15 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.view.MenuItem;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
-import reaper.android.app.service.EventService;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui.screens.FlowEntry;
 import reaper.android.app.ui.screens.MainActivity;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import reaper.android.app.ui.screens.details.EventDetailsActivity;
 
 public class EditEventActivity extends BaseActivity implements EditEventScreen
 {
@@ -80,7 +74,8 @@ public class EditEventActivity extends BaseActivity implements EditEventScreen
     {
         if (item.getItemId() == android.R.id.home)
         {
-            navigateToDetailsScreen(((Event) getIntent().getSerializableExtra(ARG_EVENT)).getId());
+            String eventId = ((Event)getIntent().getSerializableExtra(ARG_EVENT)).getId();
+            navigateToDetailsScreen(eventId);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -88,7 +83,8 @@ public class EditEventActivity extends BaseActivity implements EditEventScreen
     @Override
     public void onBackPressed()
     {
-        navigateToDetailsScreen(((Event) getIntent().getSerializableExtra(ARG_EVENT)).getId());
+        String eventId = ((Event)getIntent().getSerializableExtra(ARG_EVENT)).getId();
+        navigateToDetailsScreen(eventId);
     }
 
     /* Screen Methods */
@@ -100,35 +96,9 @@ public class EditEventActivity extends BaseActivity implements EditEventScreen
     }
 
     @Override
-    public void navigateToDetailsScreen(final String eventId)
+    public void navigateToDetailsScreen(String eventId)
     {
-        EventService.getInstance()
-                    ._fetchEvents()
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Subscriber<List<Event>>()
-                    {
-                        @Override
-                        public void onCompleted()
-                        {
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e)
-                        {
-
-                        }
-
-                        @Override
-                        public void onNext(List<Event> events)
-                        {
-                            Intent intent = MainActivity
-                                    .callingIntent(EditEventActivity.this, FlowEntry.DETAILS, eventId, (ArrayList<Event>) events);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent);
-                            finish();
-                        }
-                    });
+        startActivity(EventDetailsActivity.callingIntent(this, eventId));
+        finish();
     }
 }

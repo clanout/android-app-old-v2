@@ -21,6 +21,7 @@
     <string name="title_home">@string/app_name</string>
     <string name="title_create">Create Plan</string>
     <string name="title_edit">Edit</string>
+    <string name="title_details">Clan</string>
     <string name="title_account">Account</string>
     <string name="title_friends">Manage Friends</string>
     <string name="title_invite">Invite</string>

@@ -16,9 +16,8 @@ import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.UserService;
-import reaper.android.app.trigger.gcm.GcmRegistrationCompleteTrigger;
 import reaper.android.common.analytics.AnalyticsHelper;
-import reaper.android.common.communicator.Communicator;
+import reaper.android.app.communication.Communicator;
 import retrofit.client.Response;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
@@ -26,13 +25,11 @@ import rx.schedulers.Schedulers;
 public class RegistrationIntentService extends IntentService
 {
     private static final String TAG = "RegIntentService";
-    private Bus bus;
     private GenericCache genericCache;
 
     public RegistrationIntentService()
     {
         super(TAG);
-        this.bus = Communicator.getInstance().getBus();
         genericCache = CacheManager.getGenericCache();
     }
 
@@ -55,7 +52,6 @@ public class RegistrationIntentService extends IntentService
             genericCache.delete(GenericCacheKeys.GCM_TOKEN);
 
         }
-        bus.post(new GcmRegistrationCompleteTrigger());
     }
 
     private void sendTokenToServer(final String token)

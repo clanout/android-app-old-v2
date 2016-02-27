@@ -15,7 +15,6 @@ import reaper.android.app.api.user.request.FetchPendingInvitesApiRequest;
 import reaper.android.app.api.user.request.GetFacebookFriendsApiRequest;
 import reaper.android.app.api.user.request.GetRegisteredContactsApiRequest;
 import reaper.android.app.api.user.request.ShareFeedbackApiRequest;
-import reaper.android.app.api.user.request.UpdateFacebookFriendsApiRequest;
 import reaper.android.app.api.user.request.UpdateMobileAPiRequest;
 import reaper.android.app.api.user.response.FetchPendingInvitesApiResponse;
 import reaper.android.app.api.user.response.GetFacebookFriendsApiResponse;
@@ -24,17 +23,13 @@ import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
-import reaper.android.app.config.ErrorCode;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.model.Friend;
 import reaper.android.app.model.User;
 import reaper.android.app.model.util.FriendsComparator;
 import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.service._new.PhonebookService_;
-import reaper.android.app.trigger.common.GenericErrorTrigger;
-import reaper.android.app.trigger.event.EventsFetchTrigger;
-import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
-import reaper.android.common.communicator.Communicator;
+import reaper.android.app.communication.Communicator;
 import retrofit.client.Response;
 import rx.Observable;
 import rx.Subscriber;
@@ -402,40 +397,7 @@ public class UserService
                 .subscribeOn(Schedulers.newThread());
     }
 
-
-    /* Old */
-    public void updateFacebookFriends(List<String> friendIdList, final boolean isPolling)
-    {
-        UpdateFacebookFriendsApiRequest request = new UpdateFacebookFriendsApiRequest(friendIdList);
-
-        userApi.updateFacebookFriends(request)
-               .subscribeOn(Schedulers.newThread())
-               .observeOn(AndroidSchedulers.mainThread())
-               .subscribe(new Subscriber<Response>()
-               {
-                   @Override
-                   public void onCompleted()
-                   {
-
-                   }
-
-                   @Override
-                   public void onError(Throwable e)
-                   {
-                       bus.post(new GenericErrorTrigger(ErrorCode.FACEBOOK_FRIENDS_UPDATION_ON_SERVER_FAILURE, (Exception) e));
-                   }
-
-                   @Override
-                   public void onNext(Response response)
-                   {
-                       if (response.getStatus() == 200)
-                       {
-                           bus.post(new FacebookFriendsUpdatedOnServerTrigger(isPolling));
-                       }
-                   }
-               });
-    }
-
+    /* Feedback */
     public void shareFeedback(int type, String comment)
     {
         ShareFeedbackApiRequest request = new ShareFeedbackApiRequest(comment, type);
@@ -464,9 +426,9 @@ public class UserService
                });
     }
 
+    /* Old */
     public void fetchPendingInvites(String phoneNumber, String zone)
     {
-
         FetchPendingInvitesApiRequest request = new FetchPendingInvitesApiRequest(phoneNumber, zone);
 
         userApi.fetchPendingInvites(request).subscribeOn(Schedulers.newThread())
@@ -482,8 +444,6 @@ public class UserService
                    @Override
                    public void onError(Throwable e)
                    {
-
-                       bus.post(new GenericErrorTrigger(ErrorCode.EVENTS_FETCH_FAILURE, (Exception) e));
                    }
 
                    @Override
@@ -492,7 +452,7 @@ public class UserService
 
                        eventCache.reset(fetchPendingInvitesApiResponse.getEvents());
                        genericCache.put(GenericCacheKeys.HAS_FETCHED_PENDING_INVITES, true);
-                       bus.post(new EventsFetchTrigger(fetchPendingInvitesApiResponse.getEvents()));
+//                       bus.post(new EventsFetchTrigger(fetchPendingInvitesApiResponse.getEvents()));
                    }
                });
     }

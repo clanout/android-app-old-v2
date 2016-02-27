@@ -9,16 +9,14 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.view.MenuItem;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
-import reaper.android.app.model.Event;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui.screens.FlowEntry;
 import reaper.android.app.ui.screens.MainActivity;
+import reaper.android.app.ui.screens.chat.ChatActivity;
+import reaper.android.app.ui.screens.details.EventDetailsActivity;
 
 public class NotificationActivity extends BaseActivity implements NotificationScreen
 {
@@ -82,18 +80,14 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
     }
 
     @Override
-    public void navigateToDetailsScreen(List<Event> events, String eventId)
+    public void navigateToDetailsScreen(String eventId)
     {
-        // TODO : Back from details activity should lead here
-        startActivity(MainActivity
-                .callingIntent(this, FlowEntry.DETAILS, eventId, (ArrayList<Event>) events));
-        finish();
+        startActivity(EventDetailsActivity.callingIntent(this, eventId));
     }
 
     @Override
     public void navigateToChatScreen(String eventId)
     {
-        startActivity(MainActivity
-                .callingIntent(this, FlowEntry.CHAT, eventId, null));
+        startActivity(ChatActivity.callingIntent(this, eventId));
     }
 }

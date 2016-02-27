@@ -1,17 +1,12 @@
 package reaper.android.app.ui.screens.create;
 
-import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +16,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,12 +31,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.single.PermissionListener;
 import com.squareup.otto.Bus;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -59,6 +47,7 @@ import hotchemi.stringpicker.StringPicker;
 import reaper.android.R;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.communication.Communicator;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
 import reaper.android.app.config.Dimensions;
@@ -77,7 +66,6 @@ import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
-import reaper.android.common.communicator.Communicator;
 import timber.log.Timber;
 
 public class CreateEventDetailsFragment extends BaseFragment
@@ -534,7 +522,7 @@ public class CreateEventDetailsFragment extends BaseFragment
         builder.setCancelable(false);
 
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
-        View dialogView = layoutInflater.inflate(R.layout.alert_dialog_event_type, null);
+        View dialogView = layoutInflater.inflate(R.layout.dialog_event_type, null);
         builder.setView(dialogView);
 
         builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener()
@@ -751,23 +739,8 @@ public class CreateEventDetailsFragment extends BaseFragment
                 @Override
                 public boolean onMenuItemClick(MenuItem item)
                 {
-
                     SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
-
-                    if (genericCache.get(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED) == null)
-                    {
-
-                        Log.d("APP", "Generic cache contact permission null");
-
-                        handleReadContactsPermission();
-                    }
-                    else
-                    {
-
-                        Log.d("APP", "Generic cache contact permission not null");
-                        createEvent();
-                    }
-
+                    createEvent();
                     return true;
                 }
             });
@@ -792,166 +765,6 @@ public class CreateEventDetailsFragment extends BaseFragment
                         .getSessionUserId());
 
     }
-
-    private void handleReadContactsPermission()
-    {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
-            try
-            {
-
-                Dexter.checkPermission(new PermissionListener()
-                {
-                    @Override
-                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse)
-                    {
-
-                        createEvent();
-                    }
-
-                    @Override
-                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse)
-                    {
-
-                        if (permissionDeniedResponse.isPermanentlyDenied())
-                        {
-
-                            displayContactsPermissionRequiredDialogPermanentlyDeclinedCase();
-                        }
-                        else
-                        {
-
-                            displayContactsPermissionRequiredDialog();
-                        }
-                    }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken)
-                    {
-
-                        permissionToken.continuePermissionRequest();
-                    }
-                }, Manifest.permission.READ_CONTACTS);
-            }
-            catch (Exception e)
-            {
-                Log.d("APP", "inside handle Read contacts home fragment --- exception");
-            }
-        }
-        else
-        {
-
-            createEvent();
-        }
-    }
-
-    private void displayContactsPermissionRequiredDialog()
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setCancelable(false);
-        builder.setMessage(R.string.read_contacts_permission_required_message);
-        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-
-                dialog.dismiss();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                {
-                    try
-                    {
-
-                        Log.d("APP", "Marshmallow ---- 2");
-
-                        Dexter.checkPermission(new PermissionListener()
-                        {
-                            @Override
-                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse)
-                            {
-
-                                Log.d("APP", "2 ---- permission granted");
-
-                                createEvent();
-                            }
-
-                            @Override
-                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse)
-                            {
-
-                                Log.d("APP", "2 ---- permission denied");
-
-                                genericCache
-                                        .put(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
-
-                                createEvent();
-                            }
-
-                            @Override
-                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken)
-                            {
-
-                                permissionToken.continuePermissionRequest();
-                            }
-                        }, Manifest.permission.READ_CONTACTS);
-                    }
-                    catch (Exception e)
-                    {
-
-                    }
-                }
-                else
-                {
-
-                    createEvent();
-                }
-            }
-        });
-
-        builder.create().show();
-    }
-
-    private void displayContactsPermissionRequiredDialogPermanentlyDeclinedCase()
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setCancelable(false);
-        builder.setMessage(R.string.read_contacts_permission_required_message);
-        builder.setPositiveButton("TAKE ME TO SETTINGS", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-
-                dialog.dismiss();
-                goToSettings();
-            }
-        });
-        builder.setNegativeButton("EXIT", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-
-                genericCache.put(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
-
-                createEvent();
-            }
-        });
-
-        builder.create().show();
-    }
-
-    private void goToSettings()
-    {
-
-        Intent intent = new Intent();
-        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
-        intent.setData(uri);
-        startActivity(intent);
-    }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)

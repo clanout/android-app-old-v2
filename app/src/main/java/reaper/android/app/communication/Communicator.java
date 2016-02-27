@@ -1,4 +1,4 @@
-package reaper.android.common.communicator;
+package reaper.android.app.communication;
 
 import com.squareup.otto.Bus;
 

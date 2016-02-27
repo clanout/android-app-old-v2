@@ -13,6 +13,9 @@ import java.util.Map;
 
 public class DateTimeUtil
 {
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat
+            .forPattern("hh:mm a, dd MMM (EEEE)");
+
     private static DateTimeFormatter DAY_FORMATTER = DateTimeFormat.forPattern("EEEE");
     private static DateTimeFormatter DAY_DATE_FORMATTER = DateTimeFormat
             .forPattern("EEEE (dd MMM)");

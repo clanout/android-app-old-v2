@@ -13,8 +13,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.ui._core.BaseActivity;
-import reaper.android.app.ui.screens.FlowEntry;
-import reaper.android.app.ui.screens.MainActivity;
+import reaper.android.app.ui.screens.details.EventDetailsActivity;
 
 public class ChatActivity extends BaseActivity implements ChatScreen
 {
@@ -63,7 +62,7 @@ public class ChatActivity extends BaseActivity implements ChatScreen
     @Override
     public void onBackPressed()
     {
-        navigateToDetailsScreen();
+        close();
     }
 
     @Override
@@ -71,19 +70,19 @@ public class ChatActivity extends BaseActivity implements ChatScreen
     {
         if (item.getItemId() == android.R.id.home)
         {
-            navigateToDetailsScreen();
+            close();
         }
         return super.onOptionsItemSelected(item);
     }
 
     /* Screen Methods */
     @Override
-    public void navigateToDetailsScreen()
+    public void close()
     {
         if (isTaskRoot())
         {
-            // TODO: Change to Details screen
-            startActivity(MainActivity.callingIntent(this, FlowEntry.HOME, null, null));
+            String eventId = getIntent().getStringExtra(ARG_EVENT_ID);
+            startActivity(EventDetailsActivity.callingIntent(this, eventId));
         }
         finish();
     }

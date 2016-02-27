@@ -372,7 +372,8 @@ public class EditEventPresenterImpl implements EditEventPresenter
     {
         Location userLocation = locationService.getCurrentLocation();
         Subscription subscription = eventService
-                ._fetchLocationSuggestions(EventCategory.valueOf(originalEvent.getCategory()), userLocation
+                ._fetchLocationSuggestions(EventCategory
+                        .valueOf(originalEvent.getCategory()), userLocation
                         .getLatitude(), userLocation
                         .getLongitude())
                 .observeOn(AndroidSchedulers.mainThread())

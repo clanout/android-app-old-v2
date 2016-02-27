@@ -20,8 +20,6 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
-import reaper.android.app.model.Event;
-import reaper.android.app.service.EventService;
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationPresenter;
@@ -62,10 +60,9 @@ public class NotificationFragment extends BaseFragment implements
 
         /* Services */
         NotificationService notificationService = NotificationService.getInstance();
-        EventService eventService = EventService.getInstance();
 
         /* Presenter */
-        presenter = new NotificationPresenterImpl(notificationService, eventService);
+        presenter = new NotificationPresenterImpl(notificationService);
     }
 
     @Nullable
@@ -174,9 +171,9 @@ public class NotificationFragment extends BaseFragment implements
     }
 
     @Override
-    public void navigateToDetailsScreen(List<Event> events, String eventId)
+    public void navigateToDetailsScreen(String eventId)
     {
-        screen.navigateToDetailsScreen(events, eventId);
+        screen.navigateToDetailsScreen(eventId);
     }
 
     @Override

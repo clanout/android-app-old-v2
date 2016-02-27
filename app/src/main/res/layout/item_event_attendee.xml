@@ -32,6 +32,7 @@
         android:layout_below="@+id/tvName"
         android:layout_marginTop="4dp"
         android:layout_toRightOf="@id/ivPic"
+        android:ellipsize="end"
         android:maxLines="1"
         android:text="Some status"
         android:textColor="@color/text_subtitle"/>

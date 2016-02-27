@@ -3,8 +3,6 @@ package reaper.android.app.ui.screens.notifications.mvp;
 import java.util.ArrayList;
 import java.util.List;
 
-import reaper.android.app.model.Event;
-import reaper.android.app.service.EventService;
 import reaper.android.app.service.NotificationService;
 import reaper.android.common.notification.Notification;
 import rx.Subscriber;
@@ -16,16 +14,14 @@ public class NotificationPresenterImpl implements NotificationPresenter
 {
     private NotificationView view;
     private NotificationService notificationService;
-    private EventService eventService;
 
     private List<Notification> notifications;
 
     private CompositeSubscription subscriptions;
 
-    public NotificationPresenterImpl(NotificationService notificationService, EventService eventService)
+    public NotificationPresenterImpl(NotificationService notificationService)
     {
         this.notificationService = notificationService;
-        this.eventService = eventService;
 
         subscriptions = new CompositeSubscription();
     }
@@ -62,31 +58,7 @@ public class NotificationPresenterImpl implements NotificationPresenter
         }
         else
         {
-            Subscription subscription =
-                    eventService
-                            ._fetchEvents()
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(new Subscriber<List<Event>>()
-                            {
-                                @Override
-                                public void onCompleted()
-                                {
-                                }
-
-                                @Override
-                                public void onError(Throwable e)
-                                {
-                                    view.navigateToHomeScreen();
-                                }
-
-                                @Override
-                                public void onNext(List<Event> events)
-                                {
-                                    view.navigateToDetailsScreen(events, eventId);
-                                }
-                            });
-
-            subscriptions.add(subscription);
+            view.navigateToDetailsScreen(eventId);
         }
     }
 

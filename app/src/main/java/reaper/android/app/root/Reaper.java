@@ -10,23 +10,15 @@ import com.facebook.FacebookSdk;
 import com.facebook.stetho.Stetho;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
-import com.karumi.dexter.Dexter;
 import com.squareup.otto.Bus;
-import com.squareup.otto.Subscribe;
 import com.squareup.otto.ThreadEnforcer;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import java.util.concurrent.TimeUnit;
 
 import reaper.android.BuildConfig;
-import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache._core.DatabaseManager;
-import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.communication.Communicator;
 import reaper.android.app.config.AppConstants;
-import reaper.android.app.config.GenericCacheKeys;
-import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.ChatService_;
@@ -35,10 +27,6 @@ import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.service._new.PhonebookService_;
 import reaper.android.app.service._new.WhatsappService_;
-import reaper.android.app.trigger.facebook.FacebookFriendsIdFetchedTrigger;
-import reaper.android.app.trigger.user.FacebookFriendsUpdatedOnServerTrigger;
-import reaper.android.common.analytics.AnalyticsHelper;
-import reaper.android.common.communicator.Communicator;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -50,11 +38,6 @@ public class Reaper extends Application
 {
     private static Reaper instance;
     private static Tracker tracker;
-    private Bus bus;
-
-    // Services
-    private UserService userService;
-    private GenericCache genericCache;
 
     private boolean isConnected;
 
@@ -78,42 +61,54 @@ public class Reaper extends Application
     @Override
     public void onCreate()
     {
-        Timber.v(">>>> Reaper.onCreate()");
         super.onCreate();
 
-        init();
-        connectivityHandler();
-        Stetho.initializeWithDefaults(this);
-    }
-
-    protected void init()
-    {
-        Timber.v(">>>> Reaper.init()");
+        /* Static reference */
         instance = this;
 
+        /* Facebook SDK */
         FacebookSdk.sdkInitialize(this);
-        Dexter.initialize(this);
 
+        /* Stetho (debugging) */
+        Stetho.initializeWithDefaults(this);
+
+        /* Logging */
+        initLogging();
+
+        /* Communicator (Event Bus) */
+        initCommunicator();
+
+        /* SQLite */
+        initDb();
+
+        /* Services */
+        initServices();
+    }
+
+    private void initLogging()
+    {
         if (BuildConfig.DEBUG)
         {
             Timber.plant(new Timber.DebugTree());
         }
+    }
 
-        bus = new Bus(ThreadEnforcer.ANY);
+    private void initCommunicator()
+    {
+        Bus bus = new Bus(ThreadEnforcer.ANY);
         bus.register(this);
         Communicator.init(bus);
+    }
 
+    private void initDb()
+    {
         DatabaseManager.init(this);
-        initServices();
-
-        genericCache = CacheManager.getGenericCache();
-
-        handleTimesApplicationOpened();
     }
 
     private void initServices()
     {
-        Timber.v(">>>> Reaper.initServices()");
+        /* Gcm Service */
+        GcmService_ gcmService = GcmService_.getInstance();
 
         /* Location Service */
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -126,10 +121,7 @@ public class Reaper extends Application
 
         /* User Service */
         UserService.init(LocationService_.getInstance(), PhonebookService_.getInstance());
-        userService = UserService.getInstance();
-
-        /* Gcm Service */
-        GcmService_ gcmService = GcmService_.getInstance();
+        UserService userService = UserService.getInstance();
 
         /* Event Service */
         EventService.init(userService, gcmService, locationService);
@@ -140,54 +132,6 @@ public class Reaper extends Application
 
         /* WhatsApp Service */
         WhatsappService_.init(userService);
-    }
-
-    private void handleTimesApplicationOpened()
-    {
-        int timesApplicationOpened;
-        try
-        {
-            timesApplicationOpened = Integer
-                    .parseInt(genericCache.get(GenericCacheKeys.TIMES_APPLICATION_OPENED));
-        }
-        catch (Exception e)
-        {
-            timesApplicationOpened = 0;
-        }
-
-        timesApplicationOpened++;
-
-        genericCache.put(GenericCacheKeys.TIMES_APPLICATION_OPENED, timesApplicationOpened);
-
-        String userId = userService.getSessionUserId();
-        if (userId == null)
-        {
-            userId = "0";
-        }
-
-        AnalyticsHelper
-                .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.APP_LAUNCHED, "user - " + userId + " time - " + DateTime
-                        .now(DateTimeZone.UTC)
-                        .toString());
-    }
-
-    @Subscribe
-    public void onFacebookFriendsIdFetched(FacebookFriendsIdFetchedTrigger trigger)
-    {
-        if (trigger.isPolling())
-        {
-            userService.updateFacebookFriends(trigger.getFriendsIdList(), trigger.isPolling());
-        }
-    }
-
-    @Subscribe
-    public void onFacebookFriendsUpdatedOnServer(FacebookFriendsUpdatedOnServerTrigger trigger)
-    {
-        if (trigger.isPolling())
-        {
-            genericCache.put(GenericCacheKeys.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime
-                    .now());
-        }
     }
 
     private void connectivityHandler()

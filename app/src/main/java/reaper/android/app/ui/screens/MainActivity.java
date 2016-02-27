@@ -17,22 +17,19 @@ import reaper.android.R;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.BackstackTags;
-import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
-import reaper.android.app.service.FacebookService;
 import reaper.android.app.service.UserService;
-import reaper.android.app.trigger.common.BackPressedTrigger;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui.screens.chat.ChatActivity;
-import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
+import reaper.android.app.ui.screens.details.EventDetailsActivity;
 import reaper.android.app.ui.screens.home.HomeFragment;
 import reaper.android.app.ui.screens.notifications.NotificationActivity;
 import reaper.android.app.ui.util.FragmentUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
-import reaper.android.common.communicator.Communicator;
+import reaper.android.app.communication.Communicator;
 
 public class MainActivity extends BaseActivity
 {
@@ -78,7 +75,6 @@ public class MainActivity extends BaseActivity
     private Bus bus;
     private EventService eventService;
     private UserService userService;
-    private FacebookService facebookService;
 
     private GenericCache genericCache;
 
@@ -101,32 +97,14 @@ public class MainActivity extends BaseActivity
 
         eventService = EventService.getInstance();
         userService = UserService.getInstance();
-        facebookService = new FacebookService(bus);
         fragmentManager = getFragmentManager();
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         genericCache = CacheManager.getGenericCache();
 
-        if (genericCache.get(GenericCacheKeys.EVENT_SUGGESTIONS) == null)
+        if (genericCache.get(GenericCacheKeys.CREATE_EVENT_SUGGESTIONS) == null)
         {
             eventService.getEventSuggestions();
-        }
-
-        DateTime lastFacebookFriendsRefreshTimestamp = genericCache
-                .get(GenericCacheKeys.LAST_FACEBOOK_FRIENDS_REFRESHED_TIMESTAMP, DateTime.class);
-
-        if (lastFacebookFriendsRefreshTimestamp != null)
-        {
-            if (DateTime.now().minusDays(2).isAfter(lastFacebookFriendsRefreshTimestamp))
-            {
-                AnalyticsHelper
-                        .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.FACEBOOK_FRIEND_REFRESHED_LIMIT_CROSSED, null);
-                facebookService.getFacebookFriends(true);
-            }
-        }
-        else
-        {
-            facebookService.getFacebookFriends(true);
         }
 
         handleIntent();
@@ -188,10 +166,6 @@ public class MainActivity extends BaseActivity
         {
             finish();
         }
-        else if (activeFragment.equals(BackstackTags.EVENT_DETAILS_CONTAINER))
-        {
-            bus.post(new BackPressedTrigger(BackstackTags.EVENT_DETAILS_CONTAINER));
-        }
         else if (activeFragment.equals(BackstackTags.CREATE))
         {
             FragmentUtils.changeFragment(fragmentManager, new HomeFragment());
@@ -250,21 +224,6 @@ public class MainActivity extends BaseActivity
 
     private void navigateToDetailsFragment(ArrayList<Event> eventList, String eventId, boolean isDialogShown)
     {
-        Event activeEvent = new Event();
-        activeEvent.setId(eventId);
-        int activePosition = 0;
-        if (eventList.contains(activeEvent))
-        {
-            activePosition = eventList.indexOf(activeEvent);
-        }
-
-        EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, eventList);
-        bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
-        bundle.putBoolean(BundleKeys.POPUP_STATUS_DIALOG, isDialogShown);
-        eventDetailsContainerFragment.setArguments(bundle);
-
-        FragmentUtils.changeFragment(fragmentManager, eventDetailsContainerFragment);
+        startActivity(EventDetailsActivity.callingIntent(this, eventId));
     }
 }

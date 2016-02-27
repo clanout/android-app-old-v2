@@ -1,43 +1,50 @@
-package reaper.android.app.ui.screens.details;
+package reaper.android.app.ui.screens.details.mvp;
 
 import java.util.List;
 
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
+import reaper.android.app.model.User;
 
 public interface EventDetailsView
 {
+    /* Init View */
     void displayEventSummary(Event event);
 
-    void displayUserSummary(String userId, String name);
+    void displayUserSummary(User user);
 
+    void displayDescription(String description);
+
+    /* Rsvp */
     void displayRsvp(boolean isGoing);
 
     void disableRsvp();
 
     void displayRsvpError();
 
-    void displayDescription(String description);
+    /* Status */
+    void hideStatus();
 
-    void displayStatusMessage(int statusType, String status);
+    void displayStatus(String status);
 
-    void displayInvitationResponseDialog(String eventId, String userId);
+    void displayLastMinuteStatus(String status);
 
-    void displayUpdateStatusDialog(String eventId, String userId, String oldStatus, boolean isLastMinute);
-
+    /* Attendees */
     void displayAttendeeList(List<EventDetails.Attendee> attendees);
 
     void showAttendeeLoading();
 
     void hideAttendeeLoading();
 
-    void navigateToInviteScreen(Event event);
-
-    void navigateToChatScreen(String eventId, String eventTitle);
-
+    /* Edit */
     void setEditActionState(boolean isVisible);
 
     void displayEventFinalizedMessage();
+
+    /* Navigation */
+    void navigateToInviteScreen(String eventId);
+
+    void navigateToChatScreen(String eventId);
 
     void navigateToEditScreen(Event event, EventDetails eventDetails);
 }

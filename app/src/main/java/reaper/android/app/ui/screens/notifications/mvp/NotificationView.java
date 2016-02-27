@@ -2,7 +2,6 @@ package reaper.android.app.ui.screens.notifications.mvp;
 
 import java.util.List;
 
-import reaper.android.app.model.Event;
 import reaper.android.common.notification.Notification;
 
 public interface NotificationView
@@ -15,7 +14,7 @@ public interface NotificationView
 
     void navigateToHomeScreen();
 
-    void navigateToDetailsScreen(List<Event> events, String eventId);
+    void navigateToDetailsScreen(String eventId);
 
     void navigateToChatScreen(String eventId);
 }

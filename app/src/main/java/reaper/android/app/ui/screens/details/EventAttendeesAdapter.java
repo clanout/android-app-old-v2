@@ -16,9 +16,11 @@ import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import reaper.android.R;
-import reaper.android.app.config.AppConstants;
 import reaper.android.app.model.EventDetails;
+import reaper.android.app.service._new.FacebookService_;
 import reaper.android.app.ui.util.CircleTransform;
 
 public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAdapter.EventDetailsViewHolder>
@@ -37,21 +39,21 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
 
     private void generateDrawables()
     {
-        personDrawable = MaterialDrawableBuilder.with(context)
-                                                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
-                                                .setColor(ContextCompat
-                                                        .getColor(context, R.color.light_grey))
-                                                .setSizeDp(24)
-                                                .build();
+        personDrawable = MaterialDrawableBuilder
+                .with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
+                .setColor(ContextCompat
+                        .getColor(context, R.color.light_grey))
+                .setSizeDp(24)
+                .build();
     }
 
     @Override
     public EventDetailsViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         View view = LayoutInflater.from(parent.getContext())
-                                  .inflate(R.layout.list_item_event_attendee_, parent, false);
-        EventDetailsViewHolder eventDetailsViewHolder = new EventDetailsViewHolder(view);
-        return eventDetailsViewHolder;
+                                  .inflate(R.layout.item_event_attendee, parent, false);
+        return new EventDetailsViewHolder(view);
     }
 
     @Override
@@ -69,38 +71,28 @@ public class EventAttendeesAdapter extends RecyclerView.Adapter<EventAttendeesAd
 
     public class EventDetailsViewHolder extends RecyclerView.ViewHolder
     {
+        @Bind(R.id.ivPic)
         ImageView ivPic;
+
+        @Bind(R.id.tvName)
         TextView tvName;
+
+        @Bind(R.id.tvStatus)
         TextView tvStatus;
+
+        @Bind(R.id.mivInvite)
         View mivInvite;
 
         public EventDetailsViewHolder(final View itemView)
         {
             super(itemView);
-
-            ivPic = (ImageView) itemView.findViewById(R.id.ivPic);
-            tvName = (TextView) itemView.findViewById(R.id.tvName);
-            tvStatus = (TextView) itemView.findViewById(R.id.tvStatus);
-            mivInvite = itemView.findViewById(R.id.mivInvite);
-
-            itemView.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    EventDetails.Attendee attendee = attendees.get(getAdapterPosition());
-                    if (attendee.isInviter())
-                    {
-
-                    }
-                }
-            });
+            ButterKnife.bind(this, itemView);
         }
 
         public void render(EventDetails.Attendee attendee)
         {
             Picasso.with(context)
-                   .load(AppConstants.BASE_URL_FACEBOOK_API + attendee.getId() + "/picture?width=500")
+                   .load(FacebookService_.getFriendPicUrl(attendee.getId()))
                    .placeholder(personDrawable)
                    .transform(new CircleTransform())
                    .into(ivPic);

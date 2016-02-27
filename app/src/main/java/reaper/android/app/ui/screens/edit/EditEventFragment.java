@@ -159,7 +159,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.fragment_edit_, container, false);
+        View view = inflater.inflate(R.layout.fragment_edit, container, false);
         ButterKnife.bind(this, view);
         return view;
     }

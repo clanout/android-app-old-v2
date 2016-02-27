@@ -109,11 +109,9 @@ dependencies {
     // Material Date-Time picker
     compile 'com.wdullaer:materialdatetimepicker:1.5.3'
 
-    // Permissions
-    compile 'com.karumi:dexter:2.1.2'
-
     // Day Picker
     compile 'com.github.hotchemi:stringpicker:0.0.2'
 
+    // Custom Recycler View (for chat)
     compile 'com.jcodecraeer:xrecyclerview:1.2.6'
 }

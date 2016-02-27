@@ -57,12 +57,6 @@
         </activity>
 
         <activity
-            android:name=".app.ui.screens.chat.ChatActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait">
-        </activity>
-
-        <activity
             android:name=".app.ui.screens.accounts.AccountActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
@@ -70,6 +64,12 @@
 
         <activity
             android:name=".app.ui.screens.friends.FriendsActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity
+            android:name=".app.ui.screens.details.EventDetailsActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
         </activity>
@@ -85,6 +85,12 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize">
+        </activity>
+
+        <activity
+            android:name=".app.ui.screens.chat.ChatActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
         </activity>
 
         <activity

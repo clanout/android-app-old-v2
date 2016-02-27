@@ -1,4 +1,5 @@
-package reaper.android.app.ui.screens.details;
+package reaper.android.app.ui.screens.details.mvp;
+
 
 public interface EventDetailsPresenter
 {
@@ -8,15 +9,13 @@ public interface EventDetailsPresenter
 
     void toggleRsvp();
 
-    void onStatusClicked();
-
     void invite();
 
-    void onEdit();
+    void edit();
 
     void chat();
 
-    void setStatus(String status);
-
     void requestEditActionState();
+
+    void setStatus(String status);
 }

@@ -19,8 +19,8 @@
     <!--<color name="text_default">#111111</color>-->
     <!--<color name="text_subtitle">#666666</color>-->
     <color name="text_title_inverse">#FFFFFF</color>
-    <color name="text_default_inverse">#AAEEEEEE</color>
-    <color name="text_subtitle_inverse">#77EEEEEE</color>
+    <color name="text_default_inverse">#FDFDFD</color>
+    <color name="text_subtitle_inverse">#EEEEEE</color>
 
     <!-- RSVP colors -->
     <color name="going">#4CAF50</color>

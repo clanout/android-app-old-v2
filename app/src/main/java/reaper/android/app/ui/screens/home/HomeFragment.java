@@ -1,17 +1,12 @@
 package reaper.android.app.ui.screens.home;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -24,7 +19,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,12 +33,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.single.PermissionListener;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
@@ -62,9 +50,11 @@ import hotchemi.stringpicker.StringPicker;
 import reaper.android.R;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.communication.Communicator;
+import reaper.android.app.communication.NewNotificationReceivedTrigger;
+import reaper.android.app.communication.NewNotificationsAvailableTrigger;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.BackstackTags;
-import reaper.android.app.config.BundleKeys;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
@@ -73,14 +63,10 @@ import reaper.android.app.model.EventCategory;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
-import reaper.android.app.service._new.LocationService_;
-import reaper.android.app.trigger.event.EventsFetchTrigger;
-import reaper.android.app.trigger.notifications.NewNotificationReceivedTrigger;
-import reaper.android.app.trigger.notifications.NewNotificationsAvailableTrigger;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.accounts.AccountActivity;
 import reaper.android.app.ui.screens.create.CreateEventDetailsFragment;
-import reaper.android.app.ui.screens.details.EventDetailsContainerFragment;
+import reaper.android.app.ui.screens.details.EventDetailsActivity;
 import reaper.android.app.ui.screens.home.create.CreateEventPresenter;
 import reaper.android.app.ui.screens.home.create.CreateEventPresenterImpl;
 import reaper.android.app.ui.screens.home.create.CreateEventView;
@@ -93,7 +79,6 @@ import reaper.android.app.ui.util.PhoneUtils;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.common.analytics.AnalyticsHelper;
-import reaper.android.common.communicator.Communicator;
 import timber.log.Timber;
 
 public class HomeFragment extends BaseFragment implements EventsView,
@@ -130,8 +115,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
     CreateEventPresenter createEventPresenter;
 
     /* Data */
-    int activePosition;
-
     DateTimeUtil dateTimeUtil;
     List<String> dayList;
     List<String> dateList;
@@ -142,7 +125,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
     /* Event Bus */
     Bus bus;
-    private GenericCache genericCache;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -151,21 +133,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.HOME_FRAGMENT);
 
-        Log.d("APP", "onCreate H");
-
-        List<Event> events = new ArrayList<>();
-
-        if (getArguments() != null)
-        {
-            //noinspection unchecked
-            events = (ArrayList<Event>) getArguments()
-                    .getSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS);
-            activePosition = getArguments()
-                    .getInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION);
-        }
-
         bus = Communicator.getInstance().getBus();
-        presenter = new EventsPresenterImpl(bus, events);
+        presenter = new EventsPresenterImpl();
         createEventPresenter = new CreateEventPresenterImpl(bus);
     }
 
@@ -173,9 +142,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-
-        Log.d("APP", "onCreateView H");
-
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
@@ -209,16 +175,12 @@ public class HomeFragment extends BaseFragment implements EventsView,
     {
         super.onActivityCreated(savedInstanceState);
 
-        Log.d("APP", "onActivityCreated H");
-
         loading.getIndeterminateDrawable().setColorFilter(ContextCompat
                 .getColor(getActivity(), R.color.accent), PorterDuff.Mode.SRC_IN);
 
         toolbar.setTitle(R.string.title_home);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         setHasOptionsMenu(true);
-
-        genericCache = CacheManager.getGenericCache();
 
         srlFeed.setOnRefreshListener(this);
         srlFeed.setColorSchemeResources(R.color.category_icon_one, R.color.category_icon_eight,
@@ -304,19 +266,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
             @Override
             public void onClick(View v)
             {
-                if (genericCache.get(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED) == null)
-                {
-
-                    Log.d("APP", "Generic cache contact permission null");
-
-                    handleReadContactsPermission();
-                }
-                else
-                {
-
-                    Log.d("APP", "Generic cache contact permission not null");
-                    createEvent();
-                }
+                createEvent();
             }
         });
 
@@ -381,8 +331,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
     {
         super.onResume();
 
-        Log.d("APP", "onResume H");
-
         bus.register(this);
 
         CacheManager.getGenericCache().put(GenericCacheKeys.ACTIVE_FRAGMENT, BackstackTags.HOME);
@@ -419,9 +367,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
     public void onPause()
     {
         super.onPause();
-
-        Log.d("APP", "onPause H");
-
         SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
         bus.unregister(this);
     }
@@ -430,8 +375,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
     public void onStop()
     {
         super.onStop();
-
-        Log.d("APP", "onStop H");
 
         presenter.detachView();
         createEventPresenter.detachView();
@@ -447,7 +390,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
     @Override
     public void onRefresh()
     {
-        activePosition = 0;
         presenter.refreshEvents();
     }
 
@@ -472,7 +414,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
 
         srlFeed.setRefreshing(false);
         rvFeed.setAdapter(new EventsAdapter(getActivity(), events, this));
-        rvFeed.scrollToPosition(activePosition);
         rvFeed.setVisibility(View.VISIBLE);
     }
 
@@ -501,13 +442,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
     @Override
     public void gotoDetailsView(List<Event> events, int activePosition)
     {
-        EventDetailsContainerFragment eventDetailsContainerFragment = new EventDetailsContainerFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_EVENTS, (ArrayList<Event>) events);
-        bundle.putInt(BundleKeys.EVENT_DETAILS_CONTAINER_FRAGMENT_ACTIVE_POSITION, activePosition);
-        eventDetailsContainerFragment.setArguments(bundle);
-
-        FragmentUtils.changeFragment(getFragmentManager(), eventDetailsContainerFragment);
+        String eventId = events.get(activePosition).getId();
+        startActivity(EventDetailsActivity.callingIntent(getActivity(), eventId));
     }
 
     /* Helper Methods */
@@ -553,8 +489,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
     /* Action Bar Menu */
     public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater)
     {
-        Timber.v("Options menu created");
-
         super.onCreateOptionsMenu(menu, inflater);
 
         menu.clear();
@@ -605,7 +539,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
             });
     }
 
-    /* Unrefactored */
+    /* Notification Listeners */
     @SuppressWarnings("UnusedParameters")
     @Subscribe
     public void newNotificationsAvailable(NewNotificationsAvailableTrigger trigger)
@@ -647,19 +581,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
                 }
             }
         });
-    }
-
-    @Subscribe
-    public void onEventsFetched(EventsFetchTrigger trigger)
-    {
-        if (trigger.getEvents().size() == 0)
-        {
-            showNoEventsMessage();
-        }
-        else
-        {
-            showEvents(trigger.getEvents());
-        }
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -718,9 +639,6 @@ public class HomeFragment extends BaseFragment implements EventsView,
             public void onClick(DialogInterface dialog, int which)
             {
                 genericCache.put(GenericCacheKeys.HAS_FETCHED_PENDING_INVITES, true);
-
-                eventService
-                        .fetchEvents(LocationService_.getInstance().getCurrentLocation().getZone());
             }
         });
 
@@ -745,8 +663,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
                            {
                                userService.updatePhoneNumber(parsedPhone);
 
-                               userService.fetchPendingInvites(parsedPhone, LocationService_
-                                       .getInstance().getCurrentLocation().getZone());
+//                               userService.fetchPendingInvites(parsedPhone, LocationService_
+//                                       .getInstance().getCurrentLocation().getZone());
 
                                SoftKeyboardHandler.hideKeyboard(getActivity(), dialogView);
 
@@ -769,7 +687,7 @@ public class HomeFragment extends BaseFragment implements EventsView,
         builder.setCancelable(false);
 
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
-        View dialogView = layoutInflater.inflate(R.layout.alert_dialog_event_type, null);
+        View dialogView = layoutInflater.inflate(R.layout.dialog_event_type, null);
         builder.setView(dialogView);
 
         builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener()
@@ -1028,183 +946,8 @@ public class HomeFragment extends BaseFragment implements EventsView,
         getActivity().finish();
     }
 
-    private void handleReadContactsPermission()
-    {
-
-        Log.d("APP", "inside handle permission");
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
-
-            Log.d("APP", "inside handle permission -- Greater than M");
-
-            try
-            {
-
-                Dexter.checkPermission(new PermissionListener()
-                {
-                    @Override
-                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse)
-                    {
-
-                        Log.d("APP", "inside handle permission -- permission granted");
-
-                        createEvent();
-                    }
-
-                    @Override
-                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse)
-                    {
-
-                        Log.d("APP", "inside handle permission -- permission denied");
-
-                        if (permissionDeniedResponse.isPermanentlyDenied())
-                        {
-
-                            Log.d("APP", "inside handle permission -- permission permanently denied");
-
-                            displayContactsPermissionRequiredDialogPermanentlyDeclinedCase();
-                        }
-                        else
-                        {
-
-                            Log.d("APP", "inside handle permission -- permission permanently not denied");
-                            displayContactsPermissionRequiredDialog();
-                        }
-                    }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken)
-                    {
-
-                        permissionToken.continuePermissionRequest();
-                    }
-                }, Manifest.permission.READ_CONTACTS);
-            }
-            catch (Exception e)
-            {
-                Log.d("APP", "inside handle Read contacts home fragment --- exception");
-            }
-        }
-        else
-        {
-
-            Log.d("APP", "inside handle permission -- less than M");
-
-            createEvent();
-        }
-    }
-
-    private void displayContactsPermissionRequiredDialog()
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setCancelable(false);
-        builder.setMessage(R.string.read_contacts_permission_required_message);
-        builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-
-                dialog.dismiss();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                {
-                    try
-                    {
-
-                        Log.d("APP", "Marshmallow ---- 2");
-
-                        Dexter.checkPermission(new PermissionListener()
-                        {
-                            @Override
-                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse)
-                            {
-
-                                Log.d("APP", "2 ---- permission granted");
-
-                                createEvent();
-                            }
-
-                            @Override
-                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse)
-                            {
-
-                                Log.d("APP", "2 ---- permission denied");
-
-                                genericCache
-                                        .put(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
-
-                                createEvent();
-                            }
-
-                            @Override
-                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken)
-                            {
-
-                                permissionToken.continuePermissionRequest();
-                            }
-                        }, Manifest.permission.READ_CONTACTS);
-                    }
-                    catch (Exception e)
-                    {
-
-                    }
-                }
-                else
-                {
-
-                    createEvent();
-                }
-            }
-        });
-
-        builder.create().show();
-    }
-
-    private void displayContactsPermissionRequiredDialogPermanentlyDeclinedCase()
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setCancelable(false);
-        builder.setMessage(R.string.read_contacts_permission_required_message);
-        builder.setPositiveButton("TAKE ME TO SETTINGS", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-
-                dialog.dismiss();
-                goToSettings();
-            }
-        });
-        builder.setNegativeButton("EXIT", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-
-                genericCache.put(GenericCacheKeys.READ_CONTACT_PERMISSION_DENIED, true);
-
-                createEvent();
-            }
-        });
-
-        builder.create().show();
-    }
-
-    private void goToSettings()
-    {
-
-        Intent intent = new Intent();
-        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
-        intent.setData(uri);
-        startActivity(intent);
-    }
-
     private void createEvent()
     {
-        Log.d("APP", "inside create event");
-
         createEventPresenter.create(
                 etTitle.getText().toString(),
                 selectedCategory,
