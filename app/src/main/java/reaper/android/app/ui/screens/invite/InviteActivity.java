@@ -143,7 +143,9 @@ public class InviteActivity extends BaseActivity implements InviteScreen
 
         if (isCreateFlow)
         {
-            startActivity(EventDetailsActivity.callingIntent(this, eventId));
+            Intent intent = EventDetailsActivity.callingIntent(this, eventId);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
         }
         finish();
     }

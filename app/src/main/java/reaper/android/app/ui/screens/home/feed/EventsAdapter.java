@@ -1,4 +1,4 @@
-package reaper.android.app.ui.screens.home;
+package reaper.android.app.ui.screens.home.feed;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +16,8 @@ import org.joda.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.model.Event;
@@ -39,7 +41,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
     public EventViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         View v = LayoutInflater.from(parent.getContext())
-                               .inflate(R.layout.list_item_event, parent, false);
+                               .inflate(R.layout.item_event, parent, false);
         return new EventViewHolder(v);
     }
 
@@ -63,23 +65,28 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
 
     public class EventViewHolder extends RecyclerView.ViewHolder
     {
+        @Bind(R.id.llCategoryIconContainer)
         View llCategoryIconContainer;
+
+        @Bind(R.id.ivCategoryIcon)
         ImageView ivCategoryIcon;
+
+        @Bind(R.id.tvTitle)
         TextView tvTitle;
+
+        @Bind(R.id.tvFriendsGoing)
         TextView tvFriendsGoing;
+
+        @Bind(R.id.mivRsvp)
         MaterialIconView mivRsvp;
+
+        @Bind(R.id.llToday)
         View llToday;
 
         public EventViewHolder(View itemView)
         {
             super(itemView);
-
-            llCategoryIconContainer = itemView.findViewById(R.id.llCategoryIconContainer);
-            ivCategoryIcon = (ImageView) itemView.findViewById(R.id.ivCategoryIcon);
-            tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
-            tvFriendsGoing = (TextView) itemView.findViewById(R.id.tvFriendsGoing);
-            mivRsvp = (MaterialIconView) itemView.findViewById(R.id.mivRsvp);
-            llToday = itemView.findViewById(R.id.llToday);
+            ButterKnife.bind(this, itemView);
 
             itemView.setOnClickListener(new View.OnClickListener()
             {

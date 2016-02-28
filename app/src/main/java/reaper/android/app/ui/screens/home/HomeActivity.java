@@ -1,0 +1,238 @@
+package reaper.android.app.ui.screens.home;
+
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.support.v4.content.ContextCompat;
+import android.view.Menu;
+import android.view.MenuItem;
+
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
+
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
+
+import org.joda.time.LocalTime;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import reaper.android.R;
+import reaper.android.app.communication.Communicator;
+import reaper.android.app.communication.NewNotificationReceivedTrigger;
+import reaper.android.app.communication.NewNotificationsAvailableTrigger;
+import reaper.android.app.model.EventCategory;
+import reaper.android.app.service.NotificationService;
+import reaper.android.app.ui._core.BaseActivity;
+import reaper.android.app.ui.screens.home.create.CreateFragment;
+import reaper.android.app.ui.screens.home.feed.EventFeedFragment;
+import reaper.android.app.ui.screens.accounts.AccountActivity;
+import reaper.android.app.ui.screens.create.CreateActivity;
+import reaper.android.app.ui.screens.details.EventDetailsActivity;
+import reaper.android.app.ui.screens.notifications.NotificationActivity;
+
+public class HomeActivity extends BaseActivity implements HomeScreen
+{
+    public static Intent callingIntent(Context context)
+    {
+        Intent intent = new Intent(context, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        return intent;
+    }
+
+    /* UI Elements */
+    @Bind(R.id.appBarLayout)
+    AppBarLayout appBarLayout;
+
+    MenuItem notification;
+    Drawable notificationIcon;
+
+    /* Notification Listener */
+    Bus notificationCommunicator;
+
+    /* Lifecycle Methods */
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        /* Setup UI */
+        setContentView(R.layout.activity_home);
+        ButterKnife.bind(this);
+
+        /* Toolbar Setup */
+        setActionBar(appBarLayout);
+        showActionBar();
+        setScreenTitle(R.string.title_home);
+        setActionBarBackVisibility(false);
+
+        /* Notification Communicator */
+        notificationCommunicator = Communicator.getInstance().getBus();
+
+        FragmentManager fragmentManager = getFragmentManager();
+        /* Create Box */
+        FragmentTransaction createFragmentTransaction = fragmentManager.beginTransaction();
+        createFragmentTransaction.replace(R.id.createBox, CreateFragment.newInstance());
+        createFragmentTransaction.commit();
+
+        /* Event Feed */
+        FragmentTransaction feedFragmentTransaction = fragmentManager.beginTransaction();
+        feedFragmentTransaction.replace(R.id.feed, EventFeedFragment.newInstance());
+        feedFragmentTransaction.commit();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        notificationCommunicator.register(this);
+
+        /* Notification */
+        notificationIcon = MaterialDrawableBuilder
+                .with(this)
+                .setIcon(MaterialDrawableBuilder.IconValue.BELL)
+                .setColor(ContextCompat
+                        .getColor(this, R.color.white))
+                .setSizeDp(36)
+                .build();
+
+        if (notification != null)
+        {
+            notification.setIcon(notificationIcon);
+        }
+
+        /* Request Notifications */
+        NotificationService notificationService = NotificationService.getInstance();
+        notificationService.areNewNotificationsAvailable();
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        notificationCommunicator.unregister(this);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        menu.clear();
+        getMenuInflater().inflate(R.menu.action_home, menu);
+
+        notification = menu.findItem(R.id.action_notifications);
+
+        if (notificationIcon == null)
+        {
+            notificationIcon = MaterialDrawableBuilder
+                    .with(this)
+                    .setIcon(MaterialDrawableBuilder.IconValue.BELL)
+                    .setColor(ContextCompat
+                            .getColor(this, R.color.white))
+                    .setSizeDp(36)
+                    .build();
+        }
+        notification.setIcon(notificationIcon);
+
+        menu.findItem(R.id.action_account)
+            .setIcon(MaterialDrawableBuilder
+                    .with(this)
+                    .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
+                    .setColor(ContextCompat.getColor(this, R.color.white))
+                    .setSizeDp(36)
+                    .build());
+
+        notification
+                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+                {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item)
+                    {
+                        navigateToNotificationScreen();
+                        return true;
+                    }
+                });
+
+        menu.findItem(R.id.action_account)
+            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+            {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem)
+                {
+                    navigateToAccountsScreen();
+                    return true;
+                }
+            });
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /* Notification Listeners */
+    @SuppressWarnings("UnusedParameters")
+    @Subscribe
+    public void newNotificationsAvailable(NewNotificationsAvailableTrigger trigger)
+    {
+        notificationIcon = MaterialDrawableBuilder
+                .with(this)
+                .setIcon(MaterialDrawableBuilder.IconValue.BELL)
+                .setColor(ContextCompat
+                        .getColor(this, R.color.accent))
+                .setSizeDp(36)
+                .build();
+
+        if (notification != null)
+        {
+            notification.setIcon(notificationIcon);
+        }
+    }
+
+    @SuppressWarnings("UnusedParameters")
+    @Subscribe
+    public void newNotificationReceived(NewNotificationReceivedTrigger trigger)
+    {
+        notificationIcon = MaterialDrawableBuilder
+                .with(this)
+                .setIcon(MaterialDrawableBuilder.IconValue.BELL)
+                .setColor(ContextCompat
+                        .getColor(HomeActivity.this, R.color.accent))
+                .setSizeDp(36)
+                .build();
+
+        if (notification != null)
+        {
+            notification.setIcon(notificationIcon);
+        }
+    }
+
+    /* Screen Methods */
+    @Override
+    public void navigateToCreateDetailsScreen(String title, EventCategory category,
+                                              boolean isSecret,
+                                              String startDay, LocalTime startTime)
+    {
+        startActivity(CreateActivity
+                .callingIntent(this, title, category, isSecret, startDay, startTime));
+    }
+
+    @Override
+    public void navigateToDetailsScreen(String eventId)
+    {
+        startActivity(EventDetailsActivity.callingIntent(this, eventId));
+    }
+
+    /* Helper Methods */
+
+    private void navigateToAccountsScreen()
+    {
+        startActivity(AccountActivity.callingIntent(this));
+    }
+
+    private void navigateToNotificationScreen()
+    {
+        startActivity(NotificationActivity.callingIntent(this));
+    }
+}

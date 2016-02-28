@@ -1,16 +1,16 @@
-package reaper.android.app.ui.screens.home.create;
+package reaper.android.app.ui.screens.home.create.mvp;
 
 import reaper.android.app.model.Event;
 
 public interface CreateEventView
 {
+    void showLoading();
+
     void displayEmptyTitleErrorMessage();
 
     void displayInvalidStartTimeErrorMessage();
 
-    void showCreateLoading();
-
-    void displayCreateFailedMessage();
+    void displayError();
 
     void navigateToInviteScreen(Event event);
 }

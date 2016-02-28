@@ -1,4 +1,4 @@
-package reaper.android.app.ui.screens.home.create;
+package reaper.android.app.ui.screens.home.create.mvp;
 
 import org.joda.time.DateTime;
 

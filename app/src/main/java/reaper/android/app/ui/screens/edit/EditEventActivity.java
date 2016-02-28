@@ -15,9 +15,8 @@ import reaper.android.R;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.ui._core.BaseActivity;
-import reaper.android.app.ui.screens.FlowEntry;
-import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.app.ui.screens.details.EventDetailsActivity;
+import reaper.android.app.ui.screens.home.HomeActivity;
 
 public class EditEventActivity extends BaseActivity implements EditEventScreen
 {
@@ -91,7 +90,7 @@ public class EditEventActivity extends BaseActivity implements EditEventScreen
     @Override
     public void navigateToHomeScreen()
     {
-        startActivity(MainActivity.callingIntent(this, FlowEntry.HOME, null, null));
+        startActivity(HomeActivity.callingIntent(this));
         finish();
     }
 

@@ -56,7 +56,7 @@ import reaper.android.app.ui.util.DrawableFactory;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 
-public class CreateEventDetailsFragment extends BaseFragment implements
+public class CreateDetailsFragment extends BaseFragment implements
         CreateEventView, LocationSuggestionAdapter.SuggestionClickListener
 {
     private static final String ARG_TITLE = "arg_title";
@@ -65,8 +65,8 @@ public class CreateEventDetailsFragment extends BaseFragment implements
     private static final String ARG_START_DAY = "arg_start_day";
     private static final String ARG_START_TIME = "arg_start_time";
 
-    public static CreateEventDetailsFragment newInstance(String title, EventCategory category,
-                                                         boolean isSecret, String startDay, LocalTime startTime)
+    public static CreateDetailsFragment newInstance(String title, EventCategory category,
+                                                    boolean isSecret, String startDay, LocalTime startTime)
     {
         Bundle args = new Bundle();
         args.putString(ARG_TITLE, title);
@@ -75,7 +75,7 @@ public class CreateEventDetailsFragment extends BaseFragment implements
         args.putString(ARG_START_DAY, startDay);
         args.putSerializable(ARG_START_TIME, startTime);
 
-        CreateEventDetailsFragment fragment = new CreateEventDetailsFragment();
+        CreateDetailsFragment fragment = new CreateDetailsFragment();
         fragment.setArguments(args);
         return fragment;
     }

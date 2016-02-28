@@ -16,8 +16,7 @@ import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.ui._core.BaseActivity;
-import reaper.android.app.ui.screens.FlowEntry;
-import reaper.android.app.ui.screens.MainActivity;
+import reaper.android.app.ui.screens.home.HomeActivity;
 import reaper.android.app.ui.screens.invite.InviteActivity;
 
 public class CreateActivity extends BaseActivity implements CreateScreen
@@ -70,7 +69,7 @@ public class CreateActivity extends BaseActivity implements CreateScreen
         String startDay = callingIntent.getStringExtra(ARG_START_DAY);
         LocalTime startTime = (LocalTime) callingIntent.getSerializableExtra(ARG_START_TIME);
 
-        CreateEventDetailsFragment fragment = CreateEventDetailsFragment
+        CreateDetailsFragment fragment = CreateDetailsFragment
                 .newInstance(title, category, isSecret, startDay, startTime);
 
         FragmentManager fragmentManager = getFragmentManager();
@@ -106,7 +105,7 @@ public class CreateActivity extends BaseActivity implements CreateScreen
     /* Helper Methods */
     private void navigateToHomeScreen()
     {
-        startActivity(MainActivity.callingIntent(this, FlowEntry.HOME, null, null));
+        startActivity(HomeActivity.callingIntent(this));
         finish();
     }
 }

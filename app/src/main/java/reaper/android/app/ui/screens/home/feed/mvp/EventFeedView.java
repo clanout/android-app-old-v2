@@ -1,10 +1,10 @@
-package reaper.android.app.ui.screens.home;
+package reaper.android.app.ui.screens.home.feed.mvp;
 
 import java.util.List;
 
 import reaper.android.app.model.Event;
 
-public interface EventsView
+public interface EventFeedView
 {
     void showLoading();
 
@@ -14,5 +14,5 @@ public interface EventsView
 
     void showError();
 
-    void gotoDetailsView(List<Event> events, int activePosition);
+    void gotoDetailsView(String eventId);
 }

@@ -13,10 +13,9 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.ui._core.BaseActivity;
-import reaper.android.app.ui.screens.FlowEntry;
-import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.app.ui.screens.chat.ChatActivity;
 import reaper.android.app.ui.screens.details.EventDetailsActivity;
+import reaper.android.app.ui.screens.home.HomeActivity;
 
 public class NotificationActivity extends BaseActivity implements NotificationScreen
 {
@@ -74,7 +73,7 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
     {
         if (isTaskRoot())
         {
-            startActivity(MainActivity.callingIntent(this, FlowEntry.HOME, null, null));
+            startActivity(HomeActivity.callingIntent(this));
         }
         finish();
     }

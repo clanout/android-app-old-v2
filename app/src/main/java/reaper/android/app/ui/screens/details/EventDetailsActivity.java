@@ -17,15 +17,13 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.service.EventService;
 import reaper.android.app.ui._core.BaseActivity;
-import reaper.android.app.ui.screens.FlowEntry;
-import reaper.android.app.ui.screens.MainActivity;
 import reaper.android.app.ui.screens.chat.ChatActivity;
 import reaper.android.app.ui.screens.details.mvp.EventDetailsContainerPresenter;
 import reaper.android.app.ui.screens.details.mvp.EventDetailsContainerPresenterImpl;
 import reaper.android.app.ui.screens.details.mvp.EventDetailsContainerView;
 import reaper.android.app.ui.screens.edit.EditEventActivity;
+import reaper.android.app.ui.screens.home.HomeActivity;
 import reaper.android.app.ui.screens.invite.InviteActivity;
-import timber.log.Timber;
 
 public class EventDetailsActivity extends BaseActivity implements
         EventDetailsContainerView,
@@ -53,7 +51,6 @@ public class EventDetailsActivity extends BaseActivity implements
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
-        Timber.d(">>>> onCreate()");
         super.onCreate(savedInstanceState);
 
         /* Setup UI */
@@ -143,7 +140,7 @@ public class EventDetailsActivity extends BaseActivity implements
     {
         if (isTaskRoot())
         {
-            startActivity(MainActivity.callingIntent(this, FlowEntry.HOME, null, null));
+            startActivity(HomeActivity.callingIntent(this));
         }
         finish();
     }

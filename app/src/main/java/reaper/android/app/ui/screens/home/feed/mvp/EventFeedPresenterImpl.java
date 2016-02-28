@@ -1,50 +1,40 @@
-package reaper.android.app.ui.screens.home;
-
-import org.joda.time.DateTime;
+package reaper.android.app.ui.screens.home.feed.mvp;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import reaper.android.app.cache._core.CacheManager;
-import reaper.android.app.cache.generic.GenericCache;
-import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.model.Event;
-import reaper.android.app.model.Location;
 import reaper.android.app.service.EventService;
-import reaper.android.app.service._new.LocationService_;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-public class EventsPresenterImpl implements EventsPresenter
+public class EventFeedPresenterImpl implements EventFeedPresenter
 {
     /* Services */
     private EventService eventService;
 
     /* Data */
-    private GenericCache cache;
-    private Location userLocation;
     private List<Event> events;
 
     /* View */
-    private EventsView view;
+    private EventFeedView view;
 
     /* Subscriptions */
     private CompositeSubscription subscriptions;
 
-    public EventsPresenterImpl()
+    public EventFeedPresenterImpl(EventService eventService)
     {
-        eventService = EventService.getInstance();
-        cache = CacheManager.getGenericCache();
-        userLocation = LocationService_.getInstance().getCurrentLocation();
+        this.eventService = eventService;
+
         subscriptions = new CompositeSubscription();
         events = new ArrayList<>();
     }
 
     @Override
-    public void attachView(final EventsView view)
+    public void attachView(final EventFeedView view)
     {
         this.view = view;
 
@@ -73,7 +63,7 @@ public class EventsPresenterImpl implements EventsPresenter
                         @Override
                         public void onNext(List<Event> events)
                         {
-                            EventsPresenterImpl.this.events = events;
+                            EventFeedPresenterImpl.this.events = events;
 
                             if (events.isEmpty())
                             {
@@ -104,15 +94,8 @@ public class EventsPresenterImpl implements EventsPresenter
     @Override
     public void refreshEvents()
     {
-        List<String> eventIds = new ArrayList<>();
-        for (Event event : events)
-        {
-            eventIds.add(event.getId());
-        }
-
         Subscription subscription = eventService
-                ._refreshEvents(userLocation.getZone(), eventIds, cache
-                        .get(GenericCacheKeys.FEED_LAST_UPDATE_TIMESTAMP, DateTime.class))
+                ._refreshEvents()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Event>>()
                 {
@@ -131,7 +114,7 @@ public class EventsPresenterImpl implements EventsPresenter
                     @Override
                     public void onNext(List<Event> events)
                     {
-                        EventsPresenterImpl.this.events = events;
+                        EventFeedPresenterImpl.this.events = events;
 
                         if (events.isEmpty())
                         {
@@ -150,10 +133,6 @@ public class EventsPresenterImpl implements EventsPresenter
     @Override
     public void selectEvent(Event event)
     {
-        int activePosition = events.indexOf(event);
-        if (activePosition >= 0)
-        {
-            view.gotoDetailsView(events, activePosition);
-        }
+        view.gotoDetailsView(event.getId());
     }
 }

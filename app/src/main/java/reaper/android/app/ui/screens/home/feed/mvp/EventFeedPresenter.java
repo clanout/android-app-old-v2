@@ -1,10 +1,10 @@
-package reaper.android.app.ui.screens.home;
+package reaper.android.app.ui.screens.home.feed.mvp;
 
 import reaper.android.app.model.Event;
 
-public interface EventsPresenter
+public interface EventFeedPresenter
 {
-    void attachView(EventsView view);
+    void attachView(EventFeedView view);
 
     void detachView();
 

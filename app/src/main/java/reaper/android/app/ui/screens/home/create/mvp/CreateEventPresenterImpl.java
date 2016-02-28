@@ -1,6 +1,4 @@
-package reaper.android.app.ui.screens.home.create;
-
-import com.squareup.otto.Bus;
+package reaper.android.app.ui.screens.home.create.mvp;
 
 import org.joda.time.DateTime;
 
@@ -22,14 +20,14 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
 
     /* Services */
     private EventService eventService;
-    private Location userLocation;
+    private LocationService_ locationService;
 
     private CompositeSubscription subscriptions;
 
-    public CreateEventPresenterImpl(Bus bus)
+    public CreateEventPresenterImpl(EventService eventService, LocationService_ locationService)
     {
-        eventService = EventService.getInstance();
-        userLocation = LocationService_.getInstance().getCurrentLocation();
+        this.eventService = eventService;
+        this.locationService = locationService;
 
         subscriptions = new CompositeSubscription();
     }
@@ -71,11 +69,11 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
         DateTime endTime = DateTimeUtil.getEndTime(startTime);
 
         Location location = new Location();
-        location.setZone(userLocation.getZone());
+        location.setZone(locationService.getCurrentLocation().getZone());
 
         Event.Type type = isSecret ? Event.Type.INVITE_ONLY : Event.Type.PUBLIC;
 
-        view.showCreateLoading();
+        view.showLoading();
         Subscription subscription = eventService
                 ._create(title, type, category, "", location, startTime, endTime)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -89,7 +87,7 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
                     @Override
                     public void onError(Throwable e)
                     {
-                        view.displayCreateFailedMessage();
+                        view.displayError();
                     }
 
                     @Override

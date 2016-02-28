@@ -725,6 +725,107 @@ public class EventService
                 .subscribeOn(Schedulers.newThread());
     }
 
+    /* Refresh */
+    public Observable<List<Event>> _refreshEvents()
+    {
+        final String zone = locationService.getCurrentLocation().getZone();
+        final DateTime lastUpdateTimestamp = genericCache
+                .get(GenericCacheKeys.FEED_LAST_UPDATE_TIMESTAMP, DateTime.class);
+
+        return _fetchEventsCache()
+                .flatMap(new Func1<List<Event>, Observable<List<Event>>>()
+                {
+                    @Override
+                    public Observable<List<Event>> call(final List<Event> events)
+                    {
+                        List<String> eventIds = new ArrayList<>();
+                        for (Event event : events)
+                        {
+                            eventIds.add(event.getId());
+                        }
+
+                        FetchNewEventsAndUpdatesApiRequest request =
+                                new FetchNewEventsAndUpdatesApiRequest(zone, eventIds, lastUpdateTimestamp);
+                        return eventApi
+                                .fetchNewEventsAndUpdates(request)
+                                .map(new Func1<FetchNewEventsAndUpdatesApiResponse, List<Event>>()
+                                {
+                                    @Override
+                                    public List<Event> call(FetchNewEventsAndUpdatesApiResponse response)
+                                    {
+                                        List<Event> newEventList = response.getNewEventsList();
+                                        List<String> deletedEventIdList = response
+                                                .getDeletedEventIdList();
+                                        List<Event> updatedEventList = response
+                                                .getUpdatedEventList();
+
+                                        for (String deletedEventId : deletedEventIdList)
+                                        {
+                                            Event deletedEvent = new Event();
+                                            deletedEvent.setId(deletedEventId);
+
+                                            if (events.contains(deletedEvent))
+                                            {
+                                                events.remove(deletedEvent);
+                                            }
+                                        }
+
+                                        for (Event updatedEvent : updatedEventList)
+                                        {
+                                            if (events.contains(updatedEvent))
+                                            {
+                                                int index = events.indexOf(updatedEvent);
+                                                if (index >= 0)
+                                                {
+                                                    if (!updatedEvent.isEqualTo(events.get(index)))
+                                                    {
+                                                        events.set(index, updatedEvent);
+                                                    }
+                                                    else
+                                                    {
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        events.addAll(newEventList);
+
+                                        List<Event> filteredEvents = new ArrayList<Event>();
+                                        for (Event event : events)
+                                        {
+                                            if (event.getEndTime().isAfterNow())
+                                            {
+                                                filteredEvents.add(event);
+                                            }
+                                        }
+
+                                        return filteredEvents;
+                                    }
+                                });
+                    }
+                })
+                .doOnNext(new Action1<List<Event>>()
+                {
+                    @Override
+                    public void call(List<Event> events)
+                    {
+                        genericCache
+                                .put(GenericCacheKeys.FEED_LAST_UPDATE_TIMESTAMP, DateTime.now());
+                        eventCache.reset(events);
+                    }
+                })
+                .map(new Func1<List<Event>, List<Event>>()
+                {
+                    @Override
+                    public List<Event> call(List<Event> events)
+                    {
+                        Collections.sort(events, new EventComparator.Relevance(userService
+                                .getSessionUserId()));
+                        return events;
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
+
     /* Helper Methods */
     private boolean isExpired(Event event)
     {
@@ -762,9 +863,8 @@ public class EventService
 
 
     /* Old */
-    public Observable<List<Event>> _refreshEvents(String zone, final List<String> eventIdList, DateTime lastUpdateTimestamp)
+    public Observable<List<Event>> refreshEvents(String zone, final List<String> eventIdList, DateTime lastUpdateTimestamp)
     {
-
         Observable<FetchNewEventsAndUpdatesApiResponse> updatesObservable = eventApi
                 .fetchNewEventsAndUpdates(new FetchNewEventsAndUpdatesApiRequest(zone, eventIdList, lastUpdateTimestamp));
         Observable<List<Event>> cachedEventsObservable = eventCache.getEvents();

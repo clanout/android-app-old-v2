@@ -1,8 +1,5 @@
 package reaper.android.app.ui.screens.launch.mvp.bootstrap;
 
-import java.util.List;
-
-import reaper.android.app.model.Event;
 import reaper.android.app.model.Location;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service._new.AuthService_;
@@ -74,7 +71,7 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
         Subscription subscription =
                 getBootstrapObservable()
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Subscriber<List<Event>>()
+                        .subscribe(new Subscriber<Boolean>()
                         {
                             @Override
                             public void onCompleted()
@@ -88,16 +85,23 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
                             }
 
                             @Override
-                            public void onNext(List<Event> events)
+                            public void onNext(Boolean isSuccessful)
                             {
-                                view.proceed(events);
+                                if (isSuccessful)
+                                {
+                                    view.proceed();
+                                }
+                                else
+                                {
+                                    view.displayError();
+                                }
                             }
                         });
 
         subscriptions.add(subscription);
     }
 
-    private Observable<List<Event>> getBootstrapObservable()
+    private Observable<Boolean> getBootstrapObservable()
     {
         return Observable
                 .zip(getSessionObservable(), getLocationObservable(), new Func2<Boolean, Location, Location>()
@@ -121,21 +125,6 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
                     public Observable<Boolean> call(Location location)
                     {
                         return locationService.pushUserLocation();
-                    }
-                })
-                .flatMap(new Func1<Boolean, Observable<List<Event>>>()
-                {
-                    @Override
-                    public Observable<List<Event>> call(Boolean isLocationPushed)
-                    {
-                        if (!isLocationPushed)
-                        {
-                            throw new IllegalStateException("[Bootstrap Error] location push failed");
-                        }
-                        else
-                        {
-                            return eventService._fetchEvents();
-                        }
                     }
                 })
                 .doOnCompleted(new Action0()

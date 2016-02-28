@@ -27,14 +27,11 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
-import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.AuthService_;
@@ -44,14 +41,18 @@ import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui._core.PermissionHandler;
+import reaper.android.app.ui.dialog.DefaultDialog;
 import reaper.android.app.ui.screens.FlowEntry;
-import reaper.android.app.ui.screens.MainActivity;
+import reaper.android.app.ui.screens.chat.ChatActivity;
+import reaper.android.app.ui.screens.details.EventDetailsActivity;
+import reaper.android.app.ui.screens.home.HomeActivity;
 import reaper.android.app.ui.screens.launch.mvp.bootstrap.BootstrapPresenter;
 import reaper.android.app.ui.screens.launch.mvp.bootstrap.BootstrapPresenterImpl;
 import reaper.android.app.ui.screens.launch.mvp.bootstrap.BootstrapView;
 import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginPresenter;
 import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginPresenterImpl;
 import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginView;
+import reaper.android.app.ui.screens.notifications.NotificationActivity;
 import reaper.android.app.ui.util.SnackbarFactory;
 import rx.Observable;
 import rx.Subscriber;
@@ -75,7 +76,7 @@ public class LauncherActivity extends BaseActivity implements
 
         intent.putExtra(ARG_FLOW_ENTRY, flowEntry);
         intent.putExtra(ARG_EVENT_ID, eventId);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         return intent;
     }
@@ -364,9 +365,9 @@ public class LauncherActivity extends BaseActivity implements
     }
 
     @Override
-    public void proceed(List<Event> events)
+    public void proceed()
     {
-        gotoMainActivity(events);
+        handleIntent();
         finish();
     }
 
@@ -606,54 +607,53 @@ public class LauncherActivity extends BaseActivity implements
 
     private void displayFacebookPermissionsDialog()
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        @SuppressLint("InflateParams")
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_default, null);
-        builder.setView(dialogView);
-
-        TextView tvTitle = (TextView) dialogView.findViewById(R.id.tvTitle);
-        TextView tvMessage = (TextView) dialogView.findViewById(R.id.tvMessage);
-
-        tvTitle.setText(R.string.facebook_permission_dialog_title);
-        tvMessage.setText(R.string.facebook_permission_dialog_message);
-
-        builder.setCancelable(false);
-
-        builder.setPositiveButton(R.string.facebook_permission_dialog_positive_button,
-                new DialogInterface.OnClickListener()
+        DefaultDialog.show(this,
+                R.string.facebook_permission_dialog_title,
+                R.string.facebook_permission_dialog_message,
+                R.string.facebook_permission_dialog_positive_button,
+                R.string.facebook_permission_dialog_negative_button,
+                new DefaultDialog.Listener()
                 {
                     @Override
-                    public void onClick(DialogInterface dialog, int which)
+                    public void onPositiveButtonClicked()
                     {
                         LoginManager
                                 .getInstance()
                                 .logInWithReadPermissions(LauncherActivity.this, FacebookService_.PERMISSIONS);
                     }
-                });
 
-        builder.setNegativeButton(R.string.facebook_permission_dialog_negative_button,
-                new DialogInterface.OnClickListener()
-                {
                     @Override
-                    public void onClick(DialogInterface dialog, int which)
+                    public void onNegativeButtonClicked()
                     {
                         closeApp();
                     }
                 });
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
     }
 
-    private void gotoMainActivity(List<Event> events)
+    private void handleIntent()
     {
         Intent sourceIntent = getIntent();
 
         @FlowEntry int flowEntry = sourceIntent.getIntExtra(ARG_FLOW_ENTRY, FlowEntry.HOME);
         String eventId = sourceIntent.getStringExtra(ARG_EVENT_ID);
-        ArrayList<Event> eventList = (ArrayList<Event>) events;
 
-        startActivity(MainActivity.callingIntent(this, flowEntry, eventId, eventList));
+        switch (flowEntry)
+        {
+            case FlowEntry.HOME:
+                startActivity(HomeActivity.callingIntent(this));
+                break;
+
+            case FlowEntry.DETAILS:
+                startActivity(EventDetailsActivity.callingIntent(this, eventId));
+                break;
+
+            case FlowEntry.CHAT:
+                startActivity(ChatActivity.callingIntent(this, eventId));
+                break;
+
+            case FlowEntry.NOTIFICATIONS:
+                startActivity(NotificationActivity.callingIntent(this));
+                break;
+        }
     }
 }

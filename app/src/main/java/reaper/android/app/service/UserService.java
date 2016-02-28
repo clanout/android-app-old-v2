@@ -449,7 +449,7 @@ public class UserService
                    {
 
                        eventCache.reset(fetchPendingInvitesApiResponse.getEvents());
-                       genericCache.put(GenericCacheKeys.HAS_FETCHED_PENDING_INVITES, true);
+//                       genericCache.put(GenericCacheKeys.HAS_FETCHED_PENDING_INVITES, true);
 //                       bus.post(new EventsFetchTrigger(fetchPendingInvitesApiResponse.getEvents()));
                    }
                });

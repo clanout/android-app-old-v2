@@ -15,9 +15,6 @@ public final class GenericCacheKeys
     /* Feed */
     public static final String FEED_LAST_UPDATE_TIMESTAMP = "last_update_timestamp";
 
-    /* Pending Invites */
-    public static final String HAS_FETCHED_PENDING_INVITES = "has_fetched_pending_invites";
-
     private GenericCacheKeys()
     {
     }

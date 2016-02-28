@@ -98,7 +98,7 @@ public class AlarmReceiver extends BroadcastReceiver
             {
                 String eventId = events.get(0).getId();
                 Intent launcherIntent = LauncherActivity
-                        .callingIntent(context, FlowEntry.DETAILS_WITH_STATUS_DIALOG, eventId);
+                        .callingIntent(context, FlowEntry.DETAILS, eventId);
 
                 PendingIntent pendingIntent = PendingIntent
                         .getActivity(context, requestCode, launcherIntent, PendingIntent.FLAG_ONE_SHOT);
