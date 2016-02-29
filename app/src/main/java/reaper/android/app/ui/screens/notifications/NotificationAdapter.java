@@ -17,7 +17,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
-import reaper.android.common.notification.Notification;
+import reaper.android.app.model.Notification;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationsViewHolder>
 {

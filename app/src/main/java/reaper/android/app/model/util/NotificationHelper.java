@@ -1,8 +1,10 @@
-package reaper.android.common.notification;
+package reaper.android.app.model.util;
 
 import java.util.Map;
 
 import reaper.android.app.config.NotificationConstants;
+import reaper.android.app.config.NotificationMessages;
+import reaper.android.app.model.Notification;
 
 public class NotificationHelper
 {
@@ -81,56 +83,57 @@ public class NotificationHelper
 
     private static String newStatusUpdateReceived(Map<String, String> args) {
 
-        return args.get("user_name") + " updated status for clan " + args.get("event_name");
+        return String.format(NotificationMessages.NEW_STATUS_UPDATED, args.get("user_name"), args.get("event_name"));
     }
 
     private static String newChatMessageReceivedMessage(Map<String, String> args) {
-        return "New conversation in " + args.get("event_name");
+        return String.format(NotificationMessages.NEW_CHAT_MESSAGE, args.get("event_name"));
     }
 
     private static String newFriendJoinedAppMessage(Map<String, String> args)
     {
-        return args.get("user_name") + " is now on clanOut";
+        return String.format(NotificationMessages.NEW_FRIEND_JOINED_APP, args.get("user_name"));
     }
 
     private static String getFriendRelocatedMessage(Map<String, String> args)
     {
-        return "";
+        return NotificationMessages.FRIEND_RELOCATED;
     }
 
     private static String getUnblockedMessage(Map<String, String> args)
     {
-        return "";
+        return NotificationMessages.UNBLOCKED;
     }
 
     private static String getBlockedMessage(Map<String, String> args)
     {
-        return "";
+        return NotificationMessages.BLOCKED;
+
     }
 
     private static String getEventUpdatedMessage(Map<String, String> args)
     {
-        return "New updates in " + args.get("event_name");
+        return String.format(NotificationMessages.EVENT_UPDATED, args.get("event_name"));
     }
 
     private static String getEventRemovedMessage(Map<String, String> args)
     {
-        return args.get("user_name") + " dismissed " + args.get("event_name");
+        return String.format(NotificationMessages.EVENT_REMOVED, args.get("user_name"), args.get("event_name"));
     }
 
     private static String getRSVPChangeMessage(Map<String, String> args)
     {
-        return "New friends joined " + args.get("event_name");
+        return String.format(NotificationMessages.RSVP_CHANGED, args.get("event_name"));
     }
 
     private static String getEventInvitationMessage(Map<String, String> args)
     {
-        return args.get("user_name") + " invited you to " + args.get("event_name");
+        return String.format(NotificationMessages.EVENT_INVITATION, args.get("user_name"), args.get("event_name"));
     }
 
     private static String getEventCreatedMessage(Map<String, String> args)
     {
-        return args.get("user_name") + " suggested " + args.get("event_name");
+        return String.format(NotificationMessages.EVENT_CREATED, args.get("user_name"), args.get("event_name"));
     }
 
 }

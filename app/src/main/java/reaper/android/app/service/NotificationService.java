@@ -31,7 +31,7 @@ import reaper.android.app.communication.NewNotificationsAvailableTrigger;
 import reaper.android.app.ui.screens.FlowEntry;
 import reaper.android.app.ui.screens.launch.LauncherActivity;
 import reaper.android.app.communication.Communicator;
-import reaper.android.common.notification.Notification;
+import reaper.android.app.model.Notification;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;

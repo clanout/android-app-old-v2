@@ -1,4 +1,4 @@
-package reaper.android.common.notification;
+package reaper.android.app.model.util;
 
 import android.os.Bundle;
 
@@ -10,6 +10,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 import reaper.android.app.api._core.GsonProvider;
+import reaper.android.app.model.Notification;
 import timber.log.Timber;
 
 public class NotificationFactory

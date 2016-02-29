@@ -25,7 +25,7 @@ import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationPresenter;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationPresenterImpl;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationView;
-import reaper.android.common.notification.Notification;
+import reaper.android.app.model.Notification;
 
 public class NotificationFragment extends BaseFragment implements
         NotificationView,

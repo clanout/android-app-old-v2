@@ -1,6 +1,6 @@
 package reaper.android.app.ui.screens.notifications.mvp;
 
-import reaper.android.common.notification.Notification;
+import reaper.android.app.model.Notification;
 
 public interface NotificationPresenter
 {

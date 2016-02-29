@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.app.service.NotificationService;
-import reaper.android.common.notification.Notification;
+import reaper.android.app.model.Notification;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;

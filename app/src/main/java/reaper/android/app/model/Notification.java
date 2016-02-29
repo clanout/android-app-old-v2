@@ -1,4 +1,4 @@
-package reaper.android.common.notification;
+package reaper.android.app.model;
 
 import org.joda.time.DateTime;
 

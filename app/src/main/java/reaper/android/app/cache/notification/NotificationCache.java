@@ -2,7 +2,7 @@ package reaper.android.app.cache.notification;
 
 import java.util.List;
 
-import reaper.android.common.notification.Notification;
+import reaper.android.app.model.Notification;
 import rx.Observable;
 
 public interface NotificationCache

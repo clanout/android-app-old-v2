@@ -7,8 +7,8 @@ import com.squareup.otto.Bus;
 
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.communication.Communicator;
-import reaper.android.common.notification.Notification;
-import reaper.android.common.notification.NotificationFactory;
+import reaper.android.app.model.Notification;
+import reaper.android.app.model.util.NotificationFactory;
 import timber.log.Timber;
 
 public class ListenerServiceGcm extends GcmListenerService
