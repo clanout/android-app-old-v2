@@ -1,7 +1,7 @@
 package reaper.android.app.ui.screens.launch.mvp.bootstrap;
 
 import reaper.android.app.model.Location;
-import reaper.android.app.service.EventService;
+import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.AuthService_;
 import reaper.android.app.service._new.GcmService_;
 import reaper.android.app.service._new.LocationService_;
@@ -21,17 +21,17 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
     private LocationService_ locationService;
     private AuthService_ authService;
     private GcmService_ gcmService;
-    private EventService eventService;
+    private UserService userService;
 
     private CompositeSubscription subscriptions;
 
     public BootstrapPresenterImpl(LocationService_ locationService, AuthService_ authService,
-                                  GcmService_ gcmService, EventService eventService)
+                                  GcmService_ gcmService, UserService userService)
     {
         this.locationService = locationService;
         this.authService = authService;
         this.gcmService = gcmService;
-        this.eventService = eventService;
+        this.userService = userService;
 
         subscriptions = new CompositeSubscription();
     }
@@ -85,15 +85,15 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
                             }
 
                             @Override
-                            public void onNext(Boolean isSuccessful)
+                            public void onNext(Boolean isNewUser)
                             {
-                                if (isSuccessful)
+                                if (isNewUser)
                                 {
-                                    view.proceed();
+                                    view.navigateToPendingInvitesScreen();
                                 }
                                 else
                                 {
-                                    view.displayError();
+                                    view.proceed();
                                 }
                             }
                         });
@@ -134,6 +134,21 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
                     {
                         // Register With GCM
                         gcmService.register();
+                    }
+                })
+                .map(new Func1<Boolean, Boolean>()
+                {
+                    @Override
+                    public Boolean call(Boolean isLocationPushed)
+                    {
+                        if (isLocationPushed)
+                        {
+                            return userService.getSessionUser().isNewUser();
+                        }
+                        else
+                        {
+                            throw new IllegalStateException();
+                        }
                     }
                 })
                 .subscribeOn(Schedulers.newThread());

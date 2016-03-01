@@ -19,7 +19,7 @@ import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.config.MemoryCacheKeys;
 import reaper.android.app.model.Event;
-import reaper.android.app.ui.screens.FlowEntry;
+import reaper.android.app.ui._core.FlowEntry;
 import reaper.android.app.ui.screens.launch.LauncherActivity;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;

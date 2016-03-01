@@ -281,29 +281,30 @@
     <!-- Clan Actions -->
     <LinearLayout
         android:id="@+id/llEventActionsContainer"
+        style="?attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <Button
             android:id="@+id/btnInvite"
+            style="?attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/btn_event_actions"
             android:text="@string/label_btn_invite"
             android:textAlignment="center"
-            android:textColor="@drawable/button_text_color"
+            android:textColor="@drawable/text_btn_primary"
             android:textStyle="bold"/>
 
         <Button
             android:id="@+id/btnChat"
+            style="?attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/btn_event_actions"
             android:text="@string/label_btn_chat"
             android:textAlignment="center"
-            android:textColor="@drawable/button_text_color"
+            android:textColor="@drawable/text_btn_primary"
             android:textStyle="bold"/>
 
     </LinearLayout>

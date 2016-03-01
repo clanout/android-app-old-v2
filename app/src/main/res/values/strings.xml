@@ -26,6 +26,7 @@
     <string name="title_friends">Manage Friends</string>
     <string name="title_invite">Invite</string>
     <string name="title_notification">Notifications</string>
+    <string name="title_pending_invites">Pending Invitations</string>
     <string name="title_chat">Clan Chat</string>
 
     <!-- Action Bar -->
@@ -84,6 +85,10 @@
 
     <!-- Notifications -->
     <string name="notifications_empty">No Notifications</string>
+
+    <!-- Pending Invites Screen-->
+    <!-- Fetch Pending Invites Dialog -->
+    <string name="fetch_pending_invites_message">Enter mobile number to fetch your invitations</string>
 
     <!-- Chat Screen -->
     <string name="chat_message_label">Write a Message</string>
@@ -156,12 +161,6 @@
     <string name="facebook_permission_dialog_message">Allow access to your basic profile information, email and friend list. This is required to connect you with your facebook friends on Clanout</string>
     <string name="facebook_permission_dialog_positive_button">Allow</string>
     <string name="facebook_permission_dialog_negative_button">Close App</string>
-
-    <!-- Fetch Pending Invites Dialog -->
-    <string name="fetch_pending_invites_title">Pending Invites</string>
-    <string name="fetch_pending_invites_message">Enter number to enable invitations from friends who have your contact number</string>
-    <string name="fetch_pending_invites_positive_button">Enter</string>
-    <string name="fetch_pending_invites_negative_button">Cancel</string>
 
     <!-- Add Phone Dialog -->
     <string name="add_phone_title">Update Mobile Number</string>

@@ -86,7 +86,7 @@ public class EventDetailsActivity extends BaseActivity implements
     @Override
     public void onBackPressed()
     {
-        navigateToHomeScreen();
+        navigateBack();
     }
 
     @Override
@@ -94,7 +94,7 @@ public class EventDetailsActivity extends BaseActivity implements
     {
         if (item.getItemId() == android.R.id.home)
         {
-            navigateToHomeScreen();
+            navigateBack();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -131,12 +131,12 @@ public class EventDetailsActivity extends BaseActivity implements
     @Override
     public void handleError()
     {
-        navigateToHomeScreen();
+        navigateBack();
     }
 
     /* Screen Methods */
     @Override
-    public void navigateToHomeScreen()
+    public void navigateBack()
     {
         if (isTaskRoot())
         {

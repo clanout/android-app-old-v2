@@ -33,7 +33,7 @@ public class LastMinuteStatusDialog
         builder.setCancelable(true);
 
         LayoutInflater layoutInflater = activity.getLayoutInflater();
-        View dialogView = layoutInflater.inflate(R.layout.alert_dialog_status, null);
+        View dialogView = layoutInflater.inflate(R.layout.dialog_status, null);
         builder.setView(dialogView);
 
         TextView message = (TextView) dialogView.findViewById(R.id.tvMessage);

@@ -12,6 +12,8 @@ import reaper.android.R;
 
 public class DefaultDialog
 {
+    public static final int BUTTON_DISABLED = -1;
+
     public interface Listener
     {
         void onPositiveButtonClicked();
@@ -20,10 +22,11 @@ public class DefaultDialog
     }
 
     public static void show(final Activity activity, @StringRes int titleRes, @StringRes int messageRes,
-                            @StringRes int positiveButton, @StringRes int negativeButton, final Listener listener)
+                            int positiveButton, int negativeButton, boolean isCancelable,
+                            final Listener listener)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setCancelable(true);
+        builder.setCancelable(isCancelable);
 
         LayoutInflater layoutInflater = activity.getLayoutInflater();
         View dialogView = layoutInflater.inflate(R.layout.dialog_default, null);
@@ -35,24 +38,30 @@ public class DefaultDialog
         tvTitle.setText(titleRes);
         tvMessage.setText(messageRes);
 
-        builder.setPositiveButton(positiveButton, new DialogInterface.OnClickListener()
+        if (positiveButton != BUTTON_DISABLED)
         {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
+            builder.setPositiveButton(positiveButton, new DialogInterface.OnClickListener()
             {
-                listener.onPositiveButtonClicked();
-            }
-        });
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    listener.onPositiveButtonClicked();
+                }
+            });
+        }
 
-        builder.setNegativeButton(negativeButton, new DialogInterface.OnClickListener()
+        if (negativeButton != BUTTON_DISABLED)
         {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
+            builder.setNegativeButton(negativeButton, new DialogInterface.OnClickListener()
             {
-                listener.onNegativeButtonClicked();
-                dialog.dismiss();
-            }
-        });
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    listener.onNegativeButtonClicked();
+                    dialog.dismiss();
+                }
+            });
+        }
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();

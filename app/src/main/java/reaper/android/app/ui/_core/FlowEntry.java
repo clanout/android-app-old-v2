@@ -1,4 +1,4 @@
-package reaper.android.app.ui.screens;
+package reaper.android.app.ui._core;
 
 import android.support.annotation.IntDef;
 

@@ -28,7 +28,7 @@ import reaper.android.app.model.Event;
 import reaper.android.app.root.Reaper;
 import reaper.android.app.communication.NewNotificationReceivedTrigger;
 import reaper.android.app.communication.NewNotificationsAvailableTrigger;
-import reaper.android.app.ui.screens.FlowEntry;
+import reaper.android.app.ui._core.FlowEntry;
 import reaper.android.app.ui.screens.launch.LauncherActivity;
 import reaper.android.app.communication.Communicator;
 import reaper.android.app.model.Notification;

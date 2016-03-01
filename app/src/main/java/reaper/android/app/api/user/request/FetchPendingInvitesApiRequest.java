@@ -4,9 +4,6 @@ import com.google.gson.annotations.SerializedName;
 
 import reaper.android.app.api._core.ApiRequest;
 
-/**
- * Created by harsh on 25/09/15.
- */
 public class FetchPendingInvitesApiRequest extends ApiRequest {
 
     @SerializedName("phone")

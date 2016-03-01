@@ -1,8 +1,6 @@
 package reaper.android.app.ui.screens.launch;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
@@ -10,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -32,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
-import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.AuthService_;
 import reaper.android.app.service._new.FacebookService_;
@@ -42,7 +38,7 @@ import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui._core.PermissionHandler;
 import reaper.android.app.ui.dialog.DefaultDialog;
-import reaper.android.app.ui.screens.FlowEntry;
+import reaper.android.app.ui._core.FlowEntry;
 import reaper.android.app.ui.screens.chat.ChatActivity;
 import reaper.android.app.ui.screens.details.EventDetailsActivity;
 import reaper.android.app.ui.screens.home.HomeActivity;
@@ -53,6 +49,7 @@ import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginPresenter;
 import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginPresenterImpl;
 import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginView;
 import reaper.android.app.ui.screens.notifications.NotificationActivity;
+import reaper.android.app.ui.screens.pending_invites.PendingInvitesActivity;
 import reaper.android.app.ui.util.SnackbarFactory;
 import rx.Observable;
 import rx.Subscriber;
@@ -126,11 +123,6 @@ public class LauncherActivity extends BaseActivity implements
     CallbackManager facebookCallbackManager;
 
     GoogleService_ googleService;
-    FacebookService_ facebookService;
-    LocationService_ locationService;
-    UserService userService;
-    AuthService_ authService;
-    GcmService_ gcmService;
 
     boolean introScrolled;
 
@@ -152,27 +144,26 @@ public class LauncherActivity extends BaseActivity implements
         googleService = GoogleService_.getInstance();
 
         /* Facebook Service */
-        facebookService = FacebookService_.getInstance();
+        FacebookService_ facebookService = FacebookService_.getInstance();
 
         /* Location Service */
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         LocationService_.init(getApplicationContext(), locationManager, googleService);
-        locationService = LocationService_.getInstance();
+        LocationService_ locationService = LocationService_.getInstance();
 
         /* User Service */
-        userService = UserService.getInstance();
+        UserService userService = UserService.getInstance();
 
         /* Auth Service */
         AuthService_.init(facebookService, userService);
-        authService = AuthService_.getInstance();
+        AuthService_ authService = AuthService_.getInstance();
 
         /* Gcm Service */
-        gcmService = GcmService_.getInstance();
+        GcmService_ gcmService = GcmService_.getInstance();
 
         /* Presenters */
-        EventService eventService = EventService.getInstance();
         facebookLoginPresenter = new FacebookLoginPresenterImpl(authService, facebookService);
-        bootstrapPresenter = new BootstrapPresenterImpl(locationService, authService, gcmService, eventService);
+        bootstrapPresenter = new BootstrapPresenterImpl(locationService, authService, gcmService, userService);
     }
 
     @Override
@@ -368,6 +359,12 @@ public class LauncherActivity extends BaseActivity implements
     public void proceed()
     {
         handleIntent();
+    }
+
+    @Override
+    public void navigateToPendingInvitesScreen()
+    {
+        startActivity(PendingInvitesActivity.callingIntent(this));
         finish();
     }
 
@@ -416,7 +413,6 @@ public class LauncherActivity extends BaseActivity implements
         if (!googleService.isConnected())
         {
             googleService.connect();
-
         }
         else
         {
@@ -577,32 +573,25 @@ public class LauncherActivity extends BaseActivity implements
 
     private void displayPlayServicesErrorDialog()
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        @SuppressLint("InflateParams")
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_default, null);
-        builder.setView(dialogView);
-
-        TextView tvTitle = (TextView) dialogView.findViewById(R.id.tvTitle);
-        TextView tvMessage = (TextView) dialogView.findViewById(R.id.tvMessage);
-
-        tvTitle.setText(R.string.play_services_error_dialog_title);
-        tvMessage.setText(R.string.play_services_error_dialog_message);
-
-        builder.setCancelable(false);
-
-        builder.setNegativeButton(R.string.play_services_error_dialog_negative_button,
-                new DialogInterface.OnClickListener()
+        DefaultDialog.show(this,
+                R.string.play_services_error_dialog_title,
+                R.string.play_services_error_dialog_message,
+                DefaultDialog.BUTTON_DISABLED,
+                R.string.play_services_error_dialog_negative_button,
+                false,
+                new DefaultDialog.Listener()
                 {
                     @Override
-                    public void onClick(DialogInterface dialog, int which)
+                    public void onPositiveButtonClicked()
+                    {
+                    }
+
+                    @Override
+                    public void onNegativeButtonClicked()
                     {
                         closeApp();
                     }
                 });
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
     }
 
     private void displayFacebookPermissionsDialog()
@@ -612,6 +601,7 @@ public class LauncherActivity extends BaseActivity implements
                 R.string.facebook_permission_dialog_message,
                 R.string.facebook_permission_dialog_positive_button,
                 R.string.facebook_permission_dialog_negative_button,
+                false,
                 new DefaultDialog.Listener()
                 {
                     @Override
@@ -655,5 +645,7 @@ public class LauncherActivity extends BaseActivity implements
                 startActivity(NotificationActivity.callingIntent(this));
                 break;
         }
+
+        finish();
     }
 }

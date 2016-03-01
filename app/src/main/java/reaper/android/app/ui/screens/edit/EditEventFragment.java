@@ -652,6 +652,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
                 R.string.event_delete_message,
                 R.string.event_delete_positive_button,
                 R.string.event_delete_negative_button,
+                true,
                 new DefaultDialog.Listener()
                 {
                     @Override
@@ -678,6 +679,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
                 R.string.event_lock_message,
                 R.string.event_lock_positive_button,
                 R.string.event_lock_negative_button,
+                true,
                 new DefaultDialog.Listener()
                 {
                     @Override
@@ -704,6 +706,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
                 R.string.event_unlock_message,
                 R.string.event_unlock_positive_button,
                 R.string.event_unlock_negative_button,
+                true,
                 new DefaultDialog.Listener()
                 {
                     @Override

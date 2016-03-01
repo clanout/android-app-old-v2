@@ -16,9 +16,6 @@ import retrofit.http.Body;
 import retrofit.http.POST;
 import rx.Observable;
 
-/**
- * Created by aditya on 02/07/15.
- */
 public interface UserApi
 {
     @POST("/me/location")

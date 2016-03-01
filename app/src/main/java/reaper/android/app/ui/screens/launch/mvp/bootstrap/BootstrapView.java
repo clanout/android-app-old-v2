@@ -11,4 +11,6 @@ public interface BootstrapView
     void displayError();
 
     void proceed();
+
+    void navigateToPendingInvitesScreen();
 }

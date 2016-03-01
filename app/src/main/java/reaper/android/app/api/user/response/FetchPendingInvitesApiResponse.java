@@ -10,12 +10,21 @@ import reaper.android.app.model.Event;
 /**
  * Created by harsh on 25/09/15.
  */
-public class FetchPendingInvitesApiResponse extends ApiResponse {
+public class FetchPendingInvitesApiResponse extends ApiResponse
+{
+    @SerializedName("count")
+    private int count;
 
-    @SerializedName("events")
-    private List<Event> events;
+    @SerializedName("active_events")
+    private List<Event> activeEvents;
 
-    public List<Event> getEvents() {
-        return events;
+    public List<Event> getActiveEvents()
+    {
+        return activeEvents;
+    }
+
+    public int getTotalCount()
+    {
+        return count;
     }
 }

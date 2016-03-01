@@ -1,5 +1,7 @@
 package reaper.android.app.service;
 
+import android.util.Pair;
+
 import com.squareup.otto.Bus;
 
 import java.util.ArrayList;
@@ -23,13 +25,14 @@ import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
+import reaper.android.app.communication.Communicator;
 import reaper.android.app.config.GenericCacheKeys;
+import reaper.android.app.model.Event;
 import reaper.android.app.model.Friend;
 import reaper.android.app.model.User;
 import reaper.android.app.model.util.FriendsComparator;
 import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.service._new.PhonebookService_;
-import reaper.android.app.communication.Communicator;
 import retrofit.client.Response;
 import rx.Observable;
 import rx.Subscriber;
@@ -424,34 +427,60 @@ public class UserService
                });
     }
 
-    /* Old */
-    public void fetchPendingInvites(String phoneNumber, String zone)
+    /* Pending Invites */
+    public Observable<Pair<Integer, List<Event>>> _fetchPendingInvites(final String mobileNumber)
     {
-        FetchPendingInvitesApiRequest request = new FetchPendingInvitesApiRequest(phoneNumber, zone);
+        String zone = locationService.getCurrentLocation().getZone();
+        FetchPendingInvitesApiRequest request = new FetchPendingInvitesApiRequest(mobileNumber, zone);
+        return userApi
+                .fetchPendingInvites(request)
+                .doOnNext(new Action1<FetchPendingInvitesApiResponse>()
+                {
+                    @Override
+                    public void call(FetchPendingInvitesApiResponse response)
+                    {
+                        activeUser.setMobileNumber(mobileNumber);
+                        genericCache.put(GenericCacheKeys.SESSION_USER, activeUser);
+                    }
+                })
+                .flatMap(new Func1<FetchPendingInvitesApiResponse, Observable<Pair<Integer, List<Event>>>>()
+                {
+                    @Override
+                    public Observable<Pair<Integer, List<Event>>> call(final FetchPendingInvitesApiResponse response)
+                    {
+                        return eventCache
+                                .getEvents()
+                                .flatMap(new Func1<List<Event>, Observable<Pair<Integer, List<Event>>>>()
+                                {
+                                    @Override
+                                    public Observable<Pair<Integer, List<Event>>> call(List<Event> cachedEvents)
+                                    {
+                                        List<Event> pendingInvites = response.getActiveEvents();
+                                        int expiredInvites = response.getTotalCount() -
+                                                pendingInvites.size();
 
-        userApi.fetchPendingInvites(request).subscribeOn(Schedulers.newThread())
-               .observeOn(AndroidSchedulers.mainThread())
-               .subscribe(new Subscriber<FetchPendingInvitesApiResponse>()
-               {
-                   @Override
-                   public void onCompleted()
-                   {
+                                        for (Event pendingInvite : pendingInvites)
+                                        {
+                                            if (!cachedEvents.contains(pendingInvite))
+                                            {
+                                                cachedEvents.add(pendingInvite);
+                                            }
+                                        }
 
-                   }
+                                        eventCache.reset(cachedEvents);
 
-                   @Override
-                   public void onError(Throwable e)
-                   {
-                   }
+                                        return Observable
+                                                .just(new Pair<>(expiredInvites, pendingInvites));
+                                    }
+                                });
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
 
-                   @Override
-                   public void onNext(FetchPendingInvitesApiResponse fetchPendingInvitesApiResponse)
-                   {
-
-                       eventCache.reset(fetchPendingInvitesApiResponse.getEvents());
-//                       genericCache.put(GenericCacheKeys.HAS_FETCHED_PENDING_INVITES, true);
-//                       bus.post(new EventsFetchTrigger(fetchPendingInvitesApiResponse.getEvents()));
-                   }
-               });
+    public void markPendingInvitesVisited()
+    {
+        activeUser.setNewUser(false);
+        genericCache.put(GenericCacheKeys.SESSION_USER, activeUser);
     }
 }

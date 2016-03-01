@@ -5,7 +5,7 @@ import reaper.android.app.model.EventDetails;
 
 public interface EventDetailsScreen
 {
-    void navigateToHomeScreen();
+    void navigateBack();
 
     void navigateToChatScreen(String eventId);
 

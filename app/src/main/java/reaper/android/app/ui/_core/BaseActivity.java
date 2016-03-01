@@ -20,7 +20,6 @@ public class BaseActivity extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
-
         CacheManager.getMemoryCache().put(MemoryCacheKeys.IS_APP_IN_FOREGROUND, true);
     }
 
@@ -28,7 +27,6 @@ public class BaseActivity extends AppCompatActivity
     protected void onPause()
     {
         super.onPause();
-
         CacheManager.getMemoryCache().put(MemoryCacheKeys.IS_APP_IN_FOREGROUND, false);
     }
 
@@ -115,5 +113,4 @@ public class BaseActivity extends AppCompatActivity
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(isVisible);
     }
-    /* Action Bar */
 }
