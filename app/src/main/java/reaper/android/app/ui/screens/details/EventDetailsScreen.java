@@ -5,8 +5,6 @@ import reaper.android.app.model.EventDetails;
 
 public interface EventDetailsScreen
 {
-    void navigateBack();
-
     void navigateToChatScreen(String eventId);
 
     void navigateToInviteScreen(String eventId);

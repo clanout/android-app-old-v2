@@ -1,14 +1,12 @@
 package reaper.android.app.api.user;
 
 import reaper.android.app.api.user.request.BlockFriendsApiRequest;
-import reaper.android.app.api.user.request.FetchPendingInvitesApiRequest;
 import reaper.android.app.api.user.request.GetFacebookFriendsApiRequest;
 import reaper.android.app.api.user.request.GetRegisteredContactsApiRequest;
 import reaper.android.app.api.user.request.ShareFeedbackApiRequest;
 import reaper.android.app.api.user.request.UpdateFacebookFriendsApiRequest;
 import reaper.android.app.api.user.request.UpdateMobileAPiRequest;
 import reaper.android.app.api.user.request.UpdateUserLocationApiRequest;
-import reaper.android.app.api.user.response.FetchPendingInvitesApiResponse;
 import reaper.android.app.api.user.response.GetFacebookFriendsApiResponse;
 import reaper.android.app.api.user.response.GetRegisteredContactsApiResponse;
 import retrofit.client.Response;
@@ -39,7 +37,4 @@ public interface UserApi
 
     @POST("/me/add_friends")
     Observable<Response> updateFacebookFriends(@Body UpdateFacebookFriendsApiRequest request);
-
-    @POST("/event/pending_invitations")
-    Observable<FetchPendingInvitesApiResponse> fetchPendingInvites(@Body FetchPendingInvitesApiRequest request);
 }

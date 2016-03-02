@@ -6,6 +6,7 @@ import java.util.List;
 
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.model.Event;
+import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui.util.PhoneUtils;
 import rx.Subscriber;
@@ -18,12 +19,14 @@ public class PendingInvitesPresenterImpl implements PendingInvitesPresenter
 {
     private PendingInvitesView view;
     private UserService userService;
+    private EventService eventService;
 
     private CompositeSubscription subscriptions;
 
-    public PendingInvitesPresenterImpl(UserService userService)
+    public PendingInvitesPresenterImpl(UserService userService, EventService eventService)
     {
         this.userService = userService;
+        this.eventService = eventService;
 
         subscriptions = new CompositeSubscription();
     }
@@ -32,7 +35,7 @@ public class PendingInvitesPresenterImpl implements PendingInvitesPresenter
     public void attachView(PendingInvitesView view)
     {
         this.view = view;
-        userService.markPendingInvitesVisited();
+        userService.markUserAsOld();
     }
 
     @Override
@@ -55,7 +58,7 @@ public class PendingInvitesPresenterImpl implements PendingInvitesPresenter
         view.showLoading();
 
         Subscription subscription =
-                userService
+                eventService
                         ._fetchPendingInvites(parsedPhone)
                         .subscribeOn(Schedulers.newThread())
                         .observeOn(AndroidSchedulers.mainThread())

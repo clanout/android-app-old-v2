@@ -82,7 +82,7 @@ public class ChatActivity extends BaseActivity implements ChatScreen
         if (isTaskRoot())
         {
             String eventId = getIntent().getStringExtra(ARG_EVENT_ID);
-            startActivity(EventDetailsActivity.callingIntent(this, eventId));
+            startActivity(EventDetailsActivity.callingIntent(this, eventId, false));
         }
         finish();
     }

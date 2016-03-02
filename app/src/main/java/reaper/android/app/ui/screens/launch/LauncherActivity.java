@@ -36,9 +36,9 @@ import reaper.android.app.service._new.GcmService_;
 import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.ui._core.BaseActivity;
+import reaper.android.app.ui._core.FlowEntry;
 import reaper.android.app.ui._core.PermissionHandler;
 import reaper.android.app.ui.dialog.DefaultDialog;
-import reaper.android.app.ui._core.FlowEntry;
 import reaper.android.app.ui.screens.chat.ChatActivity;
 import reaper.android.app.ui.screens.details.EventDetailsActivity;
 import reaper.android.app.ui.screens.home.HomeActivity;
@@ -634,7 +634,7 @@ public class LauncherActivity extends BaseActivity implements
                 break;
 
             case FlowEntry.DETAILS:
-                startActivity(EventDetailsActivity.callingIntent(this, eventId));
+                startActivity(EventDetailsActivity.callingIntent(this, eventId, false));
                 break;
 
             case FlowEntry.CHAT:

@@ -1,5 +1,7 @@
 package reaper.android.app.service;
 
+import android.util.Pair;
+
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -42,6 +44,7 @@ import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.LocationSuggestion;
+import reaper.android.app.model.User;
 import reaper.android.app.model.util.EventComparator;
 import reaper.android.app.service._new.GcmService_;
 import reaper.android.app.service._new.LocationService_;
@@ -52,16 +55,15 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 public class EventService
 {
     private static EventService instance;
 
-    public static void init(UserService userService, GcmService_ gcmService, LocationService_ locationService)
+    public static void init(GcmService_ gcmService, LocationService_ locationService, UserService userService)
     {
-        instance = new EventService(userService, gcmService, locationService);
+        instance = new EventService(gcmService, locationService, userService);
     }
 
     public static EventService getInstance()
@@ -74,22 +76,24 @@ public class EventService
         return instance;
     }
 
-    private UserService userService;
     private LocationService_ locationService;
     private GcmService_ gcmService;
+    private UserService userService;
     private EventApi eventApi;
     private EventCache eventCache;
     private GenericCache genericCache;
 
-    private EventService(UserService userService, GcmService_ gcmService, LocationService_ locationService)
+    private User sessionUserId;
+
+    private EventService(GcmService_ gcmService, LocationService_ locationService, UserService userService)
     {
         eventApi = ApiManager.getEventApi();
         eventCache = CacheManager.getEventCache();
         genericCache = CacheManager.getGenericCache();
 
-        this.userService = userService;
         this.gcmService = gcmService;
         this.locationService = locationService;
+        this.userService = userService;
     }
 
     /* Events */
@@ -165,6 +169,14 @@ public class EventService
                         Collections.sort(filtered, new EventComparator.Relevance(userService
                                 .getSessionUserId()));
                         return filtered;
+                    }
+                })
+                .doOnNext(new Action1<List<Event>>()
+                {
+                    @Override
+                    public void call(List<Event> events)
+                    {
+                        eventCache.reset(events);
                     }
                 })
                 .subscribeOn(Schedulers.newThread());
@@ -826,6 +838,68 @@ public class EventService
                 .subscribeOn(Schedulers.newThread());
     }
 
+    /* Pending Invites */
+    public Observable<Pair<Integer, List<Event>>> _fetchPendingInvites(final String mobileNumber)
+    {
+        return _fetchEventsCache()
+                .flatMap(new Func1<List<Event>, Observable<Pair<Integer, List<Event>>>>()
+                {
+                    @Override
+                    public Observable<Pair<Integer, List<Event>>> call(List<Event> events)
+                    {
+                        return Observable.just(new Pair<>(3, events));
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+
+//        String zone = locationService.getCurrentLocation().getZone();
+//        FetchPendingInvitesApiRequest request = new FetchPendingInvitesApiRequest(mobileNumber, zone);
+//        return eventApi
+//                .fetchPendingInvites(request)
+//                .doOnNext(new Action1<FetchPendingInvitesApiResponse>()
+//                {
+//                    @Override
+//                    public void call(FetchPendingInvitesApiResponse response)
+//                    {
+//                        User sessionUser = userService.getSessionUser();
+//                        sessionUser.setMobileNumber(mobileNumber);
+//                        userService.setSessionUser(sessionUser);
+//                    }
+//                })
+//                .flatMap(new Func1<FetchPendingInvitesApiResponse, Observable<Pair<Integer, List<Event>>>>()
+//                {
+//                    @Override
+//                    public Observable<Pair<Integer, List<Event>>> call(final FetchPendingInvitesApiResponse response)
+//                    {
+//                        return _fetchEventsCache()
+//                                .flatMap(new Func1<List<Event>, Observable<Pair<Integer, List<Event>>>>()
+//                                {
+//                                    @Override
+//                                    public Observable<Pair<Integer, List<Event>>> call(List<Event> cachedEvents)
+//                                    {
+//                                        List<Event> pendingInvites = response.getActiveEvents();
+//                                        int expiredInvites = response.getTotalCount() -
+//                                                pendingInvites.size();
+//
+//                                        for (Event pendingInvite : pendingInvites)
+//                                        {
+//                                            if (!cachedEvents.contains(pendingInvite))
+//                                            {
+//                                                cachedEvents.add(pendingInvite);
+//                                            }
+//                                        }
+//
+//                                        eventCache.reset(cachedEvents);
+//
+//                                        return Observable
+//                                                .just(new Pair<>(expiredInvites, pendingInvites));
+//                                    }
+//                                });
+//                    }
+//                })
+//                .subscribeOn(Schedulers.newThread());
+    }
+
     /* Helper Methods */
     private boolean isExpired(Event event)
     {
@@ -863,87 +937,6 @@ public class EventService
 
 
     /* Old */
-    public Observable<List<Event>> refreshEvents(String zone, final List<String> eventIdList, DateTime lastUpdateTimestamp)
-    {
-        Observable<FetchNewEventsAndUpdatesApiResponse> updatesObservable = eventApi
-                .fetchNewEventsAndUpdates(new FetchNewEventsAndUpdatesApiRequest(zone, eventIdList, lastUpdateTimestamp));
-        Observable<List<Event>> cachedEventsObservable = eventCache.getEvents();
-
-        return Observable
-                .zip(updatesObservable, cachedEventsObservable, new Func2<FetchNewEventsAndUpdatesApiResponse, List<Event>, List<Event>>()
-                {
-                    @Override
-                    public List<Event> call(FetchNewEventsAndUpdatesApiResponse response, List<Event> events)
-                    {
-                        List<Event> newEventList = response.getNewEventsList();
-                        List<String> deletedEventIdList = response.getDeletedEventIdList();
-                        List<Event> updatedEventList = response.getUpdatedEventList();
-
-                        for (String deletedEventId : deletedEventIdList)
-                        {
-                            Event deletedEvent = new Event();
-                            deletedEvent.setId(deletedEventId);
-
-                            if (events.contains(deletedEvent))
-                            {
-                                events.remove(deletedEvent);
-                            }
-                        }
-
-                        for (Event updatedEvent : updatedEventList)
-                        {
-                            if (events.contains(updatedEvent))
-                            {
-                                int index = events.indexOf(updatedEvent);
-                                if (index >= 0)
-                                {
-                                    if (!updatedEvent.isEqualTo(events.get(index)))
-                                    {
-                                        events.set(index, updatedEvent);
-                                    }
-                                    else
-                                    {
-                                    }
-                                }
-                            }
-                        }
-
-                        events.addAll(newEventList);
-
-                        List<Event> filteredEvents = new ArrayList<Event>();
-                        for (Event event : events)
-                        {
-                            if (event.getEndTime().isAfterNow())
-                            {
-                                filteredEvents.add(event);
-                            }
-                        }
-
-                        return filteredEvents;
-                    }
-                })
-                .doOnNext(new Action1<List<Event>>()
-                {
-                    @Override
-                    public void call(List<Event> events)
-                    {
-                        genericCache
-                                .put(GenericCacheKeys.FEED_LAST_UPDATE_TIMESTAMP, DateTime.now());
-                        eventCache.reset(events);
-                    }
-                })
-                .map(new Func1<List<Event>, List<Event>>()
-                {
-                    @Override
-                    public List<Event> call(List<Event> events)
-                    {
-                        Collections.sort(events, new EventComparator.Relevance(userService
-                                .getSessionUserId()));
-                        return events;
-                    }
-                })
-                .subscribeOn(Schedulers.newThread());
-    }
 
     public void sendInvitationResponse(String eventId, String message)
     {

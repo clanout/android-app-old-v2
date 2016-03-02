@@ -42,7 +42,7 @@
         android:id="@+id/tvInvalidPhoneError"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="8dp"
+        android:layout_marginRight="16dp"
         android:gravity="right"
         android:text="@string/error_invalid_phone"
         android:textColor="@android:color/holo_red_dark"

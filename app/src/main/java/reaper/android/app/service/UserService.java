@@ -1,9 +1,5 @@
 package reaper.android.app.service;
 
-import android.util.Pair;
-
-import com.squareup.otto.Bus;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -13,21 +9,16 @@ import java.util.Set;
 import reaper.android.app.api._core.ApiManager;
 import reaper.android.app.api.user.UserApi;
 import reaper.android.app.api.user.request.BlockFriendsApiRequest;
-import reaper.android.app.api.user.request.FetchPendingInvitesApiRequest;
 import reaper.android.app.api.user.request.GetFacebookFriendsApiRequest;
 import reaper.android.app.api.user.request.GetRegisteredContactsApiRequest;
 import reaper.android.app.api.user.request.ShareFeedbackApiRequest;
 import reaper.android.app.api.user.request.UpdateMobileAPiRequest;
-import reaper.android.app.api.user.response.FetchPendingInvitesApiResponse;
 import reaper.android.app.api.user.response.GetFacebookFriendsApiResponse;
 import reaper.android.app.api.user.response.GetRegisteredContactsApiResponse;
 import reaper.android.app.cache._core.CacheManager;
-import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
-import reaper.android.app.communication.Communicator;
 import reaper.android.app.config.GenericCacheKeys;
-import reaper.android.app.model.Event;
 import reaper.android.app.model.Friend;
 import reaper.android.app.model.User;
 import reaper.android.app.model.util.FriendsComparator;
@@ -48,8 +39,7 @@ public class UserService
 
     public static void init(LocationService_ locationService, PhonebookService_ phonebookService)
     {
-        instance = new UserService(locationService, phonebookService, Communicator.getInstance()
-                                                                                  .getBus());
+        instance = new UserService(locationService, phonebookService);
     }
 
     public static UserService getInstance()
@@ -67,11 +57,10 @@ public class UserService
     private GenericCache genericCache;
     private LocationService_ locationService;
     private PhonebookService_ phonebookService;
-    private EventCache eventCache;
 
     private User activeUser;
 
-    private UserService(LocationService_ locationService, PhonebookService_ phonebookService, Bus bus)
+    private UserService(LocationService_ locationService, PhonebookService_ phonebookService)
     {
         this.locationService = locationService;
         this.phonebookService = phonebookService;
@@ -79,7 +68,6 @@ public class UserService
         userApi = ApiManager.getUserApi();
         userCache = CacheManager.getUserCache();
         genericCache = CacheManager.getGenericCache();
-        eventCache = CacheManager.getEventCache();
     }
 
     /* Session User */
@@ -158,7 +146,7 @@ public class UserService
                    public void onNext(Response response)
                    {
                        activeUser.setMobileNumber(phoneNumber);
-                       genericCache.put(GenericCacheKeys.SESSION_USER, activeUser);
+                       setSessionUser(activeUser);
                    }
                });
     }
@@ -184,8 +172,7 @@ public class UserService
                    @Override
                    public void onNext(Response response)
                    {
-                       userCache.deleteFriends();
-                       eventCache.deleteAll();
+                       CacheManager.clearEventsAndFriends();
                    }
                });
     }
@@ -427,60 +414,10 @@ public class UserService
                });
     }
 
-    /* Pending Invites */
-    public Observable<Pair<Integer, List<Event>>> _fetchPendingInvites(final String mobileNumber)
-    {
-        String zone = locationService.getCurrentLocation().getZone();
-        FetchPendingInvitesApiRequest request = new FetchPendingInvitesApiRequest(mobileNumber, zone);
-        return userApi
-                .fetchPendingInvites(request)
-                .doOnNext(new Action1<FetchPendingInvitesApiResponse>()
-                {
-                    @Override
-                    public void call(FetchPendingInvitesApiResponse response)
-                    {
-                        activeUser.setMobileNumber(mobileNumber);
-                        genericCache.put(GenericCacheKeys.SESSION_USER, activeUser);
-                    }
-                })
-                .flatMap(new Func1<FetchPendingInvitesApiResponse, Observable<Pair<Integer, List<Event>>>>()
-                {
-                    @Override
-                    public Observable<Pair<Integer, List<Event>>> call(final FetchPendingInvitesApiResponse response)
-                    {
-                        return eventCache
-                                .getEvents()
-                                .flatMap(new Func1<List<Event>, Observable<Pair<Integer, List<Event>>>>()
-                                {
-                                    @Override
-                                    public Observable<Pair<Integer, List<Event>>> call(List<Event> cachedEvents)
-                                    {
-                                        List<Event> pendingInvites = response.getActiveEvents();
-                                        int expiredInvites = response.getTotalCount() -
-                                                pendingInvites.size();
-
-                                        for (Event pendingInvite : pendingInvites)
-                                        {
-                                            if (!cachedEvents.contains(pendingInvite))
-                                            {
-                                                cachedEvents.add(pendingInvite);
-                                            }
-                                        }
-
-                                        eventCache.reset(cachedEvents);
-
-                                        return Observable
-                                                .just(new Pair<>(expiredInvites, pendingInvites));
-                                    }
-                                });
-                    }
-                })
-                .subscribeOn(Schedulers.newThread());
-    }
-
-    public void markPendingInvitesVisited()
+    /* New User */
+    public void markUserAsOld()
     {
         activeUser.setNewUser(false);
-        genericCache.put(GenericCacheKeys.SESSION_USER, activeUser);
+        setSessionUser(activeUser);
     }
 }

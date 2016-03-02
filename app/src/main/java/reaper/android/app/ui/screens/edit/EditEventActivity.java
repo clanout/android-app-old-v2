@@ -73,7 +73,7 @@ public class EditEventActivity extends BaseActivity implements EditEventScreen
     {
         if (item.getItemId() == android.R.id.home)
         {
-            String eventId = ((Event)getIntent().getSerializableExtra(ARG_EVENT)).getId();
+            String eventId = ((Event) getIntent().getSerializableExtra(ARG_EVENT)).getId();
             navigateToDetailsScreen(eventId);
         }
         return super.onOptionsItemSelected(item);
@@ -82,7 +82,7 @@ public class EditEventActivity extends BaseActivity implements EditEventScreen
     @Override
     public void onBackPressed()
     {
-        String eventId = ((Event)getIntent().getSerializableExtra(ARG_EVENT)).getId();
+        String eventId = ((Event) getIntent().getSerializableExtra(ARG_EVENT)).getId();
         navigateToDetailsScreen(eventId);
     }
 
@@ -97,7 +97,9 @@ public class EditEventActivity extends BaseActivity implements EditEventScreen
     @Override
     public void navigateToDetailsScreen(String eventId)
     {
-        startActivity(EventDetailsActivity.callingIntent(this, eventId));
+        Intent intent = EventDetailsActivity.callingIntent(this, eventId, false);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
         finish();
     }
 }

@@ -30,11 +30,13 @@ public class EventDetailsActivity extends BaseActivity implements
         EventDetailsScreen
 {
     private static final String ARG_EVENT_ID = "arg_event_id";
+    private static final String ARG_IS_FROM_HOME = "arg_is_from_home";
 
-    public static Intent callingIntent(Context context, String eventId)
+    public static Intent callingIntent(Context context, String eventId, boolean isFromHome)
     {
         Intent intent = new Intent(context, EventDetailsActivity.class);
         intent.putExtra(ARG_EVENT_ID, eventId);
+        intent.putExtra(ARG_IS_FROM_HOME, isFromHome);
         return intent;
     }
 
@@ -94,7 +96,7 @@ public class EventDetailsActivity extends BaseActivity implements
     {
         if (item.getItemId() == android.R.id.home)
         {
-            navigateBack();
+            navigateToHome();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -131,19 +133,10 @@ public class EventDetailsActivity extends BaseActivity implements
     @Override
     public void handleError()
     {
-        navigateBack();
+        navigateToHome();
     }
 
     /* Screen Methods */
-    @Override
-    public void navigateBack()
-    {
-        if (isTaskRoot())
-        {
-            startActivity(HomeActivity.callingIntent(this));
-        }
-        finish();
-    }
 
     @Override
     public void navigateToChatScreen(String eventId)
@@ -161,6 +154,26 @@ public class EventDetailsActivity extends BaseActivity implements
     public void navigateToEditScreen(Event event, EventDetails eventDetails)
     {
         startActivity(EditEventActivity.callingIntent(this, event, eventDetails));
+        finish();
+    }
+
+    /* Helper Method */
+    private void navigateToHome()
+    {
+        boolean isFromHome = getIntent().getBooleanExtra(ARG_IS_FROM_HOME, false);
+        if (!isFromHome)
+        {
+            startActivity(HomeActivity.callingIntent(this));
+        }
+        finish();
+    }
+
+    private void navigateBack()
+    {
+        if(isTaskRoot())
+        {
+            startActivity(HomeActivity.callingIntent(this));
+        }
         finish();
     }
 }

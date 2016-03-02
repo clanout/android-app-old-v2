@@ -19,7 +19,9 @@ public class PendingInvitesActivity extends BaseActivity implements PendingInvit
 {
     public static Intent callingIntent(Context context)
     {
-        return new Intent(context, PendingInvitesActivity.class);
+        Intent intent = new Intent(context, PendingInvitesActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        return intent;
     }
 
     /* UI Elements */
@@ -60,6 +62,6 @@ public class PendingInvitesActivity extends BaseActivity implements PendingInvit
     @Override
     public void navigateToDetailsScreen(String eventId)
     {
-        startActivity(EventDetailsActivity.callingIntent(this, eventId));
+        startActivity(EventDetailsActivity.callingIntent(this, eventId, false));
     }
 }

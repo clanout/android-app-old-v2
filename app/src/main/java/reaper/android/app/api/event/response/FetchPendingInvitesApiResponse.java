@@ -1,4 +1,4 @@
-package reaper.android.app.api.user.response;
+package reaper.android.app.api.event.response;
 
 import com.google.gson.annotations.SerializedName;
 

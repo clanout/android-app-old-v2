@@ -24,6 +24,8 @@ import reaper.android.app.api.event.response.EventsApiResponse;
 import reaper.android.app.api.event.response.FetchEventApiResponse;
 import reaper.android.app.api.event.response.FetchNewEventsAndUpdatesApiResponse;
 import reaper.android.app.api.event.response.GetCreateEventSuggestionsApiResponse;
+import reaper.android.app.api.event.request.FetchPendingInvitesApiRequest;
+import reaper.android.app.api.event.response.FetchPendingInvitesApiResponse;
 import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.POST;
@@ -78,4 +80,7 @@ public interface EventApi
 
     @POST("/event/suggestions")
     Observable<GetCreateEventSuggestionsApiResponse> getCreateEventSuggestion(@Body GetCreateEventSuggestionsApiRequest request);
+
+    @POST("/event/pending_invitations")
+    Observable<FetchPendingInvitesApiResponse> fetchPendingInvites(@Body FetchPendingInvitesApiRequest request);
 }

@@ -100,11 +100,11 @@ public class PendingInviteAdapter extends RecyclerView.Adapter<PendingInviteAdap
             int inviteCount = event.getInviterCount();
             if (inviteCount == 1)
             {
-                tvInvites.setText("You were invited by 1 person for this plan");
+                tvInvites.setText("You were invited by 1 person");
             }
             else
             {
-                tvInvites.setText("You were invited by " + inviteCount + " people for this event");
+                tvInvites.setText("You were invited by " + inviteCount + " people");
             }
         }
     }

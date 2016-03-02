@@ -45,47 +45,40 @@ public class AlarmReceiver extends BroadcastReceiver
     {
         EventCache eventCache = CacheManager.getEventCache();
 
-        eventCache.getEvents().subscribeOn(Schedulers.newThread())
-                  .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<List<Event>>()
-        {
-            @Override
-            public void onCompleted()
-            {
-
-            }
-
-            @Override
-            public void onError(Throwable e)
-            {
-
-            }
-
-            @Override
-            public void onNext(List<Event> events)
-            {
-                List<Event> eventsToStartShortly = new ArrayList<Event>();
-
-                for (Event event : events)
+        eventCache
+                .getEvents()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Event>>()
                 {
-
-                    if (event.getStartTime().isBefore(DateTime.now().plusHours(1)))
+                    @Override
+                    public void onCompleted()
                     {
-//                        buildNotification(event, context);
-
-                        eventsToStartShortly.add(event);
                     }
-                }
 
-                buildNotification(eventsToStartShortly, context);
-            }
-        });
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                    }
+
+                    @Override
+                    public void onNext(List<Event> events)
+                    {
+                        List<Event> eventsToStartShortly = new ArrayList<Event>();
+                        for (Event event : events)
+                        {
+                            if (event.getStartTime().isBefore(DateTime.now().plusHours(1)))
+                            {
+                                eventsToStartShortly.add(event);
+                            }
+                        }
+                        buildNotification(eventsToStartShortly, context);
+                    }
+                });
     }
 
     private void buildNotification(List<Event> events, Context context)
     {
-//        Intent intent = new Intent(context, LauncherActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//
         int requestCode = ("someString" + System.currentTimeMillis()).hashCode();
 
         if (events.size() == 0)
@@ -123,12 +116,6 @@ public class AlarmReceiver extends BroadcastReceiver
         }
         else if (events.size() > 1)
         {
-//            intent.putExtra("randomRequestCode", requestCode);
-
-//            PendingIntent pendingIntent = PendingIntent
-//                    .getActivity(context, requestCode, intent, PendingIntent.FLAG_ONE_SHOT);
-
-
             Intent launcherIntent = LauncherActivity
                     .callingIntent(context, FlowEntry.HOME, null);
 

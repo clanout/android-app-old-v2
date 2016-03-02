@@ -28,11 +28,11 @@ import reaper.android.app.communication.NewNotificationsAvailableTrigger;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.ui._core.BaseActivity;
-import reaper.android.app.ui.screens.home.create.CreateFragment;
-import reaper.android.app.ui.screens.home.feed.EventFeedFragment;
 import reaper.android.app.ui.screens.accounts.AccountActivity;
 import reaper.android.app.ui.screens.create.CreateActivity;
 import reaper.android.app.ui.screens.details.EventDetailsActivity;
+import reaper.android.app.ui.screens.home.create.CreateFragment;
+import reaper.android.app.ui.screens.home.feed.EventFeedFragment;
 import reaper.android.app.ui.screens.notifications.NotificationActivity;
 
 public class HomeActivity extends BaseActivity implements HomeScreen
@@ -40,7 +40,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
     public static Intent callingIntent(Context context)
     {
         Intent intent = new Intent(context, HomeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         return intent;
     }
 
@@ -221,7 +221,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
     @Override
     public void navigateToDetailsScreen(String eventId)
     {
-        startActivity(EventDetailsActivity.callingIntent(this, eventId));
+        startActivity(EventDetailsActivity.callingIntent(this, eventId, true));
     }
 
     /* Helper Methods */

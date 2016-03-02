@@ -81,7 +81,7 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
     @Override
     public void navigateToDetailsScreen(String eventId)
     {
-        startActivity(EventDetailsActivity.callingIntent(this, eventId));
+        startActivity(EventDetailsActivity.callingIntent(this, eventId, false));
     }
 
     @Override

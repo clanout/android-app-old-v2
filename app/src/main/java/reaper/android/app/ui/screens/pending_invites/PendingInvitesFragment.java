@@ -21,6 +21,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import reaper.android.R;
 import reaper.android.app.model.Event;
+import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.pending_invites.mvp.PendingInvitesPresenter;
@@ -85,7 +86,8 @@ public class PendingInvitesFragment extends BaseFragment implements
 
         /* Presenter */
         UserService userService = UserService.getInstance();
-        presenter = new PendingInvitesPresenterImpl(userService);
+        EventService eventService = EventService.getInstance();
+        presenter = new PendingInvitesPresenterImpl(userService, eventService);
     }
 
     @Nullable
@@ -176,7 +178,10 @@ public class PendingInvitesFragment extends BaseFragment implements
     @Override
     public void onPendingInviteClicked(Event event)
     {
-
+        if(presenter != null)
+        {
+            presenter.selectInvite(event);
+        }
     }
 
     /* View Methods */
@@ -226,7 +231,7 @@ public class PendingInvitesFragment extends BaseFragment implements
     {
         llExpiredInvites.setVisibility(View.VISIBLE);
         tvExpiredInvites
-                .setText("You have " + expiredEventsCount + " invitations for clans which are now over");
+                .setText("You have " + expiredEventsCount + " invitations for expired plans");
     }
 
     @Override

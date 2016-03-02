@@ -81,20 +81,22 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
                             @Override
                             public void onError(Throwable e)
                             {
+                                e.printStackTrace();
                                 view.displayError();
                             }
 
                             @Override
                             public void onNext(Boolean isNewUser)
                             {
-                                if (isNewUser)
-                                {
-                                    view.navigateToPendingInvitesScreen();
-                                }
-                                else
-                                {
-                                    view.proceed();
-                                }
+//                                if (isNewUser)
+//                                {
+//                                    view.navigateToPendingInvitesScreen();
+//                                }
+//                                else
+//                                {
+//                                    view.proceed();
+//                                }
+                                view.navigateToPendingInvitesScreen();
                             }
                         });
 
