@@ -79,8 +79,10 @@ public class EventService
     private LocationService_ locationService;
     private GcmService_ gcmService;
     private UserService userService;
+
     private EventApi eventApi;
     private EventCache eventCache;
+
     private GenericCache genericCache;
 
     private User sessionUserId;

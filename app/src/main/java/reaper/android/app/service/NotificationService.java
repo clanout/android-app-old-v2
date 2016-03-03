@@ -60,6 +60,7 @@ public class NotificationService
 
     private EventApi eventApi;
     private EventCache eventCache;
+
     private NotificationCache notificationCache;
     private UserCache userCache;
     private UserService userService;

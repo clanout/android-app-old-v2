@@ -54,6 +54,7 @@ public class UserService
 
     private UserApi userApi;
     private UserCache userCache;
+
     private GenericCache genericCache;
     private LocationService_ locationService;
     private PhonebookService_ phonebookService;

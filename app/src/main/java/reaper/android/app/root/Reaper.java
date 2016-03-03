@@ -128,7 +128,6 @@ public class Reaper extends Application
         EventService.init(gcmService, locationService, userService);
         EventService eventService = EventService.getInstance();
 
-
         /* Chat Service */
         ChatService_.init(userService, eventService);
 
