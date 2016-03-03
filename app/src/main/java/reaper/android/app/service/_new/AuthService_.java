@@ -11,6 +11,7 @@ import reaper.android.app.api.auth.request.ValidateSessionApiRequest;
 import reaper.android.app.api.auth.response.CreateNewSessionApiResponse;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.model.User;
+import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import retrofit.client.Response;
 import rx.Observable;
@@ -164,8 +165,7 @@ public class AuthService_
                         user.setMobileNumber(response.getMobileNumber());
                         user.setGender(response.getGender());
 
-                        user.setProfilePicUrl(facebookService
-                                .getProfilePicUrl(user.getId()));
+                        user.setProfilePicUrl(FacebookService_.getProfilePicUrl(user.getId()));
                         user.setCoverPicUrl(coverPicUrl);
 
                         return user;
@@ -195,6 +195,7 @@ public class AuthService_
                         {
                             Timber.v("[New Session Created] Session ID = " + user.getSessionId());
                             userService.setSessionUser(user);
+                            ChatService_.init(userService, EventService.getInstance());
                             return true;
                         }
                     }

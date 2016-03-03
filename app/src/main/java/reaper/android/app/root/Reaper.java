@@ -5,6 +5,7 @@ import android.content.Context;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.multidex.MultiDex;
 
 import com.facebook.FacebookSdk;
 import com.facebook.stetho.Stetho;
@@ -56,6 +57,13 @@ public class Reaper extends Application
 
         }
         return tracker;
+    }
+
+    @Override
+    protected void attachBaseContext(Context base)
+    {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 
     @Override
@@ -129,7 +137,10 @@ public class Reaper extends Application
         EventService eventService = EventService.getInstance();
 
         /* Chat Service */
-        ChatService_.init(userService, eventService);
+        if (userService.getSessionUser() != null)
+        {
+            ChatService_.init(userService, eventService);
+        }
 
         /* WhatsApp Service */
         WhatsappService_.init(userService);

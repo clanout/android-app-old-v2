@@ -51,6 +51,7 @@ import reaper.android.app.ui.screens.launch.mvp.fb_login.FacebookLoginView;
 import reaper.android.app.ui.screens.notifications.NotificationActivity;
 import reaper.android.app.ui.screens.pending_invites.PendingInvitesActivity;
 import reaper.android.app.ui.util.SnackbarFactory;
+import reaper.android.common._debugger.TraceDebugger;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -134,6 +135,11 @@ public class LauncherActivity extends BaseActivity implements
 
         setContentView(R.layout.activity_launcher);
         ButterKnife.bind(this);
+
+        if(llFb == null)
+        {
+            throw new IllegalStateException();
+        }
 
         /* Init View */
         displayBootstrapView();
@@ -553,6 +559,7 @@ public class LauncherActivity extends BaseActivity implements
 
     private void displayBootstrapView()
     {
+        TraceDebugger.print("qwerty");
         llFb.setVisibility(View.GONE);
         rlBootstrap.setVisibility(View.VISIBLE);
     }

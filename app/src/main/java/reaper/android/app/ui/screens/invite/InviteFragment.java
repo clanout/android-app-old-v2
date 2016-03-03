@@ -366,7 +366,6 @@ public class InviteFragment extends BaseFragment implements
     @Override
     public void displayError()
     {
-        TraceDebugger.print("InviteError");
         llError.setVisibility(View.VISIBLE);
         tvRetry.setOnClickListener(new View.OnClickListener()
         {
