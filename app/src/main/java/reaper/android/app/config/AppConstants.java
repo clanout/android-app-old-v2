@@ -20,6 +20,7 @@ public final class AppConstants
     public static final String CHAT_SERVICE_HOST = "52.1.78.109";
     public static final int CHAT_SERVICE_PORT = 5222;
     public static final String CHAT_POSTFIX = "@conference.52.1.78.109";
+    public static final String CHAT_ADMIN_ID = "clanout";
 
     /* Others */
     public static final String DEFAULT_COUNTRY_CODE = "91";

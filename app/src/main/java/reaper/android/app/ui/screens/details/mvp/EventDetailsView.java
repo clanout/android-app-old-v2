@@ -16,7 +16,7 @@ public interface EventDetailsView
     void displayDescription(String description);
 
     /* Rsvp */
-    void displayRsvp(boolean isGoing);
+    void displayRsvp(boolean isGoing, boolean isInvited);
 
     void disableRsvp();
 

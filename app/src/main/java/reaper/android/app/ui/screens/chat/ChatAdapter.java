@@ -20,8 +20,9 @@ import reaper.android.app.model.ChatMessage;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
-    private static final int CHAT_ME = 0;
-    private static final int CHAT_OTHERS = 1;
+    private static final int TYPE_ME = 0;
+    private static final int TYPE_OTHERS = 1;
+    private static final int TYPE_ADMIN = 2;
 
     private static DateTimeFormatter TIMESTAMP_FORMATTER = DateTimeFormat
             .forPattern("dd MMM, HH:mm");
@@ -62,32 +63,47 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        if (viewType == CHAT_ME)
+        View view;
+        switch (viewType)
         {
-            View view = LayoutInflater
-                    .from(context)
-                    .inflate(R.layout.item_chat_me, parent, false);
-            return new MyChatViewHolder(view);
-        }
-        else
-        {
-            View view = LayoutInflater
-                    .from(context)
-                    .inflate(R.layout.item_chat_others, parent, false);
-            return new OthersChatViewHolder(view);
+            case TYPE_ME:
+                view = LayoutInflater
+                        .from(context)
+                        .inflate(R.layout.item_chat_me, parent, false);
+                return new MyChatViewHolder(view);
+
+            case TYPE_OTHERS:
+                view = LayoutInflater
+                        .from(context)
+                        .inflate(R.layout.item_chat_others, parent, false);
+                return new OthersChatViewHolder(view);
+
+            case TYPE_ADMIN:
+                view = LayoutInflater
+                        .from(context)
+                        .inflate(R.layout.item_chat_admin, parent, false);
+                return new AdminChatViewHolder(view);
+
+            default:
+                throw new IllegalStateException();
         }
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position)
     {
-        if (getItemViewType(position) == CHAT_ME)
+        switch (getItemViewType(position))
         {
-            ((MyChatViewHolder) holder).render(chatMessages.get(position));
-        }
-        else
-        {
-            ((OthersChatViewHolder) holder).render(chatMessages.get(position));
+            case TYPE_ME:
+                ((MyChatViewHolder) holder).render(chatMessages.get(position));
+                break;
+
+            case TYPE_OTHERS:
+                ((OthersChatViewHolder) holder).render(chatMessages.get(position));
+                break;
+
+            case TYPE_ADMIN:
+                ((AdminChatViewHolder) holder).render(chatMessages.get(position));
         }
     }
 
@@ -115,8 +131,15 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public int getItemViewType(int position)
     {
-        return chatMessages.get(position).getSenderId().equals(sessionUserId)
-                ? CHAT_ME : CHAT_OTHERS;
+        ChatMessage chatMessage = chatMessages.get(position);
+        if (chatMessage.isAdmin())
+        {
+            return TYPE_ADMIN;
+        }
+        else
+        {
+            return chatMessage.getSenderId().equals(sessionUserId) ? TYPE_ME : TYPE_OTHERS;
+        }
     }
 
     public class MyChatViewHolder extends RecyclerView.ViewHolder
@@ -220,6 +243,27 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 tvName.setVisibility(View.VISIBLE);
             }
 
+            tvChatMessage.setText(chatMessage.getMessage());
+        }
+    }
+
+    public class AdminChatViewHolder extends RecyclerView.ViewHolder
+    {
+        @Bind(R.id.tvChatMessage)
+        TextView tvChatMessage;
+
+        @Bind(R.id.tvTimestamp)
+        TextView tvTimestamp;
+
+        public AdminChatViewHolder(View itemView)
+        {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        public void render(ChatMessage chatMessage)
+        {
+            tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER));
             tvChatMessage.setText(chatMessage.getMessage());
         }
     }

@@ -80,7 +80,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
         final boolean oldRsvp = event.getRsvp() == Event.RSVP.YES;
         if (isRsvpUpdateInProgress)
         {
-            view.displayRsvp(oldRsvp);
+            view.displayRsvp(oldRsvp, isInvited());
             return;
         }
 
@@ -91,7 +91,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
 
         isRsvpUpdateInProgress = true;
 
-        view.displayRsvp(!oldRsvp);
+        view.displayRsvp(!oldRsvp, isInvited());
         if (oldRsvp)
         {
             event.setRsvp(Event.RSVP.NO);
@@ -130,7 +130,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
                                     event.setRsvp(Event.RSVP.NO);
                                 }
 
-                                view.displayRsvp(oldRsvp);
+                                view.displayRsvp(oldRsvp, isInvited());
                                 view.displayRsvpError();
                                 isRsvpUpdateInProgress = false;
                             }
@@ -149,7 +149,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
                                         event.setRsvp(Event.RSVP.NO);
                                     }
 
-                                    view.displayRsvp(oldRsvp);
+                                    view.displayRsvp(oldRsvp, isInvited());
                                     view.displayRsvpError();
                                 }
                             }
@@ -195,6 +195,12 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
         {
             eventService.updateStatus(event.getId(), status, false);
         }
+    }
+
+    @Override
+    public void sendInvitationResponse(String invitationResponse)
+    {
+        eventService.sendInvitationResponse(event.getId(), invitationResponse);
     }
 
     /* Helper Methods */
@@ -276,11 +282,11 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
 
         if (event.getRsvp() == Event.RSVP.YES)
         {
-            view.displayRsvp(true);
+            view.displayRsvp(true, isInvited());
         }
         else
         {
-            view.displayRsvp(false);
+            view.displayRsvp(false, isInvited());
         }
 
         if (event.getOrganizerId().equals(userService.getSessionUserId()))
@@ -352,5 +358,10 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     private void processIsLastMinute()
     {
         isLastMinute = DateTime.now().plusHours(1).isAfter(event.getStartTime());
+    }
+
+    private boolean isInvited()
+    {
+        return event.getInviterCount() > 0;
     }
 }

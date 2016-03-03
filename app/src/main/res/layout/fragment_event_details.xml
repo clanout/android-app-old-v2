@@ -285,10 +285,11 @@
 
     <!-- Clan Actions -->
     <LinearLayout
-        android:id="@+id/llEventActionsContainer"
+        android:id="@+id/llEventActionsContainerYay"
         style="?attr/buttonBarStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:visibility="gone">
 
         <Button
             android:id="@+id/btnInvite"
@@ -308,6 +309,37 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/label_btn_chat"
+            android:textAlignment="center"
+            android:textColor="@drawable/text_btn_primary"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llEventActionsContainerNay"
+        style="?attr/buttonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btnInvitationResponse"
+            style="?attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Not Going?"
+            android:textAlignment="center"
+            android:textColor="@drawable/text_btn_neutral"
+            android:textStyle="bold"/>
+
+        <Button
+            android:id="@+id/btnJoin"
+            style="?attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Join"
             android:textAlignment="center"
             android:textColor="@drawable/text_btn_primary"
             android:textStyle="bold"/>

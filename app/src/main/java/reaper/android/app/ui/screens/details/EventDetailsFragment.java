@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -40,6 +41,7 @@ import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.ui._core.BaseFragment;
+import reaper.android.app.ui.dialog.InvitationResponseDialog;
 import reaper.android.app.ui.dialog.LastMinuteStatusDialog;
 import reaper.android.app.ui.dialog.StatusDialog;
 import reaper.android.app.ui.screens.details.mvp.EventDetailsPresenter;
@@ -135,8 +137,14 @@ public class EventDetailsFragment extends BaseFragment implements
     @Bind(R.id.rvAttendees)
     RecyclerView rvAttendees;
 
-    @Bind(R.id.llEventActionsContainer)
-    View llEventActionsContainer;
+    @Bind(R.id.llEventActionsContainerYay)
+    View llEventActionsContainerYay;
+
+    @Bind(R.id.llEventActionsContainerNay)
+    View llEventActionsContainerNay;
+
+    @Bind(R.id.btnInvitationResponse)
+    Button btnInvitationResponse;
 
     MenuItem edit;
     boolean isEditVisible;
@@ -261,6 +269,21 @@ public class EventDetailsFragment extends BaseFragment implements
         }
     }
 
+    @OnClick(R.id.btnInvitationResponse)
+    public void onInvitationResponseClicked()
+    {
+        displayInvitationResponseDialog();
+    }
+
+    @OnClick(R.id.btnJoin)
+    public void onJoinClicked()
+    {
+        if (presenter != null)
+        {
+            presenter.toggleRsvp();
+        }
+    }
+
     /* View Methods */
     @Override
     public void displayEventSummary(Event event)
@@ -347,7 +370,7 @@ public class EventDetailsFragment extends BaseFragment implements
     }
 
     @Override
-    public void displayRsvp(boolean isGoing)
+    public void displayRsvp(boolean isGoing, boolean isInvited)
     {
         tvRsvp.setVisibility(View.VISIBLE);
         sRsvp.setVisibility(View.VISIBLE);
@@ -360,13 +383,40 @@ public class EventDetailsFragment extends BaseFragment implements
         {
             tvRsvp.setText(R.string.rsvp_yes);
             tvRsvp.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
-            VisibilityAnimationUtil.expand(llEventActionsContainer, 200);
+
+            if (llEventActionsContainerNay.getVisibility() != View.GONE)
+            {
+                VisibilityAnimationUtil.collapse(llEventActionsContainerNay, 200);
+            }
+
+            if (llEventActionsContainerYay.getVisibility() != View.VISIBLE)
+            {
+                VisibilityAnimationUtil.expand(llEventActionsContainerYay, 200);
+            }
         }
         else
         {
             tvRsvp.setText(R.string.rsvp_no);
             tvRsvp.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_subtitle));
-            VisibilityAnimationUtil.collapse(llEventActionsContainer, 200);
+
+            if (isInvited)
+            {
+                btnInvitationResponse.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                btnInvitationResponse.setVisibility(View.GONE);
+            }
+
+            if (llEventActionsContainerYay.getVisibility() != View.GONE)
+            {
+                VisibilityAnimationUtil.collapse(llEventActionsContainerYay, 200);
+            }
+
+            if (llEventActionsContainerNay.getVisibility() != View.VISIBLE)
+            {
+                VisibilityAnimationUtil.expand(llEventActionsContainerNay, 200);
+            }
         }
 
         sRsvp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
@@ -579,5 +629,31 @@ public class EventDetailsFragment extends BaseFragment implements
         rvAttendees.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvAttendees
                 .setAdapter(new EventAttendeesAdapter(new ArrayList<EventDetails.Attendee>(), getActivity()));
+    }
+
+    private void displayInvitationResponseDialog()
+    {
+        InvitationResponseDialog.show(getActivity(), new InvitationResponseDialog.Listener()
+        {
+            @Override
+            public void onInvitationResponseSuggestionSelected(String suggestion)
+            {
+            }
+
+            @Override
+            public void onInvitationResponseEntered(String invitationResponse)
+            {
+                if(presenter != null)
+                {
+                    presenter.sendInvitationResponse(invitationResponse);
+                    SnackbarFactory.create(getActivity(), R.string.invitation_response_sent);
+                }
+            }
+
+            @Override
+            public void onInvitationResponseCancelled()
+            {
+            }
+        });
     }
 }

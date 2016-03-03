@@ -18,4 +18,6 @@ public interface EventDetailsPresenter
     void requestEditActionState();
 
     void setStatus(String status);
+
+    void sendInvitationResponse(String invitationResponse);
 }

@@ -2,6 +2,8 @@ package reaper.android.app.model;
 
 import org.joda.time.DateTime;
 
+import reaper.android.app.config.AppConstants;
+
 public class ChatMessage implements Model
 {
     private String id;
@@ -58,6 +60,11 @@ public class ChatMessage implements Model
     public void setTimestamp(DateTime timestamp)
     {
         this.timestamp = timestamp;
+    }
+
+    public boolean isAdmin()
+    {
+        return senderId.equalsIgnoreCase(AppConstants.CHAT_ADMIN_ID);
     }
 
     @Override

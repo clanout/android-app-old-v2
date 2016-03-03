@@ -937,39 +937,35 @@ public class EventService
         }
     }
 
-
-    /* Old */
-
+    /* Invitation Response */
     public void sendInvitationResponse(String eventId, String message)
     {
-
-        SendInvitaionResponseApiRequest responseApiRequest = new SendInvitaionResponseApiRequest(eventId, message);
-
-        eventApi.sendInvitationResponse(responseApiRequest).subscribeOn(Schedulers.newThread())
+        SendInvitaionResponseApiRequest request = new SendInvitaionResponseApiRequest(eventId, message);
+        eventApi
+                .sendInvitationResponse(request)
+                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Subscriber<Response>()
                 {
-
                     @Override
                     public void onCompleted()
                     {
-
                     }
 
                     @Override
                     public void onError(Throwable e)
                     {
-
                     }
 
                     @Override
                     public void onNext(Response response)
                     {
-
                     }
                 });
     }
 
-    public void getEventSuggestions()
+
+    /* Old */
+    public void getCreateEventSuggestions()
     {
 
         eventApi.getCreateEventSuggestion(new GetCreateEventSuggestionsApiRequest())

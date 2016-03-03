@@ -11,6 +11,8 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.List;
 
@@ -20,6 +22,7 @@ import reaper.android.app.model.ChatMessage;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.ui.util.DateTimeUtil;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
@@ -377,8 +380,25 @@ public class ChatService_
     {
         try
         {
-            return GsonProvider.getGson()
-                               .fromJson(message.getBody(), ChatMessage.class);
+            ChatMessage chatMessage = GsonProvider.getGson()
+                                                  .fromJson(message.getBody(), ChatMessage.class);
+
+            if (chatMessage.getSenderId() == null || chatMessage.getSenderId().isEmpty() ||
+                    chatMessage.getSenderName() == null || chatMessage.getSenderName().isEmpty() ||
+                    chatMessage.getMessage() == null || chatMessage.getMessage().isEmpty() ||
+                    chatMessage.getTimestamp() == null)
+            {
+                return null;
+            }
+
+            if (chatMessage.isAdmin())
+            {
+                return processAdminMessage(chatMessage);
+            }
+            else
+            {
+                return chatMessage;
+            }
         }
         catch (Exception e)
         {
@@ -397,5 +417,54 @@ public class ChatService_
     private String getNickname()
     {
         return userService.getSessionUserId();
+    }
+
+    private ChatMessage processAdminMessage(ChatMessage chatMessage)
+    {
+        try
+        {
+            String message = chatMessage.getMessage();
+            String[] messageTokens = message.split(":");
+
+            String typeToken = messageTokens[0];
+            if (typeToken.equalsIgnoreCase("start_time"))
+            {
+                String user = messageTokens[1];
+                String startTime = messageTokens[2];
+                String localStartTime = DateTime.parse(startTime)
+                                                .toDateTime(DateTimeZone.getDefault())
+                                                .toString(DateTimeUtil.DATE_TIME_FORMATTER);
+                chatMessage.setMessage(user + " updated start time to " + localStartTime);
+            }
+            else if (typeToken.equalsIgnoreCase("location"))
+            {
+                String user = messageTokens[1];
+                String location = messageTokens[2];
+                if (location.equalsIgnoreCase("0"))
+                {
+                    chatMessage.setMessage(user + " set location as undecided");
+                }
+                else
+                {
+                    chatMessage.setMessage(user + " updated location to " + location);
+                }
+            }
+            else if (typeToken.equalsIgnoreCase("invitation_response"))
+            {
+                String name = messageTokens[1];
+                String invitationResponse = messageTokens[2];
+                chatMessage.setMessage(name + " is not joining.\n'" + invitationResponse + "'");
+            }
+            else
+            {
+                return null;
+            }
+
+            return chatMessage;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 }

@@ -9,66 +9,52 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.R;
 
-public class LastMinuteStatusDialog
+public class InvitationResponseDialog
 {
     public interface Listener
     {
-        void onLastMinuteStatusSuggestionSelected(String suggestion);
+        void onInvitationResponseSuggestionSelected(String suggestion);
 
-        void onLastMinuteStatusEntered(String status);
+        void onInvitationResponseEntered(String invitationResponse);
 
-        void onLastMinuteStatusCancelled();
+        void onInvitationResponseCancelled();
     }
 
-    public static void show(Activity activity, String oldStatus, final Listener listener)
+    public static void show(Activity activity, final Listener listener)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setCancelable(true);
 
         LayoutInflater layoutInflater = activity.getLayoutInflater();
-        View dialogView = layoutInflater.inflate(R.layout.dialog_status, null);
+        View dialogView = layoutInflater.inflate(R.layout.dialog_invitation_response, null);
         builder.setView(dialogView);
 
-        TextView message = (TextView) dialogView.findViewById(R.id.tvMessage);
-        final EditText status = (EditText) dialogView.findViewById(R.id.etStatus);
-        ListView list = (ListView) dialogView.findViewById(R.id.lvStatus);
+        final EditText invitationResponse = (EditText) dialogView
+                .findViewById(R.id.etInvitationResponse);
+        ListView list = (ListView) dialogView.findViewById(R.id.lvInvitationResponse);
 
-        final List<String> statusList = new ArrayList<>();
-        statusList.add("On my way");
-        statusList.add("Running late");
-        statusList.add("Sorry, changed my mind");
-        statusList.add("Yippie-kai yay!");
+        final List<String> invitationResponses = new ArrayList<>();
+        invitationResponses.add("Not in mood");
+        invitationResponses.add("Sleeping");
+        invitationResponses.add("Fuck this clan and everyone in it");
 
-        ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(activity, R.layout.item_text, statusList);
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(activity, R.layout.item_text, invitationResponses);
         list.setAdapter(statusAdapter);
         list.setVisibility(View.VISIBLE);
-
-        message.setText(R.string.status_dialog_message_last_minute);
-
-        if (oldStatus == null || oldStatus.isEmpty())
-        {
-            status.setHint(R.string.status_default);
-        }
-        else
-        {
-            status.setText(oldStatus);
-            status.setSelection(oldStatus.length());
-        }
 
         list.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                status.setText(statusList.get(position));
-                listener.onLastMinuteStatusSuggestionSelected(statusList.get(position));
+                invitationResponse.setText(invitationResponses.get(position));
+                listener.onInvitationResponseSuggestionSelected(invitationResponses.get(position));
             }
         });
 
@@ -77,7 +63,7 @@ public class LastMinuteStatusDialog
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                listener.onLastMinuteStatusEntered(status.getText().toString());
+                listener.onInvitationResponseEntered(invitationResponse.getText().toString());
                 dialog.dismiss();
             }
         });
@@ -87,7 +73,7 @@ public class LastMinuteStatusDialog
             @Override
             public void onCancel(DialogInterface dialog)
             {
-                listener.onLastMinuteStatusCancelled();
+                listener.onInvitationResponseCancelled();
                 dialog.dismiss();
             }
         });
