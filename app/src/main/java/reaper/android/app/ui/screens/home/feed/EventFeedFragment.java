@@ -24,6 +24,7 @@ import reaper.android.app.ui.screens.home.HomeScreen;
 import reaper.android.app.ui.screens.home.feed.mvp.EventFeedPresenter;
 import reaper.android.app.ui.screens.home.feed.mvp.EventFeedPresenterImpl;
 import reaper.android.app.ui.screens.home.feed.mvp.EventFeedView;
+import reaper.android.app.ui.util.FriendBubbles;
 
 public class EventFeedFragment extends BaseFragment implements
         EventFeedView,
@@ -42,8 +43,14 @@ public class EventFeedFragment extends BaseFragment implements
     @Bind(R.id.rvFeed)
     RecyclerView rvFeed;
 
-    @Bind(R.id.tvNoEvents)
-    TextView tvNoEvents;
+    @Bind(R.id.llNoEvents)
+    View llNoEvents;
+
+    @Bind(R.id.tvMakePlan)
+    TextView tvMakePlan;
+
+    @Bind(R.id.friendBubbles)
+    View friendBubbles;
 
     @Bind(R.id.tvServerError)
     TextView tvServerError;
@@ -79,6 +86,16 @@ public class EventFeedFragment extends BaseFragment implements
     {
         super.onActivityCreated(savedInstanceState);
         screen = (HomeScreen) getActivity();
+
+        FriendBubbles.show(getActivity(), friendBubbles);
+        tvMakePlan.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                screen.navigateToCreateDetailsScreen(null, null, false, null, null);
+            }
+        });
 
         initSwipeRefresh();
         initRecyclerView();
@@ -116,7 +133,7 @@ public class EventFeedFragment extends BaseFragment implements
 
         srlFeed.setRefreshing(false);
         rvFeed.setVisibility(View.GONE);
-        tvNoEvents.setVisibility(View.GONE);
+        llNoEvents.setVisibility(View.GONE);
         tvServerError.setVisibility(View.GONE);
     }
 
@@ -124,7 +141,7 @@ public class EventFeedFragment extends BaseFragment implements
     public void showEvents(List<Event> events)
     {
         loading.setVisibility(View.GONE);
-        tvNoEvents.setVisibility(View.GONE);
+        llNoEvents.setVisibility(View.GONE);
         tvServerError.setVisibility(View.GONE);
 
         srlFeed.setRefreshing(false);
@@ -135,7 +152,7 @@ public class EventFeedFragment extends BaseFragment implements
     @Override
     public void showNoEventsMessage()
     {
-        tvNoEvents.setVisibility(View.VISIBLE);
+        llNoEvents.setVisibility(View.VISIBLE);
 
         srlFeed.setRefreshing(false);
         rvFeed.setVisibility(View.GONE);
@@ -150,7 +167,7 @@ public class EventFeedFragment extends BaseFragment implements
 
         srlFeed.setRefreshing(false);
         rvFeed.setVisibility(View.GONE);
-        tvNoEvents.setVisibility(View.GONE);
+        llNoEvents.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
     }
 
@@ -194,15 +211,18 @@ public class EventFeedFragment extends BaseFragment implements
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy)
             {
-                boolean enabled = false;
-                if (rvFeed.getChildCount() > 0)
+                if (rvFeed.getVisibility() == View.VISIBLE)
                 {
-                    LinearLayoutManager linearLayoutManager = (LinearLayoutManager) rvFeed
-                            .getLayoutManager();
+                    boolean enabled = false;
+                    if (rvFeed.getChildCount() > 0)
+                    {
+                        LinearLayoutManager linearLayoutManager = (LinearLayoutManager) rvFeed
+                                .getLayoutManager();
 
-                    enabled = linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0;
+                        enabled = linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0;
+                    }
+                    srlFeed.setEnabled(enabled);
                 }
-                srlFeed.setEnabled(enabled);
             }
         });
     }

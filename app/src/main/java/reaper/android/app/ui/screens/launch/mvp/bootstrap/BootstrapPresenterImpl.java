@@ -88,15 +88,14 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
                             @Override
                             public void onNext(Boolean isNewUser)
                             {
-//                                if (isNewUser)
-//                                {
-//                                    view.navigateToPendingInvitesScreen();
-//                                }
-//                                else
-//                                {
-//                                    view.proceed();
-//                                }
-                                view.navigateToPendingInvitesScreen();
+                                if (isNewUser)
+                                {
+                                    view.navigateToPendingInvitesScreen();
+                                }
+                                else
+                                {
+                                    view.proceed();
+                                }
                             }
                         });
 

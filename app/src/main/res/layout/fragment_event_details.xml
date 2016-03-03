@@ -185,19 +185,6 @@
             android:textColor="@color/text_title"
             android:textSize="16sp"/>
 
-        <!--<net.steamcrafted.materialiconlib.MaterialIconView-->
-        <!--android:id="@+id/mivEditStatus"-->
-        <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_below="@id/tvName"-->
-        <!--android:layout_marginTop="8dp"-->
-        <!--android:layout_toRightOf="@id/ivPic"-->
-        <!--android:scaleType="center"-->
-        <!--app:materialIcon="tooltip_edit"-->
-        <!--app:materialIconColor="@color/accent"-->
-        <!--app:materialIconSize="18dp"/>-->
-
         <ImageView
             android:id="@+id/ivStatus"
             android:layout_width="18dp"
@@ -224,7 +211,6 @@
             android:layout_alignParentTop="true"
             android:gravity="center_vertical"
             android:orientation="horizontal">
-
 
             <TextView
                 android:id="@+id/tvRsvp"
@@ -261,15 +247,34 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/tvNoAttendees"
+        <LinearLayout
+            android:id="@+id/llNoAttendees"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="@string/label_feed_no_friends"
-            android:textColor="@color/text_subtitle"
-            android:textSize="16sp"
-            android:visibility="gone"/>
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:gravity="center"
+                android:text="@string/label_feed_no_friends"
+                android:textColor="@color/text_subtitle"/>
+
+            <include layout="@layout/view_friend_bubbles"/>
+
+            <TextView
+                android:id="@+id/tvInvite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="Invite Friends"
+                android:textColor="@color/accent"/>
+
+        </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rvAttendees"

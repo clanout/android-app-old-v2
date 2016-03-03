@@ -48,6 +48,7 @@ import reaper.android.app.ui.screens.details.mvp.EventDetailsView;
 import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.DrawableFactory;
+import reaper.android.app.ui.util.FriendBubbles;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
 
@@ -122,8 +123,14 @@ public class EventDetailsFragment extends BaseFragment implements
     @Bind(R.id.loading)
     ProgressBar loading;
 
-    @Bind(R.id.tvNoAttendees)
-    TextView tvNoAttendees;
+    @Bind(R.id.llNoAttendees)
+    View llNoAttendees;
+
+    @Bind(R.id.tvInvite)
+    TextView tvInvite;
+
+    @Bind(R.id.friendBubbles)
+    View friendBubbles;
 
     @Bind(R.id.rvAttendees)
     RecyclerView rvAttendees;
@@ -163,6 +170,20 @@ public class EventDetailsFragment extends BaseFragment implements
     {
         super.onActivityCreated(savedInstanceState);
         screen = (EventDetailsScreen) getActivity();
+
+        FriendBubbles.show(getActivity(), friendBubbles);
+        tvInvite.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (presenter != null)
+                {
+                    presenter.invite();
+                }
+            }
+        });
+
         initRecyclerView();
     }
 
@@ -495,13 +516,13 @@ public class EventDetailsFragment extends BaseFragment implements
     {
         if (attendees.isEmpty())
         {
-            tvNoAttendees.setVisibility(View.VISIBLE);
+            llNoAttendees.setVisibility(View.VISIBLE);
             rvAttendees.setVisibility(View.GONE);
         }
         else
         {
             rvAttendees.setAdapter(new EventAttendeesAdapter(attendees, getActivity()));
-            tvNoAttendees.setVisibility(View.GONE);
+            llNoAttendees.setVisibility(View.GONE);
             rvAttendees.setVisibility(View.VISIBLE);
         }
     }
