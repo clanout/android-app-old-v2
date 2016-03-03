@@ -1,5 +1,7 @@
 package reaper.android.app.service;
 
+import android.util.Pair;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -193,14 +195,22 @@ public class UserService
                         }
                         else
                         {
-                            return _fetchFacebookFriendsNetwork(false);
+                            return _fetchFacebookFriendsNetwork(false)
+                                    .map(new Func1<Pair<List<Friend>, List<Friend>>, List<Friend>>()
+                                    {
+                                        @Override
+                                        public List<Friend> call(Pair<List<Friend>, List<Friend>> allFriends)
+                                        {
+                                            return allFriends.first;
+                                        }
+                                    });
                         }
                     }
                 })
                 .subscribeOn(Schedulers.newThread());
     }
 
-    public Observable<List<Friend>> _fetchFacebookFriendsNetwork(final boolean fetchAll)
+    public Observable<Pair<List<Friend>, List<Friend>>> _fetchFacebookFriendsNetwork(final boolean fetchAll)
     {
         GetFacebookFriendsApiRequest request = new GetFacebookFriendsApiRequest(null);
         if (!fetchAll)
@@ -210,26 +220,26 @@ public class UserService
         }
 
         return userApi.getFacebookFriends(request)
-                      .map(new Func1<GetFacebookFriendsApiResponse, List<Friend>>()
+                      .map(new Func1<GetFacebookFriendsApiResponse, Pair<List<Friend>, List<Friend>>>()
                       {
                           @Override
-                          public List<Friend> call(GetFacebookFriendsApiResponse response)
+                          public Pair<List<Friend>, List<Friend>> call(GetFacebookFriendsApiResponse response)
                           {
-                              List<Friend> facebookFriends = response.getFriends();
-                              Collections.sort(facebookFriends, new FriendsComparator());
-                              return facebookFriends;
+                              List<Friend> localFriends = response.getFriends();
+                              List<Friend> otherFriends = response.getOtherFriends();
+                              Collections.sort(localFriends, new FriendsComparator());
+                              Collections.sort(otherFriends, new FriendsComparator());
+                              return new Pair<>(localFriends, otherFriends);
                           }
                       })
-                      .doOnNext(new Action1<List<Friend>>()
+                      .doOnNext(new Action1<Pair<List<Friend>, List<Friend>>>()
                       {
                           @Override
-                          public void call(List<Friend> friends)
+                          public void call(Pair<List<Friend>, List<Friend>> friends)
                           {
-                              if (!fetchAll)
-                              {
-                                  // Cache Local Friends
-                                  userCache.saveFriends(friends);
-                              }
+                              List<Friend> localFriends = friends.first;
+                              // Cache Local Friends
+                              userCache.saveFriends(localFriends);
                           }
                       })
                       .subscribeOn(Schedulers.newThread());
@@ -363,13 +373,15 @@ public class UserService
     {
         return Observable
                 .zip(_fetchFacebookFriendsNetwork(false), _fetchRegisteredContactsNetwork(false),
-                        new Func2<List<Friend>, List<Friend>, List<Friend>>()
+                        new Func2<Pair<List<Friend>, List<Friend>>, List<Friend>, List<Friend>>()
                         {
                             @Override
-                            public List<Friend> call(List<Friend> facebookFriends, List<Friend> registeredContacts)
+                            public List<Friend> call(Pair<List<Friend>, List<Friend>> allFacebookFriends, List<Friend> registeredContacts)
                             {
+                                List<Friend> localFacebookFriends = allFacebookFriends.first;
+
                                 Set<Friend> allFriends = new HashSet<Friend>();
-                                allFriends.addAll(facebookFriends);
+                                allFriends.addAll(localFacebookFriends);
                                 allFriends.addAll(registeredContacts);
                                 return new ArrayList<>(allFriends);
                             }

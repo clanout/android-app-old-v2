@@ -21,6 +21,7 @@ import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.model.Friend;
 import reaper.android.app.service.UserService;
+import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.friends.mvp.FriendsPresenter;
 import reaper.android.app.ui.screens.friends.mvp.FriendsPresenterImpl;
@@ -53,7 +54,10 @@ public class FriendsFragment extends BaseFragment implements
     EditText etSearch;
 
     TextWatcher search;
-    List<Friend> allFriends;
+
+    List<Friend> localFriends;
+    List<Friend> otherFriends;
+    String locationZone;
 
     /* Lifecycle Methods */
     @Override
@@ -64,8 +68,11 @@ public class FriendsFragment extends BaseFragment implements
         /* User Service */
         UserService userService = UserService.getInstance();
 
+        /* Location Service */
+        LocationService_ locationService = LocationService_.getInstance();
+
         /* Presenter */
-        presenter = new FriendsPresenterImpl(userService);
+        presenter = new FriendsPresenterImpl(userService, locationService);
     }
 
     @Nullable
@@ -141,25 +148,29 @@ public class FriendsFragment extends BaseFragment implements
     }
 
     @Override
-    public void displayFriends(List<Friend> friends)
+    public void displayFriends(List<Friend> localFriends, List<Friend> otherFriends, String locationZone)
     {
-        allFriends = friends;
+        this.localFriends = localFriends;
+        this.otherFriends = otherFriends;
+        this.locationZone = locationZone;
+
         initSearch();
         etSearch.addTextChangedListener(search);
 
-        refreshRecyclerView(friends);
+        refreshRecyclerView(localFriends, otherFriends, locationZone);
     }
 
     /* Helper Methods */
     private void initRecyclerView()
     {
         rvFriends.setLayoutManager(new LinearLayoutManager(getActivity()));
-        refreshRecyclerView(new ArrayList<Friend>());
+        refreshRecyclerView(new ArrayList<Friend>(), new ArrayList<Friend>(), null);
     }
 
-    private void refreshRecyclerView(List<Friend> visibleFriends)
+    private void refreshRecyclerView(List<Friend> visibleLocalFriends, List<Friend> visibleOtherFriends, String locationZone)
     {
-        rvFriends.setAdapter(new FriendAdapter(getActivity(), visibleFriends, this));
+        rvFriends
+                .setAdapter(new FriendAdapter(getActivity(), visibleLocalFriends, visibleOtherFriends, locationZone, this));
 
         rvFriends.setVisibility(View.VISIBLE);
         tvMessage.setVisibility(View.GONE);
@@ -178,30 +189,41 @@ public class FriendsFragment extends BaseFragment implements
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count)
             {
-                List<Friend> visibleFriendList = new ArrayList<>();
+                List<Friend> visibleLocalFriends = new ArrayList<>();
+                List<Friend> visibleOtherFriends = new ArrayList<>();
+
                 if (s.length() >= 1)
                 {
-                    visibleFriendList = new ArrayList<>();
-                    for (Friend friend : allFriends)
+                    visibleLocalFriends = new ArrayList<>();
+                    for (Friend friend : localFriends)
                     {
                         if (friend.getName().toLowerCase().contains(s.toString().toLowerCase()))
                         {
-                            visibleFriendList.add(friend);
+                            visibleLocalFriends.add(friend);
                         }
                     }
 
-                    if (visibleFriendList.size() == 0)
+                    visibleOtherFriends = new ArrayList<>();
+                    for (Friend friend : otherFriends)
+                    {
+                        if (friend.getName().toLowerCase().contains(s.toString().toLowerCase()))
+                        {
+                            visibleOtherFriends.add(friend);
+                        }
+                    }
+
+                    if (visibleLocalFriends.isEmpty() && visibleOtherFriends.isEmpty())
                     {
                         displayNoFriendsMessage();
                     }
                     else
                     {
-                        refreshRecyclerView(visibleFriendList);
+                        refreshRecyclerView(visibleLocalFriends, visibleOtherFriends, locationZone);
                     }
                 }
                 else if (s.length() == 0)
                 {
-                    refreshRecyclerView(allFriends);
+                    refreshRecyclerView(localFriends, otherFriends, locationZone);
                 }
             }
 

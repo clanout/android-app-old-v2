@@ -1,10 +1,13 @@
 package reaper.android.app.ui.screens.friends.mvp;
 
+import android.util.Pair;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import reaper.android.app.model.Friend;
 import reaper.android.app.service.UserService;
+import reaper.android.app.service._new.LocationService_;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -14,15 +17,17 @@ public class FriendsPresenterImpl implements FriendsPresenter
 {
     private FriendsView view;
     private UserService userService;
+    private LocationService_ locationService;
 
     private List<String> blockUpdates;
     private List<String> unblockUpdates;
 
     private CompositeSubscription subscriptions;
 
-    public FriendsPresenterImpl(UserService userService)
+    public FriendsPresenterImpl(UserService userService, LocationService_ locationService)
     {
         this.userService = userService;
+        this.locationService = locationService;
 
         blockUpdates = new ArrayList<>();
         unblockUpdates = new ArrayList<>();
@@ -88,7 +93,7 @@ public class FriendsPresenterImpl implements FriendsPresenter
                 userService
                         ._fetchFacebookFriendsNetwork(true)
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Subscriber<List<Friend>>()
+                        .subscribe(new Subscriber<Pair<List<Friend>, List<Friend>>>()
                         {
                             @Override
                             public void onCompleted()
@@ -103,9 +108,13 @@ public class FriendsPresenterImpl implements FriendsPresenter
                             }
 
                             @Override
-                            public void onNext(List<Friend> friends)
+                            public void onNext(Pair<List<Friend>, List<Friend>> allFriends)
                             {
-                                view.displayFriends(friends);
+                                List<Friend> localFriends = allFriends.first;
+                                List<Friend> otherFriends = allFriends.second;
+
+                                view.displayFriends(localFriends, otherFriends, locationService
+                                        .getCurrentLocation().getZone());
                             }
                         });
 

@@ -297,12 +297,12 @@ public class InvitePresenterImpl implements InvitePresenter
             return Observable
                     .zip(userService._fetchFacebookFriendsNetwork(false),
                             eventService._fetchDetails(eventId),
-                            new Func2<List<Friend>, EventDetails, Pair<List<FriendInviteWrapper>, List<PhonebookContactInviteWrapper>>>()
+                            new Func2<Pair<List<Friend>, List<Friend>>, EventDetails, Pair<List<FriendInviteWrapper>, List<PhonebookContactInviteWrapper>>>()
                             {
                                 @Override
-                                public Pair<List<FriendInviteWrapper>, List<PhonebookContactInviteWrapper>> call(List<Friend> facebookFriends, EventDetails eventDetails)
+                                public Pair<List<FriendInviteWrapper>, List<PhonebookContactInviteWrapper>> call(Pair<List<Friend>, List<Friend>> allFacebookFriends, EventDetails eventDetails)
                                 {
-                                    List<FriendInviteWrapper> facebookFriendInviteWrappers = prepareFriendInviteWrappers(eventDetails, facebookFriends);
+                                    List<FriendInviteWrapper> facebookFriendInviteWrappers = prepareFriendInviteWrappers(eventDetails, allFacebookFriends.first);
                                     List<PhonebookContactInviteWrapper> phonebookContactInviteWrappers = new ArrayList<>();
                                     return new Pair<>(facebookFriendInviteWrappers, phonebookContactInviteWrappers);
                                 }

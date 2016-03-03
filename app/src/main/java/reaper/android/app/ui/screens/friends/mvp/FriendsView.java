@@ -12,7 +12,7 @@ public interface FriendsView
 
     void displayError();
 
-    void displayFriends(List<Friend> friends);
+    void displayFriends(List<Friend> localFriends, List<Friend> otherFriends, String locationZone);
 
     interface FriendListItem
     {
