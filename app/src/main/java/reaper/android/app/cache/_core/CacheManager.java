@@ -55,12 +55,13 @@ public class CacheManager
         notificationCache.clearAll();
     }
 
-    public static void clearEventsAndFriends()
+    public static void clearFriendsCache()
     {
         UserCache userCache = getUserCache();
         EventCache eventCache = getEventCache();
 
         userCache.deleteFriends();
+        userCache.deleteContacts();
         eventCache.deleteAll();
     }
 }

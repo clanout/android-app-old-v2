@@ -9,6 +9,7 @@ import reaper.android.app.api.user.request.UpdateMobileAPiRequest;
 import reaper.android.app.api.user.request.UpdateUserLocationApiRequest;
 import reaper.android.app.api.user.response.GetFacebookFriendsApiResponse;
 import reaper.android.app.api.user.response.GetRegisteredContactsApiResponse;
+import reaper.android.app.api.user.response.UpdateUserLocationApiResponse;
 import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.POST;
@@ -17,7 +18,7 @@ import rx.Observable;
 public interface UserApi
 {
     @POST("/me/location")
-    Observable<Response> updateUserLocation(@Body UpdateUserLocationApiRequest request);
+    Observable<UpdateUserLocationApiResponse> updateUserLocation(@Body UpdateUserLocationApiRequest request);
 
     @POST("/me/phone")
     Observable<Response> updateMobile(@Body UpdateMobileAPiRequest request);

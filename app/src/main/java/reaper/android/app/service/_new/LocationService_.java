@@ -19,8 +19,9 @@ import java.util.Locale;
 import reaper.android.app.api._core.ApiManager;
 import reaper.android.app.api.user.UserApi;
 import reaper.android.app.api.user.request.UpdateUserLocationApiRequest;
+import reaper.android.app.api.user.response.UpdateUserLocationApiResponse;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.model.Location;
-import retrofit.client.Response;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -270,23 +271,42 @@ public class LocationService_
 
         UpdateUserLocationApiRequest request = new UpdateUserLocationApiRequest(location.getZone());
         return userApi.updateUserLocation(request)
-                      .map(new Func1<Response, Boolean>()
-                    {
-                        @Override
-                        public Boolean call(Response response)
-                        {
-                            return true;
-                        }
-                    })
+                      .map(new Func1<UpdateUserLocationApiResponse, Boolean>()
+                      {
+                          @Override
+                          public Boolean call(UpdateUserLocationApiResponse response)
+                          {
+                              return response.isRelocated();
+                          }
+                      })
+                      .doOnNext(new Action1<Boolean>()
+                      {
+                          @Override
+                          public void call(Boolean isRelocated)
+                          {
+                              if (isRelocated)
+                              {
+                                  CacheManager.clearFriendsCache();
+                              }
+                          }
+                      })
+                      .map(new Func1<Boolean, Boolean>()
+                      {
+                          @Override
+                          public Boolean call(Boolean isRelocated)
+                          {
+                              return true;
+                          }
+                      })
                       .onErrorReturn(new Func1<Throwable, Boolean>()
-                    {
-                        @Override
-                        public Boolean call(Throwable e)
-                        {
-                            Timber.v("[Failed to push updated location] " + e.getMessage());
-                            return false;
-                        }
-                    })
+                      {
+                          @Override
+                          public Boolean call(Throwable e)
+                          {
+                              Timber.v("[Failed to push updated location] " + e.getMessage());
+                              return false;
+                          }
+                      })
                       .subscribeOn(Schedulers.newThread());
     }
 }

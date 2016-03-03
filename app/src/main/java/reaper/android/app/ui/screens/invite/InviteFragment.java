@@ -39,6 +39,7 @@ import reaper.android.app.ui.screens.invite.mvp.InvitePresenterImpl;
 import reaper.android.app.ui.screens.invite.mvp.InviteView;
 import reaper.android.app.ui.screens.invite.mvp.PhonebookContactInviteWrapper;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
+import reaper.android.common._debugger.TraceDebugger;
 
 public class InviteFragment extends BaseFragment implements
         InviteView,
@@ -155,6 +156,7 @@ public class InviteFragment extends BaseFragment implements
             }
         });
 
+        llPermission.setVisibility(View.GONE);
         screen.setReadContactsPermissionListener(this);
         presenter.attachView(this);
     }
@@ -242,7 +244,11 @@ public class InviteFragment extends BaseFragment implements
     {
         llPermission.setOnClickListener(null);
         presenter.attachView(this);
-        VisibilityAnimationUtil.collapse(llPermission, 200);
+
+        if (llPermission.getVisibility() != View.GONE)
+        {
+            VisibilityAnimationUtil.collapse(llPermission, 200);
+        }
     }
 
     @Override
@@ -258,7 +264,10 @@ public class InviteFragment extends BaseFragment implements
             }
         });
 
-        VisibilityAnimationUtil.expand(llPermission, 200);
+        if (llPermission.getVisibility() != View.VISIBLE)
+        {
+            VisibilityAnimationUtil.expand(llPermission, 200);
+        }
     }
 
     @Override
@@ -273,7 +282,10 @@ public class InviteFragment extends BaseFragment implements
             }
         });
 
-        VisibilityAnimationUtil.expand(llPermission, 200);
+        if (llPermission.getVisibility() != View.VISIBLE)
+        {
+            VisibilityAnimationUtil.expand(llPermission, 200);
+        }
     }
 
     /* Listeners */
@@ -354,6 +366,7 @@ public class InviteFragment extends BaseFragment implements
     @Override
     public void displayError()
     {
+        TraceDebugger.print("InviteError");
         llError.setVisibility(View.VISIBLE);
         tvRetry.setOnClickListener(new View.OnClickListener()
         {

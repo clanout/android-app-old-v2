@@ -175,7 +175,7 @@ public class UserService
                    @Override
                    public void onNext(Response response)
                    {
-                       CacheManager.clearEventsAndFriends();
+                       CacheManager.clearFriendsCache();
                    }
                });
     }
