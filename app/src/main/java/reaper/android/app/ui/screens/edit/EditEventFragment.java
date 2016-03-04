@@ -1,7 +1,6 @@
 package reaper.android.app.ui.screens.edit;
 
 import android.app.ProgressDialog;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -34,6 +33,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import reaper.android.R;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.model.Event;
@@ -41,7 +41,6 @@ import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.LocationSuggestion;
-import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.PlacesService;
 import reaper.android.app.service.UserService;
@@ -52,8 +51,8 @@ import reaper.android.app.ui.dialog.DefaultDialog;
 import reaper.android.app.ui.screens.edit.mvp.EditEventPresenter;
 import reaper.android.app.ui.screens.edit.mvp.EditEventPresenterImpl;
 import reaper.android.app.ui.screens.edit.mvp.EditEventView;
-import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.CategoryIconFactory;
+import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 
@@ -202,27 +201,6 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.action_edit, menu);
 
-        Drawable drawable = MaterialDrawableBuilder
-                .with(Reaper.getReaperContext())
-                .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
-                .setColor(Color.WHITE)
-                .build();
-
-        menu.findItem(R.id.action_edit)
-            .setIcon(drawable);
-
-        menu.findItem(R.id.action_edit)
-            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-            {
-                @Override
-                public boolean onMenuItemClick(MenuItem item)
-                {
-                    SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
-                    edit();
-                    return true;
-                }
-            });
-
         finalize = menu.findItem(R.id.action_finalize);
         delete = menu.findItem(R.id.action_delete);
 
@@ -297,6 +275,14 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
                 return true;
             }
         });
+    }
+
+    /* Listeners */
+    @OnClick(R.id.fabEdit)
+    public void onEditClicked()
+    {
+        SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+        edit();
     }
 
     /* View Methods */

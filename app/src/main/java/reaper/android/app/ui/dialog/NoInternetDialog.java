@@ -4,10 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.design.widget.BottomSheetDialog;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 
 import reaper.android.R;
@@ -17,15 +16,16 @@ public class NoInternetDialog
 {
     public static void show(Activity activity)
     {
-        final BottomSheetDialog dialog = new BottomSheetDialog(activity);
-        dialog.setCanceledOnTouchOutside(true);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setCancelable(false);
 
-        View view = LayoutInflater.from(activity)
-                                  .inflate(R.layout.dialog_no_internet, (ViewGroup) activity
-                                          .findViewById(android.R.id.content), false);
-        dialog.setContentView(view);
+        LayoutInflater layoutInflater = activity.getLayoutInflater();
+        final View dialogView = layoutInflater.inflate(R.layout.dialog_no_internet, null);
+        builder.setView(dialogView);
 
-        Button btnRetry = (Button) view.findViewById(R.id.btnRetry);
+        final AlertDialog dialog = builder.create();
+
+        Button btnRetry = (Button) dialogView.findViewById(R.id.btnRetry);
         btnRetry.setOnClickListener(new View.OnClickListener()
         {
             @Override

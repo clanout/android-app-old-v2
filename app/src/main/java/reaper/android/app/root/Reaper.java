@@ -3,8 +3,6 @@ package reaper.android.app.root;
 import android.app.Application;
 import android.content.Context;
 import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.support.multidex.MultiDex;
 
 import com.facebook.FacebookSdk;
@@ -13,8 +11,6 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
-
-import java.util.concurrent.TimeUnit;
 
 import reaper.android.BuildConfig;
 import reaper.android.app.cache._core.DatabaseManager;
@@ -28,19 +24,12 @@ import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.service._new.PhonebookService_;
 import reaper.android.app.service._new.WhatsappService_;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 public class Reaper extends Application
 {
     private static Reaper instance;
     private static Tracker tracker;
-
-    private boolean isConnected;
 
     public static Reaper getReaperContext()
     {
@@ -144,53 +133,5 @@ public class Reaper extends Application
 
         /* WhatsApp Service */
         WhatsappService_.init(userService);
-    }
-
-    private void connectivityHandler()
-    {
-        isConnected = true;
-
-        Observable
-                .interval(5, TimeUnit.SECONDS)
-                .map(new Func1<Long, Boolean>()
-                {
-                    @Override
-                    public Boolean call(Long aLong)
-                    {
-                        ConnectivityManager cm = (ConnectivityManager) getApplicationContext()
-                                .getSystemService(Context.CONNECTIVITY_SERVICE);
-                        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-
-                        return (netInfo != null && netInfo.isConnected());
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Boolean>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                    }
-
-                    @Override
-                    public void onNext(Boolean isConnectedNow)
-                    {
-                        if (isConnected && !isConnectedNow)
-                        {
-//                            startActivity(NoInternetActivity
-//                                    .callingIntent(getApplicationContext()));
-                        }
-
-                        isConnected = isConnectedNow;
-                    }
-                });
-
     }
 }

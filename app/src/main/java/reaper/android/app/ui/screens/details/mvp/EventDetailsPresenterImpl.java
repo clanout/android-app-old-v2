@@ -33,6 +33,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     private boolean isLastMinute;
 
     private boolean isRsvpUpdateInProgress;
+    private boolean isEditClicked;
 
     /* Subscriptions */
     private CompositeSubscription subscriptions;
@@ -161,13 +162,11 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     @Override
     public void edit()
     {
-        if (EventUtils.isOrganiser(event, userService.getSessionUserId()))
+        isEditClicked = true;
+
+        if (eventDetails != null)
         {
-            view.navigateToEditScreen(event, eventDetails);
-        }
-        else
-        {
-            view.displayEventFinalizedMessage();
+            editEvent();
         }
     }
 
@@ -322,6 +321,11 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
 
         Collections.sort(attendees, new EventAttendeeComparator(userService.getSessionUserId()));
         view.displayAttendeeList(attendees);
+
+        if (isEditClicked)
+        {
+            editEvent();
+        }
     }
 
     private void setEditAction()
@@ -363,5 +367,18 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     private boolean isInvited()
     {
         return event.getInviterCount() > 0;
+    }
+
+    private void editEvent()
+    {
+        isEditClicked = false;
+        if (EventUtils.isOrganiser(event, userService.getSessionUserId()))
+        {
+            view.navigateToEditScreen(event, eventDetails);
+        }
+        else
+        {
+            view.displayEventFinalizedMessage();
+        }
     }
 }

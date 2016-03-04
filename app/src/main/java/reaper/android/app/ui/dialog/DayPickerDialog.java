@@ -24,7 +24,7 @@ public class DayPickerDialog
     public static void show(Activity activity, List<String> days, int selectedDayPosition, final Listener listener)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setCancelable(false);
+        builder.setCancelable(true);
 
         LayoutInflater layoutInflater = activity.getLayoutInflater();
         View dialogView = layoutInflater.inflate(R.layout.dialog_day_picker, null);
@@ -51,7 +51,7 @@ public class DayPickerDialog
         Rect displayRectangle = new Rect();
         Window window = activity.getWindow();
         window.getDecorView().getWindowVisibleDisplayFrame(displayRectangle);
-        int width = (int) (displayRectangle.width() * 0.80f);
+        int width = (int) (displayRectangle.width() * 0.50f);
         alertDialog.getWindow().setLayout(width, LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
 
         alertDialog.show();

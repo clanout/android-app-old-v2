@@ -563,7 +563,6 @@ public class LauncherActivity extends BaseActivity implements
 
     private void displayBootstrapView()
     {
-        TraceDebugger.print("qwerty");
         llFb.setVisibility(View.GONE);
         rlBootstrap.setVisibility(View.VISIBLE);
     }

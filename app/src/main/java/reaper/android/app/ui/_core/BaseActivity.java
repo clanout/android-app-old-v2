@@ -1,6 +1,9 @@
 package reaper.android.app.ui._core;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
@@ -10,17 +13,78 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import java.util.concurrent.TimeUnit;
+
 import reaper.android.R;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.config.MemoryCacheKeys;
+import reaper.android.app.ui.dialog.NoInternetDialog;
+import rx.Observable;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 public class BaseActivity extends AppCompatActivity
 {
+    private boolean isConnected;
+    private Subscription noInternetSubscription;
+
+    private void initConnectivityHandler()
+    {
+        isConnected = true;
+
+        noInternetSubscription =
+                Observable
+                        .interval(5, TimeUnit.SECONDS)
+                        .map(new Func1<Long, Boolean>()
+                        {
+                            @Override
+                            public Boolean call(Long aLong)
+                            {
+                                ConnectivityManager cm = (ConnectivityManager) getApplicationContext()
+                                        .getSystemService(Context.CONNECTIVITY_SERVICE);
+                                NetworkInfo netInfo = cm.getActiveNetworkInfo();
+
+                                return (netInfo != null && netInfo.isConnected());
+                            }
+                        })
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<Boolean>()
+                        {
+                            @Override
+                            public void onCompleted()
+                            {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e)
+                            {
+                            }
+
+                            @Override
+                            public void onNext(Boolean isConnectedNow)
+                            {
+                                if (isConnected && !isConnectedNow)
+                                {
+                                    NoInternetDialog.show(BaseActivity.this);
+                                }
+
+                                isConnected = isConnectedNow;
+                            }
+                        });
+
+    }
+
     @Override
     protected void onResume()
     {
         super.onResume();
         CacheManager.getMemoryCache().put(MemoryCacheKeys.IS_APP_IN_FOREGROUND, true);
+        initConnectivityHandler();
     }
 
     @Override
@@ -28,6 +92,7 @@ public class BaseActivity extends AppCompatActivity
     {
         super.onPause();
         CacheManager.getMemoryCache().put(MemoryCacheKeys.IS_APP_IN_FOREGROUND, false);
+        noInternetSubscription.unsubscribe();
     }
 
     protected void gotoAppSettings()
