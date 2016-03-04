@@ -303,6 +303,156 @@ public class SQLiteNotificationCache implements NotificationCache
     }
 
     @Override
+    public Observable<List<Notification>> getAllForType(final int type)
+    {
+        return Observable
+                .create(new Observable.OnSubscribe<List<Notification>>()
+                {
+                    @Override
+                    public void call(Subscriber<? super List<Notification>> subscriber)
+                    {
+
+                        Timber.v("NotificationCache.getAllForType() on thread = " + Thread.currentThread()
+                                .getName());
+
+                        List<Notification> notifications = new ArrayList<Notification>();
+
+                        SQLiteDatabase db = databaseManager.openConnection();
+                        String[] projection = {
+                                SQLiteCacheContract.Notification.COLUMN_ID,
+                                SQLiteCacheContract.Notification.COLUMN_TYPE,
+                                SQLiteCacheContract.Notification.COLUMN_TITLE,
+                                SQLiteCacheContract.Notification.COLUMN_MESSAGE,
+                                SQLiteCacheContract.Notification.COLUMN_EVENT_ID,
+                                SQLiteCacheContract.Notification.COLUMN_EVENT_NAME,
+                                SQLiteCacheContract.Notification.COLUMN_USER_ID,
+                                SQLiteCacheContract.Notification.COLUMN_USER_NAME,
+                                SQLiteCacheContract.Notification.COLUMN_TIMESTAMP,
+                                SQLiteCacheContract.Notification.COLUMN_IS_NEW
+                        };
+
+                        String selection = SQLiteCacheContract.Notification.COLUMN_TYPE + " = ?";
+                        String[] selectionArgs = {String.valueOf(type)};
+
+                        Cursor cursor = db
+                                .query(SQLiteCacheContract.Notification.TABLE_NAME, projection, selection, selectionArgs, null, null, SQLiteCacheContract.Notification.COLUMN_TIMESTAMP + " DESC");
+                        cursor.moveToFirst();
+                        while (!cursor.isAfterLast())
+                        {
+                            try
+                            {
+                                Notification notification = new Notification
+                                        .Builder(cursor.getInt(0))
+                                        .type(cursor.getInt(1))
+                                        .title(cursor.getString(2))
+                                        .message(cursor.getString(3))
+                                        .eventId(cursor.getString(4))
+                                        .eventName(cursor.getString(5))
+                                        .userId(cursor.getString(6))
+                                        .userName(cursor.getString(7))
+                                        .timestamp(new DateTime(cursor.getLong(8)))
+                                        .isNew(Boolean.parseBoolean(cursor.getString(9)))
+                                        .build();
+
+                                notifications.add(notification);
+                            }
+                            catch (Exception e)
+                            {
+                                Timber.v("Unable to process a notification [" + e
+                                        .getMessage() + "]");
+                            }
+
+                            cursor.moveToNext();
+                        }
+                        cursor.close();
+                        databaseManager.closeConnection();
+
+                        subscriber.onNext(notifications);
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Observable<List<Notification>> getAllForEvent(final String eventId)
+    {
+        return Observable
+                .create(new Observable.OnSubscribe<List<Notification>>()
+                {
+                    @Override
+                    public void call(Subscriber<? super List<Notification>> subscriber)
+                    {
+
+                        Timber.v("NotificationCache.getAllForType() on thread = " + Thread.currentThread()
+                                .getName());
+
+                        List<Notification> notifications = new ArrayList<Notification>();
+
+                        SQLiteDatabase db = databaseManager.openConnection();
+                        String[] projection = {
+                                SQLiteCacheContract.Notification.COLUMN_ID,
+                                SQLiteCacheContract.Notification.COLUMN_TYPE,
+                                SQLiteCacheContract.Notification.COLUMN_TITLE,
+                                SQLiteCacheContract.Notification.COLUMN_MESSAGE,
+                                SQLiteCacheContract.Notification.COLUMN_EVENT_ID,
+                                SQLiteCacheContract.Notification.COLUMN_EVENT_NAME,
+                                SQLiteCacheContract.Notification.COLUMN_USER_ID,
+                                SQLiteCacheContract.Notification.COLUMN_USER_NAME,
+                                SQLiteCacheContract.Notification.COLUMN_TIMESTAMP,
+                                SQLiteCacheContract.Notification.COLUMN_IS_NEW
+                        };
+
+                        String selection = SQLiteCacheContract.Notification.COLUMN_EVENT_ID + " = ?";
+                        String[] selectionArgs = {String.valueOf(eventId)};
+
+                        Cursor cursor = db
+                                .query(SQLiteCacheContract.Notification.TABLE_NAME, projection, selection, selectionArgs, null, null, SQLiteCacheContract.Notification.COLUMN_TIMESTAMP + " DESC");
+                        cursor.moveToFirst();
+                        while (!cursor.isAfterLast())
+                        {
+                            try
+                            {
+                                Notification notification = new Notification
+                                        .Builder(cursor.getInt(0))
+                                        .type(cursor.getInt(1))
+                                        .title(cursor.getString(2))
+                                        .message(cursor.getString(3))
+                                        .eventId(cursor.getString(4))
+                                        .eventName(cursor.getString(5))
+                                        .userId(cursor.getString(6))
+                                        .userName(cursor.getString(7))
+                                        .timestamp(new DateTime(cursor.getLong(8)))
+                                        .isNew(Boolean.parseBoolean(cursor.getString(9)))
+                                        .build();
+
+                                notifications.add(notification);
+                            }
+                            catch (Exception e)
+                            {
+                                Timber.v("Unable to process a notification [" + e
+                                        .getMessage() + "]");
+                            }
+
+                            cursor.moveToNext();
+                        }
+                        cursor.close();
+                        databaseManager.closeConnection();
+
+                        subscriber.onNext(notifications);
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Observable<List<Notification>> getAll(int type, String eventId)
+    {
+        return null;
+    }
+
+    @Override
     public void clearAll() {
 
         synchronized (TAG)

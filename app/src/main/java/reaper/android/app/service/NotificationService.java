@@ -48,8 +48,7 @@ public class NotificationService
 
     public static NotificationService getInstance()
     {
-        if (instance == null)
-        {
+        if (instance == null) {
             instance = new NotificationService();
         }
 
@@ -81,28 +80,26 @@ public class NotificationService
     {
         return Observable
                 .zip(notificationCache.getAll(), eventService
-                        ._fetchEvents(), new Func2<List<Notification>, List<Event>, List<Notification>>()
+                        ._fetchEvents(), new Func2<List<Notification>, List<Event>,
+                        List<Notification>>()
                 {
                     @Override
-                    public List<Notification> call(List<Notification> notifications, List<Event> events)
+                    public List<Notification> call(List<Notification> notifications, List<Event>
+                            events)
                     {
                         List<Notification> filtered = new ArrayList<Notification>();
 
-                        for (Notification notification : notifications)
-                        {
+                        for (Notification notification : notifications) {
                             String eventId = notification.getEventId();
 
-                            if (eventId == null || eventId.isEmpty())
-                            {
+                            if (eventId == null || eventId.isEmpty()) {
                                 filtered.add(notification);
                             }
-                            else
-                            {
+                            else {
                                 Event event = new Event();
                                 event.setId(eventId);
 
-                                if (events.contains(event))
-                                {
+                                if (events.contains(event)) {
                                     filtered.add(notification);
                                 }
                             }
@@ -118,8 +115,7 @@ public class NotificationService
     {
         int notificationType = notification.getType();
 
-        switch (notificationType)
-        {
+        switch (notificationType) {
             case Notification.EVENT_CREATED:
                 showCreateEventNotification(notification);
                 break;
@@ -159,110 +155,102 @@ public class NotificationService
     private void handleNewStatusUpdateNotification(final Notification notification)
     {
 
-        if (!(notification.getArgs().get("user_id").equals(userService.getSessionUserId())))
-        {
+        if (!(notification.getArgs().get("user_id").equals(userService.getSessionUserId()))) {
             notificationCache.put(notification).observeOn(Schedulers.newThread())
-                             .subscribe(new Subscriber<Object>()
-                             {
-                                 @Override
-                                 public void onCompleted()
-                                 {
+                    .subscribe(new Subscriber<Object>()
+                    {
+                        @Override
+                        public void onCompleted()
+                        {
 
-                                     if (ifAppRunningInForeground())
-                                     {
-                                         bus.post(new NewNotificationReceivedTrigger());
+                            if (ifAppRunningInForeground()) {
+                                bus.post(new NewNotificationReceivedTrigger());
 
-                                     }
-                                     else
-                                     {
-                                         buildNotification(notification, true, false);
-                                     }
-                                 }
+                            }
+                            else {
+                                buildNotification(notification, true, false);
+                            }
+                        }
 
-                                 @Override
-                                 public void onError(Throwable e)
-                                 {
+                        @Override
+                        public void onError(Throwable e)
+                        {
 
-                                 }
+                        }
 
-                                 @Override
-                                 public void onNext(Object o)
-                                 {
+                        @Override
+                        public void onNext(Object o)
+                        {
 
-                                 }
-                             });
+                        }
+                    });
         }
     }
 
     private void handleNewChatMessageNotification(final Notification notification)
     {
 
-        if (!(notification.getArgs().get("user_id").equals(userService.getSessionUserId())))
-        {
+        if (!(notification.getArgs().get("user_id").equals(userService.getSessionUserId()))) {
             notificationCache.put(notification).observeOn(Schedulers.newThread())
-                             .subscribe(new Subscriber<Object>()
-                             {
-                                 @Override
-                                 public void onCompleted()
-                                 {
+                    .subscribe(new Subscriber<Object>()
+                    {
+                        @Override
+                        public void onCompleted()
+                        {
 
-                                     if (ifAppRunningInForeground())
-                                     {
-                                         bus.post(new NewNotificationReceivedTrigger());
+                            if (ifAppRunningInForeground()) {
+                                bus.post(new NewNotificationReceivedTrigger());
 
-                                     }
-                                     else
-                                     {
-                                         buildNotification(notification, true, true);
-                                     }
-                                 }
+                            }
+                            else {
+                                buildNotification(notification, true, true);
+                            }
+                        }
 
-                                 @Override
-                                 public void onError(Throwable e)
-                                 {
+                        @Override
+                        public void onError(Throwable e)
+                        {
 
-                                 }
+                        }
 
-                                 @Override
-                                 public void onNext(Object o)
-                                 {
+                        @Override
+                        public void onNext(Object o)
+                        {
 
-                                 }
-                             });
+                        }
+                    });
         }
     }
 
     private void handleNewFriendJoinedAppNotification(final Notification notification)
     {
         notificationCache.put(notification).observeOn(Schedulers.newThread())
-                         .subscribe(new Subscriber<Object>()
-                         {
-                             @Override
-                             public void onCompleted()
-                             {
-                                 if (ifAppRunningInForeground())
-                                 {
-                                     bus.post(new NewNotificationReceivedTrigger());
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+                        if (ifAppRunningInForeground()) {
+                            bus.post(new NewNotificationReceivedTrigger());
 
-                                 }
-                                 else
-                                 {
-                                     buildNotification(notification, true, false);
-                                 }
-                             }
+                        }
+                        else {
+                            buildNotification(notification, true, false);
+                        }
+                    }
 
-                             @Override
-                             public void onError(Throwable e)
-                             {
+                    @Override
+                    public void onError(Throwable e)
+                    {
 
-                             }
+                    }
 
-                             @Override
-                             public void onNext(Object o)
-                             {
+                    @Override
+                    public void onNext(Object o)
+                    {
 
-                             }
-                         });
+                    }
+                });
     }
 
     private void handleFriendNotification(Notification notification)
@@ -283,275 +271,265 @@ public class NotificationService
     private void showEventUpdatedNotification(final Notification notification)
     {
         fetchEvent(notification.getEventId()).observeOn(Schedulers.newThread())
-                                             .subscribe(new Subscriber<Event>()
-                                             {
-                                                 @Override
-                                                 public void onCompleted()
-                                                 {
-                                                     if (!(notification.getArgs().get("user_id")
-                                                                       .equals(userService
-                                                                               .getSessionUserId())))
-                                                     {
-                                                         boolean isLocationUpdated = Boolean
-                                                                 .parseBoolean(notification
-                                                                         .getArgs()
-                                                                         .get("is_location_updated"));
-                                                         boolean isTimeUpdated = Boolean
-                                                                 .parseBoolean(notification
-                                                                         .getArgs()
-                                                                         .get("is_time_updated"));
+                .subscribe(new Subscriber<Event>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+                        if (!(notification.getArgs().get("user_id")
+                                .equals(userService
+                                        .getSessionUserId()))) {
+                            boolean isLocationUpdated = Boolean
+                                    .parseBoolean(notification
+                                            .getArgs()
+                                            .get("is_location_updated"));
+                            boolean isTimeUpdated = Boolean
+                                    .parseBoolean(notification
+                                            .getArgs()
+                                            .get("is_time_updated"));
 
-                                                         if (isLocationUpdated)
-                                                         {
-                                                             if (isTimeUpdated)
-                                                             {
-                                                                 notification
-                                                                         .setMessage(notification
-                                                                                 .getArgs()
-                                                                                 .get("user_name") + " updated " + notification
-                                                                                 .getArgs()
-                                                                                 .get("event_name"));
-                                                             }
-                                                             else
-                                                             {
-                                                                 notification
-                                                                         .setMessage(notification
-                                                                                 .getArgs()
-                                                                                 .get("user_name") + " updated the location for " + notification
-                                                                                 .getArgs()
-                                                                                 .get("event_name"));
-                                                             }
-                                                         }
-                                                         else
-                                                         {
-                                                             if (isTimeUpdated)
-                                                             {
-                                                                 notification
-                                                                         .setMessage(notification
-                                                                                 .getArgs()
-                                                                                 .get("user_name") + " updated the timings for " + notification
-                                                                                 .getArgs()
-                                                                                 .get("event_name"));
-                                                             }
-                                                         }
+                            if (isLocationUpdated) {
+                                if (isTimeUpdated) {
+                                    notification
+                                            .setMessage(notification
+                                                    .getArgs()
+                                                    .get("user_name") + " updated " + notification
+                                                    .getArgs()
+                                                    .get("event_name"));
+                                }
+                                else {
+                                    notification
+                                            .setMessage(notification
+                                                    .getArgs()
+                                                    .get("user_name") + " updated the location " +
+                                                    "for " + notification
+                                                    .getArgs()
+                                                    .get("event_name"));
+                                }
+                            }
+                            else {
+                                if (isTimeUpdated) {
+                                    notification
+                                            .setMessage(notification
+                                                    .getArgs()
+                                                    .get("user_name") + " updated the timings for" +
+                                                    " " + notification
+                                                    .getArgs()
+                                                    .get("event_name"));
+                                }
+                            }
 
-                                                         notificationCache.put(notification)
-                                                                          .observeOn(Schedulers
-                                                                                  .newThread())
-                                                                          .subscribe(new Subscriber<Object>()
-                                                                          {
-                                                                              @Override
-                                                                              public void onCompleted()
-                                                                              {
-                                                                                  if (ifAppRunningInForeground())
-                                                                                  {
-                                                                                      bus.post(new NewNotificationReceivedTrigger());
+                            notificationCache.put(notification)
+                                    .observeOn(Schedulers
+                                            .newThread())
+                                    .subscribe(new Subscriber<Object>()
+                                    {
+                                        @Override
+                                        public void onCompleted()
+                                        {
+                                            if (ifAppRunningInForeground()) {
+                                                bus.post(new
+                                                        NewNotificationReceivedTrigger());
 
-                                                                                  }
-                                                                                  else
-                                                                                  {
-                                                                                      buildNotification(notification, true, false);
-                                                                                  }
-                                                                              }
+                                            }
+                                            else {
+                                                buildNotification
+                                                        (notification, true, false);
+                                            }
+                                        }
 
-                                                                              @Override
-                                                                              public void onError(Throwable e)
-                                                                              {
-                                                                              }
+                                        @Override
+                                        public void onError
+                                                (Throwable e)
+                                        {
+                                        }
 
-                                                                              @Override
-                                                                              public void onNext(Object o)
-                                                                              {
-                                                                              }
-                                                                          });
-                                                     }
-                                                 }
+                                        @Override
+                                        public void onNext(Object o)
+                                        {
+                                        }
+                                    });
+                        }
+                    }
 
-                                                 @Override
-                                                 public void onError(Throwable e)
-                                                 {
-                                                 }
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                    }
 
-                                                 @Override
-                                                 public void onNext(Event event)
-                                                 {
-                                                     eventCache.save(event);
-                                                 }
-                                             });
+                    @Override
+                    public void onNext(Event event)
+                    {
+                        eventCache.save(event);
+                    }
+                });
     }
 
     private void showEventRemovedNotification(final Notification notification)
     {
         eventCache.delete(notification.getEventId());
 
-        if (!(notification.getArgs().get("user_id").equals(userService.getSessionUserId())))
-        {
+        if (!(notification.getArgs().get("user_id").equals(userService.getSessionUserId()))) {
             notificationCache.put(notification).observeOn(Schedulers.newThread())
-                             .subscribe(new Subscriber<Object>()
-                             {
-                                 @Override
-                                 public void onCompleted()
-                                 {
-                                     if (ifAppRunningInForeground())
-                                     {
-                                         bus.post(new NewNotificationReceivedTrigger());
+                    .subscribe(new Subscriber<Object>()
+                    {
+                        @Override
+                        public void onCompleted()
+                        {
+                            if (ifAppRunningInForeground()) {
+                                bus.post(new NewNotificationReceivedTrigger());
 
-                                     }
-                                     else
-                                     {
-                                         buildNotification(notification, false, false);
-                                     }
-                                 }
+                            }
+                            else {
+                                buildNotification(notification, false, false);
+                            }
+                        }
 
-                                 @Override
-                                 public void onError(Throwable e)
-                                 {
+                        @Override
+                        public void onError(Throwable e)
+                        {
 
-                                 }
+                        }
 
-                                 @Override
-                                 public void onNext(Object o)
-                                 {
+                        @Override
+                        public void onNext(Object o)
+                        {
 
-                                 }
-                             });
+                        }
+                    });
         }
     }
 
     private void showRSVPChangedNotification(final Notification notification)
     {
         eventCache.getEvent(notification.getEventId()).observeOn(Schedulers.newThread())
-                  .subscribe(new Subscriber<Event>()
-                  {
-                      @Override
-                      public void onCompleted()
-                      {
+                .subscribe(new Subscriber<Event>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
 
-                      }
+                    }
 
-                      @Override
-                      public void onError(Throwable e)
-                      {
+                    @Override
+                    public void onError(Throwable e)
+                    {
 
-                      }
+                    }
 
-                      @Override
-                      public void onNext(Event event)
-                      {
-                          if (event == null)
-                          {
-                              boolean shouldFetchEvent = false;
-                              try
-                              {
-                                  Event.Type eventType = Event.Type
-                                          .valueOf(notification.getArgs().get("event_type"));
-                                  if (eventType == Event.Type.PUBLIC)
-                                  {
-                                      shouldFetchEvent = true;
-                                  }
+                    @Override
+                    public void onNext(Event event)
+                    {
+                        if (event == null) {
+                            boolean shouldFetchEvent = false;
+                            try {
+                                Event.Type eventType = Event.Type
+                                        .valueOf(notification.getArgs().get("event_type"));
+                                if (eventType == Event.Type.PUBLIC) {
+                                    shouldFetchEvent = true;
+                                }
 
-                              }
-                              catch (Exception e)
-                              {
-                                  Log.d("APP", "exception in notification service ---- can't convert to enum");
-                              }
+                            }
+                            catch (Exception e) {
+                                Log.d("APP", "exception in notification service ---- can't " +
+                                        "convert to enum");
+                            }
 
-                              if (shouldFetchEvent)
-                              {
-                                  fetchEvent(notification.getEventId())
-                                          .observeOn(Schedulers.newThread())
-                                          .subscribe(new Subscriber<Event>()
-                                          {
-                                              @Override
-                                              public void onCompleted()
-                                              {
-                                                  notification
-                                                          .setMessage("New friends joined " + notification
-                                                                  .getArgs().get("event_name"));
-                                                  notificationCache.put(notification)
-                                                                   .observeOn(Schedulers
-                                                                           .newThread())
-                                                                   .subscribe(new Subscriber<Object>()
-                                                                   {
-                                                                       @Override
-                                                                       public void onCompleted()
-                                                                       {
-                                                                           if (ifAppRunningInForeground())
-                                                                           {
-                                                                               bus.post(new NewNotificationReceivedTrigger());
+                            if (shouldFetchEvent) {
+                                fetchEvent(notification.getEventId())
+                                        .observeOn(Schedulers.newThread())
+                                        .subscribe(new Subscriber<Event>()
+                                        {
+                                            @Override
+                                            public void onCompleted()
+                                            {
+                                                notification
+                                                        .setMessage("New friends joined " +
+                                                                notification
+                                                                        .getArgs().get
+                                                                        ("event_name"));
+                                                notificationCache.put(notification)
+                                                        .observeOn(Schedulers
+                                                                .newThread())
+                                                        .subscribe(new Subscriber<Object>()
+                                                        {
+                                                            @Override
+                                                            public void onCompleted()
+                                                            {
+                                                                if (ifAppRunningInForeground()) {
+                                                                    bus.post(new
+                                                                            NewNotificationReceivedTrigger());
 
-                                                                           }
-                                                                           else
-                                                                           {
-                                                                               buildNotification(notification, true, false);
-                                                                           }
-                                                                       }
+                                                                }
+                                                                else {
+                                                                    buildNotification
+                                                                            (notification,
+                                                                                    true, false);
+                                                                }
+                                                            }
 
-                                                                       @Override
-                                                                       public void onError(Throwable e)
-                                                                       {
+                                                            @Override
+                                                            public void onError(Throwable e)
+                                                            {
 
-                                                                       }
+                                                            }
 
-                                                                       @Override
-                                                                       public void onNext(Object o)
-                                                                       {
+                                                            @Override
+                                                            public void onNext(Object o)
+                                                            {
 
-                                                                       }
-                                                                   });
-                                              }
+                                                            }
+                                                        });
+                                            }
 
-                                              @Override
-                                              public void onError(Throwable e)
-                                              {
+                                            @Override
+                                            public void onError(Throwable e)
+                                            {
 
-                                              }
+                                            }
 
-                                              @Override
-                                              public void onNext(Event event)
-                                              {
-                                                  eventCache.save(event);
-                                              }
-                                          });
-                              }
-                          }
-                          else
-                          {
+                                            @Override
+                                            public void onNext(Event event)
+                                            {
+                                                eventCache.save(event);
+                                            }
+                                        });
+                            }
+                        }
+                        else {
 
-                              notification.setMessage("New friends joined " + notification.getArgs()
-                                                                                          .get("event_name"));
-                              notificationCache.put(notification).observeOn(Schedulers.newThread())
-                                               .subscribe(new Subscriber<Object>()
-                                               {
-                                                   @Override
-                                                   public void onCompleted()
-                                                   {
-                                                       if (ifAppRunningInForeground())
-                                                       {
-                                                           bus.post(new NewNotificationReceivedTrigger());
+                            notification.setMessage("New friends joined " + notification.getArgs()
+                                    .get("event_name"));
+                            notificationCache.put(notification).observeOn(Schedulers.newThread())
+                                    .subscribe(new Subscriber<Object>()
+                                    {
+                                        @Override
+                                        public void onCompleted()
+                                        {
+                                            if (ifAppRunningInForeground()) {
+                                                bus.post(new NewNotificationReceivedTrigger());
 
-                                                       }
-                                                       else
-                                                       {
-                                                           buildNotification(notification, true, false);
-                                                       }
-                                                   }
+                                            }
+                                            else {
+                                                buildNotification(notification, true, false);
+                                            }
+                                        }
 
-                                                   @Override
-                                                   public void onError(Throwable e)
-                                                   {
+                                        @Override
+                                        public void onError(Throwable e)
+                                        {
 
-                                                   }
+                                        }
 
-                                                   @Override
-                                                   public void onNext(Object o)
-                                                   {
+                                        @Override
+                                        public void onNext(Object o)
+                                        {
 
-                                                   }
-                                               });
-                          }
-                      }
-                  });
+                                        }
+                                    });
+                        }
+                    }
+                });
     }
 
     private void showEventInvitedNotification(final Notification notification)
@@ -564,35 +542,33 @@ public class NotificationService
                     public void onCompleted()
                     {
                         notificationCache.put(notification)
-                                         .observeOn(Schedulers.newThread())
-                                         .subscribe(new Subscriber<Object>()
-                                         {
-                                             @Override
-                                             public void onCompleted()
-                                             {
-                                                 if (ifAppRunningInForeground())
-                                                 {
-                                                     bus.post(new NewNotificationReceivedTrigger());
+                                .observeOn(Schedulers.newThread())
+                                .subscribe(new Subscriber<Object>()
+                                {
+                                    @Override
+                                    public void onCompleted()
+                                    {
+                                        if (ifAppRunningInForeground()) {
+                                            bus.post(new NewNotificationReceivedTrigger());
 
-                                                 }
-                                                 else
-                                                 {
-                                                     buildNotification(notification, true, false);
-                                                 }
-                                             }
+                                        }
+                                        else {
+                                            buildNotification(notification, true, false);
+                                        }
+                                    }
 
-                                             @Override
-                                             public void onError(Throwable e)
-                                             {
+                                    @Override
+                                    public void onError(Throwable e)
+                                    {
 
-                                             }
+                                    }
 
-                                             @Override
-                                             public void onNext(Object o)
-                                             {
+                                    @Override
+                                    public void onNext(Object o)
+                                    {
 
-                                             }
-                                         });
+                                    }
+                                });
                     }
 
                     @Override
@@ -620,32 +596,30 @@ public class NotificationService
                     public void onCompleted()
                     {
                         notificationCache.put(notification)
-                                         .observeOn(Schedulers.newThread())
-                                         .subscribe(new Subscriber<Object>()
-                                         {
-                                             @Override
-                                             public void onCompleted()
-                                             {
-                                                 if (ifAppRunningInForeground())
-                                                 {
-                                                     bus.post(new NewNotificationReceivedTrigger());
-                                                 }
-                                                 else
-                                                 {
-                                                     buildNotification(notification, true, false);
-                                                 }
-                                             }
+                                .observeOn(Schedulers.newThread())
+                                .subscribe(new Subscriber<Object>()
+                                {
+                                    @Override
+                                    public void onCompleted()
+                                    {
+                                        if (ifAppRunningInForeground()) {
+                                            bus.post(new NewNotificationReceivedTrigger());
+                                        }
+                                        else {
+                                            buildNotification(notification, true, false);
+                                        }
+                                    }
 
-                                             @Override
-                                             public void onError(Throwable e)
-                                             {
-                                             }
+                                    @Override
+                                    public void onError(Throwable e)
+                                    {
+                                    }
 
-                                             @Override
-                                             public void onNext(Object o)
-                                             {
-                                             }
-                                         });
+                                    @Override
+                                    public void onNext(Object o)
+                                    {
+                                    }
+                                });
                     }
 
                     @Override
@@ -663,21 +637,17 @@ public class NotificationService
 
     private boolean ifAppRunningInForeground()
     {
-        try
-        {
+        try {
             Boolean isAppInForeground = CacheManager.getMemoryCache()
-                                                    .get(MemoryCacheKeys.IS_APP_IN_FOREGROUND, Boolean.class);
-            if (isAppInForeground != null)
-            {
+                    .get(MemoryCacheKeys.IS_APP_IN_FOREGROUND, Boolean.class);
+            if (isAppInForeground != null) {
                 return isAppInForeground;
             }
-            else
-            {
+            else {
                 return false;
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             return false;
         }
     }
@@ -685,126 +655,123 @@ public class NotificationService
     private Observable<Event> fetchEvent(String eventId)
     {
         return eventApi.fetchEvent(new FetchEventApiRequest(eventId))
-                       .map(new Func1<FetchEventApiResponse, Event>()
-                       {
-                           @Override
-                           public Event call(FetchEventApiResponse fetchEventApiResponse)
-                           {
-                               return fetchEventApiResponse.getEvent();
-                           }
-                       })
-                       .subscribeOn(Schedulers.newThread());
+                .map(new Func1<FetchEventApiResponse, Event>()
+                {
+                    @Override
+                    public Event call(FetchEventApiResponse fetchEventApiResponse)
+                    {
+                        return fetchEventApiResponse.getEvent();
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
     }
 
     public void deleteAllNotificationsFromCache()
     {
         notificationCache.clear().observeOn(Schedulers.newThread())
-                         .subscribe(new Subscriber<Object>()
-                         {
-                             @Override
-                             public void onCompleted()
-                             {
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
 
-                             }
+                    }
 
-                             @Override
-                             public void onError(Throwable e)
-                             {
+                    @Override
+                    public void onError(Throwable e)
+                    {
 
-                             }
+                    }
 
-                             @Override
-                             public void onNext(Object o)
-                             {
+                    @Override
+                    public void onNext(Object o)
+                    {
 
-                             }
-                         });
+                    }
+                });
     }
 
     public void markAllNotificationsAsRead()
     {
         notificationCache.markRead().observeOn(Schedulers.newThread())
-                         .subscribe(new Subscriber<Object>()
-                         {
-                             @Override
-                             public void onCompleted()
-                             {
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
 
-                             }
+                    }
 
-                             @Override
-                             public void onError(Throwable e)
-                             {
+                    @Override
+                    public void onError(Throwable e)
+                    {
 
-                             }
+                    }
 
-                             @Override
-                             public void onNext(Object o)
-                             {
+                    @Override
+                    public void onNext(Object o)
+                    {
 
-                             }
-                         });
+                    }
+                });
     }
 
     public void deleteNotificationFromCache(int notificationId)
     {
         notificationCache.clear(notificationId).observeOn(Schedulers.newThread())
-                         .subscribe(new Subscriber<Object>()
-                         {
-                             @Override
-                             public void onCompleted()
-                             {
+                .subscribe(new Subscriber<Object>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
 
-                             }
+                    }
 
-                             @Override
-                             public void onError(Throwable e)
-                             {
+                    @Override
+                    public void onError(Throwable e)
+                    {
 
-                             }
+                    }
 
-                             @Override
-                             public void onNext(Object o)
-                             {
+                    @Override
+                    public void onNext(Object o)
+                    {
 
-                             }
-                         });
+                    }
+                });
     }
 
     public void areNewNotificationsAvailable()
     {
         notificationCache.isAvaliable().observeOn(AndroidSchedulers.mainThread())
-                         .subscribe(new Subscriber<Boolean>()
-                         {
-                             @Override
-                             public void onCompleted()
-                             {
+                .subscribe(new Subscriber<Boolean>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
 
-                             }
+                    }
 
-                             @Override
-                             public void onError(Throwable e)
-                             {
-                                 bus.post(new NewNotificationsAvailableTrigger());
-                             }
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        bus.post(new NewNotificationsAvailableTrigger());
+                    }
 
-                             @Override
-                             public void onNext(Boolean isAvailable)
-                             {
-                                 if (isAvailable)
-                                 {
-                                     bus.post(new NewNotificationsAvailableTrigger());
-                                 }
-                             }
-                         });
+                    @Override
+                    public void onNext(Boolean isAvailable)
+                    {
+                        if (isAvailable) {
+                            bus.post(new NewNotificationsAvailableTrigger());
+                        }
+                    }
+                });
     }
 
-    private void buildNotification(final Notification notification, final boolean shouldGoToDetailsFragment, final boolean shouldGoToChatFragment)
+    private void buildNotification(final Notification notification, final boolean
+            shouldGoToDetailsFragment, final boolean shouldGoToChatFragment)
     {
-//        final Intent intent = new Intent(Reaper.getReaperContext(), LauncherActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        final Context context = Reaper.getReaperContext();
         final Intent[] intent = new Intent[1];
 
         final int requestCode = ("someString" + System.currentTimeMillis()).hashCode();
@@ -831,58 +798,30 @@ public class NotificationService
                     @Override
                     public void onNext(List<Notification> notifications)
                     {
-
-                        Log.d("APP", "onNext build noti --- notificationCache.getAll()" + notifications
-                                .size());
-
-
-                        if (notifications.size() == 0)
-                        {
+                        if (notifications.size() == 0) {
 
                         }
-                        else if (notifications.size() == 1)
-                        {
+                        else if (notifications.size() == 1) {
                             // if only one notification
 
-                            String eventId = notification.getEventId();
-
-                            if (shouldGoToDetailsFragment)
-                            {
-                                intent[0] = LauncherActivity
-                                        .callingIntent(context, FlowEntry.DETAILS, eventId);
-
-                            }
-                            else
-                            {
-                                intent[0] = LauncherActivity
-                                        .callingIntent(context, FlowEntry.HOME, null);
-                            }
-
-                            if (shouldGoToChatFragment)
-                            {
-                                intent[0] = LauncherActivity
-                                        .callingIntent(context, FlowEntry.CHAT, eventId);
-                            }
-                            else
-                            {
-                                intent[0] = LauncherActivity
-                                        .callingIntent(context, FlowEntry.HOME, null);
-                            }
+                            handleSingleNotificationIntent(notification,
+                                    shouldGoToDetailsFragment, shouldGoToChatFragment, intent);
 
                         }
-                        else if (notifications.size() > 1)
-                        {
+                        else if (notifications.size() > 1) {
                             intent[0] = LauncherActivity
-                                    .callingIntent(context, FlowEntry.NOTIFICATIONS, null);
+                                    .callingIntent(Reaper.getReaperContext(), FlowEntry.NOTIFICATIONS, null);
                         }
 
                         PendingIntent pendingIntent = PendingIntent
                                 .getActivity(Reaper
-                                        .getReaperContext(), requestCode, intent[0], PendingIntent.FLAG_ONE_SHOT);
+                                                .getReaperContext(), requestCode, intent[0],
+                                        PendingIntent.FLAG_ONE_SHOT);
 
                         Uri defaultSoundUri = RingtoneManager
                                 .getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(Reaper
+                        NotificationCompat.Builder notificationBuilder = new NotificationCompat
+                                .Builder(Reaper
                                 .getReaperContext())
                                 .setSmallIcon(R.mipmap.app_icon)
                                 .setAutoCancel(true)
@@ -891,171 +830,25 @@ public class NotificationService
 
                         // Set Title and message for merged view
 
-                        if (notifications.size() == 1)
-                        {
+                        if (notifications.size() == 1) {
                             notificationBuilder.setContentTitle(notification.getTitle());
                             notificationBuilder.setContentText(notification.getMessage());
                         }
-                        else if (notifications.size() > 1)
-                        {
+                        else if (notifications.size() > 1) {
 
                             notificationBuilder.setContentTitle("Clanout");
 
-                            int chatCount = 0;
-                            int updateCount = 0;
-                            int invitationCount = 0;
+                            notificationBuilder.setContentText(buildCompressedMessage(notifications));
 
-                            for (Notification noti : notifications)
-                            {
-
-                                if (noti.getType() == Notification.CHAT)
-                                {
-                                    chatCount++;
-                                }
-                                else if (noti.getType() == Notification.EVENT_INVITATION)
-                                {
-                                    invitationCount++;
-                                }
-                                else if (noti
-                                        .getType() == Notification.EVENT_UPDATED || notification
-                                        .getType() == Notification.EVENT_REMOVED)
-                                {
-                                    updateCount++;
-                                }
-                            }
-
-                            String message = "You have ";
-
-                            if (invitationCount != 0)
-                            {
-
-                                if (updateCount == 0 && chatCount == 0)
-                                {
-
-                                    if (invitationCount == 1)
-                                    {
-                                        message = message + invitationCount + " invitation";
-                                    }
-                                    else
-                                    {
-                                        message = message + invitationCount + " invitations";
-                                    }
-                                }
-                                else
-                                {
-
-                                    if (updateCount == 0 || chatCount == 0)
-                                    {
-                                        if (invitationCount == 1)
-                                        {
-                                            message = message + invitationCount + " invitation and ";
-                                        }
-                                        else
-                                        {
-                                            message = message + invitationCount + " invitations and ";
-                                        }
-                                    }
-                                    else
-                                    {
-
-                                        if (invitationCount == 1)
-                                        {
-                                            message = message + invitationCount + " invitation, ";
-                                        }
-                                        else
-                                        {
-                                            message = message + invitationCount + " invitations, ";
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (updateCount != 0)
-                            {
-
-                                if (chatCount == 0)
-                                {
-                                    if (updateCount == 1)
-                                    {
-                                        message = message + updateCount + " clan update";
-                                    }
-                                    else
-                                    {
-                                        message = message + updateCount + " clan updates";
-                                    }
-                                }
-                                else
-                                {
-
-                                    if (updateCount == 1)
-                                    {
-                                        message = message + updateCount + " clan update and ";
-                                    }
-                                    else
-                                    {
-
-                                        message = message + updateCount + " clan updates and ";
-                                    }
-                                }
-                            }
-
-                            if (chatCount != 0)
-                            {
-
-                                if (chatCount == 1)
-                                {
-                                    message = message + chatCount + " conversation";
-                                }
-                                else
-                                {
-                                    message = message + chatCount + " conversations";
-                                }
-                            }
-
-                            if (chatCount == 0 && updateCount == 0 && invitationCount == 0)
-                            {
-
-                                if (notifications.size() == 1)
-                                {
-                                    message = "You have " + notifications
-                                            .size() + " new notification";
-
-                                }
-                                else
-                                {
-
-                                    message = "You have " + notifications
-                                            .size() + " new notifications";
-                                }
-                            }
-
-                            notificationBuilder.setContentText(message);
-
-
-                            // Set Expanded View
-
-//                            NotificationCompat.InboxStyle inboxStyle =
-//                                    new NotificationCompat.InboxStyle();
-//
-//                            inboxStyle.setBigContentTitle("Clanout");
-//
-//                            for (Notification noti : notifications) {
-//                                if (noti.getType() == Notification.CHAT || noti.getType() == Notification.EVENT_INVITATION || noti.getType() == Notification.EVENT_UPDATED || noti.getType() == Notification.EVENT_REMOVED) {
-//                                    inboxStyle.addLine(noti.getMessage());
-//                                }
-//                            }
-//
-//                            notificationBuilder.setStyle(inboxStyle);
+                            // Set Title and message for expanded view
 
                             StringBuilder bigTextMessage = new StringBuilder();
 
-                            for (Notification noti : notifications)
-                            {
+                            for (Notification noti : notifications) {
                                 if (noti.getType() == Notification.CHAT || noti
                                         .getType() == Notification.EVENT_INVITATION || noti
                                         .getType() == Notification.EVENT_UPDATED || noti
-                                        .getType() == Notification.EVENT_REMOVED)
-                                {
+                                        .getType() == Notification.EVENT_REMOVED) {
 
                                     bigTextMessage
                                             .append("\u25CF" + " " + noti.getMessage());
@@ -1063,10 +856,8 @@ public class NotificationService
                                 }
                             }
 
-                            if (bigTextMessage.toString().isEmpty())
-                            {
-                                for (Notification noti : notifications)
-                                {
+                            if (bigTextMessage.toString().isEmpty()) {
+                                for (Notification noti : notifications) {
 
                                     bigTextMessage
                                             .append("\u25CF" + " " + noti.getMessage());
@@ -1084,12 +875,143 @@ public class NotificationService
 
                         NotificationManager notificationManager =
                                 (NotificationManager) Reaper.getReaperContext()
-                                                            .getSystemService(Context.NOTIFICATION_SERVICE);
-
-//                notificationManager.notify((int) (Math.random() * 1000), notificationBuilder.build());
+                                        .getSystemService(Context.NOTIFICATION_SERVICE);
 
                         notificationManager.notify(1, notificationBuilder.build());
                     }
                 });
+    }
+
+    private String buildCompressedMessage(List<Notification> notifications)
+    {
+        int chatCount = 0;
+        int updateCount = 0;
+        int invitationCount = 0;
+
+        for (Notification noti : notifications) {
+
+            if (noti.getType() == Notification.CHAT) {
+                chatCount++;
+            }
+            else if (noti.getType() == Notification.EVENT_INVITATION) {
+                invitationCount++;
+            }
+            else if (noti
+                    .getType() == Notification.EVENT_UPDATED || noti
+                    .getType() == Notification.EVENT_REMOVED) {
+                updateCount++;
+            }
+        }
+
+        String message = "You have ";
+
+        if (invitationCount != 0) {
+
+            if (updateCount == 0 && chatCount == 0) {
+
+                if (invitationCount == 1) {
+                    message = message + invitationCount + " invitation";
+                }
+                else {
+                    message = message + invitationCount + " invitations";
+                }
+            }
+            else {
+
+                if (updateCount == 0 || chatCount == 0) {
+                    if (invitationCount == 1) {
+                        message = message + invitationCount + " invitation " +
+                                "and ";
+                    }
+                    else {
+                        message = message + invitationCount + " invitations " +
+                                "and ";
+                    }
+                }
+                else {
+
+                    if (invitationCount == 1) {
+                        message = message + invitationCount + " invitation, ";
+                    }
+                    else {
+                        message = message + invitationCount + " invitations, ";
+                    }
+                }
+            }
+        }
+
+        if (updateCount != 0) {
+
+            if (chatCount == 0) {
+                if (updateCount == 1) {
+                    message = message + updateCount + " clan update";
+                }
+                else {
+                    message = message + updateCount + " clan updates";
+                }
+            }
+            else {
+
+                if (updateCount == 1) {
+                    message = message + updateCount + " clan update and ";
+                }
+                else {
+
+                    message = message + updateCount + " clan updates and ";
+                }
+            }
+        }
+
+        if (chatCount != 0) {
+
+            if (chatCount == 1) {
+                message = message + chatCount + " conversation";
+            }
+            else {
+                message = message + chatCount + " conversations";
+            }
+        }
+
+        if (chatCount == 0 && updateCount == 0 && invitationCount == 0) {
+
+            if (notifications.size() == 1) {
+                message = "You have " + notifications
+                        .size() + " new notification";
+
+            }
+            else {
+
+                message = "You have " + notifications
+                        .size() + " new notifications";
+            }
+        }
+
+        return message;
+    }
+
+    private void handleSingleNotificationIntent(Notification notification, boolean
+            shouldGoToDetailsFragment, boolean shouldGoToChatFragment, Intent[] intent)
+    {
+
+        String eventId = notification.getEventId();
+
+        if (shouldGoToDetailsFragment) {
+            intent[0] = LauncherActivity
+                    .callingIntent(Reaper.getReaperContext(), FlowEntry.DETAILS, eventId);
+
+        }
+        else {
+            intent[0] = LauncherActivity
+                    .callingIntent(Reaper.getReaperContext(), FlowEntry.HOME, null);
+        }
+
+        if (shouldGoToChatFragment) {
+            intent[0] = LauncherActivity
+                    .callingIntent(Reaper.getReaperContext(), FlowEntry.CHAT, eventId);
+        }
+        else {
+            intent[0] = LauncherActivity
+                    .callingIntent(Reaper.getReaperContext(), FlowEntry.HOME, null);
+        }
     }
 }

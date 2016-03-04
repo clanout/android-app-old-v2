@@ -19,5 +19,11 @@ public interface NotificationCache
 
     Observable<Boolean> isAvaliable();
 
+    Observable<List<Notification>> getAllForType(int type);
+
+    Observable<List<Notification>> getAllForEvent(String eventId);
+
+    Observable<List<Notification>> getAll(int type, String eventId);
+
     void clearAll();
 }
