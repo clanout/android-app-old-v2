@@ -1,8 +1,6 @@
 package reaper.android.app.ui.screens.create;
 
 import android.app.ProgressDialog;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,9 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -24,8 +19,6 @@ import android.widget.TextView;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
-import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
-
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 
@@ -34,13 +27,13 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import reaper.android.R;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.LocationSuggestion;
-import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.PlacesService;
 import reaper.android.app.service._new.LocationService_;
@@ -52,28 +45,20 @@ import reaper.android.app.ui.screens.create.mvp.CreateEventPresenter;
 import reaper.android.app.ui.screens.create.mvp.CreateEventPresenterImpl;
 import reaper.android.app.ui.screens.create.mvp.CreateEventView;
 import reaper.android.app.ui.util.DateTimeUtil;
-import reaper.android.app.ui.util.DrawableFactory;
+import reaper.android.app.ui.util.CategoryIconFactory;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
+import reaper.android.app.ui.util.VisibilityAnimationUtil;
 
 public class CreateDetailsFragment extends BaseFragment implements
         CreateEventView, LocationSuggestionAdapter.SuggestionClickListener
 {
-    private static final String ARG_TITLE = "arg_title";
     private static final String ARG_CATEGORY = "arg_category";
-    private static final String ARG_IS_SECRET = "arg_is_secret";
-    private static final String ARG_START_DAY = "arg_start_day";
-    private static final String ARG_START_TIME = "arg_start_time";
 
-    public static CreateDetailsFragment newInstance(String title, EventCategory category,
-                                                    boolean isSecret, String startDay, LocalTime startTime)
+    public static CreateDetailsFragment newInstance(EventCategory category)
     {
         Bundle args = new Bundle();
-        args.putString(ARG_TITLE, title);
         args.putSerializable(ARG_CATEGORY, category);
-        args.putBoolean(ARG_IS_SECRET, isSecret);
-        args.putString(ARG_START_DAY, startDay);
-        args.putSerializable(ARG_START_TIME, startTime);
 
         CreateDetailsFragment fragment = new CreateDetailsFragment();
         fragment.setArguments(args);
@@ -121,6 +106,15 @@ public class CreateDetailsFragment extends BaseFragment implements
     @Bind(R.id.rvLocationSuggestions)
     RecyclerView rvLocationSuggestions;
 
+    @Bind(R.id.llMoreDetailsContainer)
+    View llMoreDetailsContainer;
+
+    @Bind(R.id.llMoreDetails)
+    View llMoreDetails;
+
+    @Bind(R.id.focusThief)
+    View focusThief;
+
     ProgressDialog createProgressDialog;
 
     /* Data */
@@ -140,8 +134,6 @@ public class CreateDetailsFragment extends BaseFragment implements
     {
         super.onCreate(savedInstanceState);
 
-        setHasOptionsMenu(true);
-
         /* Presenter */
         EventService eventService = EventService.getInstance();
         LocationService_ locationService = LocationService_.getInstance();
@@ -154,7 +146,7 @@ public class CreateDetailsFragment extends BaseFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.fragment_create_details, container, false);
+        View view = inflater.inflate(R.layout.fragment_create, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
@@ -175,6 +167,7 @@ public class CreateDetailsFragment extends BaseFragment implements
     {
         super.onResume();
         presenter.attachView(this);
+        focusThief.requestFocus();
     }
 
     @Override
@@ -186,33 +179,6 @@ public class CreateDetailsFragment extends BaseFragment implements
         etLocation.addTextChangedListener(null);
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.action_create, menu);
-
-        Drawable drawable = MaterialDrawableBuilder
-                .with(Reaper.getReaperContext())
-                .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
-                .setColor(Color.WHITE)
-                .build();
-
-        menu.findItem(R.id.action_create).setIcon(drawable);
-
-        menu.findItem(R.id.action_create)
-            .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-            {
-                @Override
-                public boolean onMenuItemClick(MenuItem item)
-                {
-                    SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
-                    createEvent();
-                    return true;
-                }
-            });
-    }
-
     /* Listeners */
     @Override
     public void onSuggestionClicked(LocationSuggestion locationSuggestion)
@@ -221,6 +187,23 @@ public class CreateDetailsFragment extends BaseFragment implements
         {
             presenter.selectSuggestion(locationSuggestion);
         }
+    }
+
+    @OnClick(R.id.llMoreDetails)
+    public void onMoreDetailsToggled()
+    {
+        llMoreDetails.setVisibility(View.GONE);
+        if (llMoreDetailsContainer.getVisibility() != View.VISIBLE)
+        {
+            VisibilityAnimationUtil.expand(llMoreDetailsContainer, 200);
+        }
+    }
+
+    @OnClick(R.id.fabCreate)
+    public void onCreateClicked()
+    {
+        SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+        createEvent();
     }
 
     /* View Methods */
@@ -325,47 +308,17 @@ public class CreateDetailsFragment extends BaseFragment implements
     {
         dateTimeUtil = new DateTimeUtil();
 
-        // Title
-        String inputTitle = getArguments().getString(ARG_TITLE);
-        if (inputTitle != null && !inputTitle.isEmpty())
-        {
-            etTitle.setText(inputTitle);
-            etTitle.requestFocus();
-            etTitle.setSelection(etTitle.getText().length());
-
-            int remaining = AppConstants.TITLE_LENGTH_LIMIT - etTitle.getText().length();
-            tvTitleLimit.setText(String.valueOf(remaining));
-            tvTitleLimit.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            tvTitleLimit.setText(String.valueOf(AppConstants.TITLE_LENGTH_LIMIT));
-        }
-
-        // Type
-        boolean isSecret = getArguments().getBoolean(ARG_IS_SECRET, false);
-        cbType.setChecked(isSecret);
+        // Title Limit
+        tvTitleLimit.setText(String.valueOf(AppConstants.TITLE_LENGTH_LIMIT));
 
         // Start Time
-        startTime = (LocalTime) getArguments().getSerializable(ARG_START_TIME);
-        if (startTime == null)
-        {
-            startTime = LocalTime.now().plusHours(1).withMinuteOfHour(0);
-        }
+        startTime = LocalTime.now().plusHours(1).withMinuteOfHour(0);
         tvTime.setText(dateTimeUtil.formatTime(startTime));
 
         // Start Day
         dayList = dateTimeUtil.getDayList();
         dateList = dateTimeUtil.getDayAndDateList();
-        String startDay = getArguments().getString(ARG_START_DAY);
-        if (startDay != null)
-        {
-            selectedDay = dayList.indexOf(startDay);
-        }
-        else
-        {
-            selectedDay = 0;
-        }
+        selectedDay = 0;
         tvDay.setText(dayList.get(selectedDay));
 
         // Category
@@ -513,9 +466,9 @@ public class CreateDetailsFragment extends BaseFragment implements
     private void changeCategory(EventCategory category)
     {
         selectedCategory = category;
-        ivCategoryIcon.setImageDrawable(DrawableFactory
+        ivCategoryIcon.setImageDrawable(CategoryIconFactory
                 .get(selectedCategory, Dimensions.EVENT_ICON_SIZE));
-        llCategoryIconContainer.setBackground(DrawableFactory.getIconBackground(selectedCategory));
+        llCategoryIconContainer.setBackground(CategoryIconFactory.getIconBackground(selectedCategory));
 
         if (presenter != null)
         {

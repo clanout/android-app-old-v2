@@ -17,8 +17,6 @@ import com.squareup.otto.Subscribe;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
-import org.joda.time.LocalTime;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
@@ -31,7 +29,7 @@ import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui.screens.accounts.AccountActivity;
 import reaper.android.app.ui.screens.create.CreateActivity;
 import reaper.android.app.ui.screens.details.EventDetailsActivity;
-import reaper.android.app.ui.screens.home.create.CreateFragment;
+import reaper.android.app.ui.screens.home.create_suggestion.CreateSuggestionFragment;
 import reaper.android.app.ui.screens.home.feed.EventFeedFragment;
 import reaper.android.app.ui.screens.notifications.NotificationActivity;
 
@@ -76,7 +74,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
         FragmentManager fragmentManager = getFragmentManager();
         /* Create Box */
         FragmentTransaction createFragmentTransaction = fragmentManager.beginTransaction();
-        createFragmentTransaction.replace(R.id.createBox, CreateFragment.newInstance());
+        createFragmentTransaction.replace(R.id.createBox, CreateSuggestionFragment.newInstance());
         createFragmentTransaction.commit();
 
         /* Event Feed */
@@ -210,12 +208,9 @@ public class HomeActivity extends BaseActivity implements HomeScreen
 
     /* Screen Methods */
     @Override
-    public void navigateToCreateDetailsScreen(String title, EventCategory category,
-                                              boolean isSecret,
-                                              String startDay, LocalTime startTime)
+    public void navigateToCreateDetailsScreen(EventCategory category)
     {
-        startActivity(CreateActivity
-                .callingIntent(this, title, category, isSecret, startDay, startTime));
+        startActivity(CreateActivity.callingIntent(this, category));
     }
 
     @Override
@@ -225,7 +220,6 @@ public class HomeActivity extends BaseActivity implements HomeScreen
     }
 
     /* Helper Methods */
-
     private void navigateToAccountsScreen()
     {
         startActivity(AccountActivity.callingIntent(this));

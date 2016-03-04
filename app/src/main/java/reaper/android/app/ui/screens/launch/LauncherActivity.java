@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.AuthService_;
 import reaper.android.app.service._new.FacebookService_;
@@ -136,7 +137,7 @@ public class LauncherActivity extends BaseActivity implements
         setContentView(R.layout.activity_launcher);
         ButterKnife.bind(this);
 
-        if(llFb == null)
+        if (llFb == null)
         {
             throw new IllegalStateException();
         }
@@ -167,9 +168,12 @@ public class LauncherActivity extends BaseActivity implements
         /* Gcm Service */
         GcmService_ gcmService = GcmService_.getInstance();
 
+        /* Event Service */
+        EventService eventService = EventService.getInstance();
+
         /* Presenters */
         facebookLoginPresenter = new FacebookLoginPresenterImpl(authService, facebookService);
-        bootstrapPresenter = new BootstrapPresenterImpl(locationService, authService, gcmService, userService);
+        bootstrapPresenter = new BootstrapPresenterImpl(locationService, authService, gcmService, userService, eventService);
     }
 
     @Override

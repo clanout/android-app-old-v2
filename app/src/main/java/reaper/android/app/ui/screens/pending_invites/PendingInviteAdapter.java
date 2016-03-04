@@ -16,7 +16,7 @@ import reaper.android.R;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
-import reaper.android.app.ui.util.DrawableFactory;
+import reaper.android.app.ui.util.CategoryIconFactory;
 
 public class PendingInviteAdapter extends RecyclerView.Adapter<PendingInviteAdapter.PendingInviteViewHolder>
 {
@@ -92,9 +92,9 @@ public class PendingInviteAdapter extends RecyclerView.Adapter<PendingInviteAdap
 
             // Icon
             EventCategory category = EventCategory.valueOf(event.getCategory());
-            ivCategoryIcon.setImageDrawable(DrawableFactory
+            ivCategoryIcon.setImageDrawable(CategoryIconFactory
                     .get(category, Dimensions.EVENT_FEED_ICON_SIZE));
-            llCategoryIconContainer.setBackground(DrawableFactory.getIconBackground(category));
+            llCategoryIconContainer.setBackground(CategoryIconFactory.getIconBackground(category));
 
             // Inviter count
             int inviteCount = event.getInviterCount();

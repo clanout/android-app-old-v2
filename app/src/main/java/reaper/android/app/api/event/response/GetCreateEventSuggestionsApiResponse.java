@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 import reaper.android.app.api._core.ApiResponse;
-import reaper.android.app.model.CreateEventModel;
+import reaper.android.app.model.CreateEventSuggestion;
 
 /**
  * Created by harsh on 19/11/15.
@@ -13,13 +13,13 @@ import reaper.android.app.model.CreateEventModel;
 public class GetCreateEventSuggestionsApiResponse extends ApiResponse{
 
     @SerializedName("event_suggestions")
-    private List<CreateEventModel> eventSuggestions;
+    private List<CreateEventSuggestion> eventSuggestions;
 
-    public GetCreateEventSuggestionsApiResponse(List<CreateEventModel> eventSuggestions) {
+    public GetCreateEventSuggestionsApiResponse(List<CreateEventSuggestion> eventSuggestions) {
         this.eventSuggestions = eventSuggestions;
     }
 
-    public List<CreateEventModel> getEventSuggestions() {
+    public List<CreateEventSuggestion> getEventSuggestions() {
         return eventSuggestions;
     }
 }

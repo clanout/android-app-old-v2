@@ -1,6 +1,7 @@
 package reaper.android.app.ui.screens.launch.mvp.bootstrap;
 
 import reaper.android.app.model.Location;
+import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.AuthService_;
 import reaper.android.app.service._new.GcmService_;
@@ -22,16 +23,18 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
     private AuthService_ authService;
     private GcmService_ gcmService;
     private UserService userService;
+    private EventService eventService;
 
     private CompositeSubscription subscriptions;
 
     public BootstrapPresenterImpl(LocationService_ locationService, AuthService_ authService,
-                                  GcmService_ gcmService, UserService userService)
+                                  GcmService_ gcmService, UserService userService, EventService eventService)
     {
         this.locationService = locationService;
         this.authService = authService;
         this.gcmService = gcmService;
         this.userService = userService;
+        this.eventService = eventService;
 
         subscriptions = new CompositeSubscription();
     }
@@ -137,12 +140,27 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
                         gcmService.register();
                     }
                 })
+                .flatMap(new Func1<Boolean, Observable<Boolean>>()
+                {
+                    @Override
+                    public Observable<Boolean> call(Boolean isLocationPushed)
+                    {
+                        if (isLocationPushed)
+                        {
+                            return eventService._fetchCreateSuggestions();
+                        }
+                        else
+                        {
+                            throw new IllegalStateException();
+                        }
+                    }
+                })
                 .map(new Func1<Boolean, Boolean>()
                 {
                     @Override
-                    public Boolean call(Boolean isLocationPushed)
+                    public Boolean call(Boolean isCreateSuggestionsFetched)
                     {
-                        if (isLocationPushed)
+                        if (isCreateSuggestionsFetched)
                         {
                             return userService.getSessionUser().isNewUser();
                         }

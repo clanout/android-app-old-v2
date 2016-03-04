@@ -252,27 +252,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:gravity="center"
-                android:text="@string/label_feed_no_friends"
-                android:textColor="@color/text_subtitle"/>
+            android:orientation="vertical">
 
             <include layout="@layout/view_friend_bubbles"/>
-
-            <TextView
-                android:id="@+id/tvInvite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center"
-                android:text="Invite Friends"
-                android:textColor="@color/accent"/>
 
         </LinearLayout>
 

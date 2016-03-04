@@ -23,7 +23,7 @@ import rx.schedulers.Schedulers;
 
 public class FriendBubbles
 {
-    public static void show(final Context context, final View friendBubbles)
+    public static void render(final Context context, final View friendBubbles, final String title)
     {
         friendBubbles.setVisibility(View.GONE);
 
@@ -116,7 +116,7 @@ public class FriendBubbles
                            {
                                String zone = LocationService_.getInstance().getCurrentLocation()
                                                              .getZone();
-                               tvTitle.setText("Your friends in " + zone);
+                               tvTitle.setText(String.format(title, zone));
                                friendBubbles.setVisibility(View.VISIBLE);
 
                                if (friends.size() > 3)

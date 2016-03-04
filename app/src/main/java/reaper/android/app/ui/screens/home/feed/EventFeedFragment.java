@@ -87,13 +87,13 @@ public class EventFeedFragment extends BaseFragment implements
         super.onActivityCreated(savedInstanceState);
         screen = (HomeScreen) getActivity();
 
-        FriendBubbles.show(getActivity(), friendBubbles);
+        FriendBubbles.render(getActivity(), friendBubbles, "Your friends in %s");
         tvMakePlan.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                screen.navigateToCreateDetailsScreen(null, null, false, null, null);
+                screen.navigateToCreateDetailsScreen(null);
             }
         });
 

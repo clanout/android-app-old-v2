@@ -1,13 +1,10 @@
 package reaper.android.app.ui.util;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.support.v4.content.ContextCompat;
-import android.util.TypedValue;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
@@ -21,13 +18,8 @@ import reaper.android.R;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.root.Reaper;
 
-/**
- * Created by harsh on 24/09/15.
- */
-public class DrawableFactory
+public class CategoryIconFactory
 {
-    private static Drawable generalDrawable, eatOutDrawable, drinksDrawable, cafeDrawable, moviesDrawable, outdorsDrawable, partyDrawable, localEventsDrawable, shoppingDrawable;
-
     private static Map<EventCategory, MaterialDrawableBuilder.IconValue> iconMapping;
     private static Map<EventCategory, Integer> colorMapping;
     private static List<Integer> colors = Arrays.asList(
@@ -81,46 +73,9 @@ public class DrawableFactory
                                       .build();
     }
 
-
-    public static Drawable getIconBackground(Context context, int colorResource, int cornerRadius)
-    {
-        ShapeDrawable circle = new ShapeDrawable(new OvalShape());
-        circle.getPaint()
-              .setColor(ContextCompat.getColor(Reaper.getReaperContext(), colorResource));
-        return circle;
-
-//        GradientDrawable drawable = new GradientDrawable();
-//        drawable.setCornerRadius(TypedValue
-//                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornerRadius, context.getResources()
-//                                                                                  .getDisplayMetrics()));
-//        drawable.setColor(ContextCompat.getColor(Reaper.getReaperContext(), colorResource));
-//        return drawable;
-    }
-
-    public static Drawable randomIconBackground()
-    {
-        int random = (int) (Math.random() * colors.size());
-
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setCornerRadius(TypedValue
-                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, Reaper.getReaperContext()
-                                                                      .getResources()
-                                                                      .getDisplayMetrics()));
-        drawable.setColor(Reaper.getReaperContext().getResources().getColor(colors.get(random)));
-        return drawable;
-    }
-
     public static Drawable getIconBackground(EventCategory eventCategory)
     {
         int color = colorMapping.get(eventCategory);
-//        GradientDrawable drawable = new GradientDrawable();
-//        drawable.setCornerRadius(TypedValue
-//                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, Reaper.getReaperContext()
-//                                                                      .getResources()
-//                                                                      .getDisplayMetrics()));
-//        drawable.setColor(ContextCompat.getColor(Reaper.getReaperContext(), color));
-//        return drawable;
-
         ShapeDrawable circle = new ShapeDrawable(new OvalShape());
         circle.getPaint()
               .setColor(ContextCompat.getColor(Reaper.getReaperContext(), color));

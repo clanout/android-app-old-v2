@@ -1,17 +1,16 @@
 package reaper.android.app.model;
 
-import android.content.Context;
 import android.graphics.drawable.Drawable;
 
 import reaper.android.app.config.Dimensions;
-import reaper.android.app.ui.util.DrawableFactory;
+import reaper.android.app.ui.util.CategoryIconFactory;
 
-public class CreateEventModel implements Model
+public class CreateEventSuggestion implements Model
 {
     private final EventCategory category;
     private final String title;
 
-    public CreateEventModel(EventCategory category, String title)
+    public CreateEventSuggestion(EventCategory category, String title)
     {
         this.category = category;
         this.title = title;
@@ -29,11 +28,11 @@ public class CreateEventModel implements Model
 
     public Drawable getIcon()
     {
-        return DrawableFactory.get(category, Dimensions.EVENT_ICON_SIZE);
+        return CategoryIconFactory.get(category, Dimensions.EVENT_ICON_SIZE);
     }
 
-    public Drawable getIconBackground(Context context)
+    public Drawable getIconBackground()
     {
-        return DrawableFactory.getIconBackground(category);
+        return CategoryIconFactory.getIconBackground(category);
     }
 }

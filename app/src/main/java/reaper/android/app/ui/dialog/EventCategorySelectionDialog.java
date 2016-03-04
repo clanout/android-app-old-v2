@@ -8,7 +8,7 @@ import android.widget.LinearLayout;
 
 import reaper.android.R;
 import reaper.android.app.model.EventCategory;
-import reaper.android.app.ui.util.DrawableFactory;
+import reaper.android.app.ui.util.CategoryIconFactory;
 
 public class EventCategorySelectionDialog
 {
@@ -38,15 +38,15 @@ public class EventCategorySelectionDialog
         final LinearLayout shopping = (LinearLayout) dialogView.findViewById(R.id.llShopping);
         final LinearLayout general = (LinearLayout) dialogView.findViewById(R.id.llGeneral);
 
-        cafe.setBackground(DrawableFactory.getIconBackground(EventCategory.CAFE));
-        movies.setBackground(DrawableFactory.getIconBackground(EventCategory.MOVIES));
-        eatOut.setBackground(DrawableFactory.getIconBackground(EventCategory.EAT_OUT));
-        sports.setBackground(DrawableFactory.getIconBackground(EventCategory.SPORTS));
-        outdoors.setBackground(DrawableFactory.getIconBackground(EventCategory.OUTDOORS));
-        indoors.setBackground(DrawableFactory.getIconBackground(EventCategory.INDOORS));
-        drinks.setBackground(DrawableFactory.getIconBackground(EventCategory.DRINKS));
-        shopping.setBackground(DrawableFactory.getIconBackground(EventCategory.SHOPPING));
-        general.setBackground(DrawableFactory.getIconBackground(EventCategory.GENERAL));
+        cafe.setBackground(CategoryIconFactory.getIconBackground(EventCategory.CAFE));
+        movies.setBackground(CategoryIconFactory.getIconBackground(EventCategory.MOVIES));
+        eatOut.setBackground(CategoryIconFactory.getIconBackground(EventCategory.EAT_OUT));
+        sports.setBackground(CategoryIconFactory.getIconBackground(EventCategory.SPORTS));
+        outdoors.setBackground(CategoryIconFactory.getIconBackground(EventCategory.OUTDOORS));
+        indoors.setBackground(CategoryIconFactory.getIconBackground(EventCategory.INDOORS));
+        drinks.setBackground(CategoryIconFactory.getIconBackground(EventCategory.DRINKS));
+        shopping.setBackground(CategoryIconFactory.getIconBackground(EventCategory.SHOPPING));
+        general.setBackground(CategoryIconFactory.getIconBackground(EventCategory.GENERAL));
 
         cafe.setOnClickListener(new View.OnClickListener()
         {

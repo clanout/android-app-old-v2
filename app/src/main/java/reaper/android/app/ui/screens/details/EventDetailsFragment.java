@@ -49,7 +49,7 @@ import reaper.android.app.ui.screens.details.mvp.EventDetailsPresenterImpl;
 import reaper.android.app.ui.screens.details.mvp.EventDetailsView;
 import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.DateTimeUtil;
-import reaper.android.app.ui.util.DrawableFactory;
+import reaper.android.app.ui.util.CategoryIconFactory;
 import reaper.android.app.ui.util.FriendBubbles;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
@@ -128,9 +128,6 @@ public class EventDetailsFragment extends BaseFragment implements
     @Bind(R.id.llNoAttendees)
     View llNoAttendees;
 
-    @Bind(R.id.tvInvite)
-    TextView tvInvite;
-
     @Bind(R.id.friendBubbles)
     View friendBubbles;
 
@@ -179,19 +176,7 @@ public class EventDetailsFragment extends BaseFragment implements
         super.onActivityCreated(savedInstanceState);
         screen = (EventDetailsScreen) getActivity();
 
-        FriendBubbles.show(getActivity(), friendBubbles);
-        tvInvite.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if (presenter != null)
-                {
-                    presenter.invite();
-                }
-            }
-        });
-
+        FriendBubbles.render(getActivity(), friendBubbles, "Invite your %s friends");
         initRecyclerView();
     }
 
@@ -291,8 +276,8 @@ public class EventDetailsFragment extends BaseFragment implements
         tvTitle.setText(event.getTitle());
 
         EventCategory eventCategory = EventCategory.valueOf(event.getCategory());
-        llCategoryIconContainer.setBackground(DrawableFactory.getIconBackground(eventCategory));
-        ivCategoryIcon.setImageDrawable(DrawableFactory
+        llCategoryIconContainer.setBackground(CategoryIconFactory.getIconBackground(eventCategory));
+        ivCategoryIcon.setImageDrawable(CategoryIconFactory
                 .get(eventCategory, Dimensions.EVENT_DETAILS_ICON_SIZE));
 
         switch (event.getType())

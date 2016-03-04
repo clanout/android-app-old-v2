@@ -53,7 +53,7 @@ import reaper.android.app.ui.screens.edit.mvp.EditEventPresenter;
 import reaper.android.app.ui.screens.edit.mvp.EditEventPresenterImpl;
 import reaper.android.app.ui.screens.edit.mvp.EditEventView;
 import reaper.android.app.ui.util.DateTimeUtil;
-import reaper.android.app.ui.util.DrawableFactory;
+import reaper.android.app.ui.util.CategoryIconFactory;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 
@@ -355,10 +355,10 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
 
         // Category
         EventCategory category = EventCategory.valueOf(event.getCategory());
-        ivCategoryIcon.setImageDrawable(DrawableFactory
+        ivCategoryIcon.setImageDrawable(CategoryIconFactory
                 .get(category, Dimensions.EVENT_ICON_SIZE));
         llCategoryIconContainer
-                .setBackground(DrawableFactory.getIconBackground(category));
+                .setBackground(CategoryIconFactory.getIconBackground(category));
 
         // DateTime Pickers
         tvTime.setOnClickListener(new View.OnClickListener()
