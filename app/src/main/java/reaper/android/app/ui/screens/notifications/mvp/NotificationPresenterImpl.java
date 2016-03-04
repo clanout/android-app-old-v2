@@ -48,7 +48,7 @@ public class NotificationPresenterImpl implements NotificationPresenter
         notificationService.deleteNotificationFromCache(notification.getId());
 
         final String eventId = notification.getEventId();
-        if (eventId == null || eventId.isEmpty())
+        if (eventId == null || eventId.isEmpty() || notification.getType() == Notification.EVENT_REMOVED)
         {
             view.navigateToHomeScreen();
         }

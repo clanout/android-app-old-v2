@@ -25,5 +25,7 @@ public interface NotificationCache
 
     Observable<List<Notification>> getAll(int type, String eventId);
 
+    Observable<Boolean> clear(List<Integer> notifificationIds);
+
     void clearAll();
 }

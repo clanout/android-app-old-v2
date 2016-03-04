@@ -1,13 +1,20 @@
 package reaper.android.app.model.util;
 
+import java.util.List;
 import java.util.Map;
 
+import reaper.android.app.cache._core.CacheManager;
+import reaper.android.app.cache.notification.NotificationCache;
 import reaper.android.app.config.NotificationConstants;
 import reaper.android.app.config.NotificationMessages;
 import reaper.android.app.model.Notification;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
 public class NotificationHelper
 {
+    private static NotificationCache notificationCache = CacheManager.getNotificationCache();
+
     public static int getType(String name)
     {
         if (name.equals(NotificationConstants.EVENT_CREATED))
@@ -87,6 +94,7 @@ public class NotificationHelper
     }
 
     private static String newChatMessageReceivedMessage(Map<String, String> args) {
+
         return String.format(NotificationMessages.NEW_CHAT_MESSAGE, args.get("event_name"));
     }
 

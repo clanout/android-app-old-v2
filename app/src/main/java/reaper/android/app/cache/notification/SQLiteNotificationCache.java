@@ -28,8 +28,7 @@ public class SQLiteNotificationCache implements NotificationCache
 
     public static SQLiteNotificationCache getInstance()
     {
-        if (instance == null)
-        {
+        if (instance == null) {
             instance = new SQLiteNotificationCache();
         }
         return instance;
@@ -54,10 +53,9 @@ public class SQLiteNotificationCache implements NotificationCache
                     @Override
                     public void call(Subscriber<? super Object> subscriber)
                     {
-                        synchronized (TAG)
-                        {
+                        synchronized (TAG) {
                             Timber.v("NotificationCache.put() on thread = " + Thread.currentThread()
-                                                                                    .getName());
+                                    .getName());
 
                             SQLiteDatabase db = databaseManager.openConnection();
 
@@ -98,7 +96,7 @@ public class SQLiteNotificationCache implements NotificationCache
                     {
 
                         Timber.v("NotificationCache.read() on thread = " + Thread.currentThread()
-                                                                                 .getName());
+                                .getName());
 
                         List<Notification> notifications = new ArrayList<Notification>();
 
@@ -117,12 +115,12 @@ public class SQLiteNotificationCache implements NotificationCache
                         };
 
                         Cursor cursor = db
-                                .query(SQLiteCacheContract.Notification.TABLE_NAME, projection, null, null, null, null, SQLiteCacheContract.Notification.COLUMN_TIMESTAMP + " DESC");
+                                .query(SQLiteCacheContract.Notification.TABLE_NAME, projection,
+                                        null, null, null, null, SQLiteCacheContract.Notification
+                                                .COLUMN_TIMESTAMP + " DESC");
                         cursor.moveToFirst();
-                        while (!cursor.isAfterLast())
-                        {
-                            try
-                            {
+                        while (!cursor.isAfterLast()) {
+                            try {
                                 Notification notification = new Notification
                                         .Builder(cursor.getInt(0))
                                         .type(cursor.getInt(1))
@@ -138,8 +136,7 @@ public class SQLiteNotificationCache implements NotificationCache
 
                                 notifications.add(notification);
                             }
-                            catch (Exception e)
-                            {
+                            catch (Exception e) {
                                 Timber.v("Unable to process a notification [" + e
                                         .getMessage() + "]");
                             }
@@ -165,8 +162,7 @@ public class SQLiteNotificationCache implements NotificationCache
                     @Override
                     public void call(Subscriber<? super Object> subscriber)
                     {
-                        synchronized (TAG)
-                        {
+                        synchronized (TAG) {
                             Timber.v("NotificationCache.remove() on thread = " + Thread
                                     .currentThread()
                                     .getName());
@@ -196,8 +192,7 @@ public class SQLiteNotificationCache implements NotificationCache
                     @Override
                     public void call(Subscriber<? super Object> subscriber)
                     {
-                        synchronized (TAG)
-                        {
+                        synchronized (TAG) {
                             Timber.v("NotificationCache.markRead() on thread = " + Thread
                                     .currentThread()
                                     .getName());
@@ -205,7 +200,8 @@ public class SQLiteNotificationCache implements NotificationCache
                             SQLiteDatabase db = databaseManager.openConnection();
 
                             SQLiteStatement statement = db
-                                    .compileStatement(SQLiteCacheContract.Notification.SQL_MARK_READ);
+                                    .compileStatement(SQLiteCacheContract.Notification
+                                            .SQL_MARK_READ);
                             statement.bindString(1, String.valueOf(false));
                             statement.execute();
                             statement.close();
@@ -228,8 +224,7 @@ public class SQLiteNotificationCache implements NotificationCache
                     @Override
                     public void call(Subscriber<? super Object> subscriber)
                     {
-                        synchronized (TAG)
-                        {
+                        synchronized (TAG) {
                             Timber.v("NotificationCache.remove(id) on thread = " + Thread
                                     .currentThread()
                                     .getName());
@@ -237,7 +232,8 @@ public class SQLiteNotificationCache implements NotificationCache
                             SQLiteDatabase db = databaseManager.openConnection();
 
                             SQLiteStatement statement = db
-                                    .compileStatement(SQLiteCacheContract.Notification.SQL_DELETE_ONE);
+                                    .compileStatement(SQLiteCacheContract.Notification
+                                            .SQL_DELETE_ONE);
                             statement.bindLong(1, notificationId);
                             statement.execute();
                             statement.close();
@@ -260,8 +256,7 @@ public class SQLiteNotificationCache implements NotificationCache
                     @Override
                     public void call(Subscriber<? super Boolean> subscriber)
                     {
-                        synchronized (TAG)
-                        {
+                        synchronized (TAG) {
                             Timber.v("NotificationCache.isAvailable() on thread = " + Thread
                                     .currentThread()
                                     .getName());
@@ -272,21 +267,16 @@ public class SQLiteNotificationCache implements NotificationCache
 
                             Cursor cursor = db
                                     .rawQuery(SQLiteCacheContract.Notification.SQL_COUNT_NEW, null);
-                            if (cursor.moveToFirst())
-                            {
-                                do
-                                {
-                                    try
-                                    {
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    try {
                                         int count = Integer.parseInt(cursor.getString(0));
-                                        if (count > 0)
-                                        {
+                                        if (count > 0) {
                                             isAvailable = true;
                                             break;
                                         }
                                     }
-                                    catch (Exception e)
-                                    {
+                                    catch (Exception e) {
                                     }
                                 }
                                 while (cursor.moveToNext());
@@ -312,7 +302,8 @@ public class SQLiteNotificationCache implements NotificationCache
                     public void call(Subscriber<? super List<Notification>> subscriber)
                     {
 
-                        Timber.v("NotificationCache.getAllForType() on thread = " + Thread.currentThread()
+                        Timber.v("NotificationCache.getAllForType() on thread = " + Thread
+                                .currentThread()
                                 .getName());
 
                         List<Notification> notifications = new ArrayList<Notification>();
@@ -335,12 +326,12 @@ public class SQLiteNotificationCache implements NotificationCache
                         String[] selectionArgs = {String.valueOf(type)};
 
                         Cursor cursor = db
-                                .query(SQLiteCacheContract.Notification.TABLE_NAME, projection, selection, selectionArgs, null, null, SQLiteCacheContract.Notification.COLUMN_TIMESTAMP + " DESC");
+                                .query(SQLiteCacheContract.Notification.TABLE_NAME, projection,
+                                        selection, selectionArgs, null, null, SQLiteCacheContract
+                                                .Notification.COLUMN_TIMESTAMP + " DESC");
                         cursor.moveToFirst();
-                        while (!cursor.isAfterLast())
-                        {
-                            try
-                            {
+                        while (!cursor.isAfterLast()) {
+                            try {
                                 Notification notification = new Notification
                                         .Builder(cursor.getInt(0))
                                         .type(cursor.getInt(1))
@@ -356,8 +347,7 @@ public class SQLiteNotificationCache implements NotificationCache
 
                                 notifications.add(notification);
                             }
-                            catch (Exception e)
-                            {
+                            catch (Exception e) {
                                 Timber.v("Unable to process a notification [" + e
                                         .getMessage() + "]");
                             }
@@ -384,7 +374,8 @@ public class SQLiteNotificationCache implements NotificationCache
                     public void call(Subscriber<? super List<Notification>> subscriber)
                     {
 
-                        Timber.v("NotificationCache.getAllForType() on thread = " + Thread.currentThread()
+                        Timber.v("NotificationCache.getAllForType() on thread = " + Thread
+                                .currentThread()
                                 .getName());
 
                         List<Notification> notifications = new ArrayList<Notification>();
@@ -403,16 +394,17 @@ public class SQLiteNotificationCache implements NotificationCache
                                 SQLiteCacheContract.Notification.COLUMN_IS_NEW
                         };
 
-                        String selection = SQLiteCacheContract.Notification.COLUMN_EVENT_ID + " = ?";
+                        String selection = SQLiteCacheContract.Notification.COLUMN_EVENT_ID + " =" +
+                                " ?";
                         String[] selectionArgs = {String.valueOf(eventId)};
 
                         Cursor cursor = db
-                                .query(SQLiteCacheContract.Notification.TABLE_NAME, projection, selection, selectionArgs, null, null, SQLiteCacheContract.Notification.COLUMN_TIMESTAMP + " DESC");
+                                .query(SQLiteCacheContract.Notification.TABLE_NAME, projection,
+                                        selection, selectionArgs, null, null, SQLiteCacheContract
+                                                .Notification.COLUMN_TIMESTAMP + " DESC");
                         cursor.moveToFirst();
-                        while (!cursor.isAfterLast())
-                        {
-                            try
-                            {
+                        while (!cursor.isAfterLast()) {
+                            try {
                                 Notification notification = new Notification
                                         .Builder(cursor.getInt(0))
                                         .type(cursor.getInt(1))
@@ -428,8 +420,7 @@ public class SQLiteNotificationCache implements NotificationCache
 
                                 notifications.add(notification);
                             }
-                            catch (Exception e)
-                            {
+                            catch (Exception e) {
                                 Timber.v("Unable to process a notification [" + e
                                         .getMessage() + "]");
                             }
@@ -447,16 +438,126 @@ public class SQLiteNotificationCache implements NotificationCache
     }
 
     @Override
-    public Observable<List<Notification>> getAll(int type, String eventId)
+    public Observable<List<Notification>> getAll(final int type, final String eventId)
     {
-        return null;
+        return Observable
+                .create(new Observable.OnSubscribe<List<Notification>>()
+                {
+                    @Override
+                    public void call(Subscriber<? super List<Notification>> subscriber)
+                    {
+
+                        Timber.v("NotificationCache.getAllForType() on thread = " + Thread
+                                .currentThread()
+                                .getName());
+
+                        List<Notification> notifications = new ArrayList<Notification>();
+
+                        SQLiteDatabase db = databaseManager.openConnection();
+                        String[] projection = {
+                                SQLiteCacheContract.Notification.COLUMN_ID,
+                                SQLiteCacheContract.Notification.COLUMN_TYPE,
+                                SQLiteCacheContract.Notification.COLUMN_TITLE,
+                                SQLiteCacheContract.Notification.COLUMN_MESSAGE,
+                                SQLiteCacheContract.Notification.COLUMN_EVENT_ID,
+                                SQLiteCacheContract.Notification.COLUMN_EVENT_NAME,
+                                SQLiteCacheContract.Notification.COLUMN_USER_ID,
+                                SQLiteCacheContract.Notification.COLUMN_USER_NAME,
+                                SQLiteCacheContract.Notification.COLUMN_TIMESTAMP,
+                                SQLiteCacheContract.Notification.COLUMN_IS_NEW
+                        };
+
+                        String selection = SQLiteCacheContract.Notification.COLUMN_EVENT_ID + " =" +
+                                " ? AND " + SQLiteCacheContract.Notification.COLUMN_TYPE + " = ?";
+                        String[] selectionArgs = {String.valueOf(eventId), String.valueOf(type)};
+
+                        Cursor cursor = db
+                                .query(SQLiteCacheContract.Notification.TABLE_NAME, projection,
+                                        selection, selectionArgs, null, null, SQLiteCacheContract
+                                                .Notification.COLUMN_TIMESTAMP + " DESC");
+                        cursor.moveToFirst();
+                        while (!cursor.isAfterLast()) {
+                            try {
+                                Notification notification = new Notification
+                                        .Builder(cursor.getInt(0))
+                                        .type(cursor.getInt(1))
+                                        .title(cursor.getString(2))
+                                        .message(cursor.getString(3))
+                                        .eventId(cursor.getString(4))
+                                        .eventName(cursor.getString(5))
+                                        .userId(cursor.getString(6))
+                                        .userName(cursor.getString(7))
+                                        .timestamp(new DateTime(cursor.getLong(8)))
+                                        .isNew(Boolean.parseBoolean(cursor.getString(9)))
+                                        .build();
+
+                                notifications.add(notification);
+                            }
+                            catch (Exception e) {
+                                Timber.v("Unable to process a notification [" + e
+                                        .getMessage() + "]");
+                            }
+
+                            cursor.moveToNext();
+                        }
+                        cursor.close();
+                        databaseManager.closeConnection();
+
+                        subscriber.onNext(notifications);
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io());
     }
 
     @Override
-    public void clearAll() {
+    public Observable<Boolean> clear(final List<Integer> notifificationIds)
+    {
+        return Observable
+                .create(new Observable.OnSubscribe<Boolean>()
+                {
+                    @Override
+                    public void call(Subscriber<? super Boolean> subscriber)
+                    {
+                        synchronized (TAG) {
+                            Timber.v("NotificationCache.clearList(ids) on thread = " + Thread
+                                    .currentThread()
+                                    .getName());
 
-        synchronized (TAG)
-        {
+                            if(notifificationIds.size() > 0) {
+                                SQLiteDatabase db = databaseManager.openConnection();
+                                db.beginTransactionNonExclusive();
+
+                                for (Integer notificationId : notifificationIds) {
+                                    SQLiteStatement statement = db
+                                            .compileStatement(SQLiteCacheContract.Notification
+                                                    .SQL_DELETE_ONE);
+                                    statement.bindLong(1, notificationId);
+                                    statement.execute();
+                                    statement.close();
+                                }
+
+                                db.setTransactionSuccessful();
+                                db.endTransaction();
+
+                                databaseManager.closeConnection();
+
+                            }
+
+                            subscriber.onNext(true);
+
+                            subscriber.onCompleted();
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public void clearAll()
+    {
+
+        synchronized (TAG) {
             Timber.v("NotificationCache.remove() on thread = " + Thread
                     .currentThread()
                     .getName());

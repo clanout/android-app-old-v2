@@ -101,6 +101,11 @@ public class NotificationService
 
                                 if (events.contains(event)) {
                                     filtered.add(notification);
+                                }else{
+                                    if(notification.getType() == Notification.EVENT_REMOVED)
+                                    {
+                                        filtered.add(notification);
+                                    }
                                 }
                             }
                         }
@@ -279,45 +284,13 @@ public class NotificationService
                         if (!(notification.getArgs().get("user_id")
                                 .equals(userService
                                         .getSessionUserId()))) {
-                            boolean isLocationUpdated = Boolean
-                                    .parseBoolean(notification
-                                            .getArgs()
-                                            .get("is_location_updated"));
-                            boolean isTimeUpdated = Boolean
-                                    .parseBoolean(notification
-                                            .getArgs()
-                                            .get("is_time_updated"));
 
-                            if (isLocationUpdated) {
-                                if (isTimeUpdated) {
-                                    notification
-                                            .setMessage(notification
+                            notification
+                                    .setMessage(notification
                                                     .getArgs()
                                                     .get("user_name") + " updated " + notification
                                                     .getArgs()
                                                     .get("event_name"));
-                                }
-                                else {
-                                    notification
-                                            .setMessage(notification
-                                                    .getArgs()
-                                                    .get("user_name") + " updated the location " +
-                                                    "for " + notification
-                                                    .getArgs()
-                                                    .get("event_name"));
-                                }
-                            }
-                            else {
-                                if (isTimeUpdated) {
-                                    notification
-                                            .setMessage(notification
-                                                    .getArgs()
-                                                    .get("user_name") + " updated the timings for" +
-                                                    " " + notification
-                                                    .getArgs()
-                                                    .get("event_name"));
-                                }
-                            }
 
                             notificationCache.put(notification)
                                     .observeOn(Schedulers
