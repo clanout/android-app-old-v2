@@ -137,7 +137,6 @@ public class EventDetailsActivity extends BaseActivity implements
     }
 
     /* Screen Methods */
-
     @Override
     public void navigateToChatScreen(String eventId)
     {
@@ -157,6 +156,12 @@ public class EventDetailsActivity extends BaseActivity implements
         finish();
     }
 
+    @Override
+    public void setTitle(String title)
+    {
+        setScreenTitle(title);
+    }
+
     /* Helper Method */
     private void navigateToHome()
     {
@@ -170,7 +175,7 @@ public class EventDetailsActivity extends BaseActivity implements
 
     private void navigateBack()
     {
-        if(isTaskRoot())
+        if (isTaskRoot())
         {
             startActivity(HomeActivity.callingIntent(this));
         }

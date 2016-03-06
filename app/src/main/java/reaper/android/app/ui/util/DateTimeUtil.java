@@ -1,6 +1,7 @@
 package reaper.android.app.ui.util;
 
 import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import timber.log.Timber;
 
 public class DateTimeUtil
 {
@@ -132,5 +135,39 @@ public class DateTimeUtil
     public static DateTime getEndTime(DateTime startTime)
     {
         return startTime.plusDays(1).withTimeAtStartOfDay();
+    }
+
+    public static String getDetailsScreenTitle(DateTime dateTime)
+    {
+        LocalDate date = dateTime.toLocalDate();
+        DateTime now = DateTime.now();
+
+        Timber.v(">>>> HERE : " + dateTime.toString() + " : " + now.toString());
+
+        if (dateTime.isBefore(now))
+        {
+            return "Clan Out";
+        }
+        else
+        {
+            LocalDate today = now.toLocalDate();
+            if (today.equals(date))
+            {
+                return "Today";
+            }
+            else
+            {
+                LocalDate tomorrow = today.plusDays(1);
+                if (tomorrow.equals(date))
+                {
+                    return "Tomorrow";
+                }
+                else
+                {
+                    int days = Days.daysBetween(today, date).getDays();
+                    return days + " days to go";
+                }
+            }
+        }
     }
 }

@@ -10,4 +10,6 @@ public interface EventDetailsScreen
     void navigateToInviteScreen(String eventId);
 
     void navigateToEditScreen(Event event, EventDetails eventDetails);
+
+    void setTitle(String title);
 }

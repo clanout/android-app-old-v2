@@ -668,7 +668,6 @@ public class SQLiteEventCache implements EventCache
                     @Override
                     public void onNext(Object o)
                     {
-
                     }
                 });
     }
@@ -702,7 +701,6 @@ public class SQLiteEventCache implements EventCache
                             }
                             catch (Exception e)
                             {
-                                e.printStackTrace();
                             }
                         }
                         else

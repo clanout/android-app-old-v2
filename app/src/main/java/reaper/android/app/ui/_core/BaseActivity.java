@@ -169,6 +169,16 @@ public class BaseActivity extends AppCompatActivity
         getSupportActionBar().setTitle(title);
     }
 
+    protected void setScreenTitle(String title)
+    {
+        if (getSupportActionBar() == null)
+        {
+            return;
+        }
+
+        getSupportActionBar().setTitle(title);
+    }
+
     protected void setActionBarBackVisibility(boolean isVisible)
     {
         if (getSupportActionBar() == null)

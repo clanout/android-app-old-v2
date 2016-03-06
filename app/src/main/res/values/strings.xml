@@ -185,7 +185,7 @@
 
     <!-- Invitation Response Dialog -->
     <string name="invitation_response_title">Not Going?</string>
-    <string name="invitation_response_message">Inform friends of your absence by leaving a message</string>
+    <string name="invitation_response_message">Your friends invited you for this plan. Inform friends of your absence by leaving a message</string>
     <string name="invitation_response_positive_button">OK</string>
     <string name="invitation_response_sent">Your friends will be notified</string>
 

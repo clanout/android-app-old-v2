@@ -24,6 +24,8 @@ import com.squareup.picasso.Picasso;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,9 +49,9 @@ import reaper.android.app.ui.dialog.StatusDialog;
 import reaper.android.app.ui.screens.details.mvp.EventDetailsPresenter;
 import reaper.android.app.ui.screens.details.mvp.EventDetailsPresenterImpl;
 import reaper.android.app.ui.screens.details.mvp.EventDetailsView;
+import reaper.android.app.ui.util.CategoryIconFactory;
 import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.DateTimeUtil;
-import reaper.android.app.ui.util.CategoryIconFactory;
 import reaper.android.app.ui.util.FriendBubbles;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
@@ -319,6 +321,8 @@ public class EventDetailsFragment extends BaseFragment implements
         {
             mivGoogleMap.setVisibility(View.GONE);
         }
+
+        screen.setTitle(getScreenTitle(event.getStartTime()));
     }
 
     @Override
@@ -512,7 +516,7 @@ public class EventDetailsFragment extends BaseFragment implements
         else
         {
             tvStatus.setText(status);
-            tvStatus.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_subtitle));
+            tvStatus.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
         }
 
         tvStatus.setOnClickListener(new View.OnClickListener()
@@ -628,7 +632,7 @@ public class EventDetailsFragment extends BaseFragment implements
             @Override
             public void onInvitationResponseEntered(String invitationResponse)
             {
-                if(presenter != null)
+                if (presenter != null)
                 {
                     presenter.sendInvitationResponse(invitationResponse);
                     SnackbarFactory.create(getActivity(), R.string.invitation_response_sent);
@@ -640,5 +644,10 @@ public class EventDetailsFragment extends BaseFragment implements
             {
             }
         });
+    }
+
+    private String getScreenTitle(DateTime startTime)
+    {
+        return DateTimeUtil.getDetailsScreenTitle(startTime);
     }
 }
