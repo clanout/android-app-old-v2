@@ -103,93 +103,113 @@ public class PhonebookService_
 
     public Observable<List<PhonebookContact>> fetchAllContacts()
     {
-        return Observable
-                .create(new Observable.OnSubscribe<List<PhonebookContact>>()
+        return Observable.create(new Observable.OnSubscribe<List<PhonebookContact>>()
+        {
+            @Override
+            public void call(Subscriber<? super List<PhonebookContact>> subscriber)
+            {
+                String cachedPhonebookContactsString = genericCache.get(GenericCacheKeys
+                        .PHONEBOOK_CONTACTS);
+                Type type = new TypeToken<List<PhonebookContact>>()
                 {
-                    @Override
-                    public void call(Subscriber<? super List<PhonebookContact>> subscriber)
-                    {
-                        String cachedPhonebookContactsString = genericCache.get(GenericCacheKeys.PHONEBOOK_CONTACTS);
-                        Type type = new TypeToken<List<PhonebookContact>>(){}.getType();
-                        List<PhonebookContact> cachedPhonebookContacts = GsonProvider.getGson().fromJson(cachedPhonebookContactsString, type);
+                }.getType();
+                List<PhonebookContact> cachedPhonebookContacts = GsonProvider.getGson().fromJson
+                        (cachedPhonebookContactsString, type);
 
-                        if(cachedPhonebookContacts == null)
+                if (cachedPhonebookContacts == null) {
+                    cachedPhonebookContacts = new ArrayList<PhonebookContact>();
+                }
+
+                subscriber.onNext(cachedPhonebookContacts);
+                subscriber.onCompleted();
+
+            }
+        })
+        .flatMap(new Func1<List<PhonebookContact>, Observable<List<PhonebookContact>>>()
+        {
+            @Override
+            public Observable<List<PhonebookContact>> call(final List<PhonebookContact> phonebookContacts)
+            {
+                return Observable
+                        .create(new Observable.OnSubscribe<List<PhonebookContact>>()
                         {
-                            cachedPhonebookContacts = new ArrayList<PhonebookContact>();
-                        }
+                            @Override
+                            public void call(Subscriber<? super List<PhonebookContact>> subscriber)
+                            {
+                                if (phonebookContacts.size() != 0) {
 
-                        if (cachedPhonebookContacts.size() != 0) {
-
-                            subscriber.onNext(cachedPhonebookContacts);
-                            subscriber.onCompleted();
-                        }
-                        else {
-
-                            try {
-                                List<PhonebookContact> contacts = new ArrayList<>();
-                                Cursor cursor = context
-                                        .getContentResolver()
-                                        .query(ContactsContract.Contacts.CONTENT_URI, null, null,
-                                                null, null);
-
-                                String id = null;
-                                String name = null;
-                                String phone = null;
-                                String sanitizedPhone = null;
-
-                                if (cursor.getCount() > 0) {
-                                    while (cursor.moveToNext()) {
-                                        id = cursor.getString(cursor
-                                                .getColumnIndex(ContactsContract.Contacts._ID));
-                                        name = cursor.getString(cursor
-                                                .getColumnIndex(ContactsContract.Contacts
-                                                        .DISPLAY_NAME));
-                                        if (Integer.parseInt(cursor.getString(cursor
-                                                .getColumnIndex(ContactsContract.Contacts
-                                                        .HAS_PHONE_NUMBER))) > 0) {
-
-                                            Cursor smallCursor =
-                                                    context.getContentResolver()
-                                                            .query(ContactsContract.CommonDataKinds
-                                                                            .Phone.CONTENT_URI,
-                                                                    null,
-                                                                    ContactsContract.CommonDataKinds
-                                                                            .Phone.CONTACT_ID + "" +
-                                                                            " = ?",
-                                                                    new String[]{id}, null);
-
-
-                                            while (smallCursor.moveToNext()) {
-                                                phone = smallCursor.getString(smallCursor
-                                                        .getColumnIndex(ContactsContract
-                                                                .CommonDataKinds.Phone.NUMBER));
-                                                sanitizedPhone = PhoneUtils
-                                                        .sanitize(phone, AppConstants
-                                                                .DEFAULT_COUNTRY_CODE);
-
-                                                PhonebookContact contact = new PhonebookContact();
-                                                contact.setName(name);
-                                                contact.setPhone(sanitizedPhone);
-                                                if (!contacts.contains(contact)) {
-                                                    contacts.add(contact);
-                                                }
-                                            }
-                                            smallCursor.close();
-                                        }
-                                    }
-                                    cursor.close();
-
-                                    subscriber.onNext(contacts);
+                                    subscriber.onNext(phonebookContacts);
                                     subscriber.onCompleted();
                                 }
+                                else {
+
+                                    try {
+                                        List<PhonebookContact> contacts = new ArrayList<>();
+                                        Cursor cursor = context
+                                                .getContentResolver()
+                                                .query(ContactsContract.Contacts.CONTENT_URI, null, null,
+                                                        null, null);
+
+                                        String id = null;
+                                        String name = null;
+                                        String phone = null;
+                                        String sanitizedPhone = null;
+
+                                        if (cursor.getCount() > 0) {
+                                            while (cursor.moveToNext()) {
+                                                id = cursor.getString(cursor
+                                                        .getColumnIndex(ContactsContract.Contacts._ID));
+                                                name = cursor.getString(cursor
+                                                        .getColumnIndex(ContactsContract.Contacts
+                                                                .DISPLAY_NAME));
+                                                if (Integer.parseInt(cursor.getString(cursor
+                                                        .getColumnIndex(ContactsContract.Contacts
+                                                                .HAS_PHONE_NUMBER))) > 0) {
+
+                                                    Cursor smallCursor =
+                                                            context.getContentResolver()
+                                                                    .query(ContactsContract.CommonDataKinds
+                                                                                    .Phone.CONTENT_URI,
+                                                                            null,
+                                                                            ContactsContract.CommonDataKinds
+                                                                                    .Phone.CONTACT_ID + "" +
+                                                                                    " = ?",
+                                                                            new String[]{id}, null);
+
+
+                                                    while (smallCursor.moveToNext()) {
+                                                        phone = smallCursor.getString(smallCursor
+                                                                .getColumnIndex(ContactsContract
+                                                                        .CommonDataKinds.Phone.NUMBER));
+                                                        sanitizedPhone = PhoneUtils
+                                                                .sanitize(phone, AppConstants
+                                                                        .DEFAULT_COUNTRY_CODE);
+
+                                                        PhonebookContact contact = new PhonebookContact();
+                                                        contact.setName(name);
+                                                        contact.setPhone(sanitizedPhone);
+                                                        if (!contacts.contains(contact)) {
+                                                            contacts.add(contact);
+                                                        }
+                                                    }
+                                                    smallCursor.close();
+                                                }
+                                            }
+                                            cursor.close();
+
+                                            subscriber.onNext(contacts);
+                                            subscriber.onCompleted();
+                                        }
+                                    }
+                                    catch (Exception e) {
+                                        subscriber.onError(e);
+                                    }
+                                }
                             }
-                            catch (Exception e) {
-                                subscriber.onError(e);
-                            }
-                        }
-                    }
-                })
-                .map(new Func1<List<PhonebookContact>, List<PhonebookContact>>()
+                        });
+
+            }
+        })      .map(new Func1<List<PhonebookContact>, List<PhonebookContact>>()
                 {
                     @Override
                     public List<PhonebookContact> call(List<PhonebookContact> phonebookContacts)
