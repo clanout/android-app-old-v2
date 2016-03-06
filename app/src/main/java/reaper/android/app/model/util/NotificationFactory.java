@@ -1,6 +1,7 @@
 package reaper.android.app.model.util;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
 
@@ -14,9 +15,9 @@ import java.util.Map;
 import reaper.android.app.api._core.GsonProvider;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.notification.NotificationCache;
+import reaper.android.app.config.NotificationMessages;
 import reaper.android.app.model.Notification;
 import rx.Observable;
-import rx.Subscriber;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
@@ -38,6 +39,8 @@ public class NotificationFactory
                     .fromJson(data.getString("parameters"), TYPE);
 
             int typeCode = NotificationHelper.getType(type);
+
+            Log.d("NOTIFICATION", "typecode ---- " + typeCode);
 
             return buildNotification(typeCode, args);
 
@@ -82,23 +85,78 @@ public class NotificationFactory
             case Notification.EVENT_REMOVED:
                 return buildEventRemovedNotification(args);
 
+            case Notification.EVENT_INVITATION:
+                Log.d("NOTIFICATION", "building invitation notification");
+                return buildEventInvitationNotification(args);
+
             default:
                 throw new IllegalArgumentException("Notification Type Invalid");
         }
     }
 
-    private static Observable<Notification> buildEventRemovedNotification(final Map<String, String> args)
+    private static Observable<Notification> buildEventInvitationNotification(final Map<String,
+            String>
+                                                                                     args)
+    {
+        return notificationCache.getAll(Notification.EVENT_INVITATION, args.get("event_id"))
+                .flatMap(new Func1<List<Notification>, Observable<Integer>>()
+                         {
+                             @Override
+                             public Observable<Integer> call(final List<Notification> notifications)
+                             {
+                                 Log.d("NOTIFICATION", "notifications size --- " + notifications.size());
+
+                                 List<Integer> notificationIds = getNotificationIdsList
+                                         (notifications);
+
+                                 Log.d("NOTIFICATION", "notifications id size --- " + notificationIds.size());
+
+                                 return notificationCache
+                                         .clear(notificationIds)
+                                         .flatMap(new Func1<Boolean, Observable<Integer>>()
+                                         {
+                                             @Override
+                                             public Observable<Integer> call(Boolean aBoolean)
+                                             {
+                                                 return calculatePreviousInviteeCount
+                                                         (notifications);
+                                             }
+                                         });
+                             }
+                         }
+                )
+                .flatMap(new Func1<Integer, Observable<Notification>>()
+                {
+                    @Override
+                    public Observable<Notification> call(Integer previousInviteeCount)
+                    {
+
+                        Log.d("NOTIFICATION", "previous invitee count --- " + previousInviteeCount);
+
+                        String message = getInviteNotificationMessage(previousInviteeCount, args);
+
+                        Log.d("NOTIFICATION", "mssage --- " + message);
+
+                        Notification notification = getNotificationObjectHavingEventInformation
+                                (Notification.EVENT_INVITATION, args, message);
+
+                        Log.d("NOTIFICATION", "notification --- " + notification.getType() + " " + notification.getArgs());
+
+                        return Observable.just(notification);
+                    }
+                });
+    }
+
+    private static Observable<Notification> buildEventRemovedNotification(final Map<String,
+            String> args)
     {
         return notificationCache.getAllForEvent(args.get("event_id"))
                 .flatMap(new Func1<List<Notification>, Observable<Boolean>>()
                 {
                     @Override
-                    public Observable<Boolean> call(List<Notification> notifications)
+                    public Observable<Boolean> call(final List<Notification> notifications)
                     {
-                        List<Integer> notificationIds = new ArrayList<Integer>();
-                        for (Notification notification : notifications) {
-                            notificationIds.add(notification.getId());
-                        }
+                        List<Integer> notificationIds = getNotificationIdsList(notifications);
 
                         return notificationCache.clear(notificationIds);
                     }
@@ -110,6 +168,7 @@ public class NotificationFactory
                     {
                         String message = NotificationHelper.getMessage(Notification
                                 .EVENT_REMOVED, args);
+
                         Notification notification = getNotificationObjectHavingEventInformation
                                 (Notification.EVENT_REMOVED, args, message);
                         return Observable.just(notification);
@@ -134,10 +193,7 @@ public class NotificationFactory
                     @Override
                     public Observable<Boolean> call(List<Notification> notifications)
                     {
-                        List<Integer> notificationIds = new ArrayList<Integer>();
-                        for (Notification notification : notifications) {
-                            notificationIds.add(notification.getId());
-                        }
+                        List<Integer> notificationIds = getNotificationIdsList(notifications);
 
                         return notificationCache.clear(notificationIds);
                     }
@@ -149,6 +205,7 @@ public class NotificationFactory
                     {
                         String message = NotificationHelper.getMessage(Notification
                                 .STATUS, args);
+
                         Notification notification = getNotificationObjectHavingEventInformation
                                 (Notification.STATUS, args, message);
                         return Observable.just(notification);
@@ -165,16 +222,20 @@ public class NotificationFactory
                 .subscribeOn(Schedulers.newThread());
     }
 
-    private static Observable<Notification> buildFriendRelocatedNotification(Map<String, String> args)
+    private static Observable<Notification> buildFriendRelocatedNotification(Map<String, String>
+                                                                                     args)
 
     {
         String message = NotificationHelper.getMessage(Notification.FRIEND_RELOCATED, args);
+
         return Observable.just(
-                getNotificationObjectNotHavingEventInformation(Notification.FRIEND_RELOCATED, args, message)
+                getNotificationObjectNotHavingEventInformation(Notification.FRIEND_RELOCATED,
+                        args, message)
         );
     }
 
-    private static Observable<Notification> buildNewRsvpUpdatedNotification(final Map<String, String> args)
+    private static Observable<Notification> buildNewRsvpUpdatedNotification(final Map<String,
+            String> args)
 
     {
         return notificationCache.getAll(Notification.RSVP, args.get("event_id"))
@@ -183,10 +244,7 @@ public class NotificationFactory
                     @Override
                     public Observable<Boolean> call(List<Notification> notifications)
                     {
-                        List<Integer> notificationIds = new ArrayList<Integer>();
-                        for (Notification notification : notifications) {
-                            notificationIds.add(notification.getId());
-                        }
+                        List<Integer> notificationIds = getNotificationIdsList(notifications);
 
                         return notificationCache.clear(notificationIds);
                     }
@@ -198,6 +256,7 @@ public class NotificationFactory
                     {
                         String message = NotificationHelper.getMessage(Notification
                                 .RSVP, args);
+
                         Notification notification = getNotificationObjectHavingEventInformation
                                 (Notification.RSVP, args, message);
                         return Observable.just(notification);
@@ -224,10 +283,7 @@ public class NotificationFactory
                     @Override
                     public Observable<Boolean> call(List<Notification> notifications)
                     {
-                        List<Integer> notificationIds = new ArrayList<Integer>();
-                        for (Notification notification : notifications) {
-                            notificationIds.add(notification.getId());
-                        }
+                        List<Integer> notificationIds = getNotificationIdsList(notifications);
 
                         return notificationCache.clear(notificationIds);
                     }
@@ -239,6 +295,7 @@ public class NotificationFactory
                     {
                         String message = NotificationHelper.getMessage(Notification
                                 .EVENT_UPDATED, args);
+
                         Notification notification = getNotificationObjectHavingEventInformation
                                 (Notification.EVENT_UPDATED, args, message);
                         return Observable.just(notification);
@@ -259,6 +316,7 @@ public class NotificationFactory
             String> args)
     {
         String message = NotificationHelper.getMessage(Notification.NEW_FRIEND_ADDED, args);
+
         return Observable.just(
                 getNotificationObjectNotHavingEventInformation(Notification.NEW_FRIEND_ADDED,
                         args, message)
@@ -268,6 +326,7 @@ public class NotificationFactory
     private static Observable<Notification> buildEventCreatedNotification(Map<String, String> args)
     {
         String message = NotificationHelper.getMessage(Notification.EVENT_CREATED, args);
+
         return Observable.just(
                 getNotificationObjectHavingEventInformation(Notification.EVENT_CREATED, args,
                         message)
@@ -277,6 +336,7 @@ public class NotificationFactory
     private static Observable<Notification> buildUnblockedNotification(Map<String, String> args)
     {
         String message = NotificationHelper.getMessage(Notification.UNBLOCKED, args);
+
         return Observable.just(
                 getNotificationObjectNotHavingEventInformation(Notification.UNBLOCKED, args,
                         message)
@@ -286,6 +346,7 @@ public class NotificationFactory
     private static Observable<Notification> buildBlockedNotification(Map<String, String> args)
     {
         String message = NotificationHelper.getMessage(Notification.BLOCKED, args);
+
         return Observable.just(
                 getNotificationObjectNotHavingEventInformation(Notification.BLOCKED, args, message)
         );
@@ -301,10 +362,7 @@ public class NotificationFactory
                     @Override
                     public Observable<Boolean> call(List<Notification> notifications)
                     {
-                        List<Integer> notificationIds = new ArrayList<Integer>();
-                        for (Notification notification : notifications) {
-                            notificationIds.add(notification.getId());
-                        }
+                        List<Integer> notificationIds = getNotificationIdsList(notifications);
 
                         return notificationCache.clear(notificationIds);
                     }
@@ -316,7 +374,8 @@ public class NotificationFactory
                     {
 
                         String message = NotificationHelper.getMessage(Notification.CHAT, args);
-                        Notification notification = new Notification.Builder(Integer.parseInt(args.get("notification_id")))
+                        Notification notification = new Notification.Builder(Integer.parseInt
+                                (args.get("notification_id")))
                                 .type(Notification.CHAT)
                                 .title(args.get("event_name"))
                                 .eventId(args.get("event_id"))
@@ -324,7 +383,7 @@ public class NotificationFactory
                                 .userId(args.get("user_id"))
                                 .userName("")
                                 .timestamp(DateTime.now())
-                                .message(NotificationHelper.getMessage(Notification.CHAT, args))
+                                .message(message)
                                 .isNew(true)
                                 .args(args)
                                 .build();
@@ -356,7 +415,7 @@ public class NotificationFactory
                 .userId(args.get("user_id"))
                 .userName("user_name")
                 .timestamp(DateTime.now())
-                .message(NotificationHelper.getMessage(typeCode, args))
+                .message(message)
                 .isNew(true)
                 .args(args)
                 .build();
@@ -375,64 +434,94 @@ public class NotificationFactory
                 .userId("")
                 .userName("")
                 .timestamp(DateTime.now())
-                .message(NotificationHelper.getMessage(typeCode, args))
+                .message(message)
                 .isNew(true)
                 .args(args)
                 .build();
     }
 
-//    private void test()
-//    {
-//        if ((typeCode == Notification.BLOCKED) || (typeCode == Notification.UNBLOCKED) ||
-//                (typeCode == Notification.FRIEND_RELOCATED) || (typeCode == Notification
-//                .NEW_FRIEND_ADDED)) {
-//            Notification notification =
-//                    new Notification.Builder(Integer.parseInt(args.get("notification_id")))
-//                            .type(typeCode)
-//                            .title(TITLE)
-//                            .eventId("")
-//                            .eventName("")
-//                            .userId("")
-//                            .userName("")
-//                            .timestamp(DateTime.now())
-//                            .message(NotificationHelper.getMessage(typeCode, args))
-//                            .isNew(true)
-//                            .args(args)
-//                            .build();
-//            return notification;
-//        }
-//        else if (typeCode == Notification.CHAT) {
-//            Notification notification =
-//                    new Notification.Builder(Integer.parseInt(args.get("notification_id")))
-//                            .type(typeCode)
-//                            .title(args.get("event_name"))
-//                            .eventId(args.get("event_id"))
-//                            .eventName(args.get("event_name"))
-//                            .userId(args.get("user_id"))
-//                            .userName("")
-//                            .timestamp(DateTime.now())
-//                            .message(NotificationHelper.getMessage(typeCode, args))
-//                            .isNew(true)
-//                            .args(args)
-//                            .build();
-//            return notification;
-//        }
-//        else {
-//            Notification notification =
-//                    new Notification.Builder(Integer.parseInt(args.get("notification_id")))
-//                            .type(typeCode)
-//                            .title(args.get("event_name"))
-//                            .eventId(args.get("event_id"))
-//                            .eventName(args.get("event_name"))
-//                            .userId(args.get("user_id"))
-//                            .userName(args.get("user_name"))
-//                            .timestamp(DateTime.now())
-//                            .message(NotificationHelper.getMessage(typeCode, args))
-//                            .isNew(true)
-//                            .args(args)
-//                            .build();
-//            return notification;
-//        }
-//
-//    }
+    private static String getInviteNotificationMessage(Integer previousInviteeCount, Map<String,
+            String> args)
+    {
+        String message = "";
+
+        if (previousInviteeCount == 0) {
+            message = NotificationHelper.getMessage(Notification
+                    .EVENT_INVITATION, args);
+
+        }
+        else {
+
+            message = String.format(NotificationMessages.EVENT_INVITATION,
+                    args.get
+                            ("user_name") + " and " + previousInviteeCount + " others",
+                    args.get("event_name"));
+
+        }
+
+        return message;
+    }
+
+    private static Observable<Integer> calculatePreviousInviteeCount(List<Notification>
+                                                                             notifications)
+    {
+        if (notifications.size() != 0) {
+
+            String message = notifications.get(0).getMessage();
+
+            return Observable.just(getInviteeCountFromMessage(message));
+
+        }
+        else {
+            return Observable.just(0);
+        }
+    }
+
+    private static List<Integer> getNotificationIdsList(List<Notification> notifications)
+    {
+        List<Integer> notificationIds = new ArrayList<Integer>();
+        for (Notification notification : notifications) {
+            notificationIds.add(notification.getId());
+        }
+
+        return notificationIds;
+    }
+
+    private static Integer getInviteeCountFromMessage(String message)
+    {
+        try {
+            if (message.contains("others invited you to")) {
+
+                String [] wordArray = message.split(" ");
+
+                try{
+
+                    return Integer.valueOf(wordArray[3]) + 1;
+                }catch (Exception e)
+                {
+                    try {
+                        return Integer.valueOf(wordArray[2]) + 1;
+                    }catch (Exception exception)
+                    {
+                        return 0;
+                    }
+                }
+
+            }
+            else if (message.contains("invited you to")) {
+
+                return 1;
+
+            }
+            else {
+
+                return 0;
+            }
+        }
+        catch (Exception e) {
+            return 0;
+        }
+
+    }
+
 }

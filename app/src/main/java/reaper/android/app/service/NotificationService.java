@@ -240,7 +240,7 @@ public class NotificationService
 
                         }
                         else {
-                            buildNotification(notification, true, false);
+                            buildNotification(notification, false, false);
                         }
                     }
 
@@ -806,6 +806,7 @@ public class NotificationService
                         if (notifications.size() == 1) {
                             notificationBuilder.setContentTitle(notification.getTitle());
                             notificationBuilder.setContentText(notification.getMessage());
+
                         }
                         else if (notifications.size() > 1) {
 
@@ -824,7 +825,7 @@ public class NotificationService
                                         .getType() == Notification.EVENT_REMOVED) {
 
                                     bigTextMessage
-                                            .append("\u25CF" + " " + noti.getMessage());
+                                            .append(noti.getMessage());
                                     bigTextMessage.append("\n");
                                 }
                             }
@@ -833,7 +834,7 @@ public class NotificationService
                                 for (Notification noti : notifications) {
 
                                     bigTextMessage
-                                            .append("\u25CF" + " " + noti.getMessage());
+                                            .append(noti.getMessage());
                                     bigTextMessage.append("\n");
 
                                 }
