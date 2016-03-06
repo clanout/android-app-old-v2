@@ -44,8 +44,8 @@ import reaper.android.app.ui.dialog.EventTypeInfoDialog;
 import reaper.android.app.ui.screens.create.mvp.CreateEventPresenter;
 import reaper.android.app.ui.screens.create.mvp.CreateEventPresenterImpl;
 import reaper.android.app.ui.screens.create.mvp.CreateEventView;
-import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.CategoryIconFactory;
+import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
@@ -116,6 +116,7 @@ public class CreateDetailsFragment extends BaseFragment implements
     View focusThief;
 
     ProgressDialog createProgressDialog;
+//    CreateEventLoadingDialog createProgressDialog;
 
     /* Data */
     DateTimeUtil dateTimeUtil;
@@ -239,7 +240,7 @@ public class CreateDetailsFragment extends BaseFragment implements
     public void showLoading()
     {
         createProgressDialog = ProgressDialog
-                .show(getActivity(), "Creating your clan", "Please wait ...");
+                .show(getActivity(), "Creating your plan", "Please wait ...");
     }
 
     @Override
@@ -468,7 +469,8 @@ public class CreateDetailsFragment extends BaseFragment implements
         selectedCategory = category;
         ivCategoryIcon.setImageDrawable(CategoryIconFactory
                 .get(selectedCategory, Dimensions.EVENT_ICON_SIZE));
-        llCategoryIconContainer.setBackground(CategoryIconFactory.getIconBackground(selectedCategory));
+        llCategoryIconContainer
+                .setBackground(CategoryIconFactory.getIconBackground(selectedCategory));
 
         if (presenter != null)
         {

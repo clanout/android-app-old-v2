@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteStatement;
 
 import com.google.gson.Gson;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +18,7 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import rx.Observable;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -58,8 +60,7 @@ public class SQLiteEventCache implements EventCache
 
                         SQLiteDatabase db = databaseManager.openConnection();
                         String[] projection = {
-                                SQLiteCacheContract.Event.COLUMN_CONTENT,
-                                SQLiteCacheContract.Event.COLUMN_UPDATES
+                                SQLiteCacheContract.Event.COLUMN_CONTENT
                         };
 
                         Cursor cursor = db
@@ -68,10 +69,7 @@ public class SQLiteEventCache implements EventCache
                         while (!cursor.isAfterLast())
                         {
                             String eventJson = cursor.getString(0);
-                            boolean isUpdated = Boolean.parseBoolean(cursor.getString(1));
-
                             Event event = gson.fromJson(eventJson, Event.class);
-                            event.setIsUpdated(isUpdated);
                             events.add(event);
 
                             cursor.moveToNext();
@@ -98,8 +96,7 @@ public class SQLiteEventCache implements EventCache
                         SQLiteDatabase db = databaseManager.openConnection();
 
                         String[] projection = {
-                                SQLiteCacheContract.Event.COLUMN_CONTENT,
-                                SQLiteCacheContract.Event.COLUMN_UPDATES
+                                SQLiteCacheContract.Event.COLUMN_CONTENT
                         };
                         String selection = SQLiteCacheContract.Event.COLUMN_ID + " = ?";
                         String[] selectionArgs = {eventId};
@@ -112,10 +109,7 @@ public class SQLiteEventCache implements EventCache
                         if (!cursor.isAfterLast())
                         {
                             String eventJson = cursor.getString(0);
-                            boolean isUpdated = Boolean.parseBoolean(cursor.getString(1));
-
                             event = gson.fromJson(eventJson, Event.class);
-                            event.setIsUpdated(isUpdated);
                         }
                         else
                         {
@@ -212,8 +206,7 @@ public class SQLiteEventCache implements EventCache
                                 {
                                     statement.bindString(1, event.getId());
                                     statement.bindString(2, gson.toJson(event));
-                                    statement.bindString(3, String.valueOf(false));
-                                    statement.bindString(4, String.valueOf(false));
+                                    statement.bindString(3, "");
                                     statement.execute();
                                     statement.clearBindings();
                                 }
@@ -229,7 +222,6 @@ public class SQLiteEventCache implements EventCache
                     }
                 })
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Object>()
                 {
                     @Override
@@ -255,47 +247,63 @@ public class SQLiteEventCache implements EventCache
     @Override
     public void save(final Event event)
     {
-        Observable
-                .create(new Observable.OnSubscribe<Object>()
+        getChatSeenTimestamp(event.getId())
+                .flatMap(new Func1<DateTime, Observable<Object>>()
                 {
                     @Override
-                    public void call(Subscriber<? super Object> subscriber)
+                    public Observable<Object> call(final DateTime chatTimestamp)
                     {
-                        synchronized (TAG)
-                        {
-                            Timber.v("EventCache.save() on thread = " + Thread.currentThread()
-                                                                              .getName());
+                        return Observable
+                                .create(new Observable.OnSubscribe<Object>()
+                                {
+                                    @Override
+                                    public void call(Subscriber<? super Object> subscriber)
+                                    {
+                                        synchronized (TAG)
+                                        {
+                                            Timber.v("EventCache.save() on thread = " + Thread
+                                                    .currentThread()
+                                                    .getName());
 
-                            SQLiteDatabase db = databaseManager.openConnection();
-                            db.beginTransactionNonExclusive();
+                                            SQLiteDatabase db = databaseManager.openConnection();
+                                            db.beginTransactionNonExclusive();
 
-                            SQLiteStatement statement = db
-                                    .compileStatement(SQLiteCacheContract.Event.SQL_DELETE_ONE);
-                            statement.bindString(1, event.getId());
-                            statement.execute();
-                            statement.clearBindings();
-                            statement.close();
+                                            SQLiteStatement statement = db
+                                                    .compileStatement(SQLiteCacheContract.Event.SQL_DELETE_ONE);
+                                            statement.bindString(1, event.getId());
+                                            statement.execute();
+                                            statement.clearBindings();
+                                            statement.close();
 
-                            statement = db
-                                    .compileStatement(SQLiteCacheContract.Event.SQL_INSERT);
-                            statement.bindString(1, event.getId());
-                            statement.bindString(2, gson.toJson(event));
-                            statement.bindString(3, String.valueOf(false));
-                            statement.bindString(4, String.valueOf(false));
-                            statement.execute();
-                            statement.clearBindings();
-                            statement.close();
+                                            statement = db
+                                                    .compileStatement(SQLiteCacheContract.Event.SQL_INSERT);
+                                            statement.bindString(1, event.getId());
+                                            statement.bindString(2, gson.toJson(event));
 
-                            db.setTransactionSuccessful();
-                            db.endTransaction();
-                            databaseManager.closeConnection();
+                                            if (chatTimestamp != null)
+                                            {
+                                                statement.bindString(3, chatTimestamp.toString());
+                                            }
+                                            else
+                                            {
+                                                statement.bindString(3, "");
+                                            }
 
-                            subscriber.onCompleted();
-                        }
+                                            statement.execute();
+                                            statement.clearBindings();
+                                            statement.close();
+
+                                            db.setTransactionSuccessful();
+                                            db.endTransaction();
+                                            databaseManager.closeConnection();
+
+                                            subscriber.onCompleted();
+                                        }
+                                    }
+                                });
                     }
                 })
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Object>()
                 {
                     @Override
@@ -361,7 +369,6 @@ public class SQLiteEventCache implements EventCache
                     }
                 })
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Object>()
                 {
                     @Override
@@ -424,7 +431,6 @@ public class SQLiteEventCache implements EventCache
                     }
                 })
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Object>()
                 {
                     @Override
@@ -476,7 +482,6 @@ public class SQLiteEventCache implements EventCache
                     }
                 })
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Object>()
                 {
                     @Override
@@ -530,7 +535,6 @@ public class SQLiteEventCache implements EventCache
                     }
                 })
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Object>()
                 {
                     @Override
@@ -595,7 +599,6 @@ public class SQLiteEventCache implements EventCache
                     }
                 })
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Object>()
                 {
                     @Override
@@ -620,7 +623,7 @@ public class SQLiteEventCache implements EventCache
     }
 
     @Override
-    public void markUpdated(final List<String> eventIds)
+    public void updateChatSeenTimestamp(final String eventId, final DateTime timestamp)
     {
         Observable
                 .create(new Observable.OnSubscribe<Object>()
@@ -630,49 +633,36 @@ public class SQLiteEventCache implements EventCache
                     {
                         synchronized (TAG)
                         {
-                            Timber.v("EventCache.markUpdated() on thread = " + Thread
+                            Timber.v("EventCache.updateChatSeenTimestamp() on thread = " + Thread
                                     .currentThread()
                                     .getName());
 
-                            if (!eventIds.isEmpty())
-                            {
-                                SQLiteDatabase db = databaseManager.openConnection();
-                                db.beginTransactionNonExclusive();
-
-                                SQLiteStatement statement = db
-                                        .compileStatement(SQLiteCacheContract.Event.SQL_MARK_UPDATED);
-                                for (String eventId : eventIds)
-                                {
-                                    statement.bindString(1, String.valueOf(true));
-                                    statement.bindString(2, eventId);
-                                    statement.execute();
-                                    statement.clearBindings();
-                                }
-                                statement.close();
-
-                                db.setTransactionSuccessful();
-                                db.endTransaction();
-                                databaseManager.closeConnection();
-                            }
+                            SQLiteDatabase db = databaseManager.openConnection();
+                            SQLiteStatement statement = db
+                                    .compileStatement(SQLiteCacheContract.Event.SQL_CHAT_SEEN_TIMESTAMP);
+                            statement.bindString(1, timestamp.toString());
+                            statement.bindString(2, eventId);
+                            statement.execute();
+                            statement.close();
+                            databaseManager.closeConnection();
 
                             subscriber.onCompleted();
                         }
                     }
                 })
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Object>()
                 {
                     @Override
                     public void onCompleted()
                     {
-                        Timber.d("Marked " + eventIds.size() + " events as updated");
                     }
 
                     @Override
                     public void onError(Throwable e)
                     {
-                        Timber.e("Unable to mark events as updated [" + e.getMessage() + "]");
+                        Timber.e("Unable to update chat timestamp for event (" + eventId + ") [" + e
+                                .getMessage() + "]");
                     }
 
                     @Override
@@ -684,55 +674,49 @@ public class SQLiteEventCache implements EventCache
     }
 
     @Override
-    public void markSeen(final String eventId)
+    public Observable<DateTime> getChatSeenTimestamp(final String eventId)
     {
-        Observable
-                .create(new Observable.OnSubscribe<Object>()
+        return Observable
+                .create(new Observable.OnSubscribe<DateTime>()
                 {
                     @Override
-                    public void call(Subscriber<? super Object> subscriber)
+                    public void call(Subscriber<? super DateTime> subscriber)
                     {
-                        synchronized (TAG)
+                        SQLiteDatabase db = databaseManager.openConnection();
+
+                        String[] projection = {SQLiteCacheContract.Event.COLUMN_CHAT_SEEN_TIMESTAMP};
+                        String selection = SQLiteCacheContract.Event.COLUMN_ID + " = ?";
+                        String[] selectionArgs = {eventId};
+
+                        Cursor cursor = db
+                                .query(SQLiteCacheContract.Event.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+                        cursor.moveToFirst();
+
+                        DateTime timestamp = null;
+                        if (!cursor.isAfterLast())
                         {
-                            Timber.v("EventCache.markUpdated() on thread = " + Thread
-                                    .currentThread()
-                                    .getName());
-
-                            SQLiteDatabase db = databaseManager.openConnection();
-                            SQLiteStatement statement = db
-                                    .compileStatement(SQLiteCacheContract.Event.SQL_MARK_UPDATED);
-                            statement.bindString(1, String.valueOf(false));
-                            statement.bindString(2, eventId);
-                            statement.execute();
-                            statement.close();
-                            databaseManager.closeConnection();
-
-                            subscriber.onCompleted();
+                            try
+                            {
+                                String timestampJson = cursor.getString(0);
+                                timestamp = DateTime.parse(timestampJson);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
+                        else
+                        {
+                            Timber.d("Event not present in cache (" + eventId + ")");
+                        }
+
+                        cursor.close();
+                        databaseManager.closeConnection();
+
+                        subscriber.onNext(timestamp);
+                        subscriber.onCompleted();
                     }
                 })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Object>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
-                        Timber.d("Marked one event [" + eventId + "] as seen");
-                    }
-
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                        Timber.e("Unable to mark event [" + eventId + "] as seen [" + e
-                                .getMessage() + "]");
-                    }
-
-                    @Override
-                    public void onNext(Object o)
-                    {
-
-                    }
-                });
+                .subscribeOn(Schedulers.io());
     }
 }

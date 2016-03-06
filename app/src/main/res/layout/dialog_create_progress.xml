@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        style="@style/AlertDialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="Create Clan"/>
+
+    <LinearLayout
+        android:id="@+id/llLoading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvTitle"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            style="@style/AlertDialogMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Please wait ..."/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llComplete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvTitle"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <net.steamcrafted.materialiconlib.MaterialIconView
+            android:id="@+id/mivGoogleMap"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="center"
+            app:materialIcon="check"
+            app:materialIconColor="@color/green"
+            app:materialIconSize="48dp"/>
+
+        <TextView
+            style="@style/AlertDialogMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Your clan is successfully created. Invite friends?"/>
+
+        <LinearLayout
+            style="?attr/buttonBarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:id="@+id/btnSkip"
+                style="?attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Skip"
+                android:textAlignment="center"
+                android:textColor="@drawable/text_btn_neutral"
+                android:textStyle="bold"/>
+
+            <Button
+                android:id="@+id/btnInvite"
+                style="?attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Invite"
+                android:textAlignment="center"
+                android:textColor="@drawable/text_btn_primary"
+                android:textStyle="bold"/>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

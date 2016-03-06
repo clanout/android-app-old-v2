@@ -45,6 +45,8 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
     private DateTime startTime;
     private DateTime endTime;
 
+    private String eventId;
+
     public CreateEventPresenterImpl(EventService eventService, LocationService_ locationService, PlacesService placesService)
     {
         this.eventService = eventService;
@@ -276,7 +278,8 @@ public class CreateEventPresenterImpl implements CreateEventPresenter
                     @Override
                     public void onNext(Event event)
                     {
-                        view.navigateToInviteScreen(event.getId());
+                        eventId = event.getId();
+                        view.navigateToInviteScreen(eventId);
                     }
                 });
 

@@ -98,7 +98,7 @@ public class EditEventActivity extends BaseActivity implements EditEventScreen
     public void navigateToDetailsScreen(String eventId)
     {
         Intent intent = EventDetailsActivity.callingIntent(this, eventId, false);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }

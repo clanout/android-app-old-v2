@@ -1,5 +1,7 @@
 package reaper.android.app.cache.event;
 
+import org.joda.time.DateTime;
+
 import java.util.List;
 
 import reaper.android.app.model.Event;
@@ -28,7 +30,7 @@ public interface EventCache
 
     void deleteCompletely(String eventId);
 
-    void markUpdated(List<String> eventIds);
+    void updateChatSeenTimestamp(String eventId, DateTime timestamp);
 
-    void markSeen(String eventId);
+    Observable<DateTime> getChatSeenTimestamp(String eventId);
 }

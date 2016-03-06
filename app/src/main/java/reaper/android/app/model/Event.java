@@ -10,13 +10,13 @@ import reaper.android.app.api._core.GsonProvider;
 
 public class Event implements Model
 {
-    public static enum Type implements Model
+    public enum Type implements Model
     {
         PUBLIC,
         INVITE_ONLY;
     }
 
-    public static enum RSVP implements Model
+    public enum RSVP implements Model
     {
         YES,
         MAYBE,
@@ -39,9 +39,6 @@ public class Event implements Model
     private int friendCount;
     private int inviterCount;
     private List<String> friends;
-
-    private boolean isUpdated;
-    private boolean isChatUpdated;
 
     public String getId()
     {
@@ -195,26 +192,6 @@ public class Event implements Model
     public void setIsFinalized(Boolean isFinalized)
     {
         this.isFinalized = isFinalized;
-    }
-
-    public boolean isUpdated()
-    {
-        return isUpdated;
-    }
-
-    public void setIsUpdated(boolean isUpdated)
-    {
-        this.isUpdated = isUpdated;
-    }
-
-    public boolean isChatUpdated()
-    {
-        return isChatUpdated;
-    }
-
-    public void setIsChatUpdated(boolean isChatUpdated)
-    {
-        this.isChatUpdated = isChatUpdated;
     }
 
     @Override

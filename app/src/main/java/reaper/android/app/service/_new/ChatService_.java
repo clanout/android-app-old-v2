@@ -288,7 +288,7 @@ public class ChatService_
         }
     }
 
-    public void sendNotification(final String eventId)
+    public void sendNotification(final String eventId, final DateTime lastSentTimestamp)
     {
         eventService
                 ._fetchEvent(eventId)
@@ -297,7 +297,9 @@ public class ChatService_
                     @Override
                     public Observable<Boolean> call(Event event)
                     {
-                        return eventService._sendChatNotification(eventId, event.getTitle());
+                        return eventService
+                                ._sendChatNotification(eventId, event
+                                        .getTitle(), lastSentTimestamp);
                     }
                 })
                 .subscribeOn(Schedulers.newThread())
@@ -319,6 +321,11 @@ public class ChatService_
                     {
                     }
                 });
+    }
+
+    public void updateLastSeen(String eventId)
+    {
+        eventService.updateChatLastSeen(eventId, DateTime.now());
     }
 
     /* Helper Methods */

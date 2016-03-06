@@ -14,14 +14,14 @@ import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.ui._core.BaseActivity;
-import reaper.android.app.ui.screens.home.HomeActivity;
+import reaper.android.app.ui.screens.details.EventDetailsActivity;
 import reaper.android.app.ui.screens.invite.InviteActivity;
 
 public class CreateActivity extends BaseActivity implements CreateScreen
 {
     private static final String ARG_CATEGORY = "arg_category";
 
-    public static Intent callingIntent(Context context,EventCategory category)
+    public static Intent callingIntent(Context context, EventCategory category)
     {
         Intent intent = new Intent(context, CreateActivity.class);
         intent.putExtra(ARG_CATEGORY, category);
@@ -83,10 +83,16 @@ public class CreateActivity extends BaseActivity implements CreateScreen
         finish();
     }
 
+    @Override
+    public void navigateToDetailsScreen(String eventId)
+    {
+        startActivity(EventDetailsActivity.callingIntent(this, eventId, false));
+        finish();
+    }
+
     /* Helper Methods */
     private void navigateToHomeScreen()
     {
-        startActivity(HomeActivity.callingIntent(this));
         finish();
     }
 }

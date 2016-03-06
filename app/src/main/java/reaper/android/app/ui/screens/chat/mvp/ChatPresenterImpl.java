@@ -29,6 +29,9 @@ public class ChatPresenterImpl implements ChatPresenter
     private int historyCount;
     private boolean isLoadHistoryInProgress;
 
+    private boolean isChatSent;
+    private DateTime lastSentTimestamp;
+
     public ChatPresenterImpl(ChatService_ chatService, UserService userService, String eventId)
     {
         this.chatService = chatService;
@@ -38,6 +41,7 @@ public class ChatPresenterImpl implements ChatPresenter
         visibleChats = new ArrayList<>();
         historyCount = 0;
         isLoadHistoryInProgress = false;
+        isChatSent = false;
     }
 
     @Override
@@ -59,7 +63,17 @@ public class ChatPresenterImpl implements ChatPresenter
         chatService.leaveChat();
         view = null;
 
-        chatService.sendNotification(eventId);
+        if (isChatSent)
+        {
+            if (lastSentTimestamp == null)
+            {
+                lastSentTimestamp = DateTime.now();
+            }
+
+            chatService.sendNotification(eventId, lastSentTimestamp);
+        }
+
+        chatService.updateLastSeen(eventId);
     }
 
     @Override
@@ -88,6 +102,8 @@ public class ChatPresenterImpl implements ChatPresenter
                     @Override
                     public void onCompleted()
                     {
+                        isChatSent = true;
+                        lastSentTimestamp = chatMessage.getTimestamp();
                     }
 
                     @Override

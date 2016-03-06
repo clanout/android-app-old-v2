@@ -531,10 +531,10 @@ public class EventService
     }
 
     /* Chat Notification */
-    public Observable<Boolean> _sendChatNotification(String eventId, String eventName)
+    public Observable<Boolean> _sendChatNotification(String eventId, String eventName, DateTime lastSentTimestamp)
     {
         return eventApi
-                .sendChatNotification(new SendChatNotificationApiRequest(eventId, eventName))
+                .sendChatNotification(new SendChatNotificationApiRequest(eventId, eventName, lastSentTimestamp))
                 .map(new Func1<Response, Boolean>()
                 {
                     @Override
@@ -552,6 +552,11 @@ public class EventService
                     }
                 })
                 .subscribeOn(Schedulers.newThread());
+    }
+
+    public void updateChatLastSeen(String eventId, DateTime timestamp)
+    {
+        eventCache.updateChatSeenTimestamp(eventId, timestamp);
     }
 
     /* Location Suggestions */

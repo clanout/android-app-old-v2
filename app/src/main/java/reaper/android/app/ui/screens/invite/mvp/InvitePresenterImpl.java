@@ -192,6 +192,7 @@ public class InvitePresenterImpl implements InvitePresenter
 
                         invitedFriends = new ArrayList<String>();
                         invitedContacts = new ArrayList<String>();
+                        view.hideInviteButton();
                     }
                 });
 

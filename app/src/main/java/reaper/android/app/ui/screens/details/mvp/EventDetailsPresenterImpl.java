@@ -372,13 +372,13 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     private void editEvent()
     {
         isEditClicked = false;
-        if (EventUtils.isOrganiser(event, userService.getSessionUserId()))
+        if (event.isFinalized() && !EventUtils.isOrganiser(event, userService.getSessionUserId()))
         {
-            view.navigateToEditScreen(event, eventDetails);
+            view.displayEventFinalizedMessage();
         }
         else
         {
-            view.displayEventFinalizedMessage();
+            view.navigateToEditScreen(event, eventDetails);
         }
     }
 }
