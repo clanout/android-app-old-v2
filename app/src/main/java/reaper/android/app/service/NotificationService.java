@@ -23,10 +23,13 @@ import reaper.android.app.api.event.request.FetchEventApiRequest;
 import reaper.android.app.api.event.response.FetchEventApiResponse;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.notification.NotificationCache;
 import reaper.android.app.cache.user.UserCache;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.MemoryCacheKeys;
 import reaper.android.app.model.Event;
+import reaper.android.app.model.User;
 import reaper.android.app.root.Reaper;
 import reaper.android.app.communication.NewNotificationReceivedTrigger;
 import reaper.android.app.communication.NewNotificationsAvailableTrigger;
@@ -54,35 +57,34 @@ public class NotificationService
     {
         if (instance == null) {
 
-            throw new IllegalStateException("[NotificationService Not Initialized]");
+            return new NotificationService();
         }
 
         return instance;
     }
 
-    private EventService eventService;
     private NotificationCache notificationCache;
-    private UserService userService;
     private Bus bus;
+    private EventCache eventCache;
+    private UserCache userCache;
+    private EventApi eventApi;
+    private GenericCache genericCache;
 
-    public static void init(EventService eventService, UserService userService)
-    {
-        instance = new NotificationService(userService, eventService);
-    }
-
-    private NotificationService(UserService userService, EventService eventService)
+    private NotificationService()
     {
         notificationCache = CacheManager.getNotificationCache();
         bus = Communicator.getInstance().getBus();
-        this.userService = userService;
-        this.eventService = eventService;
+        eventCache = CacheManager.getEventCache();
+        userCache = CacheManager.getUserCache();
+        eventApi = ApiManager.getEventApi();
+        genericCache = CacheManager.getGenericCache();
     }
 
     public Observable<List<Notification>> fetchNotifications()
     {
         return Observable
-                .zip(notificationCache.getAll(), eventService
-                        ._fetchEvents(), new Func2<List<Notification>, List<Event>,
+                .zip(notificationCache.getAll(), eventCache
+                        .getEvents(), new Func2<List<Notification>, List<Event>,
                         List<Notification>>()
                 {
                     @Override
@@ -162,7 +164,7 @@ public class NotificationService
     private void handleNewStatusUpdateNotification(final Notification notification)
     {
 
-        if (!(notification.getArgs().get("user_id").equals(userService.getSessionUserId()))) {
+        if (!(notification.getArgs().get("user_id").equals(genericCache.get(GenericCacheKeys.SESSION_USER, User.class).getId()))) {
             notificationCache.put(notification).observeOn(Schedulers.newThread())
                     .subscribe(new Subscriber<Object>()
                     {
@@ -197,11 +199,11 @@ public class NotificationService
     private void handleNewChatMessageNotification(final Notification notification)
     {
 
-        if (!(notification.getArgs().get("user_id").equals(userService.getSessionUserId()))) {
+        if (!(notification.getArgs().get("user_id").equals(genericCache.get(GenericCacheKeys.SESSION_USER, User.class).getId()))) {
 
             final DateTime notificationTimestamp = DateTime.parse(notification.getArgs().get("timestamp"));
 
-            eventService.getChatLastSeenTimestamp(notification.getEventId())
+            eventCache.getChatSeenTimestamp(notification.getEventId())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Subscriber<DateTime>()
                     {
@@ -311,8 +313,7 @@ public class NotificationService
                     public void onCompleted()
                     {
                         if (!(notification.getArgs().get("user_id")
-                                .equals(userService
-                                        .getSessionUserId()))) {
+                                .equals(genericCache.get(GenericCacheKeys.SESSION_USER, User.class).getId()))) {
 
                             notification
                                     .setMessage(notification
@@ -362,16 +363,16 @@ public class NotificationService
                     @Override
                     public void onNext(Event event)
                     {
-                        eventService.saveEvent(event);
+                        eventCache.save(event);
                     }
                 });
     }
 
     private void showEventRemovedNotification(final Notification notification)
     {
-        eventService.deleteEventCompletely(notification.getEventId());
+        eventCache.deleteCompletely(notification.getEventId());
 
-        if (!(notification.getArgs().get("user_id").equals(userService.getSessionUserId()))) {
+        if (!(notification.getArgs().get("user_id").equals(genericCache.get(GenericCacheKeys.SESSION_USER, User.class).getId()))) {
             notificationCache.put(notification).observeOn(Schedulers.newThread())
                     .subscribe(new Subscriber<Object>()
                     {
@@ -404,7 +405,7 @@ public class NotificationService
 
     private void showRSVPChangedNotification(final Notification notification)
     {
-        eventService._fetchEvent(notification.getEventId()).observeOn(Schedulers.newThread())
+        eventCache.getEvent(notification.getEventId()).observeOn(Schedulers.newThread())
                 .subscribe(new Subscriber<Event>()
                 {
                     @Override
@@ -493,7 +494,7 @@ public class NotificationService
                                             @Override
                                             public void onNext(Event event)
                                             {
-                                                eventService.saveEvent(event);
+                                                eventCache.save(event);
                                             }
                                         });
                             }
@@ -582,7 +583,7 @@ public class NotificationService
                     @Override
                     public void onNext(Event event)
                     {
-                        eventService.saveEvent(event);
+                        eventCache.save(event);
                     }
                 });
     }
@@ -632,7 +633,7 @@ public class NotificationService
                     @Override
                     public void onNext(Event event)
                     {
-                        eventService.saveEvent(event);
+                        eventCache.save(event);
                     }
                 });
     }
@@ -656,7 +657,15 @@ public class NotificationService
 
     private Observable<Event> fetchEvent(String eventId)
     {
-        return eventService._fetchEventNetwork(eventId)
+        return eventApi.fetchEvent(new FetchEventApiRequest(eventId))
+                .map(new Func1<FetchEventApiResponse, Event>()
+                {
+                    @Override
+                    public Event call(FetchEventApiResponse fetchEventApiResponse)
+                    {
+                        return fetchEventApiResponse.getEvent();
+                    }
+                })
                 .subscribeOn(Schedulers.newThread());
     }
 

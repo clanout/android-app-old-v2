@@ -134,8 +134,5 @@ public class Reaper extends Application
 
         /* WhatsApp Service */
         WhatsappService_.init(userService);
-
-         /* Notification Servie */
-        NotificationService.init(eventService, userService);
     }
 }

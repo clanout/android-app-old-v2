@@ -36,47 +36,8 @@ public class ListenerServiceGcm extends GcmListenerService
 
     public ListenerServiceGcm()
     {
-        initServices();
         bus = Communicator.getInstance().getBus();
         notificationService = NotificationService.getInstance();
-    }
-
-    private void initServices()
-    {
-
-        /* Gcm Service */
-        GcmService_ gcmService = GcmService_.getInstance();
-
-        /* Location Service */
-        LocationManager locationManager = (LocationManager) getSystemService(Context
-                .LOCATION_SERVICE);
-        LocationService_
-                .init(getApplicationContext(), locationManager, GoogleService_.getInstance());
-        LocationService_ locationService = LocationService_.getInstance();
-
-        /* Phonebook Service */
-        PhonebookService_.init(getApplicationContext());
-        PhonebookService_ phonebookService = PhonebookService_.getInstance();
-
-        /* User Service */
-        UserService.init(locationService, phonebookService);
-        UserService userService = UserService.getInstance();
-
-        /* Event Service */
-        EventService.init(gcmService, locationService, userService);
-        EventService eventService = EventService.getInstance();
-
-        /* Chat Service */
-        if (userService.getSessionUser() != null) {
-            ChatService_.init(userService, eventService);
-        }
-
-        /* WhatsApp Service */
-        WhatsappService_.init(userService);
-
-        /* Notification Servie */
-        NotificationService.init(eventService, userService);
-
     }
 
     @Override

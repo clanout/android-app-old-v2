@@ -531,5 +531,3 @@ public class CreateDetailsFragment extends BaseFragment implements
         });
     }
 }
-
-// TODO: Stop keyboard from automatically popping up
