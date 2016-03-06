@@ -203,6 +203,8 @@ public class NotificationService
 
             final DateTime notificationTimestamp = DateTime.parse(notification.getArgs().get("timestamp"));
 
+            Log.d("NOTIFICATION", "notiTimestamp ---- " + notificationTimestamp);
+
             eventCache.getChatSeenTimestamp(notification.getEventId())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Subscriber<DateTime>()
@@ -216,14 +218,16 @@ public class NotificationService
                         @Override
                         public void onError(Throwable e)
                         {
-
+                            Log.d("NOTIFICATION", "onError ---- ");
                         }
 
                         @Override
                         public void onNext(DateTime lastSeenTimestamp)
                         {
+                            Log.d("NOTIFICATION", "onNext ---- " + lastSeenTimestamp);
                             if(notificationTimestamp.isAfter(lastSeenTimestamp))
                             {
+                                Log.d("NOTIFICATION", "true ---- ");
                                 notificationCache.put(notification).observeOn(Schedulers.newThread())
                                         .subscribe(new Subscriber<Object>()
                                         {
@@ -232,10 +236,13 @@ public class NotificationService
                                             {
 
                                                 if (ifAppRunningInForeground()) {
+
+                                                    Log.d("NOTIFICATION", "foreground ---- ");
                                                     bus.post(new NewNotificationReceivedTrigger());
 
                                                 }
                                                 else {
+                                                    Log.d("NOTIFICATION", "background ---- ");
                                                     buildNotification(notification, true, true);
                                                 }
                                             }
@@ -252,6 +259,9 @@ public class NotificationService
 
                                             }
                                         });
+                            }else{
+
+                                Log.d("NOTIFICATION", "false ---- ");
                             }
                         }
                     });

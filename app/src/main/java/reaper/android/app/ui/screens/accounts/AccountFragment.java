@@ -25,6 +25,7 @@ import reaper.android.app.service.UserService;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.dialog.FeedbackDialog;
 import reaper.android.app.ui.dialog.UpdateMobileDialog;
+import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.SnackbarFactory;
 
 public class AccountFragment extends BaseFragment
@@ -41,7 +42,7 @@ public class AccountFragment extends BaseFragment
     ImageView ivCoverPic;
 
     @Bind(R.id.ivProfilePic)
-    CircleImageView ivProfilePic;
+    ImageView ivProfilePic;
 
     @Bind(R.id.tvName)
     TextView tvName;
@@ -52,7 +53,8 @@ public class AccountFragment extends BaseFragment
     /* Lifecycle Methods */
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle
+            savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_accounts, container, false);
         ButterKnife.bind(this, view);
@@ -81,20 +83,21 @@ public class AccountFragment extends BaseFragment
                 .build();
 
         Picasso.with(getActivity())
-               .load(sessionUser.getCoverPicUrl())
-               .placeholder(personDrawable)
-               .fit()
-               .centerCrop()
-               .noFade()
-               .into(ivCoverPic);
+                .load(sessionUser.getCoverPicUrl())
+                .placeholder(personDrawable)
+                .fit()
+                .centerCrop()
+                .noFade()
+                .into(ivCoverPic);
 
         Picasso.with(getActivity())
-               .load(sessionUser.getProfilePicUrl())
-               .placeholder(personDrawable)
-               .fit()
-               .centerCrop()
-               .noFade()
-               .into(ivProfilePic);
+                .load(sessionUser.getProfilePicUrl())
+                .placeholder(personDrawable)
+                .fit()
+                .centerCrop()
+                .noFade()
+                .transform(new CircleTransform())
+                .into(ivProfilePic);
 
         llBlockFriends.setOnClickListener(new View.OnClickListener()
         {
@@ -124,12 +127,10 @@ public class AccountFragment extends BaseFragment
     public void onWhatsAppInviteClicked()
     {
         WhatsappService_ accountsService = WhatsappService_.getInstance();
-        if (accountsService.isWhatsAppInstalled(getActivity()))
-        {
+        if (accountsService.isWhatsAppInstalled(getActivity())) {
             startActivity(accountsService.getWhatsAppIntent());
         }
-        else
-        {
+        else {
             SnackbarFactory.create(getActivity(), R.string.error_no_whatsapp);
         }
     }
