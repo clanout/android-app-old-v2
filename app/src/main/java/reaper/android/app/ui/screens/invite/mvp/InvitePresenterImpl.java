@@ -281,7 +281,7 @@ public class InvitePresenterImpl implements InvitePresenter
             return Observable
                     .zip(userService._refreshLocalAppFriends(),
                             eventService._fetchDetails(eventId),
-                            phonebookService.fetchAllContacts(),
+                            phonebookService.refreshAllContacts(),
                             new Func3<List<Friend>, EventDetails, List<PhonebookContact>, Pair<List<FriendInviteWrapper>, List<PhonebookContactInviteWrapper>>>()
                             {
                                 @Override
