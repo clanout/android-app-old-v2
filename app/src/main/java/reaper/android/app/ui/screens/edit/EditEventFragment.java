@@ -33,7 +33,6 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import reaper.android.R;
 import reaper.android.app.config.Dimensions;
 import reaper.android.app.model.Event;
@@ -207,6 +206,27 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         finalize.setVisible(false);
         delete.setVisible(false);
 
+        MenuItem edit = menu.findItem(R.id.action_edit);
+        Drawable editDrawable = MaterialDrawableBuilder
+                .with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.CHECK)
+                .setColor(ContextCompat
+                        .getColor(getActivity(), R.color.white))
+                .setSizeDp(36)
+                .build();
+        edit.setIcon(editDrawable);
+        edit.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+                edit();
+                return true;
+            }
+        });
+
+
         if (isDeleteOptionVisible)
         {
             Drawable deleteDrawable = MaterialDrawableBuilder
@@ -275,14 +295,6 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
                 return true;
             }
         });
-    }
-
-    /* Listeners */
-    @OnClick(R.id.fabEdit)
-    public void onEditClicked()
-    {
-        SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
-        edit();
     }
 
     /* View Methods */

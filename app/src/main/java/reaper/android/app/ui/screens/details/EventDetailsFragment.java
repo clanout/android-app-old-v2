@@ -24,8 +24,6 @@ import com.squareup.picasso.Picasso;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
-import org.joda.time.DateTime;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -216,6 +214,7 @@ public class EventDetailsFragment extends BaseFragment implements
         });
 
         presenter.requestEditActionState();
+        screen.setTitle(presenter.getTitle());
     }
 
     @Override
@@ -321,8 +320,6 @@ public class EventDetailsFragment extends BaseFragment implements
         {
             mivGoogleMap.setVisibility(View.GONE);
         }
-
-        screen.setTitle(getScreenTitle(event.getStartTime()));
     }
 
     @Override
@@ -644,10 +641,5 @@ public class EventDetailsFragment extends BaseFragment implements
             {
             }
         });
-    }
-
-    private String getScreenTitle(DateTime startTime)
-    {
-        return DateTimeUtil.getDetailsScreenTitle(startTime);
     }
 }

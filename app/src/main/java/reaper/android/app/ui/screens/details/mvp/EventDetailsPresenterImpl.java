@@ -10,6 +10,7 @@ import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.util.EventAttendeeComparator;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
+import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.EventUtils;
 import rx.Subscriber;
 import rx.Subscription;
@@ -200,6 +201,12 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     public void sendInvitationResponse(String invitationResponse)
     {
         eventService.sendInvitationResponse(event.getId(), invitationResponse);
+    }
+
+    @Override
+    public String getTitle()
+    {
+        return DateTimeUtil.getDetailsScreenTitle(event.getStartTime());
     }
 
     /* Helper Methods */
