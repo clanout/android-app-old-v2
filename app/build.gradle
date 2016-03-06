@@ -115,9 +115,6 @@ dependencies {
     // Facebook Shimmer
     compile 'com.facebook.shimmer:shimmer:0.1.0@aar'
 
-    // Circular Image View
-    compile 'de.hdodenhof:circleimageview:2.0.0'
-
     // Material Date-Time picker
     compile 'com.wdullaer:materialdatetimepicker:1.5.3'
 
