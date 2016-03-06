@@ -48,6 +48,7 @@ public class ChatPresenterImpl implements ChatPresenter
     public void attachView(ChatView view)
     {
         this.view = view;
+        chatService.updateLastSeen(eventId);
         initChat();
     }
 
@@ -196,6 +197,7 @@ public class ChatPresenterImpl implements ChatPresenter
                                     {
                                         visibleChats.add(chatMessage);
                                         view.displayMessage(chatMessage);
+                                        chatService.updateLastSeen(eventId);
 
                                         if (isLoadHistoryInProgress)
                                         {
@@ -264,6 +266,7 @@ public class ChatPresenterImpl implements ChatPresenter
                                     {
                                         visibleChats.add(chatMessage);
                                         view.displayMessage(chatMessage);
+                                        chatService.updateLastSeen(eventId);
                                     }
                                 }
                             }

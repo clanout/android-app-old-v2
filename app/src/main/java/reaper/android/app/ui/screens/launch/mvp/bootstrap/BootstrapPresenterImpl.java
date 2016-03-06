@@ -2,6 +2,7 @@ package reaper.android.app.ui.screens.launch.mvp.bootstrap;
 
 import reaper.android.app.model.Location;
 import reaper.android.app.service.EventService;
+import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.AuthService_;
 import reaper.android.app.service._new.GcmService_;
@@ -24,6 +25,7 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
     private GcmService_ gcmService;
     private UserService userService;
     private EventService eventService;
+    private NotificationService notificationService;
 
     private CompositeSubscription subscriptions;
 
@@ -138,6 +140,8 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
                     {
                         // Register With GCM
                         gcmService.register();
+
+
                     }
                 })
                 .flatMap(new Func1<Boolean, Observable<Boolean>>()

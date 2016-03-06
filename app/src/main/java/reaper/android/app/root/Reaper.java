@@ -17,6 +17,7 @@ import reaper.android.app.cache._core.DatabaseManager;
 import reaper.android.app.communication.Communicator;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.service.EventService;
+import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.ChatService_;
 import reaper.android.app.service._new.GcmService_;
@@ -133,5 +134,8 @@ public class Reaper extends Application
 
         /* WhatsApp Service */
         WhatsappService_.init(userService);
+
+         /* Notification Servie */
+        NotificationService.init(eventService, userService);
     }
 }

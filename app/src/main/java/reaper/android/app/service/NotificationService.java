@@ -11,6 +11,8 @@ import android.util.Log;
 
 import com.squareup.otto.Bus;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +30,8 @@ import reaper.android.app.model.Event;
 import reaper.android.app.root.Reaper;
 import reaper.android.app.communication.NewNotificationReceivedTrigger;
 import reaper.android.app.communication.NewNotificationsAvailableTrigger;
+import reaper.android.app.service._new.GcmService_;
+import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.ui._core.FlowEntry;
 import reaper.android.app.ui.screens.launch.LauncherActivity;
 import reaper.android.app.communication.Communicator;
@@ -49,31 +53,29 @@ public class NotificationService
     public static NotificationService getInstance()
     {
         if (instance == null) {
-            instance = new NotificationService();
+
+            throw new IllegalStateException("[NotificationService Not Initialized]");
         }
 
         return instance;
     }
 
     private EventService eventService;
-
-    private EventApi eventApi;
-    private EventCache eventCache;
-
     private NotificationCache notificationCache;
-    private UserCache userCache;
     private UserService userService;
     private Bus bus;
 
-    private NotificationService()
+    public static void init(EventService eventService, UserService userService)
     {
-        this.eventApi = ApiManager.getEventApi();
-        eventCache = CacheManager.getEventCache();
+        instance = new NotificationService(userService, eventService);
+    }
+
+    private NotificationService(UserService userService, EventService eventService)
+    {
         notificationCache = CacheManager.getNotificationCache();
-        userCache = CacheManager.getUserCache();
-        this.bus = Communicator.getInstance().getBus();
-        this.userService = UserService.getInstance();
-        eventService = EventService.getInstance();
+        bus = Communicator.getInstance().getBus();
+        this.userService = userService;
+        this.eventService = eventService;
     }
 
     public Observable<List<Notification>> fetchNotifications()
@@ -196,20 +198,17 @@ public class NotificationService
     {
 
         if (!(notification.getArgs().get("user_id").equals(userService.getSessionUserId()))) {
-            notificationCache.put(notification).observeOn(Schedulers.newThread())
-                    .subscribe(new Subscriber<Object>()
+
+            final DateTime notificationTimestamp = DateTime.parse(notification.getArgs().get("timestamp"));
+
+            eventService.getChatLastSeenTimestamp(notification.getEventId())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Subscriber<DateTime>()
                     {
                         @Override
                         public void onCompleted()
                         {
 
-                            if (ifAppRunningInForeground()) {
-                                bus.post(new NewNotificationReceivedTrigger());
-
-                            }
-                            else {
-                                buildNotification(notification, true, true);
-                            }
                         }
 
                         @Override
@@ -219,9 +218,39 @@ public class NotificationService
                         }
 
                         @Override
-                        public void onNext(Object o)
+                        public void onNext(DateTime lastSeenTimestamp)
                         {
+                            if(notificationTimestamp.isAfter(lastSeenTimestamp))
+                            {
+                                notificationCache.put(notification).observeOn(Schedulers.newThread())
+                                        .subscribe(new Subscriber<Object>()
+                                        {
+                                            @Override
+                                            public void onCompleted()
+                                            {
 
+                                                if (ifAppRunningInForeground()) {
+                                                    bus.post(new NewNotificationReceivedTrigger());
+
+                                                }
+                                                else {
+                                                    buildNotification(notification, true, true);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onError(Throwable e)
+                                            {
+
+                                            }
+
+                                            @Override
+                                            public void onNext(Object o)
+                                            {
+
+                                            }
+                                        });
+                            }
                         }
                     });
         }
@@ -260,17 +289,17 @@ public class NotificationService
 
     private void handleFriendNotification(Notification notification)
     {
-        userCache.deleteFriends();
+        CacheManager.clearFriendsCache();
     }
 
     private void handleUnblockedNotification(Notification notification)
     {
-        userCache.deleteFriends();
+        CacheManager.clearFriendsCache();
     }
 
     private void handleBlockedNotification(Notification notification)
     {
-        userCache.deleteFriends();
+        CacheManager.clearFriendsCache();
     }
 
     private void showEventUpdatedNotification(final Notification notification)
@@ -287,10 +316,10 @@ public class NotificationService
 
                             notification
                                     .setMessage(notification
-                                                    .getArgs()
-                                                    .get("user_name") + " updated " + notification
-                                                    .getArgs()
-                                                    .get("event_name"));
+                                            .getArgs()
+                                            .get("user_name") + " updated " + notification
+                                            .getArgs()
+                                            .get("event_name"));
 
                             notificationCache.put(notification)
                                     .observeOn(Schedulers
@@ -333,14 +362,14 @@ public class NotificationService
                     @Override
                     public void onNext(Event event)
                     {
-                        eventCache.save(event);
+                        eventService.saveEvent(event);
                     }
                 });
     }
 
     private void showEventRemovedNotification(final Notification notification)
     {
-        eventCache.delete(notification.getEventId());
+        eventService.deleteEventCompletely(notification.getEventId());
 
         if (!(notification.getArgs().get("user_id").equals(userService.getSessionUserId()))) {
             notificationCache.put(notification).observeOn(Schedulers.newThread())
@@ -375,7 +404,7 @@ public class NotificationService
 
     private void showRSVPChangedNotification(final Notification notification)
     {
-        eventCache.getEvent(notification.getEventId()).observeOn(Schedulers.newThread())
+        eventService._fetchEvent(notification.getEventId()).observeOn(Schedulers.newThread())
                 .subscribe(new Subscriber<Event>()
                 {
                     @Override
@@ -464,7 +493,7 @@ public class NotificationService
                                             @Override
                                             public void onNext(Event event)
                                             {
-                                                eventCache.save(event);
+                                                eventService.saveEvent(event);
                                             }
                                         });
                             }
@@ -553,7 +582,7 @@ public class NotificationService
                     @Override
                     public void onNext(Event event)
                     {
-                        eventCache.save(event);
+                        eventService.saveEvent(event);
                     }
                 });
     }
@@ -603,7 +632,7 @@ public class NotificationService
                     @Override
                     public void onNext(Event event)
                     {
-                        eventCache.save(event);
+                        eventService.saveEvent(event);
                     }
                 });
     }
@@ -627,15 +656,7 @@ public class NotificationService
 
     private Observable<Event> fetchEvent(String eventId)
     {
-        return eventApi.fetchEvent(new FetchEventApiRequest(eventId))
-                .map(new Func1<FetchEventApiResponse, Event>()
-                {
-                    @Override
-                    public Event call(FetchEventApiResponse fetchEventApiResponse)
-                    {
-                        return fetchEventApiResponse.getEvent();
-                    }
-                })
+        return eventService._fetchEventNetwork(eventId)
                 .subscribeOn(Schedulers.newThread());
     }
 
@@ -987,5 +1008,11 @@ public class NotificationService
             intent[0] = LauncherActivity
                     .callingIntent(Reaper.getReaperContext(), FlowEntry.HOME, null);
         }
+    }
+
+    public void clearAllNotificationsFromBar(Context context)
+    {
+        NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
     }
 }
