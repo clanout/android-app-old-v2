@@ -8,11 +8,18 @@ import android.os.Build;
 import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import reaper.android.app.api._core.GsonProvider;
+import reaper.android.app.cache._core.CacheManager;
+import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.model.PhonebookContact;
 import reaper.android.app.model.util.PhonebookContactComparator;
 import reaper.android.app.ui.util.PhoneUtils;
@@ -24,6 +31,7 @@ import rx.schedulers.Schedulers;
 public class PhonebookService_
 {
     private static PhonebookService_ instance;
+    private GenericCache genericCache;
 
     public static void init(Context context)
     {
@@ -32,8 +40,7 @@ public class PhonebookService_
 
     public static PhonebookService_ getInstance()
     {
-        if (instance == null)
-        {
+        if (instance == null) {
             throw new IllegalStateException("[PhonebookService Not Initialized]");
         }
 
@@ -45,12 +52,14 @@ public class PhonebookService_
     private PhonebookService_(Context context)
     {
         this.context = context;
+        this.genericCache = CacheManager.getGenericCache();
     }
 
     public boolean isReadContactsPermissionGranted()
     {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ActivityCompat
-                .checkSelfPermission(context, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED;
+                .checkSelfPermission(context, Manifest.permission.READ_CONTACTS) ==
+                PackageManager.PERMISSION_GRANTED;
     }
 
     public Observable<List<String>> fetchAllNumbers()
@@ -61,20 +70,19 @@ public class PhonebookService_
                     @Override
                     public void call(Subscriber<? super List<String>> subscriber)
                     {
-                        try
-                        {
+                        try {
                             List<String> allContacts = new ArrayList<>();
 
                             String defaultCountryCode = AppConstants.DEFAULT_COUNTRY_CODE;
-                            String[] PROJECTION = new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER};
+                            String[] PROJECTION = new String[]{ContactsContract.CommonDataKinds
+                                    .Phone.NUMBER};
                             Cursor cur = context
                                     .getContentResolver()
-                                    .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, PROJECTION, null, null, null);
+                                    .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                            PROJECTION, null, null, null);
 
-                            if (cur.moveToFirst())
-                            {
-                                do
-                                {
+                            if (cur.moveToFirst()) {
+                                do {
                                     String phone = PhoneUtils
                                             .sanitize(cur.getString(0), defaultCountryCode);
                                     allContacts.add(phone);
@@ -85,8 +93,7 @@ public class PhonebookService_
                             subscriber.onNext(allContacts);
                             subscriber.onCompleted();
                         }
-                        catch (Exception e)
-                        {
+                        catch (Exception e) {
                             subscriber.onError(e);
                         }
                     }
@@ -102,49 +109,161 @@ public class PhonebookService_
                     @Override
                     public void call(Subscriber<? super List<PhonebookContact>> subscriber)
                     {
-                        try
+                        String cachedPhonebookContactsString = genericCache.get(GenericCacheKeys.PHONEBOOK_CONTACTS);
+                        Type type = new TypeToken<List<PhonebookContact>>(){}.getType();
+                        List<PhonebookContact> cachedPhonebookContacts = GsonProvider.getGson().fromJson(cachedPhonebookContactsString, type);
+
+                        if(cachedPhonebookContacts == null)
                         {
+                            cachedPhonebookContacts = new ArrayList<PhonebookContact>();
+                        }
+
+                        if (cachedPhonebookContacts.size() != 0) {
+
+                            subscriber.onNext(cachedPhonebookContacts);
+                            subscriber.onCompleted();
+                        }
+                        else {
+
+                            try {
+                                List<PhonebookContact> contacts = new ArrayList<>();
+                                Cursor cursor = context
+                                        .getContentResolver()
+                                        .query(ContactsContract.Contacts.CONTENT_URI, null, null,
+                                                null, null);
+
+                                String id = null;
+                                String name = null;
+                                String phone = null;
+                                String sanitizedPhone = null;
+
+                                if (cursor.getCount() > 0) {
+                                    while (cursor.moveToNext()) {
+                                        id = cursor.getString(cursor
+                                                .getColumnIndex(ContactsContract.Contacts._ID));
+                                        name = cursor.getString(cursor
+                                                .getColumnIndex(ContactsContract.Contacts
+                                                        .DISPLAY_NAME));
+                                        if (Integer.parseInt(cursor.getString(cursor
+                                                .getColumnIndex(ContactsContract.Contacts
+                                                        .HAS_PHONE_NUMBER))) > 0) {
+
+                                            Cursor smallCursor =
+                                                    context.getContentResolver()
+                                                            .query(ContactsContract.CommonDataKinds
+                                                                            .Phone.CONTENT_URI,
+                                                                    null,
+                                                                    ContactsContract.CommonDataKinds
+                                                                            .Phone.CONTACT_ID + "" +
+                                                                            " = ?",
+                                                                    new String[]{id}, null);
+
+
+                                            while (smallCursor.moveToNext()) {
+                                                phone = smallCursor.getString(smallCursor
+                                                        .getColumnIndex(ContactsContract
+                                                                .CommonDataKinds.Phone.NUMBER));
+                                                sanitizedPhone = PhoneUtils
+                                                        .sanitize(phone, AppConstants
+                                                                .DEFAULT_COUNTRY_CODE);
+
+                                                PhonebookContact contact = new PhonebookContact();
+                                                contact.setName(name);
+                                                contact.setPhone(sanitizedPhone);
+                                                if (!contacts.contains(contact)) {
+                                                    contacts.add(contact);
+                                                }
+                                            }
+                                            smallCursor.close();
+                                        }
+                                    }
+                                    cursor.close();
+
+                                    subscriber.onNext(contacts);
+                                    subscriber.onCompleted();
+                                }
+                            }
+                            catch (Exception e) {
+                                subscriber.onError(e);
+                            }
+                        }
+                    }
+                })
+                .map(new Func1<List<PhonebookContact>, List<PhonebookContact>>()
+                {
+                    @Override
+                    public List<PhonebookContact> call(List<PhonebookContact> phonebookContacts)
+                    {
+                        List<PhonebookContact> filtered = new ArrayList<PhonebookContact>();
+                        for (PhonebookContact phonebookContact : phonebookContacts) {
+                            if (!phonebookContact.getName().equalsIgnoreCase("Identified As " +
+                                    "Spam")) {
+                                filtered.add(phonebookContact);
+                            }
+                        }
+
+                        Collections.sort(filtered, new PhonebookContactComparator());
+
+                        genericCache.put(GenericCacheKeys.PHONEBOOK_CONTACTS, filtered);
+
+                        return filtered;
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
+
+    public Observable<List<PhonebookContact>> refreshAllContacts()
+    {
+        return Observable
+                .create(new Observable.OnSubscribe<List<PhonebookContact>>()
+                {
+                    @Override
+                    public void call(Subscriber<? super List<PhonebookContact>> subscriber)
+                    {
+                        try {
                             List<PhonebookContact> contacts = new ArrayList<>();
                             Cursor cursor = context
                                     .getContentResolver()
-                                    .query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+                                    .query(ContactsContract.Contacts.CONTENT_URI, null, null,
+                                            null, null);
 
                             String id = null;
                             String name = null;
                             String phone = null;
                             String sanitizedPhone = null;
 
-                            if (cursor.getCount() > 0)
-                            {
-                                while (cursor.moveToNext())
-                                {
+                            if (cursor.getCount() > 0) {
+                                while (cursor.moveToNext()) {
                                     id = cursor.getString(cursor
                                             .getColumnIndex(ContactsContract.Contacts._ID));
                                     name = cursor.getString(cursor
-                                            .getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                                            .getColumnIndex(ContactsContract.Contacts
+                                                    .DISPLAY_NAME));
                                     if (Integer.parseInt(cursor.getString(cursor
-                                            .getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0)
-                                    {
+                                            .getColumnIndex(ContactsContract.Contacts
+                                                    .HAS_PHONE_NUMBER))) > 0) {
 
                                         Cursor smallCursor =
                                                 context.getContentResolver()
-                                                       .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
-                                                               ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                                                               new String[]{id}, null);
+                                                        .query(ContactsContract.CommonDataKinds
+                                                                        .Phone.CONTENT_URI, null,
+                                                                ContactsContract.CommonDataKinds
+                                                                        .Phone.CONTACT_ID + " = ?",
+                                                                new String[]{id}, null);
 
 
-                                        while (smallCursor.moveToNext())
-                                        {
+                                        while (smallCursor.moveToNext()) {
                                             phone = smallCursor.getString(smallCursor
-                                                    .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                                                    .getColumnIndex(ContactsContract
+                                                            .CommonDataKinds.Phone.NUMBER));
                                             sanitizedPhone = PhoneUtils
-                                                    .sanitize(phone, AppConstants.DEFAULT_COUNTRY_CODE);
+                                                    .sanitize(phone, AppConstants
+                                                            .DEFAULT_COUNTRY_CODE);
 
                                             PhonebookContact contact = new PhonebookContact();
                                             contact.setName(name);
                                             contact.setPhone(sanitizedPhone);
-                                            if (!contacts.contains(contact))
-                                            {
+                                            if (!contacts.contains(contact)) {
                                                 contacts.add(contact);
                                             }
                                         }
@@ -157,8 +276,7 @@ public class PhonebookService_
                                 subscriber.onCompleted();
                             }
                         }
-                        catch (Exception e)
-                        {
+                        catch (Exception e) {
                             subscriber.onError(e);
                         }
                     }
@@ -169,15 +287,17 @@ public class PhonebookService_
                     public List<PhonebookContact> call(List<PhonebookContact> phonebookContacts)
                     {
                         List<PhonebookContact> filtered = new ArrayList<PhonebookContact>();
-                        for(PhonebookContact phonebookContact:phonebookContacts)
-                        {
-                            if(!phonebookContact.getName().equalsIgnoreCase("Identified As Spam"))
-                            {
+                        for (PhonebookContact phonebookContact : phonebookContacts) {
+                            if (!phonebookContact.getName().equalsIgnoreCase("Identified As " +
+                                    "Spam")) {
                                 filtered.add(phonebookContact);
                             }
                         }
 
                         Collections.sort(filtered, new PhonebookContactComparator());
+
+                        genericCache.put(GenericCacheKeys.PHONEBOOK_CONTACTS, filtered);
+
                         return filtered;
                     }
                 })

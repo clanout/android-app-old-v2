@@ -2,6 +2,7 @@ package reaper.android.app.model.util;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 
 import com.google.gson.reflect.TypeToken;
 
@@ -19,6 +20,7 @@ import reaper.android.app.config.NotificationMessages;
 import reaper.android.app.model.Notification;
 import rx.Observable;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -39,8 +41,6 @@ public class NotificationFactory
                     .fromJson(data.getString("parameters"), TYPE);
 
             int typeCode = NotificationHelper.getType(type);
-
-            Log.d("NOTIFICATION", "typecode ---- " + typeCode);
 
             return buildNotification(typeCode, args);
 
@@ -86,7 +86,6 @@ public class NotificationFactory
                 return buildEventRemovedNotification(args);
 
             case Notification.EVENT_INVITATION:
-                Log.d("NOTIFICATION", "building invitation notification");
                 return buildEventInvitationNotification(args);
 
             default:
@@ -98,19 +97,52 @@ public class NotificationFactory
             String>
                                                                                      args)
     {
-        return notificationCache.getAll(Notification.EVENT_INVITATION, args.get("event_id"))
+        Observable<List<Notification>> getAllInvitationsForEvent = notificationCache.getAll
+                (Notification.EVENT_INVITATION, args.get("event_id"));
+        Observable<List<Notification>> getCreateNotificationsForEvent = notificationCache.getAll
+                (Notification.EVENT_CREATED, args.get("event_id"));
+
+        return Observable
+                .zip(getAllInvitationsForEvent,
+                        getCreateNotificationsForEvent,
+                        new Func2<List<Notification>, List<Notification>,
+                                Pair<List<Notification>, List<Notification>>>()
+                        {
+                            @Override
+                            public Pair<List<Notification>, List<Notification>> call
+                                    (List<Notification> inviteNotifs,
+                                     List<Notification> createNotifs)
+                            {
+                                return new Pair<>(inviteNotifs, createNotifs);
+                            }
+                        })
+                .flatMap(new Func1<Pair<List<Notification>, List<Notification>>,
+                        Observable<List<Notification>>>()
+                {
+                    @Override
+                    public Observable<List<Notification>> call(final Pair<List<Notification>,
+                            List<Notification>> notifs)
+                    {
+                        List<Integer> createNotificationIds = getNotificationIdsList(notifs.second);
+                        return notificationCache
+                                .clear(createNotificationIds)
+                                .flatMap(new Func1<Boolean, Observable<List<Notification>>>()
+                                {
+                                    @Override
+                                    public Observable<List<Notification>> call(Boolean aBoolean)
+                                    {
+                                        return Observable.just(notifs.first);
+                                    }
+                                });
+                    }
+                })
                 .flatMap(new Func1<List<Notification>, Observable<Integer>>()
                          {
                              @Override
                              public Observable<Integer> call(final List<Notification> notifications)
                              {
-                                 Log.d("NOTIFICATION", "notifications size --- " + notifications.size());
-
                                  List<Integer> notificationIds = getNotificationIdsList
                                          (notifications);
-
-                                 Log.d("NOTIFICATION", "notifications id size --- " + notificationIds.size());
-
                                  return notificationCache
                                          .clear(notificationIds)
                                          .flatMap(new Func1<Boolean, Observable<Integer>>()
@@ -131,16 +163,10 @@ public class NotificationFactory
                     public Observable<Notification> call(Integer previousInviteeCount)
                     {
 
-                        Log.d("NOTIFICATION", "previous invitee count --- " + previousInviteeCount);
-
                         String message = getInviteNotificationMessage(previousInviteeCount, args);
-
-                        Log.d("NOTIFICATION", "mssage --- " + message);
 
                         Notification notification = getNotificationObjectHavingEventInformation
                                 (Notification.EVENT_INVITATION, args, message);
-
-                        Log.d("NOTIFICATION", "notification --- " + notification.getType() + " " + notification.getArgs());
 
                         return Observable.just(notification);
                     }
@@ -492,17 +518,17 @@ public class NotificationFactory
         try {
             if (message.contains("others invited you to")) {
 
-                String [] wordArray = message.split(" ");
+                String[] wordArray = message.split(" ");
 
-                try{
+                try {
 
                     return Integer.valueOf(wordArray[3]) + 1;
-                }catch (Exception e)
-                {
+                }
+                catch (Exception e) {
                     try {
                         return Integer.valueOf(wordArray[2]) + 1;
-                    }catch (Exception exception)
-                    {
+                    }
+                    catch (Exception exception) {
                         return 0;
                     }
                 }

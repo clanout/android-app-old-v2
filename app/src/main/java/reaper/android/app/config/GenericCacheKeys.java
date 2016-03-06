@@ -14,6 +14,7 @@ public final class GenericCacheKeys
 
     /* Feed */
     public static final String FEED_LAST_UPDATE_TIMESTAMP = "last_update_timestamp";
+    public static final String PHONEBOOK_CONTACTS = "phonebook_contacts";
 
     private GenericCacheKeys()
     {
