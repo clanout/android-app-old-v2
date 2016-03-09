@@ -5,22 +5,26 @@ import android.content.Intent;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
-import com.squareup.otto.Bus;
+
+import java.util.List;
 
 import reaper.android.app.api._core.ApiManager;
 import reaper.android.app.api.notification.NotificationApi;
 import reaper.android.app.api.notification.request.GCmRegisterUserApiRequest;
 import reaper.android.app.cache._core.CacheManager;
+import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.GenericCacheKeys;
-import reaper.android.app.config.GoogleAnalyticsConstants;
-import reaper.android.app.service.UserService;
-import reaper.android.common.analytics.AnalyticsHelper;
-import reaper.android.app.communication.Communicator;
+import reaper.android.app.model.Event;
+import reaper.android.app.service._new.GcmService_;
 import retrofit.client.Response;
+import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 public class RegistrationIntentService extends IntentService
 {
@@ -44,54 +48,141 @@ public class RegistrationIntentService extends IntentService
                 String token = instanceID
                         .getToken(AppConstants.GCM_SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
 
-                sendTokenToServer(token);
+                sendTokenToServer(token)
+                        .flatMap(new Func1<Boolean, Observable<Boolean>>()
+                        {
+                            @Override
+                            public Observable<Boolean> call(Boolean isTokenSent)
+                            {
+                                if (isTokenSent)
+                                {
+                                    return processEvents();
+                                }
+                                else
+                                {
+                                    throw new IllegalStateException("[GCM] Failed to push token to server");
+                                }
+                            }
+                        })
+                        .doOnNext(new Action1<Boolean>()
+                        {
+                            @Override
+                            public void call(Boolean isEventsProcessingSuccessful)
+                            {
+                                if (!isEventsProcessingSuccessful)
+                                {
+                                    throw new IllegalStateException("[GCM] Failed to process events");
+                                }
+                            }
+                        })
+                        .subscribeOn(Schedulers.newThread())
+                        .subscribe(new Subscriber<Boolean>()
+                        {
+                            @Override
+                            public void onCompleted()
+                            {
+                            }
+
+                            @Override
+                            public void onError(Throwable e)
+                            {
+                                Timber.v(e.getMessage());
+                            }
+
+                            @Override
+                            public void onNext(Boolean isSuccess)
+                            {
+                            }
+                        });
             }
         }
         catch (Exception e)
         {
             genericCache.delete(GenericCacheKeys.GCM_TOKEN);
-
         }
     }
 
-    private void sendTokenToServer(final String token)
+    private Observable<Boolean> sendTokenToServer(final String token)
     {
-        Bus bus = Communicator.getInstance().getBus();
-        UserService userService = UserService.getInstance();
-
         NotificationApi notificationApi = ApiManager.getNotificationApi();
 
         GCmRegisterUserApiRequest request = new GCmRegisterUserApiRequest(token);
-        notificationApi.registerUser(request)
-                       .subscribeOn(Schedulers.newThread())
-                       .observeOn(Schedulers.newThread())
-                       .subscribe(new Subscriber<Response>()
-                       {
-                           @Override
-                           public void onCompleted()
-                           {
-                           }
+        return notificationApi
+                .registerUser(request)
+                .doOnNext(new Action1<Response>()
+                {
+                    @Override
+                    public void call(Response response)
+                    {
+                        genericCache.put(GenericCacheKeys.GCM_TOKEN, token);
+                    }
+                })
+                .doOnError(new Action1<Throwable>()
+                {
+                    @Override
+                    public void call(Throwable throwable)
+                    {
+                        genericCache.delete(GenericCacheKeys.GCM_TOKEN);
+                    }
+                })
+                .map(new Func1<Response, Boolean>()
+                {
+                    @Override
+                    public Boolean call(Response response)
+                    {
+                        return true;
+                    }
+                })
+                .onErrorReturn(new Func1<Throwable, Boolean>()
+                {
+                    @Override
+                    public Boolean call(Throwable throwable)
+                    {
+                        return false;
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
+    }
 
-                           @Override
-                           public void onError(Throwable e)
-                           {
-                               genericCache.delete(GenericCacheKeys.GCM_TOKEN);
-                           }
+    private Observable<Boolean> processEvents()
+    {
+        final GcmService_ gcmService = GcmService_.getInstance();
+        EventCache eventCache = CacheManager.getEventCache();
+        return eventCache
+                .getEvents()
+                .flatMap(new Func1<List<Event>, Observable<Boolean>>()
+                {
+                    @Override
+                    public Observable<Boolean> call(List<Event> events)
+                    {
+                        int subscribeCount = 0;
+                        int unsubscribeCount = 0;
 
-                           @Override
-                           public void onNext(Response response)
-                           {
-                               if (response.getStatus() == 200)
-                               {
-                                   AnalyticsHelper
-                                           .sendEvents(GoogleAnalyticsConstants.GENERAL, GoogleAnalyticsConstants.GCM_TOKEN_SENT_TO_SERVER, "");
-                                   genericCache.put(GenericCacheKeys.GCM_TOKEN, token);
-                               }
-                               else
-                               {
-                                   genericCache.delete(GenericCacheKeys.GCM_TOKEN);
-                               }
-                           }
-                       });
+                        for (Event event : events)
+                        {
+                            if (event.getRsvp() == Event.RSVP.YES)
+                            {
+                                gcmService.subscribeTopic(genericCache
+                                        .get(GenericCacheKeys.GCM_TOKEN), event
+                                        .getId());
+
+                                subscribeCount++;
+                            }
+                            else
+                            {
+                                gcmService.unsubscribeTopic(genericCache
+                                        .get(GenericCacheKeys.GCM_TOKEN), event
+                                        .getId());
+
+                                unsubscribeCount++;
+                            }
+                        }
+
+                        Timber.v("[GCM] Subscribe Count = " + subscribeCount);
+
+                        return Observable.just(true);
+                    }
+                })
+                .subscribeOn(Schedulers.newThread());
     }
 }

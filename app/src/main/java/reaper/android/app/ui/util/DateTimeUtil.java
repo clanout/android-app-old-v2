@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import timber.log.Timber;
-
 public class DateTimeUtil
 {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat
@@ -141,8 +139,6 @@ public class DateTimeUtil
     {
         LocalDate date = dateTime.toLocalDate();
         DateTime now = DateTime.now();
-
-        Timber.v(">>>> HERE : " + dateTime.toString() + " : " + now.toString());
 
         if (dateTime.isBefore(now))
         {

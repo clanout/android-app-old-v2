@@ -133,17 +133,6 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
                         return locationService.pushUserLocation();
                     }
                 })
-                .doOnCompleted(new Action0()
-                {
-                    @Override
-                    public void call()
-                    {
-                        // Register With GCM
-                        gcmService.register();
-
-
-                    }
-                })
                 .flatMap(new Func1<Boolean, Observable<Boolean>>()
                 {
                     @Override
@@ -155,7 +144,7 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
                         }
                         else
                         {
-                            throw new IllegalStateException();
+                            throw new IllegalStateException("[Bootstrap Error] location push failed");
                         }
                     }
                 })
@@ -172,6 +161,15 @@ public class BootstrapPresenterImpl implements BootstrapPresenter
                         {
                             throw new IllegalStateException();
                         }
+                    }
+                })
+                .doOnCompleted(new Action0()
+                {
+                    @Override
+                    public void call()
+                    {
+                        // Handle GCM registration and channel subscription
+                        gcmService.register();
                     }
                 })
                 .subscribeOn(Schedulers.newThread());
