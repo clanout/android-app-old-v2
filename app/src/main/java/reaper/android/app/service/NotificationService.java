@@ -178,7 +178,7 @@ public class NotificationService
 
                             }
                             else {
-                                buildNotification(notification, true, false);
+                                buildNotification(notification);
                             }
                         }
 
@@ -206,8 +206,6 @@ public class NotificationService
             final DateTime notificationTimestamp = DateTime.parse(notification.getArgs().get
                     ("timestamp"));
 
-            Log.d("NOTIFICATION", "notiTimestamp ---- " + notificationTimestamp);
-
             eventCache.getChatSeenTimestamp(notification.getEventId())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Subscriber<DateTime>()
@@ -221,14 +219,11 @@ public class NotificationService
                         @Override
                         public void onError(Throwable e)
                         {
-                            Log.d("NOTIFICATION", "onError ---- ");
                         }
 
                         @Override
                         public void onNext(DateTime lastSeenTimestamp)
                         {
-                            Log.d("NOTIFICATION", "onNext ---- " + lastSeenTimestamp);
-
                             if (lastSeenTimestamp == null) {
                                 notificationCache.put(notification).observeOn(Schedulers
                                         .newThread())
@@ -239,14 +234,11 @@ public class NotificationService
                                             {
 
                                                 if (ifAppRunningInForeground()) {
-
-                                                    Log.d("NOTIFICATION", "foreground ---- ");
                                                     bus.post(new NewNotificationReceivedTrigger());
 
                                                 }
                                                 else {
-                                                    Log.d("NOTIFICATION", "background ---- ");
-                                                    buildNotification(notification, true, true);
+                                                    buildNotification(notification);
                                                 }
                                             }
 
@@ -264,7 +256,6 @@ public class NotificationService
                                         });
                             }
                             else if (notificationTimestamp.isAfter(lastSeenTimestamp)) {
-                                Log.d("NOTIFICATION", "true ---- ");
 
                                 notificationCache.put(notification).observeOn(Schedulers
                                         .newThread())
@@ -276,13 +267,11 @@ public class NotificationService
 
                                                 if (ifAppRunningInForeground()) {
 
-                                                    Log.d("NOTIFICATION", "foreground ---- ");
                                                     bus.post(new NewNotificationReceivedTrigger());
 
                                                 }
                                                 else {
-                                                    Log.d("NOTIFICATION", "background ---- ");
-                                                    buildNotification(notification, true, true);
+                                                    buildNotification(notification);
                                                 }
                                             }
 
@@ -301,8 +290,6 @@ public class NotificationService
 
                             }
                             else {
-
-                                Log.d("NOTIFICATION", "false ---- ");
                             }
                         }
                     });
@@ -322,7 +309,7 @@ public class NotificationService
 
                         }
                         else {
-                            buildNotification(notification, false, false);
+                            buildNotification(notification);
                         }
                     }
 
@@ -388,8 +375,7 @@ public class NotificationService
 
                                             }
                                             else {
-                                                buildNotification
-                                                        (notification, true, false);
+                                                buildNotification(notification);
                                             }
                                         }
 
@@ -437,7 +423,7 @@ public class NotificationService
 
                             }
                             else {
-                                buildNotification(notification, false, false);
+                                buildNotification(notification);
                             }
                         }
 
@@ -518,9 +504,7 @@ public class NotificationService
 
                                                                 }
                                                                 else {
-                                                                    buildNotification
-                                                                            (notification,
-                                                                                    true, false);
+                                                                    buildNotification(notification);
                                                                 }
                                                             }
 
@@ -567,7 +551,7 @@ public class NotificationService
 
                                             }
                                             else {
-                                                buildNotification(notification, true, false);
+                                                buildNotification(notification);
                                             }
                                         }
 
@@ -609,7 +593,7 @@ public class NotificationService
 
                                         }
                                         else {
-                                            buildNotification(notification, true, false);
+                                            buildNotification(notification);
                                         }
                                     }
 
@@ -662,7 +646,7 @@ public class NotificationService
                                             bus.post(new NewNotificationReceivedTrigger());
                                         }
                                         else {
-                                            buildNotification(notification, true, false);
+                                            buildNotification(notification);
                                         }
                                     }
 
@@ -824,8 +808,7 @@ public class NotificationService
                 });
     }
 
-    private void buildNotification(final Notification notification, final boolean
-            shouldGoToDetailsFragment, final boolean shouldGoToChatFragment)
+    private void buildNotification(final Notification notification)
     {
 
         final Intent[] intent = new Intent[1];
@@ -860,8 +843,7 @@ public class NotificationService
                         else if (notifications.size() == 1) {
                             // if only one notification
 
-                            handleSingleNotificationIntent(notification,
-                                    shouldGoToDetailsFragment, shouldGoToChatFragment, intent);
+                            handleSingleNotificationIntent(notification, intent);
 
                         }
                         else if (notifications.size() > 1) {
@@ -1048,29 +1030,56 @@ public class NotificationService
         return message;
     }
 
-    private void handleSingleNotificationIntent(Notification notification, boolean
-            shouldGoToDetailsFragment, boolean shouldGoToChatFragment, Intent[] intent)
+    private void handleSingleNotificationIntent(Notification notification, Intent[] intent)
     {
 
         String eventId = notification.getEventId();
 
-        if (shouldGoToDetailsFragment) {
-            intent[0] = LauncherActivity
-                    .callingIntent(Reaper.getReaperContext(), FlowEntry.DETAILS, eventId);
+        switch (notification.getType()) {
+            case Notification.EVENT_INVITATION:
+                intent[0] = LauncherActivity
+                        .callingIntent(Reaper.getReaperContext(), FlowEntry.DETAILS, eventId);
+                break;
 
-        }
-        else {
-            intent[0] = LauncherActivity
-                    .callingIntent(Reaper.getReaperContext(), FlowEntry.HOME, null);
-        }
+            case Notification.STATUS:
+                intent[0] = LauncherActivity
+                        .callingIntent(Reaper.getReaperContext(), FlowEntry.DETAILS, eventId);
+                break;
 
-        if (shouldGoToChatFragment) {
-            intent[0] = LauncherActivity
-                    .callingIntent(Reaper.getReaperContext(), FlowEntry.CHAT, eventId);
-        }
-        else {
-            intent[0] = LauncherActivity
-                    .callingIntent(Reaper.getReaperContext(), FlowEntry.HOME, null);
+            case Notification.CHAT:
+                intent[0] = LauncherActivity
+                        .callingIntent(Reaper.getReaperContext(), FlowEntry.CHAT, eventId);
+                break;
+
+            case Notification.EVENT_CREATED:
+                intent[0] = LauncherActivity
+                        .callingIntent(Reaper.getReaperContext(), FlowEntry.DETAILS, eventId);
+                break;
+
+            case Notification.EVENT_REMOVED:
+                intent[0] = LauncherActivity
+                        .callingIntent(Reaper.getReaperContext(), FlowEntry.HOME, null);
+                break;
+
+            case Notification.EVENT_UPDATED:
+                intent[0] = LauncherActivity
+                        .callingIntent(Reaper.getReaperContext(), FlowEntry.DETAILS, eventId);
+                break;
+
+            case Notification.NEW_FRIEND_ADDED:
+                intent[0] = LauncherActivity
+                        .callingIntent(Reaper.getReaperContext(), FlowEntry.HOME, null);
+                break;
+
+            case Notification.RSVP:
+                intent[0] = LauncherActivity
+                        .callingIntent(Reaper.getReaperContext(), FlowEntry.DETAILS, eventId);
+                break;
+
+            default:
+                intent[0] = LauncherActivity
+                        .callingIntent(Reaper.getReaperContext(), FlowEntry.HOME, null);
+                break;
         }
     }
 
