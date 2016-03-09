@@ -17,7 +17,6 @@ import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import de.hdodenhof.circleimageview.CircleImageView;
 import reaper.android.R;
 import reaper.android.app.model.User;
 import reaper.android.app.service._new.WhatsappService_;

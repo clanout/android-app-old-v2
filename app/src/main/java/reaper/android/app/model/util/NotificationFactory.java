@@ -42,6 +42,8 @@ public class NotificationFactory
 
             int typeCode = NotificationHelper.getType(type);
 
+            Log.d("NOTIFICATION", "typeCode" + typeCode);
+
             return buildNotification(typeCode, args);
 
         }
@@ -56,6 +58,7 @@ public class NotificationFactory
     {
         switch (typeCode) {
             case Notification.CHAT:
+                Log.d("NOTIFICATION", "building chat notification");
                 return buildChatNotification(args);
 
             case Notification.BLOCKED:
@@ -388,6 +391,8 @@ public class NotificationFactory
                     @Override
                     public Observable<Boolean> call(List<Notification> notifications)
                     {
+                        Log.d("NOTIFICATION", "notifications size ---- " + notifications.size());
+
                         List<Integer> notificationIds = getNotificationIdsList(notifications);
 
                         return notificationCache.clear(notificationIds);
@@ -399,7 +404,12 @@ public class NotificationFactory
                     public Observable<Notification> call(Boolean isDeleteSuccessful)
                     {
 
+                        Log.d("NOTIFICATION", "isDeleteSuccessful ---- " + isDeleteSuccessful);
+
                         String message = NotificationHelper.getMessage(Notification.CHAT, args);
+
+                        Log.d("NOTIFICATION", "message " + message);
+
                         Notification notification = new Notification.Builder(Integer.parseInt
                                 (args.get("notification_id")))
                                 .type(Notification.CHAT)

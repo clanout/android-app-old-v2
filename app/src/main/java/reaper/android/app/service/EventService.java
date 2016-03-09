@@ -993,28 +993,4 @@ public class EventService
                     .getId());
         }
     }
-
-    public void deleteEvent(String eventId)
-    {
-        eventCache.delete(eventId);
-    }
-
-    public void deleteEventCompletely(String eventId)
-    {
-        eventCache.deleteCompletely(eventId);
-    }
-
-    public void saveEvent(Event event)
-    {
-        eventCache.save(event);
-    }
-
-    public Observable<DateTime> getChatLastSeenTimestamp(String eventId)
-    {
-        return eventCache.getChatSeenTimestamp(eventId)
-                .subscribeOn(Schedulers.newThread());
-    }
-
-
-
 }

@@ -59,7 +59,7 @@ public class ListenerServiceGcm extends GcmListenerService
                     @Override
                     public void onError(Throwable e)
                     {
-
+                        Timber.d("onError ---- " + e.getMessage());
                     }
 
                     @Override
