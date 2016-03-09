@@ -105,9 +105,9 @@ public class NotificationService
 
                                 if (events.contains(event)) {
                                     filtered.add(notification);
-                                }else{
-                                    if(notification.getType() == Notification.EVENT_REMOVED)
-                                    {
+                                }
+                                else {
+                                    if (notification.getType() == Notification.EVENT_REMOVED) {
                                         filtered.add(notification);
                                     }
                                 }
@@ -164,7 +164,8 @@ public class NotificationService
     private void handleNewStatusUpdateNotification(final Notification notification)
     {
 
-        if (!(notification.getArgs().get("user_id").equals(genericCache.get(GenericCacheKeys.SESSION_USER, User.class).getId()))) {
+        if (!(notification.getArgs().get("user_id").equals(genericCache.get(GenericCacheKeys
+                .SESSION_USER, User.class).getId()))) {
             notificationCache.put(notification).observeOn(Schedulers.newThread())
                     .subscribe(new Subscriber<Object>()
                     {
@@ -199,9 +200,11 @@ public class NotificationService
     private void handleNewChatMessageNotification(final Notification notification)
     {
 
-        if (!(notification.getArgs().get("user_id").equals(genericCache.get(GenericCacheKeys.SESSION_USER, User.class).getId()))) {
+        if (!(notification.getArgs().get("user_id").equals(genericCache.get(GenericCacheKeys
+                .SESSION_USER, User.class).getId()))) {
 
-            final DateTime notificationTimestamp = DateTime.parse(notification.getArgs().get("timestamp"));
+            final DateTime notificationTimestamp = DateTime.parse(notification.getArgs().get
+                    ("timestamp"));
 
             Log.d("NOTIFICATION", "notiTimestamp ---- " + notificationTimestamp);
 
@@ -225,10 +228,10 @@ public class NotificationService
                         public void onNext(DateTime lastSeenTimestamp)
                         {
                             Log.d("NOTIFICATION", "onNext ---- " + lastSeenTimestamp);
-                            if(notificationTimestamp.isAfter(lastSeenTimestamp))
-                            {
-                                Log.d("NOTIFICATION", "true ---- ");
-                                notificationCache.put(notification).observeOn(Schedulers.newThread())
+
+                            if (lastSeenTimestamp == null) {
+                                notificationCache.put(notification).observeOn(Schedulers
+                                        .newThread())
                                         .subscribe(new Subscriber<Object>()
                                         {
                                             @Override
@@ -259,7 +262,45 @@ public class NotificationService
 
                                             }
                                         });
-                            }else{
+                            }
+                            else if (notificationTimestamp.isAfter(lastSeenTimestamp)) {
+                                Log.d("NOTIFICATION", "true ---- ");
+
+                                notificationCache.put(notification).observeOn(Schedulers
+                                        .newThread())
+                                        .subscribe(new Subscriber<Object>()
+                                        {
+                                            @Override
+                                            public void onCompleted()
+                                            {
+
+                                                if (ifAppRunningInForeground()) {
+
+                                                    Log.d("NOTIFICATION", "foreground ---- ");
+                                                    bus.post(new NewNotificationReceivedTrigger());
+
+                                                }
+                                                else {
+                                                    Log.d("NOTIFICATION", "background ---- ");
+                                                    buildNotification(notification, true, true);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onError(Throwable e)
+                                            {
+
+                                            }
+
+                                            @Override
+                                            public void onNext(Object o)
+                                            {
+
+                                            }
+                                        });
+
+                            }
+                            else {
 
                                 Log.d("NOTIFICATION", "false ---- ");
                             }
@@ -323,7 +364,8 @@ public class NotificationService
                     public void onCompleted()
                     {
                         if (!(notification.getArgs().get("user_id")
-                                .equals(genericCache.get(GenericCacheKeys.SESSION_USER, User.class).getId()))) {
+                                .equals(genericCache.get(GenericCacheKeys.SESSION_USER, User
+                                        .class).getId()))) {
 
                             notification
                                     .setMessage(notification
@@ -382,7 +424,8 @@ public class NotificationService
     {
         eventCache.deleteCompletely(notification.getEventId());
 
-        if (!(notification.getArgs().get("user_id").equals(genericCache.get(GenericCacheKeys.SESSION_USER, User.class).getId()))) {
+        if (!(notification.getArgs().get("user_id").equals(genericCache.get(GenericCacheKeys
+                .SESSION_USER, User.class).getId()))) {
             notificationCache.put(notification).observeOn(Schedulers.newThread())
                     .subscribe(new Subscriber<Object>()
                     {
@@ -823,7 +866,8 @@ public class NotificationService
                         }
                         else if (notifications.size() > 1) {
                             intent[0] = LauncherActivity
-                                    .callingIntent(Reaper.getReaperContext(), FlowEntry.NOTIFICATIONS, null);
+                                    .callingIntent(Reaper.getReaperContext(), FlowEntry
+                                            .NOTIFICATIONS, null);
                         }
 
                         PendingIntent pendingIntent = PendingIntent
@@ -852,7 +896,8 @@ public class NotificationService
 
                             notificationBuilder.setContentTitle("Clanout");
 
-                            notificationBuilder.setContentText(buildCompressedMessage(notifications));
+                            notificationBuilder.setContentText(buildCompressedMessage
+                                    (notifications));
 
                             // Set Title and message for expanded view
 
@@ -1031,7 +1076,8 @@ public class NotificationService
 
     public void clearAllNotificationsFromBar(Context context)
     {
-        NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService
+                (Context.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();
     }
 }

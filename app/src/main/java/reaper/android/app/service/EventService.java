@@ -777,12 +777,7 @@ public class EventService
                     public void call(Event event)
                     {
                         eventCache.save(event);
-
-                        if (genericCache.get(GenericCacheKeys.GCM_TOKEN) != null) {
-                            gcmService.subscribeTopic(genericCache
-                                    .get(GenericCacheKeys.GCM_TOKEN), event
-                                    .getId());
-                        }
+                        handleTopicSubscription(event);
                     }
                 })
                 .subscribeOn(Schedulers.newThread());
