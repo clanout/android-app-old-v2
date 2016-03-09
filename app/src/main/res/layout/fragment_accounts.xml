@@ -27,7 +27,7 @@
             android:layout_centerInParent="true"
             android:background="@drawable/profile_pic_border"
             android:gravity="center_vertical|center_horizontal"
-            android:padding="8dp">
+            android:padding="4dp">
 
             <ImageView
                 android:id="@+id/ivProfilePic"
