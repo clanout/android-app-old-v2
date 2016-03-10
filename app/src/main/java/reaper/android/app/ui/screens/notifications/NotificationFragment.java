@@ -20,12 +20,14 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationPresenter;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationPresenterImpl;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationView;
 import reaper.android.app.model.Notification;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class NotificationFragment extends BaseFragment implements
         NotificationView,

@@ -23,6 +23,7 @@ import reaper.android.R;
 import reaper.android.app.communication.Communicator;
 import reaper.android.app.communication.NewNotificationReceivedTrigger;
 import reaper.android.app.communication.NewNotificationsAvailableTrigger;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.ui._core.BaseActivity;
@@ -32,6 +33,7 @@ import reaper.android.app.ui.screens.details.EventDetailsActivity;
 import reaper.android.app.ui.screens.home.create_suggestion.CreateSuggestionFragment;
 import reaper.android.app.ui.screens.home.feed.EventFeedFragment;
 import reaper.android.app.ui.screens.notifications.NotificationActivity;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class HomeActivity extends BaseActivity implements HomeScreen
 {
@@ -57,6 +59,9 @@ public class HomeActivity extends BaseActivity implements HomeScreen
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_HOME_ACTIVITY);
 
         /* Setup UI */
         setContentView(R.layout.activity_home);

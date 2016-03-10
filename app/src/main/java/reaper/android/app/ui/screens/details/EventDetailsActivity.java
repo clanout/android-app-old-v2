@@ -13,6 +13,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.service.EventService;
@@ -24,6 +25,7 @@ import reaper.android.app.ui.screens.details.mvp.EventDetailsContainerView;
 import reaper.android.app.ui.screens.edit.EditEventActivity;
 import reaper.android.app.ui.screens.home.HomeActivity;
 import reaper.android.app.ui.screens.invite.InviteActivity;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class EventDetailsActivity extends BaseActivity implements
         EventDetailsContainerView,
@@ -54,6 +56,9 @@ public class EventDetailsActivity extends BaseActivity implements
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_EVENT_DETAILS_ACTIVITY);
 
         /* Setup UI */
         setContentView(R.layout.activity_event_details);

@@ -17,6 +17,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
 import reaper.android.app.ui._core.BaseFragment;
@@ -25,6 +26,7 @@ import reaper.android.app.ui.screens.home.feed.mvp.EventFeedPresenter;
 import reaper.android.app.ui.screens.home.feed.mvp.EventFeedPresenterImpl;
 import reaper.android.app.ui.screens.home.feed.mvp.EventFeedView;
 import reaper.android.app.ui.util.FriendBubbles;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class EventFeedFragment extends BaseFragment implements
         EventFeedView,

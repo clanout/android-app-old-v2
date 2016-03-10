@@ -14,9 +14,11 @@ import android.view.MenuItem;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui._core.PermissionHandler;
 import reaper.android.app.ui.screens.details.EventDetailsActivity;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class InviteActivity extends BaseActivity implements InviteScreen
 {
@@ -48,6 +50,9 @@ public class InviteActivity extends BaseActivity implements InviteScreen
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_INVITE_ACTIVITY);
 
         /* Setup UI */
         setContentView(R.layout.activity_invite);

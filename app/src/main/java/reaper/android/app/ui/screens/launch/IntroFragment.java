@@ -11,7 +11,9 @@ import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.ui._core.BaseFragment;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class IntroFragment extends BaseFragment
 {

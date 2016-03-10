@@ -26,6 +26,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.LocationService_;
@@ -40,6 +41,7 @@ import reaper.android.app.ui.screens.invite.mvp.InviteView;
 import reaper.android.app.ui.screens.invite.mvp.PhonebookContactInviteWrapper;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common._debugger.TraceDebugger;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class InviteFragment extends BaseFragment implements
         InviteView,

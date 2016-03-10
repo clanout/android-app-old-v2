@@ -12,10 +12,12 @@ import android.view.MenuItem;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui.screens.chat.ChatActivity;
 import reaper.android.app.ui.screens.details.EventDetailsActivity;
 import reaper.android.app.ui.screens.home.HomeActivity;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class NotificationActivity extends BaseActivity implements NotificationScreen
 {
@@ -33,6 +35,9 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_NOTIFICATION_ACTIVITY);
 
         /* Setup UI */
         setContentView(R.layout.activity_notification);

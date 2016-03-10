@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.CreateEventSuggestion;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.service.EventService;
@@ -29,6 +30,7 @@ import reaper.android.app.ui.screens.home.create_suggestion.mvp.CreateSuggestion
 import reaper.android.app.ui.screens.home.create_suggestion.mvp.CreateSuggestionPresenterImpl;
 import reaper.android.app.ui.screens.home.create_suggestion.mvp.CreateSuggestionView;
 import reaper.android.app.ui.util.OnSwipeTouchListener;
+import reaper.android.common.analytics.AnalyticsHelper;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;

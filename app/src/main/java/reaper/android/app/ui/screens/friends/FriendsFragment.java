@@ -19,6 +19,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Friend;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.LocationService_;
@@ -26,6 +27,7 @@ import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.friends.mvp.FriendsPresenter;
 import reaper.android.app.ui.screens.friends.mvp.FriendsPresenterImpl;
 import reaper.android.app.ui.screens.friends.mvp.FriendsView;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class FriendsFragment extends BaseFragment implements
         FriendsView,

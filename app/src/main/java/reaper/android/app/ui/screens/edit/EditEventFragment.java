@@ -35,6 +35,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.config.Dimensions;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
@@ -54,6 +55,7 @@ import reaper.android.app.ui.util.CategoryIconFactory;
 import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class EditEventFragment extends BaseFragment implements EditEventView,
         LocationSuggestionAdapter.SuggestionClickListener
