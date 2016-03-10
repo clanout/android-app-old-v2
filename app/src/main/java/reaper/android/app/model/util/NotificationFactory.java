@@ -490,7 +490,7 @@ public class NotificationFactory
 
             message = String.format(NotificationMessages.EVENT_INVITATION,
                     args.get
-                            ("user_name") + " and " + previousInviteeCount + " others",
+                            ("user_name") + " & " + previousInviteeCount + " others",
                     args.get("event_name"));
 
         }

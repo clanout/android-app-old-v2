@@ -19,6 +19,7 @@ import java.util.List;
 import reaper.android.R;
 import reaper.android.app.api._core.ApiManager;
 import reaper.android.app.api.event.EventApi;
+import reaper.android.app.api.event.request.EventsApiRequest;
 import reaper.android.app.api.event.request.FetchEventApiRequest;
 import reaper.android.app.api.event.response.FetchEventApiResponse;
 import reaper.android.app.cache._core.CacheManager;
@@ -83,8 +84,8 @@ public class NotificationService
     public Observable<List<Notification>> fetchNotifications()
     {
         return Observable
-                .zip(notificationCache.getAll(), eventCache
-                        .getEvents(), new Func2<List<Notification>, List<Event>,
+                .zip(notificationCache.getAll(), eventCache.getEvents(), new
+                        Func2<List<Notification>, List<Event>,
                         List<Notification>>()
                 {
                     @Override
@@ -868,7 +869,6 @@ public class NotificationService
                                 .setContentIntent(pendingIntent);
 
                         // Set Title and message for merged view
-
                         if (notifications.size() == 1) {
                             notificationBuilder.setContentTitle(notification.getTitle());
                             notificationBuilder.setContentText(notification.getMessage());
@@ -945,74 +945,50 @@ public class NotificationService
         }
 
         String message = "You have ";
-
         if (invitationCount != 0) {
+            if (invitationCount == 1) {
+                message = message + invitationCount + " invitation";
+            }
+            else {
+                message = message + invitationCount + " invitations";
+            }
 
-            if (updateCount == 0 && chatCount == 0) {
-
-                if (invitationCount == 1) {
-                    message = message + invitationCount + " invitation";
-                }
-                else {
-                    message = message + invitationCount + " invitations";
-                }
+            int sumOfChatsAndUpdates = chatCount + updateCount;
+            if (sumOfChatsAndUpdates != 0) {
+                message = message + "and " + sumOfChatsAndUpdates + " other notifications.";
             }
             else {
 
-                if (updateCount == 0 || chatCount == 0) {
-                    if (invitationCount == 1) {
-                        message = message + invitationCount + " invitation " +
-                                "and ";
-                    }
-                    else {
-                        message = message + invitationCount + " invitations " +
-                                "and ";
-                    }
-                }
-                else {
-
-                    if (invitationCount == 1) {
-                        message = message + invitationCount + " invitation, ";
-                    }
-                    else {
-                        message = message + invitationCount + " invitations, ";
-                    }
-                }
+                message = message + ".";
             }
         }
+        else if (updateCount != 0) {
 
-        if (updateCount != 0) {
-
-            if (chatCount == 0) {
-                if (updateCount == 1) {
-                    message = message + updateCount + " clan update";
-                }
-                else {
-                    message = message + updateCount + " clan updates";
-                }
+            if (updateCount == 1) {
+                message = message + updateCount + " update";
             }
             else {
-
-                if (updateCount == 1) {
-                    message = message + updateCount + " clan update and ";
-                }
-                else {
-
-                    message = message + updateCount + " clan updates and ";
-                }
+                message = message + updateCount + " updates";
             }
-        }
 
-        if (chatCount != 0) {
 
+            if (chatCount != 0) {
+                message = message + "and " + chatCount + " other notifications.";
+            }
+            else {
+                message = message + ".";
+            }
+        }else if(chatCount != 0)
+        {
             if (chatCount == 1) {
-                message = message + chatCount + " conversation";
+                message = message + chatCount + " chat";
             }
             else {
-                message = message + chatCount + " conversations";
+                message = message + chatCount + " chats";
             }
-        }
 
+        }
+        
         if (chatCount == 0 && updateCount == 0 && invitationCount == 0) {
 
             if (notifications.size() == 1) {
