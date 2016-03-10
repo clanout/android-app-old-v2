@@ -357,13 +357,6 @@ public class NotificationService
                                 .equals(genericCache.get(GenericCacheKeys.SESSION_USER, User
                                         .class).getId()))) {
 
-                            notification
-                                    .setMessage(notification
-                                            .getArgs()
-                                            .get("user_name") + " updated " + notification
-                                            .getArgs()
-                                            .get("event_name"));
-
                             notificationCache.put(notification)
                                     .observeOn(Schedulers
                                             .newThread())

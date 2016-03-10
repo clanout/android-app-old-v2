@@ -1,6 +1,7 @@
 package reaper.android.app.model.util;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
@@ -58,7 +59,6 @@ public class NotificationFactory
     {
         switch (typeCode) {
             case Notification.CHAT:
-                Log.d("NOTIFICATION", "building chat notification");
                 return buildChatNotification(args);
 
             case Notification.BLOCKED:
@@ -426,10 +426,7 @@ public class NotificationFactory
                     @Override
                     public Observable<Boolean> call(List<Notification> notifications)
                     {
-                        Log.d("NOTIFICATION", "notifications size ---- " + notifications.size());
-
                         List<Integer> notificationIds = getNotificationIdsList(notifications);
-
                         return notificationCache.clear(notificationIds);
                     }
                 })
@@ -439,11 +436,7 @@ public class NotificationFactory
                     public Observable<Notification> call(Boolean isDeleteSuccessful)
                     {
 
-                        Log.d("NOTIFICATION", "isDeleteSuccessful ---- " + isDeleteSuccessful);
-
                         String message = NotificationHelper.getMessage(Notification.CHAT, args);
-
-                        Log.d("NOTIFICATION", "message " + message);
 
                         Notification notification = new Notification.Builder(Integer.parseInt
                                 (args.get("notification_id")))
