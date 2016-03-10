@@ -38,6 +38,7 @@ import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.User;
 import reaper.android.app.service.EventService;
+import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.ui._core.BaseFragment;
@@ -157,8 +158,9 @@ public class EventDetailsFragment extends BaseFragment implements
         /* Presenter */
         EventService eventService = EventService.getInstance();
         UserService userService = UserService.getInstance();
+        NotificationService notificationService = NotificationService.getInstance();
         Event event = (Event) getArguments().getSerializable(ARG_EVENT);
-        presenter = new EventDetailsPresenterImpl(eventService, userService, event);
+        presenter = new EventDetailsPresenterImpl(eventService, userService, notificationService, event);
     }
 
     @Nullable

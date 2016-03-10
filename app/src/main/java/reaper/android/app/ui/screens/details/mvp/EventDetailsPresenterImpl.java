@@ -9,6 +9,7 @@ import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.util.EventAttendeeComparator;
 import reaper.android.app.service.EventService;
+import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.EventUtils;
@@ -26,6 +27,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     /* Service */
     private EventService eventService;
     private UserService userService;
+    private NotificationService notificationService;
 
     /* Data */
     private Event event;
@@ -39,10 +41,13 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     /* Subscriptions */
     private CompositeSubscription subscriptions;
 
-    public EventDetailsPresenterImpl(EventService eventService, UserService userService, Event event)
+    public EventDetailsPresenterImpl(EventService eventService, UserService userService,
+                                     NotificationService notificationService, Event event)
     {
         this.eventService = eventService;
         this.userService = userService;
+        this.notificationService = notificationService;
+
         this.event = event;
         processIsLastMinute();
 
@@ -53,7 +58,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     public void attachView(EventDetailsView view)
     {
         this.view = view;
-
+        notificationService.deletePlanCreateNotification(event.getId());
         initView();
     }
 

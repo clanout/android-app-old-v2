@@ -68,10 +68,10 @@ public class EventService
 {
     private static EventService instance;
 
-    public static void init(GcmService_ gcmService, LocationService_ locationService, UserService
-            userService)
+    public static void init(GcmService_ gcmService, LocationService_ locationService,
+                            UserService userService, NotificationService notificationService)
     {
-        instance = new EventService(gcmService, locationService, userService);
+        instance = new EventService(gcmService, locationService, userService, notificationService);
     }
 
     public static EventService getInstance()
@@ -87,14 +87,15 @@ public class EventService
     private LocationService_ locationService;
     private GcmService_ gcmService;
     private UserService userService;
+    private NotificationService notificationService;
 
     private EventApi eventApi;
     private EventCache eventCache;
 
     private GenericCache genericCache;
 
-    private EventService(GcmService_ gcmService, LocationService_ locationService, UserService
-            userService)
+    private EventService(GcmService_ gcmService, LocationService_ locationService,
+                         UserService userService, NotificationService notificationService)
     {
         eventApi = ApiManager.getEventApi();
         eventCache = CacheManager.getEventCache();
@@ -103,6 +104,7 @@ public class EventService
         this.gcmService = gcmService;
         this.locationService = locationService;
         this.userService = userService;
+        this.notificationService = notificationService;
     }
 
     /* Events */
@@ -752,6 +754,12 @@ public class EventService
                                    eventCache.deleteCompletely(updatedEvent.getId());
                                    eventCache.save(updatedEvent);
                                    handleTopicSubscription(updatedEvent);
+
+                                   if (updatedEvent.getRsvp() == Event.RSVP.YES)
+                                   {
+                                       notificationService
+                                               .deleteInvitationNotification(updatedEvent.getId());
+                                   }
                                }
                            }
                        })
