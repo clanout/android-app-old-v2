@@ -169,34 +169,37 @@ public class NotificationService
 
         if (!(notification.getArgs().get("user_id").equals(genericCache.get(GenericCacheKeys
                 .SESSION_USER, User.class).getId()))) {
-            notificationCache.put(notification).observeOn(Schedulers.newThread())
-                    .subscribe(new Subscriber<Object>()
-                    {
-                        @Override
-                        public void onCompleted()
-                        {
 
-                            if (ifAppRunningInForeground()) {
-                                bus.post(new NewNotificationReceivedTrigger());
+            if(!ifAppRunningInForeground())
+            {
+                int requestCode = ("someString" + Math.random() + System.currentTimeMillis()).hashCode();
+                String eventId = notification.getEventId();
+                Intent launcherIntent = LauncherActivity
+                        .callingIntent(Reaper.getReaperContext(), FlowEntry.DETAILS, eventId);
 
-                            }
-                            else {
-                                buildNotification(notification);
-                            }
-                        }
+                PendingIntent pendingIntent = PendingIntent
+                        .getActivity(Reaper.getReaperContext(), requestCode, launcherIntent, PendingIntent
+                                .FLAG_ONE_SHOT);
 
-                        @Override
-                        public void onError(Throwable e)
-                        {
+                Uri defaultSoundUri = RingtoneManager
+                        .getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder
+                        (Reaper.getReaperContext())
+                        .setSmallIcon(R.mipmap.app_icon)
+                        .setContentTitle(notification.getTitle())
+                        .setContentText(Reaper.getReaperContext().getResources()
+                                .getString(R.string.reminder_notification_message))
+                        .setAutoCancel(true)
+                        .setSound(defaultSoundUri)
+                        .setContentIntent(pendingIntent);
 
-                        }
+                NotificationManager notificationManager =
+                        (NotificationManager) Reaper.getReaperContext()
+                                .getSystemService(Context.NOTIFICATION_SERVICE);
 
-                        @Override
-                        public void onNext(Object o)
-                        {
+                notificationManager.notify(eventId.hashCode(), notificationBuilder.build());
 
-                        }
-                    });
+            }
         }
     }
 
