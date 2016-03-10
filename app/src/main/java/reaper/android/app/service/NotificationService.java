@@ -86,38 +86,40 @@ public class NotificationService
         return Observable
                 .zip(notificationCache.getAll(), eventCache.getEvents(), new
                         Func2<List<Notification>, List<Event>,
-                        List<Notification>>()
-                {
-                    @Override
-                    public List<Notification> call(List<Notification> notifications, List<Event>
-                            events)
-                    {
-                        List<Notification> filtered = new ArrayList<Notification>();
+                                List<Notification>>()
+                        {
+                            @Override
+                            public List<Notification> call(List<Notification> notifications,
+                                                           List<Event>
+                                    events)
+                            {
+                                List<Notification> filtered = new ArrayList<Notification>();
 
-                        for (Notification notification : notifications) {
-                            String eventId = notification.getEventId();
+                                for (Notification notification : notifications) {
+                                    String eventId = notification.getEventId();
 
-                            if (eventId == null || eventId.isEmpty()) {
-                                filtered.add(notification);
-                            }
-                            else {
-                                Event event = new Event();
-                                event.setId(eventId);
-
-                                if (events.contains(event)) {
-                                    filtered.add(notification);
-                                }
-                                else {
-                                    if (notification.getType() == Notification.EVENT_REMOVED) {
+                                    if (eventId == null || eventId.isEmpty()) {
                                         filtered.add(notification);
                                     }
-                                }
-                            }
-                        }
+                                    else {
+                                        Event event = new Event();
+                                        event.setId(eventId);
 
-                        return filtered;
-                    }
-                })
+                                        if (events.contains(event)) {
+                                            filtered.add(notification);
+                                        }
+                                        else {
+                                            if (notification.getType() == Notification
+                                                    .EVENT_REMOVED) {
+                                                filtered.add(notification);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                return filtered;
+                            }
+                        })
                 .subscribeOn(Schedulers.newThread());
     }
 
@@ -978,8 +980,8 @@ public class NotificationService
             else {
                 message = message + ".";
             }
-        }else if(chatCount != 0)
-        {
+        }
+        else if (chatCount != 0) {
             if (chatCount == 1) {
                 message = message + chatCount + " chat";
             }
@@ -988,7 +990,7 @@ public class NotificationService
             }
 
         }
-        
+
         if (chatCount == 0 && updateCount == 0 && invitationCount == 0) {
 
             if (notifications.size() == 1) {
@@ -1064,5 +1066,85 @@ public class NotificationService
         NotificationManager notificationManager = (NotificationManager) context.getSystemService
                 (Context.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();
+    }
+
+    public void deletePlanCreateNotification(String eventId)
+    {
+        notificationCache.getAll(Notification.EVENT_CREATED, eventId)
+                .flatMap(new Func1<List<Notification>, Observable<Boolean>>()
+                {
+                    @Override
+                    public Observable<Boolean> call(List<Notification> notifications)
+                    {
+                        List<Integer> notificationIds = new ArrayList<Integer>();
+
+                        for (Notification notification : notifications) {
+                            notificationIds.add(notification.getId());
+                        }
+
+                        return notificationCache.clear(notificationIds);
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new Subscriber<Boolean>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+
+                    }
+
+                    @Override
+                    public void onNext(Boolean aBoolean)
+                    {
+
+                    }
+                });
+    }
+
+    public void deleteInvitationNotification(String eventId)
+    {
+        notificationCache.getAll(Notification.EVENT_INVITATION, eventId)
+                .flatMap(new Func1<List<Notification>, Observable<Boolean>>()
+                {
+                    @Override
+                    public Observable<Boolean> call(List<Notification> notifications)
+                    {
+                        List<Integer> notificationIds = new ArrayList<Integer>();
+
+                        for (Notification notification : notifications) {
+                            notificationIds.add(notification.getId());
+                        }
+
+                        return notificationCache.clear(notificationIds);
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new Subscriber<Boolean>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+
+                    }
+
+                    @Override
+                    public void onNext(Boolean aBoolean)
+                    {
+
+                    }
+                });
     }
 }
