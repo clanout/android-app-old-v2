@@ -19,6 +19,7 @@ import reaper.android.R;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.config.MemoryCacheKeys;
 import reaper.android.app.ui.dialog.NoInternetDialog;
+import reaper.android.app.ui.screens.launch.LauncherActivity;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
@@ -70,7 +71,10 @@ public class BaseActivity extends AppCompatActivity
                             {
                                 if (isConnected && !isConnectedNow)
                                 {
-                                    NoInternetDialog.show(BaseActivity.this);
+                                    if (!(BaseActivity.this instanceof LauncherActivity))
+                                    {
+                                        NoInternetDialog.show(BaseActivity.this);
+                                    }
                                 }
 
                                 isConnected = isConnectedNow;
