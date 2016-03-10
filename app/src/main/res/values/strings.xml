@@ -138,7 +138,7 @@
     <string name="add_phone_number">Clanout is exciting with your friends around. Add your number to instantly connect with your nearby phonebook friends.\n\nClanOut won\'t share your personal information with anyone</string>
     <string name="read_contacts_permission_required_message">You\'ll not be able to invite friends from your phonebook to your plans. We do not store your phonebook information.</string>
 
-    <string name="reminder_notification_message">1 hour to go. Giddy up!</string>
+    <string name="reminder_notification_message">1 hour to go. Update your last moment status!</string>
 
     <!-- Permission Defaults -->
     <string name="permission_request_again">Request Again</string>

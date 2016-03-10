@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import org.joda.time.DateTime;
+import org.joda.time.Minutes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +36,7 @@ public class AlarmReceiver extends BroadcastReceiver
     public void onReceive(Context context, Intent intent)
     {
 
-        if (!ifAppRunningInForeground())
-        {
+        if (!ifAppRunningInForeground()) {
             fetchEvents(context);
         }
     }
@@ -64,11 +64,12 @@ public class AlarmReceiver extends BroadcastReceiver
                     @Override
                     public void onNext(List<Event> events)
                     {
+                        DateTime currentTimestamp = DateTime.now();
                         List<Event> eventsToStartShortly = new ArrayList<Event>();
-                        for (Event event : events)
-                        {
-                            if (event.getStartTime().isBefore(DateTime.now().plusHours(1)))
-                            {
+                        for (Event event : events) {
+                            if ((event.getStartTime().isAfter(currentTimestamp)) && (Minutes
+                                    .minutesBetween(currentTimestamp, event.getStartTime())
+                                    .isLessThan(Minutes.minutes(60)))) {
                                 eventsToStartShortly.add(event);
                             }
                         }
@@ -79,30 +80,25 @@ public class AlarmReceiver extends BroadcastReceiver
 
     private void buildNotification(List<Event> events, Context context)
     {
-        int requestCode = ("someString" + System.currentTimeMillis()).hashCode();
-
-        if (events.size() == 0)
-        {
-        }
-        else if (events.size() == 1)
-        {
-
-            if (events.get(0) != null)
-            {
-                String eventId = events.get(0).getId();
+        if (!events.isEmpty()) {
+            for (Event event : events) {
+                int requestCode = ("someString" + Math.random() + System.currentTimeMillis()).hashCode();
+                String eventId = event.getId();
                 Intent launcherIntent = LauncherActivity
                         .callingIntent(context, FlowEntry.DETAILS, eventId);
 
                 PendingIntent pendingIntent = PendingIntent
-                        .getActivity(context, requestCode, launcherIntent, PendingIntent.FLAG_ONE_SHOT);
+                        .getActivity(context, requestCode, launcherIntent, PendingIntent
+                                .FLAG_ONE_SHOT);
 
                 Uri defaultSoundUri = RingtoneManager
                         .getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
+                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder
+                        (context)
                         .setSmallIcon(R.mipmap.app_icon)
-                        .setContentTitle(events.get(0).getTitle())
+                        .setContentTitle(event.getTitle())
                         .setContentText(context.getResources()
-                                               .getString(R.string.reminder_notification_message))
+                                .getString(R.string.reminder_notification_message))
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
                         .setContentIntent(pendingIntent);
@@ -111,51 +107,24 @@ public class AlarmReceiver extends BroadcastReceiver
                         (NotificationManager) context
                                 .getSystemService(Context.NOTIFICATION_SERVICE);
 
-                notificationManager.notify(2, notificationBuilder.build());
+                notificationManager.notify(eventId.hashCode(), notificationBuilder.build());
             }
-        }
-        else if (events.size() > 1)
-        {
-            Intent launcherIntent = LauncherActivity
-                    .callingIntent(context, FlowEntry.HOME, null);
-
-            PendingIntent pendingIntent = PendingIntent
-                    .getActivity(context, requestCode, launcherIntent, PendingIntent.FLAG_ONE_SHOT);
-
-            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.mipmap.app_icon)
-                    .setContentTitle("Clanout")
-                    .setContentText(events.size() + " clans starting in an hour. Giddy up!")
-                    .setAutoCancel(true)
-                    .setSound(defaultSoundUri)
-                    .setContentIntent(pendingIntent);
-
-            NotificationManager notificationManager =
-                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-            notificationManager.notify(2, notificationBuilder.build());
         }
     }
 
     private boolean ifAppRunningInForeground()
     {
-        try
-        {
+        try {
             Boolean isAppInForeground = CacheManager.getMemoryCache()
-                                                    .get(MemoryCacheKeys.IS_APP_IN_FOREGROUND, Boolean.class);
-            if (isAppInForeground != null)
-            {
+                    .get(MemoryCacheKeys.IS_APP_IN_FOREGROUND, Boolean.class);
+            if (isAppInForeground != null) {
                 return isAppInForeground;
             }
-            else
-            {
+            else {
                 return false;
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             return false;
         }
     }
