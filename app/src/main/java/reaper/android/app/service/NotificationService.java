@@ -957,7 +957,7 @@ public class NotificationService
 
             int sumOfChatsAndUpdates = chatCount + updateCount;
             if (sumOfChatsAndUpdates != 0) {
-                message = message + "and " + sumOfChatsAndUpdates + " other notifications.";
+                message = message + " and " + sumOfChatsAndUpdates + " other notifications.";
             }
             else {
 
@@ -975,7 +975,7 @@ public class NotificationService
 
 
             if (chatCount != 0) {
-                message = message + "and " + chatCount + " other notifications.";
+                message = message + " and " + chatCount + " other notifications.";
             }
             else {
                 message = message + ".";
