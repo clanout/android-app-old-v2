@@ -462,6 +462,19 @@ public class ChatService_
                 String invitationResponse = messageTokens[2];
                 chatMessage.setMessage(name + " is not joining.\n'" + invitationResponse + "'");
             }
+            else if (typeToken.equalsIgnoreCase("rsvp"))
+            {
+                String name = messageTokens[1];
+                String rsvp = messageTokens[2];
+                if (rsvp.equalsIgnoreCase("YES"))
+                {
+                    chatMessage.setMessage(name + " joined");
+                }
+                else
+                {
+                    chatMessage.setMessage(name + " left");
+                }
+            }
             else
             {
                 return null;
