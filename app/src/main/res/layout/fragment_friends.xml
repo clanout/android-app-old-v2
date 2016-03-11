@@ -78,6 +78,7 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:hint="@string/search_friends"
+            android:inputType="textPersonName"
             android:textSize="14sp"/>
     </LinearLayout>
 

@@ -29,8 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:gravity="center_horizontal"
-                android:orientation="vertical"
-                android:visibility="gone">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -41,15 +40,6 @@
                     android:textColor="@color/text_subtitle"/>
 
                 <include layout="@layout/view_friend_bubbles"/>
-
-                <TextView
-                    android:id="@+id/tvMakePlan"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center"
-                    android:text="Make a plan"
-                    android:textColor="@color/accent"/>
 
             </LinearLayout>
 

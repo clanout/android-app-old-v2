@@ -179,6 +179,18 @@ public class EventDetailsFragment extends BaseFragment implements
         screen = (EventDetailsScreen) getActivity();
 
         FriendBubbles.render(getActivity(), friendBubbles, "Invite your %s friends");
+        friendBubbles.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (presenter != null)
+                {
+                    presenter.invite();
+                }
+            }
+        });
+
         initRecyclerView();
     }
 
