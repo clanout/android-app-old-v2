@@ -19,11 +19,23 @@ public class GoogleAnalyticsConstants
     public static final String SCREEN_NOTIFICATION_ACTIVITY = "notification";
     public static final String SCREEN_PENDING_INVITES_ACTIVITY = "pending_invites";
     public static final String SCREEN_LOGIN_FRAGMENT = "login";
-    
+
+    public static final String SCREEN_NO_INTERNET = "dialog_no_internet";
+    public static final String SCREEN_UPDATE_PHONE_DIALOG_FROM_ACCOUNTS = "dialog_update_phone_from_accounts";
+    public static final String SCREEN_UPDATE_PHONE_DIALOG_FROM_INVITE = "dialog_update_phone_from_invite";
+    public static final String SCREEN_STATUS_DIALOG = "dialog_status";
+    public static final String SCREEN_LAST_MOMENT_STATUS_DIALOG = "dialog_last_moment_status";
+    public static final String SCREEN_INVITATION_RESPONSE_DIALOG = "dialog_invitation_response";
+    public static final String SCREEN_EVENT_TYPE_DIALOG = "dialog_event_type_dialog";
+    public static final String SCREEN_PLAN_CATEGORY_SELECTION_DIALOG = "dialog_plan_categories";
+    public static final String SCREEN_FEEDBACK_DIALOG = "dialog_feedback";
+    public static final String SCREEN_EDIT_DISMISS_DIALOG = "dialog_edit_dismiss";
+    public static final String SCREEN_EDIT_FINALIZE_DIALOG = "dialog_edit_finalize";
+    public static final String SCREEN_EDIT_UNFINALIZE_DIALOG = "dialog_edit_unfinalize";
+    public static final String SCREEN_GOOGLE_SERVICES_PERMISSION_DIALOG = "dialog_google_services_permission";
+    public static final String SCREEN_FACEBOOK_PERMISSION_DIALOG = "dialog_facebook_permission";
 
 
-    public static final String SCREEN_NO_INTERNET_ACTIVITY = "activity_no_internet";
-    public static final String SCREEN_EVENT_DETAILS_CONTAINER_FRAGMENT = "event_details_container";
 
 
     /* Event Category */

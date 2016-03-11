@@ -243,11 +243,9 @@ public class LauncherActivity extends BaseActivity implements
 
         tvActionMessage.setText(R.string.permission_location_message);
         tvAction.setText(R.string.permission_request_again);
-        tvAction.setOnClickListener(new View.OnClickListener()
-        {
+        tvAction.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 PermissionHandler
                         .requestPermission(LauncherActivity.this, PermissionHandler.Permissions.LOCATION);
             }
@@ -491,40 +489,30 @@ public class LauncherActivity extends BaseActivity implements
 
         Observable.interval(2, TimeUnit.SECONDS)
                   .observeOn(AndroidSchedulers.mainThread())
-                  .subscribe(new Subscriber<Long>()
-                             {
+                  .subscribe(new Subscriber<Long>() {
                                  @Override
-                                 public void onCompleted()
-                                 {
+                                 public void onCompleted() {
 
                                  }
 
                                  @Override
-                                 public void onError(Throwable e)
-                                 {
+                                 public void onError(Throwable e) {
 
                                  }
 
                                  @Override
-                                 public void onNext(Long aLong)
-                                 {
-                                     if (!introScrolled)
-                                     {
+                                 public void onNext(Long aLong) {
+                                     if (!introScrolled) {
                                          int position = vpIntro.getCurrentItem();
-                                         if (position == 3)
-                                         {
+                                         if (position == 3) {
                                              position = 0;
-                                         }
-                                         else
-                                         {
+                                         } else {
                                              position++;
                                          }
 
                                          setIntroMarker(position);
                                          vpIntro.setCurrentItem(position);
-                                     }
-                                     else
-                                     {
+                                     } else {
                                          introScrolled = false;
                                      }
                                  }
@@ -598,19 +586,20 @@ public class LauncherActivity extends BaseActivity implements
                 DefaultDialog.BUTTON_DISABLED,
                 R.string.play_services_error_dialog_negative_button,
                 false,
-                new DefaultDialog.Listener()
-                {
+                new DefaultDialog.Listener() {
                     @Override
-                    public void onPositiveButtonClicked()
-                    {
+                    public void onPositiveButtonClicked() {
                     }
 
                     @Override
-                    public void onNegativeButtonClicked()
-                    {
+                    public void onNegativeButtonClicked() {
                         closeApp();
                     }
                 });
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_GOOGLE_SERVICES_PERMISSION_DIALOG);
+        /* Analytics */
     }
 
     private void displayFacebookPermissionsDialog()
@@ -637,6 +626,10 @@ public class LauncherActivity extends BaseActivity implements
                         closeApp();
                     }
                 });
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_FACEBOOK_PERMISSION_DIALOG);
+        /* Analytics */
     }
 
     private void handleIntent()

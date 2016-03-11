@@ -18,6 +18,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.User;
 import reaper.android.app.service._new.WhatsappService_;
 import reaper.android.app.service.UserService;
@@ -26,6 +27,7 @@ import reaper.android.app.ui.dialog.FeedbackDialog;
 import reaper.android.app.ui.dialog.UpdateMobileDialog;
 import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.SnackbarFactory;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class AccountFragment extends BaseFragment
 {
@@ -120,6 +122,9 @@ public class AccountFragment extends BaseFragment
 
             }
         });
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_UPDATE_PHONE_DIALOG_FROM_ACCOUNTS);
     }
 
     @OnClick(R.id.llWhatsAppInvite)
@@ -151,6 +156,10 @@ public class AccountFragment extends BaseFragment
 
             }
         });
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_FEEDBACK_DIALOG);
+        /* Analytics */
     }
 
     @OnClick(R.id.llFaq)

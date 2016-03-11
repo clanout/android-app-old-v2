@@ -670,6 +670,10 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
 
                     }
                 });
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_EDIT_DISMISS_DIALOG);
+        /* Analytics */
     }
 
     private void displayFinalizationDialog()
@@ -697,6 +701,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
 
                     }
                 });
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_EDIT_FINALIZE_DIALOG);
     }
 
     private void displayUnfinalizationDialog()
@@ -724,5 +729,9 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
 
                     }
                 });
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_EDIT_UNFINALIZE_DIALOG);
+        /* Analytics */
     }
 }

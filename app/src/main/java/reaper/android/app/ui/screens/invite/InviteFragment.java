@@ -233,6 +233,11 @@ public class InviteFragment extends BaseFragment implements
                         addPhone.setVisible(false);
                     }
                 });
+
+                /* Analytics */
+                AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_UPDATE_PHONE_DIALOG_FROM_INVITE);
+                /* Analytics */
+
                 return true;
             }
         });

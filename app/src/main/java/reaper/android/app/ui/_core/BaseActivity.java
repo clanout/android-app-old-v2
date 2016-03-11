@@ -17,9 +17,11 @@ import java.util.concurrent.TimeUnit;
 
 import reaper.android.R;
 import reaper.android.app.cache._core.CacheManager;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.MemoryCacheKeys;
 import reaper.android.app.ui.dialog.NoInternetDialog;
 import reaper.android.app.ui.screens.launch.LauncherActivity;
+import reaper.android.common.analytics.AnalyticsHelper;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
@@ -74,6 +76,9 @@ public class BaseActivity extends AppCompatActivity
                                     if (!(BaseActivity.this instanceof LauncherActivity))
                                     {
                                         NoInternetDialog.show(BaseActivity.this);
+
+                                        /* Analytics */
+                                        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_NO_INTERNET);
                                     }
                                 }
 

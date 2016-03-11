@@ -417,6 +417,10 @@ public class CreateDetailsFragment extends BaseFragment implements
     private void displayEventTypeDescriptionDialog()
     {
         EventTypeInfoDialog.show(getActivity());
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_EVENT_TYPE_DIALOG);
+        /* Analytics */
     }
 
     private void displayTimePicker()
@@ -464,6 +468,10 @@ public class CreateDetailsFragment extends BaseFragment implements
                 changeCategory(category);
             }
         });
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_PLAN_CATEGORY_SELECTION_DIALOG);
+        /* Analytics */
     }
 
     private void changeCategory(EventCategory category)

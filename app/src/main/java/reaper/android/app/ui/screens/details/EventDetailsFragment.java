@@ -488,6 +488,10 @@ public class EventDetailsFragment extends BaseFragment implements
                     {
                     }
                 });
+
+                /* Analytics */
+                AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_STATUS_DIALOG);
+                /* Analytics */
             }
         });
     }
@@ -545,6 +549,10 @@ public class EventDetailsFragment extends BaseFragment implements
                             {
                             }
                         });
+
+                /* Analytics */
+                AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_LAST_MOMENT_STATUS_DIALOG);
+                /* Analytics */
             }
         });
     }
@@ -643,5 +651,9 @@ public class EventDetailsFragment extends BaseFragment implements
             {
             }
         });
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_INVITATION_RESPONSE_DIALOG);
+        /* Analytics */
     }
 }
