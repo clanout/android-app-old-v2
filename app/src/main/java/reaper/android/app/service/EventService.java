@@ -893,17 +893,7 @@ public class EventService
                                             }
                                         }
                                         events.addAll(newEventList);
-
-                                        List<Event> filteredEvents = new ArrayList<Event>();
-                                        for (Event event : events)
-                                        {
-                                            if (event.getEndTime().isAfterNow())
-                                            {
-                                                filteredEvents.add(event);
-                                            }
-                                        }
-
-                                        return filteredEvents;
+                                        return filterExpiredEvents(events);
                                     }
                                 });
                     }
