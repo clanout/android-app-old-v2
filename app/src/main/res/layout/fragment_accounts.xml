@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="16dp"
                 android:scaleType="center"
-                app:materialIcon="account_minus"
+                app:materialIcon="account_multiple"
                 app:materialIconColor="@color/primary"
                 app:materialIconSize="24dp"/>
 
@@ -82,7 +82,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:text="@string/account_menu_block"
+                android:text="@string/account_menu_friends"
                 android:textColor="@color/text_title"
                 android:textSize="16sp"/>
 

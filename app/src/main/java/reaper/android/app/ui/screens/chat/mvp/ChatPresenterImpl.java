@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import reaper.android.app.model.ChatMessage;
+import reaper.android.app.model.Event;
+import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.ChatService_;
 import rx.Observable;
@@ -21,6 +23,7 @@ public class ChatPresenterImpl implements ChatPresenter
     private ChatView view;
     private ChatService_ chatService;
     private UserService userService;
+    private EventService eventService;
     private String eventId;
 
     private Subscription chatSubscription;
@@ -32,10 +35,11 @@ public class ChatPresenterImpl implements ChatPresenter
     private boolean isChatSent;
     private DateTime lastSentTimestamp;
 
-    public ChatPresenterImpl(ChatService_ chatService, UserService userService, String eventId)
+    public ChatPresenterImpl(ChatService_ chatService, UserService userService, EventService eventService, String eventId)
     {
         this.chatService = chatService;
         this.userService = userService;
+        this.eventService = eventService;
         this.eventId = eventId;
 
         visibleChats = new ArrayList<>();
@@ -45,11 +49,37 @@ public class ChatPresenterImpl implements ChatPresenter
     }
 
     @Override
-    public void attachView(ChatView view)
+    public void attachView(final ChatView view)
     {
         this.view = view;
         chatService.updateLastSeen(eventId);
         initChat();
+
+        eventService
+                ._fetchEventCache(eventId)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Event>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                    }
+
+                    @Override
+                    public void onNext(Event event)
+                    {
+                        if (view != null)
+                        {
+                            view.displayTitle(event.getTitle());
+                        }
+                    }
+                });
     }
 
     @Override

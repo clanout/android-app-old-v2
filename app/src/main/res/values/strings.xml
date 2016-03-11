@@ -74,7 +74,7 @@
     <string name="intro_title_4">Discuss and finalize plans through chat</string>
 
     <!-- Account Screen -->
-    <string name="account_menu_block">Block a friend</string>
+    <string name="account_menu_friends">Manage Friends</string>
     <string name="account_menu_phone">Update Mobile Number</string>
     <string name="account_menu_whatsapp">WhatsApp Invite</string>
     <string name="account_menu_feedback">Help Us Improve</string>
