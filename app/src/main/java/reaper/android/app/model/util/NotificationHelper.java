@@ -1,5 +1,8 @@
 package reaper.android.app.model.util;
 
+import android.text.Spannable;
+import android.text.SpannableString;
+
 import java.util.List;
 import java.util.Map;
 

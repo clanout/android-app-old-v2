@@ -3,19 +3,20 @@ package reaper.android.app.ui.screens.notifications.mvp;
 import java.util.ArrayList;
 import java.util.List;
 
+import reaper.android.app.model.NotificationWrapper;
 import reaper.android.app.service.NotificationService;
-import reaper.android.app.model.Notification;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.CompositeSubscription;
+import timber.log.Timber;
 
 public class NotificationPresenterImpl implements NotificationPresenter
 {
     private NotificationView view;
     private NotificationService notificationService;
 
-    private List<Notification> notifications;
+    private List<NotificationWrapper> notifications;
 
     private CompositeSubscription subscriptions;
 
@@ -43,35 +44,61 @@ public class NotificationPresenterImpl implements NotificationPresenter
     }
 
     @Override
-    public void onNotificationSelected(final Notification notification)
+    public void onNotificationSelected(final NotificationWrapper notification)
     {
-        notificationService.deleteNotificationFromCache(notification.getId());
+        String eventId = notification.getEventId();
+        int type = notification.getType();
+        Timber.v(">>>> type = " + type);
+        Timber.v(">>>> event_id = " + eventId);
 
-        final String eventId = notification.getEventId();
-        if (eventId == null || eventId.isEmpty() || notification.getType() == Notification.EVENT_REMOVED)
+        switch (type)
         {
-            view.navigateToHomeScreen();
+            case NotificationWrapper.Type.EVENT_INVITATION:
+                view.navigateToDetailsScreen(eventId);
+                break;
+
+            case NotificationWrapper.Type.NEW_FRIEND_JOINED_APP:
+                view.navigateToFriendsScreen();
+                break;
+
+            case NotificationWrapper.Type.EVENT_REMOVED:
+                // TODO : prompt for event creation
+                break;
+
+            case NotificationWrapper.Type.EVENT_ACTIVITY:
+                if (notification.getNotificationItems().size() > 1)
+                {
+                    view.navigateToDetailsScreen(eventId);
+                }
+                else
+                {
+                    NotificationWrapper.NotificationItem item = notification.getNotificationItems()
+                                                                            .get(0);
+                    if (item.getType() == NotificationWrapper.NotificationItem.Type.NEW_CHAT)
+                    {
+                        view.navigateToChatScreen(eventId);
+                    }
+                    else
+                    {
+                        view.navigateToDetailsScreen(eventId);
+                    }
+                }
+                break;
         }
-        else if (notification.getType() == Notification.CHAT)
-        {
-            view.navigateToChatScreen(eventId);
-        }
-        else
-        {
-            view.navigateToDetailsScreen(eventId);
-        }
+
+        notificationService.deleteNotificationFromCache(notification.getNotificationIds());
     }
 
     @Override
     public void onNotificationDeleted(int position)
     {
-        Notification deletedNotification = notifications.remove(position);
+        NotificationWrapper deletedNotification = notifications.remove(position);
         if (notifications.isEmpty())
         {
             view.displayNoNotificationsMessage();
         }
 
-        notificationService.deleteNotificationFromCache(deletedNotification.getId());
+        notificationService.deleteNotificationFromCache(deletedNotification.getNotificationIds());
     }
 
     @Override
@@ -87,16 +114,16 @@ public class NotificationPresenterImpl implements NotificationPresenter
 
         Subscription subscription =
                 notificationService
-                        .fetchNotifications()
+                        ._fetchNotifications()
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Subscriber<List<Notification>>()
+                        .subscribe(new Subscriber<List<NotificationWrapper>>()
                         {
                             @Override
                             public void onCompleted()
                             {
                                 if (notifications == null || notifications.isEmpty())
                                 {
-                                    notifications = new ArrayList<Notification>();
+                                    notifications = new ArrayList<>();
                                 }
                             }
 
@@ -107,7 +134,7 @@ public class NotificationPresenterImpl implements NotificationPresenter
                             }
 
                             @Override
-                            public void onNext(List<Notification> notifications)
+                            public void onNext(List<NotificationWrapper> notifications)
                             {
                                 if (notifications.isEmpty())
                                 {

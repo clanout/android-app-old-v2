@@ -20,6 +20,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.model.NotificationWrapper;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.ui._core.BaseFragment;
@@ -128,7 +129,7 @@ public class NotificationFragment extends BaseFragment implements
     }
 
     @Override
-    public void displayNotifications(List<Notification> notifications)
+    public void displayNotifications(List<NotificationWrapper> notifications)
     {
         rvNotifications.setAdapter(new NotificationAdapter(getActivity(), notifications, this));
 
@@ -167,12 +168,6 @@ public class NotificationFragment extends BaseFragment implements
     }
 
     @Override
-    public void navigateToHomeScreen()
-    {
-        screen.navigateToHomeScreen();
-    }
-
-    @Override
     public void navigateToDetailsScreen(String eventId)
     {
         screen.navigateToDetailsScreen(eventId);
@@ -184,9 +179,15 @@ public class NotificationFragment extends BaseFragment implements
         screen.navigateToChatScreen(eventId);
     }
 
+    @Override
+    public void navigateToFriendsScreen()
+    {
+        screen.navigateToFriendsScreen();
+    }
+
     /* Listeners */
     @Override
-    public void onNotificationClicked(Notification notification)
+    public void onNotificationClicked(NotificationWrapper notification)
     {
         presenter.onNotificationSelected(notification);
     }
@@ -196,6 +197,6 @@ public class NotificationFragment extends BaseFragment implements
     {
         rvNotifications.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvNotifications
-                .setAdapter(new NotificationAdapter(getActivity(), new ArrayList<Notification>(), this));
+                .setAdapter(new NotificationAdapter(getActivity(), new ArrayList<NotificationWrapper>(), this));
     }
 }

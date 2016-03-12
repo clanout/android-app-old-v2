@@ -1,6 +1,6 @@
 package reaper.android.app.ui.screens.notifications.mvp;
 
-import reaper.android.app.model.Notification;
+import reaper.android.app.model.NotificationWrapper;
 
 public interface NotificationPresenter
 {
@@ -8,7 +8,7 @@ public interface NotificationPresenter
 
     void detachView();
 
-    void onNotificationSelected(Notification notification);
+    void onNotificationSelected(NotificationWrapper notification);
 
     void onNotificationDeleted(int position);
 

@@ -2,6 +2,7 @@ package reaper.android.app.ui.util;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;
+import org.joda.time.Hours;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
@@ -149,7 +150,8 @@ public class DateTimeUtil
             LocalDate today = now.toLocalDate();
             if (today.equals(date))
             {
-                return "Today";
+                int hours = Hours.hoursBetween(now, dateTime).getHours();
+                return hours + " hours to go";
             }
             else
             {

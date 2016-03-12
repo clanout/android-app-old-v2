@@ -5,7 +5,7 @@ package reaper.android.app.config;
  */
 public class NotificationMessages
 {
-    public static final String NEW_STATUS_UPDATED = "Update : %s updated their status for '%s'.";
+    public static final String NEW_STATUS_UPDATED = "Update : %s updated their status for '%s'. Update yours too.";
     public static final String NEW_CHAT_MESSAGE = "Chat : '%s'.";
     public static final String NEW_FRIEND_JOINED_APP = "%s is now on ClanOut.";
     public static final String FRIEND_RELOCATED = "";
@@ -16,7 +16,4 @@ public class NotificationMessages
     public static final String RSVP_CHANGED = "RSVP : New friends joined '%s'.";
     public static final String EVENT_INVITATION = "Invitation : Join %s for '%s'.";
     public static final String EVENT_CREATED = "New Clan : %s created '%s'.";
-
-
-
 }

@@ -24,6 +24,7 @@ import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.ChatMessage;
+import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.ChatService_;
 import reaper.android.app.ui._core.BaseFragment;
@@ -31,6 +32,7 @@ import reaper.android.app.ui.screens.chat.mvp.ChatPresenter;
 import reaper.android.app.ui.screens.chat.mvp.ChatPresenterImpl;
 import reaper.android.app.ui.screens.chat.mvp.ChatView;
 import reaper.android.app.ui.util.SnackbarFactory;
+import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.analytics.AnalyticsHelper;
 
 public class ChatFragment extends BaseFragment implements ChatView
@@ -53,6 +55,12 @@ public class ChatFragment extends BaseFragment implements ChatView
     ChatPresenter presenter;
 
     /* UI Elements */
+    @Bind(R.id.llTitleContainer)
+    View llTitleContainer;
+
+    @Bind(R.id.tvTitle)
+    TextView tvTitle;
+
     @Bind(R.id.llError)
     View llError;
 
@@ -87,8 +95,9 @@ public class ChatFragment extends BaseFragment implements ChatView
         /* Presenter */
         ChatService_ chatService = ChatService_.getInstance();
         UserService userService = UserService.getInstance();
+        EventService eventService = EventService.getInstance();
         String eventId = getArguments().getString(ARG_EVENT_ID);
-        presenter = new ChatPresenterImpl(chatService, userService, eventId);
+        presenter = new ChatPresenterImpl(chatService, userService, eventService, eventId);
     }
 
     @Nullable
@@ -131,6 +140,14 @@ public class ChatFragment extends BaseFragment implements ChatView
     }
 
     /* View Methods */
+
+    @Override
+    public void displayTitle(String title)
+    {
+        tvTitle.setText(title);
+        VisibilityAnimationUtil.expand(llTitleContainer, 200);
+    }
+
     @Override
     public void displayMessage(ChatMessage chatMessage)
     {

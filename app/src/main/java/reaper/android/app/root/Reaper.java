@@ -122,8 +122,11 @@ public class Reaper extends Application
         UserService.init(locationService, phonebookService);
         UserService userService = UserService.getInstance();
 
+        /* Notification Service */
+        NotificationService notificationService = NotificationService.getInstance();
+
         /* Event Service */
-        EventService.init(gcmService, locationService, userService);
+        EventService.init(gcmService, locationService, userService, notificationService);
         EventService eventService = EventService.getInstance();
 
         /* Chat Service */

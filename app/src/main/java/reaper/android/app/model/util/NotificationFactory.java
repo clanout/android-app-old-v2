@@ -1,6 +1,7 @@
 package reaper.android.app.model.util;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
@@ -53,12 +54,12 @@ public class NotificationFactory
         }
     }
 
+
     private static Observable<Notification> buildNotification(int typeCode, Map<String, String>
             args)
     {
         switch (typeCode) {
             case Notification.CHAT:
-                Log.d("NOTIFICATION", "building chat notification");
                 return buildChatNotification(args);
 
             case Notification.BLOCKED:
@@ -341,15 +342,50 @@ public class NotificationFactory
                 .subscribeOn(Schedulers.newThread());
     }
 
-    private static Observable<Notification> buildNewFriendJoinedAppNotification(Map<String,
+    private static Observable<Notification> buildNewFriendJoinedAppNotification(final Map<String,
             String> args)
     {
-        String message = NotificationHelper.getMessage(Notification.NEW_FRIEND_ADDED, args);
 
-        return Observable.just(
-                getNotificationObjectNotHavingEventInformation(Notification.NEW_FRIEND_ADDED,
-                        args, message)
-        );
+        return notificationCache.getAllForType(Notification.NEW_FRIEND_ADDED)
+                .flatMap(new Func1<List<Notification>, Observable<Integer>>()
+                {
+                    @Override
+                    public Observable<Integer> call(final List<Notification> notifications)
+                    {
+                        List<Integer> notificationIds = new ArrayList<Integer>();
+
+                        for (Notification notification : notifications) {
+                            notificationIds.add(notification.getId());
+                        }
+
+                        return notificationCache.clear(notificationIds)
+                                .flatMap(new Func1<Boolean, Observable<Integer>>()
+                                {
+                                    @Override
+                                    public Observable<Integer> call(Boolean aBoolean)
+                                    {
+                                        return calculateNumberOfNewFriendsInApp
+                                                (notifications);
+                                    }
+                                });
+                    }
+                })
+                .flatMap(new Func1<Integer, Observable<Notification>>()
+                {
+                    @Override
+                    public Observable<Notification> call(Integer newFriendsAlreadyOnApp)
+                    {
+                        String message = getNewFriendJoinedAppMessage(newFriendsAlreadyOnApp, args);
+
+                        return Observable.just(
+                                getNotificationObjectNotHavingEventInformation(Notification
+                                                .NEW_FRIEND_ADDED,
+                                        args, message)
+                        );
+                    }
+                });
+
+
     }
 
     private static Observable<Notification> buildEventCreatedNotification(Map<String, String> args)
@@ -391,10 +427,7 @@ public class NotificationFactory
                     @Override
                     public Observable<Boolean> call(List<Notification> notifications)
                     {
-                        Log.d("NOTIFICATION", "notifications size ---- " + notifications.size());
-
                         List<Integer> notificationIds = getNotificationIdsList(notifications);
-
                         return notificationCache.clear(notificationIds);
                     }
                 })
@@ -404,11 +437,7 @@ public class NotificationFactory
                     public Observable<Notification> call(Boolean isDeleteSuccessful)
                     {
 
-                        Log.d("NOTIFICATION", "isDeleteSuccessful ---- " + isDeleteSuccessful);
-
                         String message = NotificationHelper.getMessage(Notification.CHAT, args);
-
-                        Log.d("NOTIFICATION", "message " + message);
 
                         Notification notification = new Notification.Builder(Integer.parseInt
                                 (args.get("notification_id")))
@@ -526,7 +555,58 @@ public class NotificationFactory
     private static Integer getInviteeCountFromMessage(String message)
     {
         try {
-            if (message.contains("others invited you to")) {
+            if (message.contains("others")) {
+
+                String[] wordArray = message.split(" ");
+
+                try {
+
+                    return Integer.valueOf(wordArray[6]) + 1;
+                }
+                catch (Exception e) {
+                    try {
+                        return Integer.valueOf(wordArray[5]) + 1;
+                    }
+                    catch (Exception exception) {
+                        return 0;
+                    }
+                }
+
+            }
+            else if (message.contains("Join")) {
+
+                return 1;
+
+            }
+            else {
+
+                return 0;
+            }
+        }
+        catch (Exception e) {
+            return 0;
+        }
+
+    }
+
+    private static Observable<Integer> calculateNumberOfNewFriendsInApp(List<Notification> notifications)
+    {
+        if (notifications.size() != 0) {
+
+            String message = notifications.get(0).getMessage();
+
+            return Observable.just(getNewFriendsOnAppCountFromMessage(message));
+
+        }
+        else {
+            return Observable.just(0);
+        }
+    }
+
+    private static Integer getNewFriendsOnAppCountFromMessage(String message)
+    {
+        try {
+            if (message.contains("others are now on")) {
 
                 String[] wordArray = message.split(" ");
 
@@ -544,7 +624,7 @@ public class NotificationFactory
                 }
 
             }
-            else if (message.contains("invited you to")) {
+            else if (message.contains("is now on")) {
 
                 return 1;
 
@@ -557,7 +637,26 @@ public class NotificationFactory
         catch (Exception e) {
             return 0;
         }
-
     }
 
+    private static String getNewFriendJoinedAppMessage(Integer newFriendsAlreadyOnApp, Map<String, String> args)
+
+    {
+        String message = "";
+
+        if (newFriendsAlreadyOnApp == 0) {
+            message = NotificationHelper.getMessage(Notification
+                    .NEW_FRIEND_ADDED, args);
+
+        }
+        else {
+
+            message = String.format(NotificationMessages.NEW_FRIEND_JOINED_APP,
+                    args.get
+                            ("user_name") + " & " + newFriendsAlreadyOnApp + " others");
+
+        }
+
+        return message;
+    }
 }

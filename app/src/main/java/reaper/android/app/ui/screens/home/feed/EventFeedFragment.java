@@ -48,9 +48,6 @@ public class EventFeedFragment extends BaseFragment implements
     @Bind(R.id.llNoEvents)
     View llNoEvents;
 
-    @Bind(R.id.tvMakePlan)
-    TextView tvMakePlan;
-
     @Bind(R.id.friendBubbles)
     View friendBubbles;
 
@@ -89,8 +86,8 @@ public class EventFeedFragment extends BaseFragment implements
         super.onActivityCreated(savedInstanceState);
         screen = (HomeScreen) getActivity();
 
-        FriendBubbles.render(getActivity(), friendBubbles, "Your friends in %s");
-        tvMakePlan.setOnClickListener(new View.OnClickListener()
+        FriendBubbles.render(getActivity(), friendBubbles, "Create a plan with your %s friends");
+        friendBubbles.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
