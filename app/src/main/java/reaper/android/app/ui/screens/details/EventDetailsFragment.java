@@ -32,6 +32,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import reaper.android.R;
 import reaper.android.app.config.Dimensions;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
@@ -54,6 +55,7 @@ import reaper.android.app.ui.util.DateTimeUtil;
 import reaper.android.app.ui.util.FriendBubbles;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class EventDetailsFragment extends BaseFragment implements
         EventDetailsView

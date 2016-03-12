@@ -20,6 +20,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
@@ -28,6 +29,7 @@ import reaper.android.app.ui.screens.pending_invites.mvp.PendingInvitesPresenter
 import reaper.android.app.ui.screens.pending_invites.mvp.PendingInvitesPresenterImpl;
 import reaper.android.app.ui.screens.pending_invites.mvp.PendingInvitesView;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class PendingInvitesFragment extends BaseFragment implements
         PendingInvitesView,

@@ -12,7 +12,9 @@ import android.view.MenuItem;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.ui._core.BaseActivity;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class FriendsActivity extends BaseActivity implements FriendsScreen
 {
@@ -30,6 +32,9 @@ public class FriendsActivity extends BaseActivity implements FriendsScreen
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_MANAGE_FRIENDS_ACTIVITY);
 
         /* Setup UI */
         setContentView(R.layout.activity_friends);

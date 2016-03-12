@@ -5,7 +5,28 @@ package reaper.android.app.config;
  */
 public class GoogleAnalyticsConstants
 {
-    /* Category */
+    /* Screen Names */
+
+    public static final String SCREEN_ACCOUNTS_ACTIVITY = "account";
+    public static final String SCREEN_CHAT_ACTIVITY = "chat";
+    public static final String SCREEN_CREATE_ACTIVITY = "create";
+    public static final String SCREEN_EVENT_DETAILS_ACTIVITY = "event_details";
+    public static final String SCREEN_EDIT_EVENT_ACTIVITY = "edit_event";
+    public static final String SCREEN_MANAGE_FRIENDS_ACTIVITY = "block";
+    public static final String SCREEN_HOME_ACTIVITY = "home";
+    public static final String SCREEN_INVITE_ACTIVITY = "invite";
+    public static final String SCREEN_LAUNCHER_ACTIVITY = "launcher";
+    public static final String SCREEN_NOTIFICATION_ACTIVITY = "notification";
+    public static final String SCREEN_PENDING_INVITES_ACTIVITY = "pending_invites";
+    public static final String SCREEN_LOGIN_FRAGMENT = "login";
+    
+
+
+    public static final String SCREEN_NO_INTERNET_ACTIVITY = "activity_no_internet";
+    public static final String SCREEN_EVENT_DETAILS_CONTAINER_FRAGMENT = "event_details_container";
+
+
+    /* Event Category */
     public static final String CATEGORY_LOGIN = "login";
     public static final String CATEGORY_HOME = "home";
     public static final String CATEGORY_CREATE = "create";
@@ -19,26 +40,12 @@ public class GoogleAnalyticsConstants
     public static final String CATEGORY_BACKGROUND = "background";
     public static final String CATEGORY_ERROR = "error";
 
-    /* Actions */
+    /* Event Actions */
     public static final String ACTION_OPEN = "open";
 
-    // Screen Names
-    public static final String MAIN_ACTIVITY = "MAIN_ACTIVITY";
-    public static final String FACEBOOK_ACTIVITY = "FACEBOOK_ACTIVITY";
-    public static final String LAUNCHER_ACTIVITY = "LAUNCHER_ACTIVITY";
-    public static final String NO_INTERNET_ACTIVITY = "NO_INTERNET_ACTIVITY";
-    public static final String HOME_FRAGMENT = "HOME";
-    public static final String ACCOUNTS_FRAGMENT = "ACCOUNT";
-    public static final String EVENT_DETAILS_CONTAINER_FRAGMENT = "EVENT_DETAILS_CONTAINER";
-    public static final String EVENT_DETAILS_FRAGMENT = "EVENT_DETAILS";
-    public static final String CHAT_FRAGMENT = "CHAT";
-    public static final String MANAGE_FRIENDS_FRAGMENT = "BLOCK";
-    public static final String INVITE_USERS_CONTAINER_FRAGMENT = "INVITE_CONTAINER";
-    public static final String INVITE_FACEBOOK_FRIENDS_FRAGMENT = "INVITE_FB";
-    public static final String EDIT_EVENT_FRAGMENT = "EDIT_EVENT";
-    public static final String NOTIFICATION_FRAGMENT = "NOTIFICATION";
-    public static final String CREATE_FRAGMENT = "CREATE_DETAIL";
-    public static final String INVITE_THROUGH_SMS_FRAGMENT = "INVITE_PB";
+
+    /* Event Labels */
+
 
     // Event CATEGORY
     public static final String BUTTON_CLICK = "button_click";
@@ -141,6 +148,8 @@ public class GoogleAnalyticsConstants
     public static final String ON_CANCEL_FACEBOOK_CALLBACK = "on_cancel_facebook_callback";
     public static final String FACEBOOK_FRIENDS_NOT_FETCHED = "facebook_friends_not_fetched";
     public static final String FACEBOOK_PROFILE_NOT_FETCHED = "facebook_profile_not_fetched";
+
+
 
 
 }

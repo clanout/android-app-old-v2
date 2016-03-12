@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.AuthService_;
@@ -53,6 +54,7 @@ import reaper.android.app.ui.screens.notifications.NotificationActivity;
 import reaper.android.app.ui.screens.pending_invites.PendingInvitesActivity;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.common._debugger.TraceDebugger;
+import reaper.android.common.analytics.AnalyticsHelper;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -133,6 +135,9 @@ public class LauncherActivity extends BaseActivity implements
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_LAUNCHER_ACTIVITY);
 
         setContentView(R.layout.activity_launcher);
         ButterKnife.bind(this);
@@ -571,6 +576,10 @@ public class LauncherActivity extends BaseActivity implements
     {
         llFb.setVisibility(View.VISIBLE);
         rlBootstrap.setVisibility(View.GONE);
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_LOGIN_FRAGMENT);
+        /* Analytics */
 
         setupIntroViewPager();
     }

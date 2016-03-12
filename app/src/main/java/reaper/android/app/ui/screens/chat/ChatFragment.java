@@ -22,6 +22,7 @@ import net.steamcrafted.materialiconlib.MaterialIconView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.ChatMessage;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
@@ -32,6 +33,7 @@ import reaper.android.app.ui.screens.chat.mvp.ChatPresenterImpl;
 import reaper.android.app.ui.screens.chat.mvp.ChatView;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class ChatFragment extends BaseFragment implements ChatView
 {

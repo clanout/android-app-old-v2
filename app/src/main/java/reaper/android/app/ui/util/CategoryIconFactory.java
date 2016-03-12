@@ -36,7 +36,7 @@ public class CategoryIconFactory
     static
     {
         iconMapping = new HashMap<>();
-        iconMapping.put(EventCategory.GENERAL, MaterialDrawableBuilder.IconValue.BULLETIN_BOARD);
+        iconMapping.put(EventCategory.GENERAL, MaterialDrawableBuilder.IconValue.CALENDAR_CHECK);
         iconMapping.put(EventCategory.EAT_OUT, MaterialDrawableBuilder.IconValue.FOOD);
         iconMapping.put(EventCategory.DRINKS, MaterialDrawableBuilder.IconValue.MARTINI);
         iconMapping.put(EventCategory.CAFE, MaterialDrawableBuilder.IconValue.COFFEE);

@@ -54,6 +54,7 @@ public class NotificationFactory
         }
     }
 
+
     private static Observable<Notification> buildNotification(int typeCode, Map<String, String>
             args)
     {

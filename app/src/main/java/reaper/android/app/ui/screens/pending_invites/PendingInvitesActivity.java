@@ -11,9 +11,11 @@ import android.support.design.widget.AppBarLayout;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui.screens.details.EventDetailsActivity;
 import reaper.android.app.ui.screens.home.HomeActivity;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class PendingInvitesActivity extends BaseActivity implements PendingInvitesScreen
 {
@@ -33,6 +35,9 @@ public class PendingInvitesActivity extends BaseActivity implements PendingInvit
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_PENDING_INVITES_ACTIVITY);
 
         /* Setup UI */
         setContentView(R.layout.activity_pending_invites);

@@ -12,10 +12,12 @@ import android.view.MenuItem;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui.screens.details.EventDetailsActivity;
 import reaper.android.app.ui.screens.invite.InviteActivity;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class CreateActivity extends BaseActivity implements CreateScreen
 {
@@ -37,6 +39,9 @@ public class CreateActivity extends BaseActivity implements CreateScreen
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_CREATE_ACTIVITY);
 
         /* Setup UI */
         setContentView(R.layout.activity_create);
