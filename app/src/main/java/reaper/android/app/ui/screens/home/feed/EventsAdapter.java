@@ -80,8 +80,8 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         @Bind(R.id.mivRsvp)
         MaterialIconView mivRsvp;
 
-        @Bind(R.id.llToday)
-        View llToday;
+        @Bind(R.id.tvToday)
+        TextView tvToday;
 
         public EventViewHolder(View itemView)
         {
@@ -123,7 +123,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             }
             else if (event.getFriendCount() == 1)
             {
-                if (friends.size() > 0)
+                if (friends.size() > 1)
                 {
                     tvFriendsGoing.setText(context
                             .getString(R.string.label_feed_one_friend, friends.get(0)));
@@ -135,37 +135,23 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             }
             else
             {
-                if (friends.size() == 1)
+                if (friends.size() > 0)
                 {
-                    tvFriendsGoing.setText(context
-                            .getString(R.string.label_feed_multiple_friend_one_name,
-                                    friends.get(0), (event.getFriendCount() - 1)));
-                }
-                else if (friends.size() > 1)
-                {
-                    if (event.getFriendCount() == 2)
+                    int otherCount = event.getFriendCount() - 1;
+                    if (otherCount > 1)
                     {
                         tvFriendsGoing.setText(context
-                                .getString(R.string.label_feed_multiple_friend_two_name,
-                                        friends.get(0), friends.get(1)));
+                                .getString(R.string.label_feed_multiple_friend_multiple_other,
+                                        friends.get(0), otherCount));
                     }
                     else
                     {
                         tvFriendsGoing.setText(context
-                                .getString(R.string.label_feed_multiple_friend,
-                                        friends.get(0), friends.get(1), (event
-                                                .getFriendCount() - 2)));
+                                .getString(R.string.label_feed_multiple_friend_one_other,
+                                        friends.get(0)));
                     }
                 }
                 else
-                {
-                    tvFriendsGoing.setText(context
-                            .getString(R.string.label_feed_multiple_friend_default,
-                                    event.getFriendCount()));
-                }
-
-                String friendsGoingText = tvFriendsGoing.getText().toString();
-                if (friendsGoingText.length() > 30)
                 {
                     tvFriendsGoing.setText(context
                             .getString(R.string.label_feed_multiple_friend_default,
@@ -189,11 +175,11 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             LocalDate startDate = startTime.toLocalDate();
             if (startDate.equals(today))
             {
-                llToday.setVisibility(View.VISIBLE);
+                tvToday.setVisibility(View.VISIBLE);
             }
             else
             {
-                llToday.setVisibility(View.GONE);
+                tvToday.setVisibility(View.GONE);
             }
         }
     }

@@ -110,7 +110,7 @@ dependencies {
     compile 'org.igniterealtime.smack:smack-android-extensions:4.1.0'
 
     // Material Icon Library
-    compile 'net.steamcrafted:materialiconlib:1.0.4'
+    compile 'net.steamcrafted:materialiconlib:1.0.9'
 
     // Facebook Shimmer
     compile 'com.facebook.shimmer:shimmer:0.1.0@aar'

@@ -102,15 +102,14 @@
 
     <!-- Home Screen -->
     <string name="home_no_events">No active clans</string>
-    <string name="home_events_fetch_error"> Unable to show clans. Swipe to refresh </string>
+    <string name="home_events_fetch_error">Unable to show clans. Swipe to refresh.</string>
     <!-- Feed - Friends Going -->
     <string name="label_feed_no_friends">Waiting for friends to join</string>
     <string name="label_feed_one_friend">%s joined</string>
     <string name="label_feed_one_friend_default">1 friend joined</string>
-    <string name="label_feed_multiple_friend" formatted="false">%s, %s and %s other friends joined</string>
     <string name="label_feed_multiple_friend_default">%s friends joined</string>
-    <string name="label_feed_multiple_friend_one_name" formatted="false">%s and %s other friends joined</string>
-    <string name="label_feed_multiple_friend_two_name" formatted="false">%s and %s joined</string>
+    <string name="label_feed_multiple_friend_one_other" formatted="false">%s and 1 other friend joined</string>
+    <string name="label_feed_multiple_friend_multiple_other" formatted="false">%s and %s other friends joined</string>
 
     <!-- Create Screen -->
     <string name="label_title">Plan</string>
