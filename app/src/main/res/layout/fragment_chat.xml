@@ -111,7 +111,7 @@
                 android:layout_marginTop="16dp"
                 android:background="@android:color/transparent"
                 android:hint="@string/chat_message_label"
-                android:inputType="textShortMessage"
+                android:inputType="textAutoComplete"
                 android:maxLines="2"/>
 
             <net.steamcrafted.materialiconlib.MaterialIconView

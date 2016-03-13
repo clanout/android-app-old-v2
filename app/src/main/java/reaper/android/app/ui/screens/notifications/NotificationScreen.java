@@ -9,4 +9,6 @@ public interface NotificationScreen
     void navigateToChatScreen(String eventId);
 
     void navigateToFriendsScreen();
+
+    void navigateToCreateScreen();
 }

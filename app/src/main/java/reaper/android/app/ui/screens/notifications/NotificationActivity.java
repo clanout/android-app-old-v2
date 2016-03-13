@@ -15,6 +15,7 @@ import reaper.android.R;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui.screens.chat.ChatActivity;
+import reaper.android.app.ui.screens.create.CreateActivity;
 import reaper.android.app.ui.screens.details.EventDetailsActivity;
 import reaper.android.app.ui.screens.friends.FriendsActivity;
 import reaper.android.app.ui.screens.home.HomeActivity;
@@ -100,5 +101,11 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
     public void navigateToFriendsScreen()
     {
         startActivity(FriendsActivity.callingIntent(this));
+    }
+
+    @Override
+    public void navigateToCreateScreen()
+    {
+        startActivity(CreateActivity.callingIntent(this, null));
     }
 }

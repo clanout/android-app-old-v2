@@ -12,6 +12,8 @@ public interface NotificationView
 
     void displayNoNotificationsMessage();
 
+    void displayEventRemovedMessage();
+
     void navigateToDetailsScreen(String eventId);
 
     void navigateToChatScreen(String eventId);

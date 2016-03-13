@@ -22,8 +22,9 @@
 
         <TextView
             android:id="@+id/tvChatMessage"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="Hello, World!"
             android:textSize="12sp"/>
 
@@ -33,10 +34,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/tvChatMessage"
             android:layout_marginTop="2dp"
-            android:gravity="right"
+            android:fontFamily="sans-serif-condensed"
+            android:gravity="center"
             android:text="22:45, Feb 25"
             android:textColor="@color/text_subtitle"
-            android:textSize="8sp"/>
+            android:textSize="10sp"/>
     </LinearLayout>
 
 </RelativeLayout>

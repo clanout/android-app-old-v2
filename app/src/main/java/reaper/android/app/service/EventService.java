@@ -24,7 +24,6 @@ import reaper.android.app.api.event.request.FetchNewEventsAndUpdatesApiRequest;
 import reaper.android.app.api.event.request.FetchPendingInvitesApiRequest;
 import reaper.android.app.api.event.request.FinaliseEventApiRequest;
 import reaper.android.app.api.event.request.GetCreateEventSuggestionsApiRequest;
-import reaper.android.app.api.event.request.InviteThroughSMSApiRequest;
 import reaper.android.app.api.event.request.InviteUsersApiRequest;
 import reaper.android.app.api.event.request.LocationSuggestionsApiRequest;
 import reaper.android.app.api.event.request.RsvpUpdateApiRequest;
@@ -377,31 +376,31 @@ public class EventService
 
     public void _invitePhonebookContacts(String eventId, List<String> mobileNumbers)
     {
-        InviteThroughSMSApiRequest request = new InviteThroughSMSApiRequest(eventId, mobileNumbers);
-
-        eventApi.inviteThroughSMS(request)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Response>()
-                {
-                    @Override
-                    public void onCompleted()
-                    {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e)
-                    {
-
-                    }
-
-                    @Override
-                    public void onNext(Response response)
-                    {
-
-                    }
-                });
+//        InviteThroughSMSApiRequest request = new InviteThroughSMSApiRequest(eventId, mobileNumbers);
+//
+//        eventApi.inviteThroughSMS(request)
+//                .subscribeOn(Schedulers.newThread())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Subscriber<Response>()
+//                {
+//                    @Override
+//                    public void onCompleted()
+//                    {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e)
+//                    {
+//
+//                    }
+//
+//                    @Override
+//                    public void onNext(Response response)
+//                    {
+//
+//                    }
+//                });
     }
 
     /* Edit */

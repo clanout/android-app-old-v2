@@ -169,16 +169,19 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 if (isDateInvisible)
                 {
                     tvTimestamp.setText(chatMessage.getTimestamp()
-                                                   .toString(TIMESTAMP_FORMATTER_TIME_ONLY));
+                                                   .toString(TIMESTAMP_FORMATTER_TIME_ONLY)
+                                                   .toUpperCase());
                 }
                 else
                 {
-                    tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER));
+                    tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER)
+                                                   .toUpperCase());
                 }
             }
             else
             {
-                tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER));
+                tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER)
+                                               .toUpperCase());
             }
 
             tvChatMessage.setText(chatMessage.getMessage());
@@ -229,16 +232,19 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 if (isDateInvisible)
                 {
                     tvTimestamp.setText(chatMessage.getTimestamp()
-                                                   .toString(TIMESTAMP_FORMATTER_TIME_ONLY));
+                                                   .toString(TIMESTAMP_FORMATTER_TIME_ONLY)
+                                                   .toUpperCase());
                 }
                 else
                 {
-                    tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER));
+                    tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER)
+                                                   .toUpperCase());
                 }
             }
             else
             {
-                tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER));
+                tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER)
+                                               .toUpperCase());
                 tvName.setText(chatMessage.getSenderName());
                 tvName.setVisibility(View.VISIBLE);
             }
@@ -263,7 +269,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         public void render(ChatMessage chatMessage)
         {
-            tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER));
+            tvTimestamp.setText(chatMessage.getTimestamp().toString(TIMESTAMP_FORMATTER)
+                                           .toUpperCase());
             tvChatMessage.setText(chatMessage.getMessage());
         }
     }

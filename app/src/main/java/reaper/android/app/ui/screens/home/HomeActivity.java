@@ -101,7 +101,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
                 .setIcon(MaterialDrawableBuilder.IconValue.BELL)
                 .setColor(ContextCompat
                         .getColor(this, R.color.white))
-                .setSizeDp(36)
+                .setSizeDp(24)
                 .build();
 
         if (notification != null)
@@ -136,7 +136,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
                     .setIcon(MaterialDrawableBuilder.IconValue.BELL)
                     .setColor(ContextCompat
                             .getColor(this, R.color.white))
-                    .setSizeDp(36)
+                    .setSizeDp(24)
                     .build();
         }
         notification.setIcon(notificationIcon);
@@ -146,7 +146,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
                     .with(this)
                     .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
                     .setColor(ContextCompat.getColor(this, R.color.white))
-                    .setSizeDp(36)
+                    .setSizeDp(24)
                     .build());
 
         notification
@@ -184,7 +184,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
                 .setIcon(MaterialDrawableBuilder.IconValue.BELL)
                 .setColor(ContextCompat
                         .getColor(this, R.color.accent))
-                .setSizeDp(36)
+                .setSizeDp(24)
                 .build();
 
         if (notification != null)
@@ -202,7 +202,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
                 .setIcon(MaterialDrawableBuilder.IconValue.BELL)
                 .setColor(ContextCompat
                         .getColor(HomeActivity.this, R.color.accent))
-                .setSizeDp(36)
+                .setSizeDp(24)
                 .build();
 
         if (notification != null)

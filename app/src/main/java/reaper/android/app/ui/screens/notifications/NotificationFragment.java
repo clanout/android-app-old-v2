@@ -24,6 +24,7 @@ import reaper.android.app.model.NotificationWrapper;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.ui._core.BaseFragment;
+import reaper.android.app.ui.dialog.DefaultDialog;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationPresenter;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationPresenterImpl;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationView;
@@ -165,6 +166,32 @@ public class NotificationFragment extends BaseFragment implements
         tvNoNotifications.setVisibility(View.VISIBLE);
         loading.setVisibility(View.GONE);
         rvNotifications.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void displayEventRemovedMessage()
+    {
+        DefaultDialog.show(getActivity(),
+                R.string.event_removed_title,
+                R.string.event_removed_message,
+                R.string.event_removed_positive_button,
+                R.string.event_removed_negative_button,
+                true,
+                new DefaultDialog.Listener()
+                {
+                    @Override
+                    public void onPositiveButtonClicked()
+                    {
+                        screen.navigateToCreateScreen();
+                    }
+
+                    @Override
+                    public void onNegativeButtonClicked()
+                    {
+
+                    }
+                }
+        );
     }
 
     @Override

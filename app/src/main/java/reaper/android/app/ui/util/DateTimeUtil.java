@@ -5,6 +5,7 @@ import org.joda.time.Days;
 import org.joda.time.Hours;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.joda.time.Minutes;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -143,7 +144,7 @@ public class DateTimeUtil
 
         if (dateTime.isBefore(now))
         {
-            return "Clan Out";
+            return "Started";
         }
         else
         {
@@ -151,7 +152,22 @@ public class DateTimeUtil
             if (today.equals(date))
             {
                 int hours = Hours.hoursBetween(now, dateTime).getHours();
-                return hours + " hours to go";
+                if (hours > 0)
+                {
+                    return hours + " hours to go";
+                }
+                else
+                {
+                    int minutes = Minutes.minutesBetween(now, dateTime).getMinutes();
+                    if (minutes > 0)
+                    {
+                        return minutes + " minutes to go";
+                    }
+                    else
+                    {
+                        return "Started";
+                    }
+                }
             }
             else
             {

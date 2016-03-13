@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Clanout</string>
 
+    <string name="disabled_for_beta">Disabled for beta</string>
+
     <!-- WhatsApp Message -->
     <string name="whatsapp_message" formatted="false">%s wants to clan out with you. Join %s at %s</string>
 
@@ -206,5 +208,11 @@
     <string name="event_delete_message">This will delete all information related to this clan. And it will be removed from everyone\'s feed.</string>
     <string name="event_delete_positive_button">Dismiss</string>
     <string name="event_delete_negative_button">Cancel</string>
+
+    <!-- Event Removed Dialog -->
+    <string name="event_removed_title">Clan Deleted</string>
+    <string name="event_removed_message">This clan was removed. Do you want to make a new plan?</string>
+    <string name="event_removed_positive_button">Make Plan</string>
+    <string name="event_removed_negative_button">Not Now</string>
 
 </resources>

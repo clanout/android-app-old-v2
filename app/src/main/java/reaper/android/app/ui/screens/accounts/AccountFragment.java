@@ -20,7 +20,6 @@ import butterknife.OnClick;
 import reaper.android.R;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.User;
-import reaper.android.app.service._new.WhatsappService_;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.dialog.FeedbackDialog;
@@ -84,21 +83,21 @@ public class AccountFragment extends BaseFragment
                 .build();
 
         Picasso.with(getActivity())
-                .load(sessionUser.getCoverPicUrl())
-                .placeholder(personDrawable)
-                .fit()
-                .centerCrop()
-                .noFade()
-                .into(ivCoverPic);
+               .load(sessionUser.getCoverPicUrl())
+               .placeholder(personDrawable)
+               .fit()
+               .centerCrop()
+               .noFade()
+               .into(ivCoverPic);
 
         Picasso.with(getActivity())
-                .load(sessionUser.getProfilePicUrl())
-                .placeholder(personDrawable)
-                .fit()
-                .centerCrop()
-                .noFade()
-                .transform(new CircleTransform())
-                .into(ivProfilePic);
+               .load(sessionUser.getProfilePicUrl())
+               .placeholder(personDrawable)
+               .fit()
+               .centerCrop()
+               .noFade()
+               .transform(new CircleTransform())
+               .into(ivProfilePic);
 
         llBlockFriends.setOnClickListener(new View.OnClickListener()
         {
@@ -130,13 +129,14 @@ public class AccountFragment extends BaseFragment
     @OnClick(R.id.llWhatsAppInvite)
     public void onWhatsAppInviteClicked()
     {
-        WhatsappService_ accountsService = WhatsappService_.getInstance();
-        if (accountsService.isWhatsAppInstalled(getActivity())) {
-            startActivity(accountsService.getWhatsAppIntent());
-        }
-        else {
-            SnackbarFactory.create(getActivity(), R.string.error_no_whatsapp);
-        }
+        SnackbarFactory.create(getActivity(), R.string.disabled_for_beta);
+//        WhatsappService_ accountsService = WhatsappService_.getInstance();
+//        if (accountsService.isWhatsAppInstalled(getActivity())) {
+//            startActivity(accountsService.getWhatsAppIntent());
+//        }
+//        else {
+//            SnackbarFactory.create(getActivity(), R.string.error_no_whatsapp);
+//        }
     }
 
     @OnClick(R.id.llFeedback)
@@ -165,6 +165,6 @@ public class AccountFragment extends BaseFragment
     @OnClick(R.id.llFaq)
     public void onFaqClicked()
     {
-
+        SnackbarFactory.create(getActivity(), R.string.disabled_for_beta);
     }
 }

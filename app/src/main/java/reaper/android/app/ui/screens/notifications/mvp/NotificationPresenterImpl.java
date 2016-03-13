@@ -62,7 +62,7 @@ public class NotificationPresenterImpl implements NotificationPresenter
                 break;
 
             case NotificationWrapper.Type.EVENT_REMOVED:
-                // TODO : prompt for event creation
+                view.displayEventRemovedMessage();
                 break;
 
             case NotificationWrapper.Type.EVENT_ACTIVITY:

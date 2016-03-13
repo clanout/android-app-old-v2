@@ -16,6 +16,7 @@ import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui.screens.details.EventDetailsActivity;
+import reaper.android.app.ui.screens.home.HomeActivity;
 import reaper.android.app.ui.screens.invite.InviteActivity;
 import reaper.android.common.analytics.AnalyticsHelper;
 
@@ -77,7 +78,7 @@ public class CreateActivity extends BaseActivity implements CreateScreen
     @Override
     public void onBackPressed()
     {
-        navigateToHomeScreen();
+        finish();
     }
 
     /* Screen Methods */
@@ -98,6 +99,7 @@ public class CreateActivity extends BaseActivity implements CreateScreen
     /* Helper Methods */
     private void navigateToHomeScreen()
     {
+        startActivity(HomeActivity.callingIntent(this));
         finish();
     }
 }
