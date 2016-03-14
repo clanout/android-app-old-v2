@@ -157,6 +157,10 @@ public class PendingInvitesFragment extends BaseFragment implements
         {
             presenter.gotoHome();
         }
+
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_PENDING_INVITES,GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_AFTER_FETCH);
+        /* Analytics */
     }
 
     @OnClick(R.id.btnSkip)
@@ -166,6 +170,10 @@ public class PendingInvitesFragment extends BaseFragment implements
         {
             presenter.skip();
         }
+
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_PENDING_INVITES,GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_ON_SKIP);
+        /* Analytics */
     }
 
     @OnClick(R.id.btnFetch)
@@ -175,6 +183,10 @@ public class PendingInvitesFragment extends BaseFragment implements
         {
             presenter.fetchPendingInvites(etMobileNumber.getText().toString());
         }
+
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_PENDING_INVITES,GoogleAnalyticsConstants.ACTION_FETCH_INVITES,GoogleAnalyticsConstants.LABEL_ATTEMPT);
+        /* Analytics */
     }
 
     @Override
@@ -191,6 +203,10 @@ public class PendingInvitesFragment extends BaseFragment implements
     public void displayInvalidMobileNumberMessage()
     {
         tvInvalidPhoneError.setVisibility(View.VISIBLE);
+
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_PENDING_INVITES,GoogleAnalyticsConstants.ACTION_FETCH_INVITES, GoogleAnalyticsConstants.LABEL_PHONE_ERROR);
+        /* Analytics */
     }
 
     @Override

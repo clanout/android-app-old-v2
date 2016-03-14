@@ -15,10 +15,12 @@ public class GoogleAnalyticsConstants
     public static final String SCREEN_MANAGE_FRIENDS_ACTIVITY = "block";
     public static final String SCREEN_HOME_ACTIVITY = "home";
     public static final String SCREEN_INVITE_ACTIVITY = "invite";
-    public static final String SCREEN_LAUNCHER_ACTIVITY = "launcher";
     public static final String SCREEN_NOTIFICATION_ACTIVITY = "notification";
     public static final String SCREEN_PENDING_INVITES_ACTIVITY = "pending_invites";
+    public static final String SCREEN_LAUNCHER_ACTIVITY = "launcher";
     public static final String SCREEN_LOGIN_FRAGMENT = "login";
+    public static final String SCREEN_POST_LOGIN_SPLASH = "post_login_splash";
+
 
     public static final String SCREEN_NO_INTERNET = "dialog_no_internet";
     public static final String SCREEN_UPDATE_PHONE_DIALOG_FROM_ACCOUNTS = "dialog_update_phone_from_accounts";
@@ -50,34 +52,34 @@ public class GoogleAnalyticsConstants
     public static final String CATEGORY_EDIT = "edit";
     public static final String CATEGORY_ACCOUNT = "account";
     public static final String CATEGORY_NOTIFICATION = "notification";
+    public static final String CATEGORY_PENDING_INVITES = "pending_invites";
+
 
     public static final String CATEGORY_BACKGROUND = "background";
     public static final String CATEGORY_ERROR = "error";
 
     /* Event Actions */
     public static final String ACTION_OPEN = "open";
+    public static final String ACTION_LOGIN_ATTEMPT = "login_attempt";
+    public static final String ACTION_GO_TO_HOME = "go_to_home";
+    public static final String ACTION_FETCH_INVITES = "fetch_invites";
 
+    public static final String ACTION_VIEWED = "intro_viewed";
 
     /* Event Labels */
+    public static final String LABEL_SUCCESS = "success";
+    public static final String LABEL_ATTEMPT = "attempt";
+    public static final String LABEL_FAILURE = "failure";
+    public static final String LABEL_CANCEL = "error";
+    public static final String LABEL_ERROR = "cancel";
+    public static final String LABEL_ON_SKIP = "on_skip";
+    public static final String LABEL_AFTER_FETCH = "invitations_fetched";
 
 
     // Event CATEGORY
     public static final String BUTTON_CLICK = "button_click";
     public static final String LIST_ITEM_CLICK = "list_item_click";
     public static final String GENERAL = "general";
-
-    public static final String LOGIN = "LOGIN";
-    public static final String HOME = "HOME";
-    public static final String CREATE_CARD = "CREATE_CARD";
-    public static final String CREATE_DETAIL = "CREATE_DETAIL";
-    public static final String INVITE = "INVITE";
-    public static final String DETAILS = "DETAILS";
-    public static final String EDIT = "EDIT";
-    public static final String ACCOUNT = "ACCOUNT";
-    public static final String NOTIFICATION = "NOTIFICATION";
-    public static final String BACKGROUND = "BACKGROUND";
-    public static final String ERROR = "ERROR";
-
 
     // Event Actions
     public static final String FACEBOOK_PERMISSION_GRANTED = "facebook_permission_granted";
@@ -164,6 +166,5 @@ public class GoogleAnalyticsConstants
     public static final String FACEBOOK_PROFILE_NOT_FETCHED = "facebook_profile_not_fetched";
 
 
-
-
+    public static final String LABEL_INVALID_PHONE = "invalid_phone";
 }

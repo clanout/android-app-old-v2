@@ -259,11 +259,9 @@ public class LauncherActivity extends BaseActivity implements
 
         tvActionMessage.setText(R.string.permission_location_message);
         tvAction.setText(R.string.permission_goto_settings);
-        tvAction.setOnClickListener(new View.OnClickListener()
-        {
+        tvAction.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 LauncherActivity.this.gotoAppSettings();
             }
         });
@@ -298,6 +296,10 @@ public class LauncherActivity extends BaseActivity implements
         displayBootstrapView();
         facebookLoginPresenter.detachView();
         bootstrapPresenter.attachView(this);
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_POST_LOGIN_SPLASH);
+        /* Analytics */
     }
 
     /* View Methods (BootstrapView) */
@@ -341,11 +343,9 @@ public class LauncherActivity extends BaseActivity implements
 
         tvActionMessage.setText(R.string.location_off_message);
         tvAction.setText(R.string.location_off_action);
-        tvAction.setOnClickListener(new View.OnClickListener()
-        {
+        tvAction.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
             }
         });
@@ -358,11 +358,9 @@ public class LauncherActivity extends BaseActivity implements
 
         tvActionMessage.setText(R.string.error_default);
         tvAction.setText(R.string.try_again);
-        tvAction.setOnClickListener(new View.OnClickListener()
-        {
+        tvAction.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 bootstrapPresenter.attachView(LauncherActivity.this);
             }
         });
@@ -389,6 +387,10 @@ public class LauncherActivity extends BaseActivity implements
         {
             facebookLoginPresenter.onFacebookLoginSuccess();
         }
+
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN, GoogleAnalyticsConstants.ACTION_LOGIN_ATTEMPT, GoogleAnalyticsConstants.LABEL_SUCCESS);
+        /* Analytics */
     }
 
     @Override
@@ -398,6 +400,10 @@ public class LauncherActivity extends BaseActivity implements
         {
             facebookLoginPresenter.onFacebookLoginCancel();
         }
+
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN, GoogleAnalyticsConstants.ACTION_LOGIN_ATTEMPT, GoogleAnalyticsConstants.LABEL_CANCEL);
+        /* Analytics */
     }
 
     @Override
@@ -407,6 +413,10 @@ public class LauncherActivity extends BaseActivity implements
         {
             facebookLoginPresenter.onFacebookLoginError();
         }
+
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_LOGIN_ATTEMPT, GoogleAnalyticsConstants.LABEL_ERROR);
+        /* Analytics */
     }
 
     /* Google Play Services */
