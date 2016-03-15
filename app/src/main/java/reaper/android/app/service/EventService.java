@@ -44,6 +44,7 @@ import reaper.android.app.cache.event.EventCache;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.GenericCacheKeys;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.CreateEventSuggestion;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
@@ -54,6 +55,7 @@ import reaper.android.app.model.User;
 import reaper.android.app.model.util.EventComparator;
 import reaper.android.app.service._new.GcmService_;
 import reaper.android.app.service._new.LocationService_;
+import reaper.android.common.analytics.AnalyticsHelper;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import rx.Observable;
@@ -319,6 +321,9 @@ public class EventService
                                                 }
                                                 catch (Exception e)
                                                 {
+                                                    /* Analytics */
+                                                    AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_P,null,false);
+                                                    /* Analytics */
                                                 }
                                             }
                                         }
@@ -468,6 +473,10 @@ public class EventService
                                }
                                catch (Exception e)
                                {
+                                   /* Analytics */
+                                   AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Q,null,false);
+                                   /* Analytics */
+
                                    return -1;
                                }
                            }
@@ -629,6 +638,9 @@ public class EventService
                         }
                         catch (Exception e)
                         {
+                            /* Analytics */
+                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_R,null,false);
+                            /* Analytics */
                         }
 
                         if (isSuggestionsAvailable && !isExpired)

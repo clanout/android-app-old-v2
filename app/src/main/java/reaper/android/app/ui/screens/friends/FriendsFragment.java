@@ -146,10 +146,6 @@ public class FriendsFragment extends BaseFragment implements
     @Override
     public void displayError()
     {
-        /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ERROR, GoogleAnalyticsConstants.ACTION_FACEBOOK_FRIENDS_NOT_FOUND, GoogleAnalyticsConstants.LABEL_MANAGE_FRIENDS);
-        /* Analytics */
-
         tvMessage.setText(R.string.error_facebook_friends);
 
         tvMessage.setVisibility(View.VISIBLE);

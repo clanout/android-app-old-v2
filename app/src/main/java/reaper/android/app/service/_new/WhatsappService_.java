@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 
 import reaper.android.app.config.AppConstants;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.UserService;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class WhatsappService_
 {
@@ -46,6 +48,10 @@ public class WhatsappService_
         }
         catch (PackageManager.NameNotFoundException e)
         {
+            /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_O,null,false);
+            /* Analytics */
+            
             return false;
         }
     }

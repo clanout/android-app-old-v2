@@ -112,6 +112,44 @@ public class GoogleAnalyticsConstants
 
 
 
+    // Caught Exception Methods
+    public static final String METHOD_CHAT_CONNECT_FAILED = "chat_connection_failed";
+    public static final String METHOD_XMPP_CONNECTION_FAILED = "xmpp_connection_failed";
+    public static final String METHOD_UNABLE_TO_JOIN_CHAT = "unable_to_join_chat";
+    public static final String METHOD_LEAVE_CHAT_FAILED = "leave_chat_failed";
+    public static final String METHOD_CHAT_NOTIFICATION_FAILED = "chat_notification_failed";
+    public static final String METHOD_UNABLE_TO_CREATE_SESSION = "unable_to_create_session";
+    public static final String METHOD_EVENT_SUBSCRIPTION_FAILED = "event_subscription_failed";
+    public static final String METHOD_FAILED_TO_PUSH_UPDATED_LOCATION = "failed_to_push_updated_location";
+    public static final String METHOD_CANNOT_CONVERT_TO_ENUM = "cannot_convert_to_enum";
+
+
+    public static final String METHOD_A = "a";
+    public static final String METHOD_B = "b";
+    public static final String METHOD_C = "c";
+    public static final String METHOD_D = "d";
+    public static final String METHOD_E = "e";
+    public static final String METHOD_F = "f";
+    public static final String METHOD_G = "g";
+    public static final String METHOD_H = "h";
+    public static final String METHOD_I = "i";
+    public static final String METHOD_J = "j";
+    public static final String METHOD_K = "k";
+    public static final String METHOD_L = "l";
+    public static final String METHOD_M = "m";
+    public static final String METHOD_N = "n";
+    public static final String METHOD_O = "o";
+    public static final String METHOD_P = "p";
+    public static final String METHOD_Q = "q";
+    public static final String METHOD_R = "r";
+    public static final String METHOD_S = "s";
+    public static final String METHOD_T = "t";
+
+
+
+    // Exception Location
+    public static final String LOCATION_NOTIFICATION_SERVICE_EXCEPTION = "notification_service_exception";
+
 
 
 
@@ -206,6 +244,7 @@ public class GoogleAnalyticsConstants
 
 
     public static final String LABEL_INVALID_PHONE = "invalid_phone";
+
 
 
 }

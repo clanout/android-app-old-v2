@@ -14,7 +14,9 @@ import reaper.android.app.api.user.UserApi;
 import reaper.android.app.api.user.request.UpdateUserLocationApiRequest;
 import reaper.android.app.api.user.response.UpdateUserLocationApiResponse;
 import reaper.android.app.cache._core.CacheManager;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Location;
+import reaper.android.common.analytics.AnalyticsHelper;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -132,6 +134,10 @@ public class LocationService_
 //                            }
 //                            catch (Exception e)
 //                            {
+//
+//                                /* Analytics */
+//                                AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_K,null,false);
+//                                /* Analytics */
 //                                subscriber.onError(e);
 //                            }
 //                        }
@@ -246,6 +252,10 @@ public class LocationService_
 //                            }
 //                            catch (Exception e)
 //                            {
+//                                /* Analytics */
+//                                AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_L,null,false);
+//                                /* Analytics */
+//
 //                                Timber.e("[Location fetch error] " + e.getMessage());
 //                                return null;
 //                            }
@@ -282,38 +292,33 @@ public class LocationService_
 
         UpdateUserLocationApiRequest request = new UpdateUserLocationApiRequest(location.getZone());
         return userApi.updateUserLocation(request)
-                      .map(new Func1<UpdateUserLocationApiResponse, Boolean>()
-                      {
+                      .map(new Func1<UpdateUserLocationApiResponse, Boolean>() {
                           @Override
-                          public Boolean call(UpdateUserLocationApiResponse response)
-                          {
+                          public Boolean call(UpdateUserLocationApiResponse response) {
                               return response.isRelocated();
                           }
                       })
-                      .doOnNext(new Action1<Boolean>()
-                      {
+                      .doOnNext(new Action1<Boolean>() {
                           @Override
-                          public void call(Boolean isRelocated)
-                          {
-                              if (isRelocated)
-                              {
+                          public void call(Boolean isRelocated) {
+                              if (isRelocated) {
                                   CacheManager.clearFriendsCache();
                               }
                           }
                       })
-                      .map(new Func1<Boolean, Boolean>()
-                      {
+                      .map(new Func1<Boolean, Boolean>() {
                           @Override
-                          public Boolean call(Boolean isRelocated)
-                          {
+                          public Boolean call(Boolean isRelocated) {
                               return true;
                           }
                       })
-                      .onErrorReturn(new Func1<Throwable, Boolean>()
-                      {
+                      .onErrorReturn(new Func1<Throwable, Boolean>() {
                           @Override
-                          public Boolean call(Throwable e)
-                          {
+                          public Boolean call(Throwable e) {
+                              /* Analytics */
+                              AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_FAILED_TO_PUSH_UPDATED_LOCATION,null,false);
+                              /* Analytics */
+
                               Timber.v("[Failed to push updated location] " + e.getMessage());
                               return false;
                           }

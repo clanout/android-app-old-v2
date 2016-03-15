@@ -48,4 +48,21 @@ public class AnalyticsHelper
                 .setFatal(isFatal)
                 .build());
     }
+
+    public static void sendCustomDimension(int index, String dimension)
+    {
+        googleAnalyticsTracker.send(new HitBuilders.ScreenViewBuilder()
+                        .setCustomDimension(index, dimension)
+                        .build()
+        );
+    }
+
+    public static void sendCustomMetric(int index, String metric)
+    {
+        googleAnalyticsTracker.send(new HitBuilders.ScreenViewBuilder()
+                        .setCustomDimension(index, metric)
+                        .build()
+        );
+    }
+
 }

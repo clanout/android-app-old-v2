@@ -34,6 +34,7 @@ import reaper.android.app.communication.Communicator;
 import reaper.android.app.communication.NewNotificationReceivedTrigger;
 import reaper.android.app.communication.NewNotificationsAvailableTrigger;
 import reaper.android.app.config.GenericCacheKeys;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.config.MemoryCacheKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.Notification;
@@ -43,6 +44,7 @@ import reaper.android.app.model.util.NotificationComparator;
 import reaper.android.app.root.Reaper;
 import reaper.android.app.ui._core.FlowEntry;
 import reaper.android.app.ui.screens.launch.LauncherActivity;
+import reaper.android.common.analytics.AnalyticsHelper;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -640,6 +642,10 @@ public class NotificationService
                               }
                               catch (Exception e)
                               {
+                                  /* Analytics */
+                                  AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_CANNOT_CONVERT_TO_ENUM,GoogleAnalyticsConstants.LOCATION_NOTIFICATION_SERVICE_EXCEPTION,false);
+                                  /* Analytics */
+
                                   Log.d("APP", "exception in notification service ---- can't " +
                                           "convert to enum");
                               }
@@ -869,6 +875,10 @@ public class NotificationService
         }
         catch (Exception e)
         {
+            /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_S,null,false);
+            /* Analytics */
+
             return false;
         }
     }

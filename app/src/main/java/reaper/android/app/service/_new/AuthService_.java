@@ -10,11 +10,15 @@ import reaper.android.app.api.auth.request.CreateNewSessionApiRequest;
 import reaper.android.app.api.auth.request.ValidateSessionApiRequest;
 import reaper.android.app.api.auth.response.CreateNewSessionApiResponse;
 import reaper.android.app.cache._core.CacheManager;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.User;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
+import reaper.android.common.analytics.AnalyticsHelper;
 import retrofit.client.Response;
 import rx.Observable;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
@@ -54,18 +58,25 @@ public class AuthService_
     public Observable<Boolean> initSession()
     {
         return validateSession()
-                .flatMap(new Func1<Boolean, Observable<Boolean>>()
-                {
+                .flatMap(new Func1<Boolean, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> call(Boolean isSessionValid)
-                    {
-                        if (isSessionValid)
-                        {
+                    public Observable<Boolean> call(Boolean isSessionValid) {
+                        if (isSessionValid) {
                             return Observable.just(true);
-                        }
-                        else
-                        {
+                        } else {
                             return createSession();
+                        }
+                    }
+                })
+                .doOnNext(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean isSessionAvailable) {
+                        if (isSessionAvailable) {
+
+                            /* Analyics */
+                            Reaper.getAnalyticsTracker().setClientId(userService.getSessionUserId());
+                            /* Analytics */
+
                         }
                     }
                 })
@@ -147,11 +158,9 @@ public class AuthService_
                                 });
                     }
                 })
-                .map(new Func1<Pair<CreateNewSessionApiResponse, String>, User>()
-                {
+                .map(new Func1<Pair<CreateNewSessionApiResponse, String>, User>() {
                     @Override
-                    public User call(Pair<CreateNewSessionApiResponse, String> userData)
-                    {
+                    public User call(Pair<CreateNewSessionApiResponse, String> userData) {
                         CreateNewSessionApiResponse response = userData.first;
                         String coverPicUrl = userData.second;
 
@@ -171,11 +180,14 @@ public class AuthService_
                         return user;
                     }
                 })
-                .onErrorReturn(new Func1<Throwable, User>()
-                {
+                .onErrorReturn(new Func1<Throwable, User>() {
                     @Override
-                    public User call(Throwable e)
-                    {
+                    public User call(Throwable e) {
+
+                        /* Analytics */
+                        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_UNABLE_TO_CREATE_SESSION,null,true);
+                        /* Analytics */
+
                         Timber.e("[Unable to create session] " + e.getMessage());
                         return null;
                     }

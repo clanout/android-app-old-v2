@@ -7,7 +7,9 @@ import com.google.android.gms.gcm.GcmPubSub;
 
 import java.io.IOException;
 
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.root.Reaper;
+import reaper.android.common.analytics.AnalyticsHelper;
 import reaper.android.common.gcm.RegistrationIntentService;
 import rx.Observable;
 import rx.Subscriber;
@@ -57,6 +59,11 @@ public class GcmService_
                         }
                         catch (IOException e)
                         {
+
+                            /* Analytics */
+                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_H,null,false);
+                            /* Analytics */
+
                             subscriber.onError(e);
                         }
 
@@ -64,23 +71,24 @@ public class GcmService_
                 })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.newThread())
-                .subscribe(new Subscriber<Object>()
-                {
+                .subscribe(new Subscriber<Object>() {
                     @Override
-                    public void onCompleted()
-                    {
+                    public void onCompleted() {
 
                     }
 
                     @Override
-                    public void onError(Throwable e)
-                    {
+                    public void onError(Throwable e) {
+
+                        /* Analytics */
+                        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_EVENT_SUBSCRIPTION_FAILED,null,false);
+                        /* Analytics */
+
                         Timber.e("[Event Subscription Failed] " + e.getMessage());
                     }
 
                     @Override
-                    public void onNext(Object o)
-                    {
+                    public void onNext(Object o) {
 
                     }
                 });
@@ -102,6 +110,10 @@ public class GcmService_
                         }
                         catch (IOException e)
                         {
+                            /* Analytics */
+                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_E,null,false);
+                            /* Analytics */
+
                             subscriber.onError(e);
                         }
 
@@ -109,22 +121,21 @@ public class GcmService_
                 })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.newThread())
-                .subscribe(new Subscriber<Object>()
-                {
+                .subscribe(new Subscriber<Object>() {
                     @Override
-                    public void onCompleted()
-                    {
+                    public void onCompleted() {
 
                     }
 
                     @Override
-                    public void onError(Throwable e)
-                    {
+                    public void onError(Throwable e) {
+                        /* Analytics */
+                        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_I,null,false);
+                        /* Analytics */
                     }
 
                     @Override
-                    public void onNext(Object o)
-                    {
+                    public void onNext(Object o) {
 
                     }
                 });

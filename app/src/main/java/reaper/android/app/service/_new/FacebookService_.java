@@ -16,6 +16,8 @@ import java.util.Set;
 import reaper.android.app.api._core.ApiManager;
 import reaper.android.app.api.fb.FacebookApi;
 import reaper.android.app.api.fb.response.FacebookCoverPicResponse;
+import reaper.android.app.config.GoogleAnalyticsConstants;
+import reaper.android.common.analytics.AnalyticsHelper;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
@@ -151,6 +153,11 @@ public class FacebookService_
                                                         }
                                                         catch (Exception e)
                                                         {
+
+                                                            /* Analytics */
+                                                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_F,null,false);
+                                                            /* Analytics */
+
                                                             subscriber.onNext(null);
                                                             subscriber.onCompleted();
                                                             totalFriends[0] = -1;
@@ -193,6 +200,11 @@ public class FacebookService_
                                                                                 }
                                                                                 catch (Exception e)
                                                                                 {
+
+                                                                                    /* Analytics */
+                                                                                    AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_G,null,false);
+                                                                                    /* Analytics */
+
                                                                                     subscriber.onNext(null);
                                                                                     subscriber
                                                                                             .onCompleted();

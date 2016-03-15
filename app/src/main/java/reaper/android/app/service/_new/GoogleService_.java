@@ -5,7 +5,9 @@ import android.net.Uri;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Location;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class GoogleService_
 {
@@ -36,6 +38,10 @@ public class GoogleService_
         }
         catch (Exception e)
         {
+            /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_J,null,false);
+            /* Analytics */
+
             return false;
         }
     }

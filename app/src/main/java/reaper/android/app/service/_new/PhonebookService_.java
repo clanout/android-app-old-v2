@@ -20,9 +20,11 @@ import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.config.GenericCacheKeys;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.PhonebookContact;
 import reaper.android.app.model.util.PhonebookContactComparator;
 import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.common.analytics.AnalyticsHelper;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
@@ -99,6 +101,10 @@ public class PhonebookService_
                         }
                         catch (Exception e)
                         {
+                            /* Analytics */
+                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_M,null,false);
+                            /* Analytics */
+
                             subscriber.onError(e);
                         }
                     }
@@ -223,6 +229,10 @@ public class PhonebookService_
                         }
                         catch (Exception e)
                         {
+                            /* Analytics */
+                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_N,null,false);
+                            /* Analytics */
+
                             subscriber.onError(e);
                         }
                     }
