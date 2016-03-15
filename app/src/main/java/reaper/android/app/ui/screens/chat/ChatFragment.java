@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
 import com.jcodecraeer.xrecyclerview.ProgressStyle;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
@@ -164,12 +165,20 @@ public class ChatFragment extends BaseFragment implements ChatView
     @Override
     public void displaySendMessageFailureError()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CHAT, GoogleAnalyticsConstants.ACTION_SEND, GoogleAnalyticsConstants.LABEL_FAILURE);
+        /* Analytics */
+
         SnackbarFactory.create(getActivity(), R.string.error_chat_not_sent);
     }
 
     @Override
     public void displayError()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CHAT, GoogleAnalyticsConstants.ACTION_DISPLAY_ERROR, null);
+        /* Analytics */
+
         tvRetry.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -274,6 +283,10 @@ public class ChatFragment extends BaseFragment implements ChatView
             @Override
             public void onClick(View v)
             {
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CHAT, GoogleAnalyticsConstants.ACTION_SEND, GoogleAnalyticsConstants.LABEL_ATTEMPT);
+                /* Analytics */
+
                 String message = etChatMessage.getText().toString();
                 if (!TextUtils.isEmpty(message))
                 {

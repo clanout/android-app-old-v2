@@ -78,6 +78,11 @@ public class CreateActivity extends BaseActivity implements CreateScreen
     @Override
     public void onBackPressed()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE, GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_BACK);
+        /* Analytics */
+
+        navigateToHomeScreen();
         finish();
     }
 

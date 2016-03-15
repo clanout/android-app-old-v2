@@ -179,6 +179,10 @@ public class EventFeedFragment extends BaseFragment implements
     /* Helper Methods */
     private void initSwipeRefresh()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_HOME, GoogleAnalyticsConstants.ACTION_SWIPE_TO_REFRESH, null);
+        /* Analytics */
+
         srlFeed.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
         {
             @Override

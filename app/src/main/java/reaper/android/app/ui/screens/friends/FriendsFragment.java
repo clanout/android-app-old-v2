@@ -132,6 +132,10 @@ public class FriendsFragment extends BaseFragment implements
     @Override
     public void displayNoFriendsMessage()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_MANAGE_FRIENDS, GoogleAnalyticsConstants.ACTION_NO_FRIENDS, null);
+        /* Analytics */
+
         tvMessage.setText(R.string.no_facebook_friends);
 
         tvMessage.setVisibility(View.VISIBLE);
@@ -142,6 +146,10 @@ public class FriendsFragment extends BaseFragment implements
     @Override
     public void displayError()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ERROR, GoogleAnalyticsConstants.ACTION_FACEBOOK_FRIENDS_NOT_FOUND, GoogleAnalyticsConstants.LABEL_MANAGE_FRIENDS);
+        /* Analytics */
+
         tvMessage.setText(R.string.error_facebook_friends);
 
         tvMessage.setVisibility(View.VISIBLE);
@@ -181,6 +189,10 @@ public class FriendsFragment extends BaseFragment implements
 
     private void initSearch()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_MANAGE_FRIENDS, GoogleAnalyticsConstants.ACTION_SEARCH, GoogleAnalyticsConstants.LABEL_ATTEMPT);
+        /* Analytics */
+
         search = new TextWatcher()
         {
             @Override

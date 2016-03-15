@@ -20,6 +20,7 @@ import butterknife.OnClick;
 import reaper.android.R;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.User;
+import reaper.android.app.service._new.WhatsappService_;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.dialog.FeedbackDialog;
@@ -113,22 +114,45 @@ public class AccountFragment extends BaseFragment
     @OnClick(R.id.llUpdateMobileNumber)
     public void onUpdateMobileClicked()
     {
-        UpdateMobileDialog.show(getActivity(), new UpdateMobileDialog.Listener()
-        {
-            @Override
-            public void onSuccess(String mobileNumber)
-            {
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_UPDATE_PHONE_DIALOG_FROM_ACCOUNTS);
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_UPDATE_MOBILE);
+        /* Analytics */
 
+        UpdateMobileDialog.show(getActivity(), new UpdateMobileDialog.Listener() {
+            @Override
+            public void onSuccess(String mobileNumber) {
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_UPDATE_PHONE, GoogleAnalyticsConstants.LABEL_SUCCESS);
+                /* Analytics */
             }
         });
 
-        /* Analytics */
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_UPDATE_PHONE_DIALOG_FROM_ACCOUNTS);
     }
 
     @OnClick(R.id.llWhatsAppInvite)
     public void onWhatsAppInviteClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_WHATSAPP_INVITE);
+        /* Analytics */
+
+
+        WhatsappService_ accountsService = WhatsappService_.getInstance();
+        if (accountsService.isWhatsAppInstalled(getActivity())) {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_WHATSAPP_INVITE, GoogleAnalyticsConstants.LABEL_SUCCESS);
+            /* Analytics */
+
+            startActivity(accountsService.getWhatsAppIntent());
+        }
+        else {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_WHATSAPP_INVITE, GoogleAnalyticsConstants.LABEL_FAILURE);
+            /* Analytics */
+
+            SnackbarFactory.create(getActivity(), R.string.error_no_whatsapp);
+        }
         SnackbarFactory.create(getActivity(), R.string.disabled_for_beta);
 //        WhatsappService_ accountsService = WhatsappService_.getInstance();
 //        if (accountsService.isWhatsAppInstalled(getActivity())) {
@@ -142,29 +166,39 @@ public class AccountFragment extends BaseFragment
     @OnClick(R.id.llFeedback)
     public void onFeedbackClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_FEEDBACK_DIALOG);
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_FEEDBACK);
+        /* Analytics */
+
         FeedbackDialog.show(getActivity(), new FeedbackDialog.Listener()
         {
             @Override
             public void onSuccess(int feedbackType, String comment)
             {
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_FEEDBACK, GoogleAnalyticsConstants.LABEL_SUCCESS + "-" + String.valueOf(feedbackType));
+                /* Analytics */
 
             }
 
             @Override
             public void onCancel()
             {
-
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_FEEDBACK, GoogleAnalyticsConstants.LABEL_CANCEL);
+                /* Analytics */
             }
         });
-
-        /* Analytics */
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_FEEDBACK_DIALOG);
-        /* Analytics */
     }
 
     @OnClick(R.id.llFaq)
     public void onFaqClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_FAQ);
+        /* Analytics */
+
         SnackbarFactory.create(getActivity(), R.string.disabled_for_beta);
     }
 }

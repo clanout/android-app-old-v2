@@ -20,9 +20,11 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.config.Dimensions;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.ui.util.CategoryIconFactory;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewHolder>
 {
@@ -96,6 +98,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                     eventActionListener.onEventClicked(events.get(getAdapterPosition()));
                 }
             });
+
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_HOME, GoogleAnalyticsConstants.ACTION_OPEN_FEED_ITEM, String.valueOf(getAdapterPosition()));
+            /* Analytics */
         }
 
         public void render(Event event)

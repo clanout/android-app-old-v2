@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/android_v2.iml" filepath="$PROJECT_DIR$/android_v2.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/reaper.iml" filepath="$PROJECT_DIR$/reaper.iml" />
     </modules>
   </component>
 </project>

@@ -62,6 +62,10 @@ public class AccountActivity extends BaseActivity implements AccountScreen
     @Override
     public void onBackPressed()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_BACK);
+        /* Analytics */
+
         super.onBackPressed();
         navigateToHomeScreen();
     }
@@ -86,6 +90,10 @@ public class AccountActivity extends BaseActivity implements AccountScreen
                 @Override
                 public boolean onMenuItemClick(MenuItem item)
                 {
+                    /* Analytics */
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_BACK);
+                    /* Analytics */
+
                     navigateToHomeScreen();
                     return true;
                 }

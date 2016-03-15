@@ -56,6 +56,10 @@ public class FriendsActivity extends BaseActivity implements FriendsScreen
     @Override
     public void onBackPressed()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_MANAGE_FRIENDS, GoogleAnalyticsConstants.ACTION_BACK, GoogleAnalyticsConstants.LABEL_ACCOUNT);
+        /* Analytics */
+
         navigateToAccountScreen();
     }
 

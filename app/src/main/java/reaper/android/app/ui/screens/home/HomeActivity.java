@@ -155,6 +155,10 @@ public class HomeActivity extends BaseActivity implements HomeScreen
                     @Override
                     public boolean onMenuItemClick(MenuItem item)
                     {
+                        /* Analytics */
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_HOME, GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants.LABEL_NOTIFICATION);
+                        /* Analytics */
+
                         navigateToNotificationScreen();
                         return true;
                     }
@@ -166,6 +170,10 @@ public class HomeActivity extends BaseActivity implements HomeScreen
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem)
                 {
+                    /* Analytics */
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_HOME, GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants.LABEL_ACCOUNT);
+                    /* Analytics */
+
                     navigateToAccountsScreen();
                     return true;
                 }

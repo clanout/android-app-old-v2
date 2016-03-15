@@ -53,18 +53,43 @@ public class GoogleAnalyticsConstants
     public static final String CATEGORY_ACCOUNT = "account";
     public static final String CATEGORY_NOTIFICATION = "notification";
     public static final String CATEGORY_PENDING_INVITES = "pending_invites";
+    public static final String CATEGORY_MANAGE_FRIENDS = "manage_friends";
+    public static final String CATEGORY_CHAT = "chat";
 
 
     public static final String CATEGORY_BACKGROUND = "background";
     public static final String CATEGORY_ERROR = "error";
+
+
+
 
     /* Event Actions */
     public static final String ACTION_OPEN = "open";
     public static final String ACTION_LOGIN_ATTEMPT = "login_attempt";
     public static final String ACTION_GO_TO_HOME = "go_to_home";
     public static final String ACTION_FETCH_INVITES = "fetch_invites";
+    public static final String ACTION_OPEN_FEED_ITEM = "open_plan_detail";
+    public static final String ACTION_CREATE = "banner_create";
+    public static final String ACTION_GO_TO = "go_to";
+    public static final String ACTION_SWIPE_TO_REFRESH = "swipe_to_refresh";
+    public static final String ACTION_UPDATE_PHONE = "update_phone";
+    public static final String ACTION_WHATSAPP_INVITE = "whatsapp_invite";
+    public static final String ACTION_FEEDBACK = "feedback";
+    public static final String ACTION_BACK = "back_button";
+    public static final String ACTION_BLOCK_OR_UNBLOCK = "block_or_unblock";
+    public static final String ACTION_SEARCH = "search";
+    public static final String ACTION_SEND = "send_chat";
+    public static final String ACTION_DISPLAY_ERROR = "display_error";
+
+
+
+    public static final String ACTION_NO_FRIENDS = "no_friends";
+    public static final String ACTION_FACEBOOK_FRIENDS_NOT_FOUND = "facebook_friends_display_error";
 
     public static final String ACTION_VIEWED = "intro_viewed";
+
+
+
 
     /* Event Labels */
     public static final String LABEL_SUCCESS = "success";
@@ -74,6 +99,20 @@ public class GoogleAnalyticsConstants
     public static final String LABEL_ERROR = "cancel";
     public static final String LABEL_ON_SKIP = "on_skip";
     public static final String LABEL_AFTER_FETCH = "invitations_fetched";
+    public static final String LABEL_NOTIFICATION = "notification";
+    public static final String LABEL_ACCOUNT = "account";
+    public static final String LABEL_PHONE_ERROR = "phone_error";
+    public static final String LABEL_BACK = "back_button";
+    public static final String LABEL_FEEDBACK = "feedback";
+    public static final String LABEL_WHATSAPP_INVITE = "whatsapp_invite";
+    public static final String LABEL_UPDATE_MOBILE = "update_mobile";
+    public static final String LABEL_FAQ = "faq";
+    public static final String LABEL_FRIENDS = "block_friends";
+    public static final String LABEL_MANAGE_FRIENDS = "manage_friends";
+
+
+
+
 
 
     // Event CATEGORY
@@ -167,4 +206,6 @@ public class GoogleAnalyticsConstants
 
 
     public static final String LABEL_INVALID_PHONE = "invalid_phone";
+
+
 }
