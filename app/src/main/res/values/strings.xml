@@ -70,10 +70,11 @@
     <string name="location_off_action">Turn on GPS</string>
     <string name="location_off_message">Your location helps us connect you with your nearby friends.
         Cautious? Once inside, make a secret clan.</string>
-    <string name="intro_title_1">Join you friends in their plans or make your own</string>
+    <string name="intro_title_1">Discover and join in your nearby friends\' plans</string>
     <string name="intro_title_2">Keep your plans open or secret</string>
     <string name="intro_title_3">Invite friends from facebook and phonebook</string>
-    <string name="intro_title_4">Discuss and finalize plans through chat</string>
+    <string name="intro_title_4">Chat, finalize plans and ClanOut!</string>
+    <string name="user_agreement">By continuing, you agree to our Terms of service and Privacy policy</string>
 
     <!-- Account Screen -->
     <string name="account_menu_friends">Manage Friends</string>
