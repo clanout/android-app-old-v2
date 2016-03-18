@@ -64,9 +64,12 @@ public class AlarmReceiver extends BroadcastReceiver
                     @Override
                     public void onNext(List<Event> events)
                     {
+
+                        List<Event> filteredEvents = filterEvents(events);
+
                         DateTime currentTimestamp = DateTime.now();
                         List<Event> eventsToStartShortly = new ArrayList<Event>();
-                        for (Event event : events) {
+                        for (Event event : filteredEvents) {
                             if ((event.getStartTime().isAfter(currentTimestamp)) && (Minutes
                                     .minutesBetween(currentTimestamp, event.getStartTime())
                                     .isLessThan(Minutes.minutes(60)))) {
@@ -76,6 +79,25 @@ public class AlarmReceiver extends BroadcastReceiver
                         buildNotification(eventsToStartShortly, context);
                     }
                 });
+    }
+
+    private List<Event> filterEvents(List<Event> events)
+    {
+        List<Event> filteredEvents = new ArrayList<>();
+        EventCache eventCache = CacheManager.getEventCache();
+
+        for(Event event : events)
+        {
+            if(!event.getEndTime().isBefore(DateTime.now()))
+            {
+                filteredEvents.add(event);
+            }else {
+
+                eventCache.deleteCompletely(event.getId());
+            }
+        }
+
+        return filteredEvents;
     }
 
     private void buildNotification(List<Event> events, Context context)
