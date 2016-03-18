@@ -1,25 +1,24 @@
 package reaper.android.app.ui.screens.details.mvp;
 
-
 public interface EventDetailsPresenter
 {
     void attachView(EventDetailsView view);
 
     void detachView();
 
+    String getTitle();
+
     void toggleRsvp();
-
-    void invite();
-
-    void edit();
-
-    void chat();
-
-    void requestEditActionState();
 
     void setStatus(String status);
 
     void sendInvitationResponse(String invitationResponse);
 
-    String getTitle();
+    void invite();
+
+    void chat();
+
+    void edit();
+
+    void delete();
 }

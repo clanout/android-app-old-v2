@@ -8,43 +8,29 @@ import reaper.android.app.model.User;
 
 public interface EventDetailsView
 {
-    /* Init View */
-    void displayEventSummary(Event event);
+    void init(User sessionUser, Event event, boolean isLastMinute);
 
-    void displayUserSummary(User user);
+    void displayAttendees(List<EventDetails.Attendee> attendees);
 
-    void displayDescription(String description);
+    void resetEvent(Event event);
 
-    /* Rsvp */
-    void displayRsvp(boolean isGoing, boolean isInvited);
+    void showLoading();
 
-    void disableRsvp();
+    void hideLoading();
 
-    void displayRsvpError();
+    void setEditVisibility(boolean isVisible);
 
-    /* Status */
-    void hideStatus();
+    void setDeleteVisibility(boolean isVisible);
 
-    void displayStatus(String status);
+    void displayYayActions();
 
-    void displayLastMinuteStatus(String status);
+    void displayNayActions(boolean isInvited);
 
-    /* Attendees */
-    void displayAttendeeList(List<EventDetails.Attendee> attendees);
+    void navigateToInvite(String eventId);
 
-    void showAttendeeLoading();
+    void navigateToChat(String eventId);
 
-    void hideAttendeeLoading();
+    void navigateToEdit(Event event, EventDetails eventDetails);
 
-    /* Edit */
-    void setEditActionState(boolean isVisible);
-
-    void displayEventFinalizedMessage();
-
-    /* Navigation */
-    void navigateToInviteScreen(String eventId);
-
-    void navigateToChatScreen(String eventId);
-
-    void navigateToEditScreen(Event event, EventDetails eventDetails);
+    void navigateToHome();
 }
