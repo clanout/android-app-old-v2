@@ -112,7 +112,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             // Icon
             EventCategory category = EventCategory.valueOf(event.getCategory());
             ivCategoryIcon.setImageDrawable(CategoryIconFactory
-                    .get(category, Dimensions.EVENT_FEED_ICON_SIZE));
+                    .get(category, Dimensions.DEFAULT_BUBBLE_SIZE));
             llCategoryIconContainer.setBackground(CategoryIconFactory.getIconBackground(category));
 
             // Friends Attending

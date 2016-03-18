@@ -35,7 +35,7 @@
         android:scaleType="center"
         android:visibility="gone"
         app:materialIcon="checkbox_marked_circle_outline"
-        app:materialIconColor="@color/green"
+        app:materialIconColor="@color/rsvp_yes"
         app:materialIconSize="20dp"/>
 
     <CheckBox

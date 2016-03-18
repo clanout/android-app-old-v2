@@ -1,13 +1,10 @@
 package reaper.android.app.ui.screens.details;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,26 +12,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
-
-import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import reaper.android.R;
-import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
-import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.User;
@@ -43,22 +30,21 @@ import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.ui._core.BaseFragment;
+import reaper.android.app.ui.dialog.DefaultDialog;
 import reaper.android.app.ui.dialog.InvitationResponseDialog;
 import reaper.android.app.ui.dialog.LastMinuteStatusDialog;
 import reaper.android.app.ui.dialog.StatusDialog;
-import reaper.android.app.ui.screens.details.mvp.EventDetailsPresenter;
-import reaper.android.app.ui.screens.details.mvp.EventDetailsPresenterImpl;
-import reaper.android.app.ui.screens.details.mvp.EventDetailsView;
-import reaper.android.app.ui.util.CategoryIconFactory;
-import reaper.android.app.ui.util.CircleTransform;
-import reaper.android.app.ui.util.DateTimeUtil;
-import reaper.android.app.ui.util.FriendBubbles;
+import reaper.android.app.ui.screens.details.mvp._new.EventDetailsPresenter;
+import reaper.android.app.ui.screens.details.mvp._new.EventDetailsPresenterImpl;
+import reaper.android.app.ui.screens.details.mvp._new.EventDetailsView;
 import reaper.android.app.ui.util.SnackbarFactory;
+import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.analytics.AnalyticsHelper;
 
 public class EventDetailsFragment extends BaseFragment implements
-        EventDetailsView
+        EventDetailsView,
+        EventDetailsAdapter.EventDetailsListener
 {
     private static final String ARG_EVENT = "arg_event";
 
@@ -83,59 +69,8 @@ public class EventDetailsFragment extends BaseFragment implements
     EventDetailsPresenter presenter;
 
     /* UI Elements */
-    @Bind(R.id.llCategoryIconContainer)
-    View llCategoryIconContainer;
-
-    @Bind(R.id.ivCategoryIcon)
-    ImageView ivCategoryIcon;
-
-    @Bind(R.id.tvTitle)
-    TextView tvTitle;
-
-    @Bind(R.id.tvType)
-    TextView tvType;
-
-    @Bind(R.id.tvDescription)
-    TextView tvDescription;
-
-    @Bind(R.id.tvTime)
-    TextView tvTime;
-
-    @Bind(R.id.tvLocation)
-    TextView tvLocation;
-
-    @Bind(R.id.mivGoogleMap)
-    View mivGoogleMap;
-
-    @Bind(R.id.ivPic)
-    ImageView ivPic;
-
-    @Bind(R.id.tvName)
-    TextView tvName;
-
-    @Bind(R.id.ivStatus)
-    ImageView ivStatus;
-
-    @Bind(R.id.tvStatus)
-    TextView tvStatus;
-
-    @Bind(R.id.tvRsvp)
-    TextView tvRsvp;
-
-    @Bind(R.id.sRsvp)
-    SwitchCompat sRsvp;
-
-    @Bind(R.id.loading)
-    ProgressBar loading;
-
-    @Bind(R.id.llNoAttendees)
-    View llNoAttendees;
-
-    @Bind(R.id.friendBubbles)
-    View friendBubbles;
-
-    @Bind(R.id.rvAttendees)
-    RecyclerView rvAttendees;
+    @Bind(R.id.rvEventDetails)
+    RecyclerView rvEventDetails;
 
     @Bind(R.id.llEventActionsContainerYay)
     View llEventActionsContainerYay;
@@ -146,8 +81,17 @@ public class EventDetailsFragment extends BaseFragment implements
     @Bind(R.id.btnInvitationResponse)
     Button btnInvitationResponse;
 
+    @Bind(R.id.ivShadow)
+    View ivShadow;
+
+    MenuItem loading;
     MenuItem edit;
+    MenuItem delete;
+    boolean isLoadingVisible;
     boolean isEditVisible;
+    boolean isDeleteVisible;
+
+    EventDetailsAdapter adapter;
 
     /* Lifecycle Methods */
     @Override
@@ -179,20 +123,6 @@ public class EventDetailsFragment extends BaseFragment implements
     {
         super.onActivityCreated(savedInstanceState);
         screen = (EventDetailsScreen) getActivity();
-
-        FriendBubbles.render(getActivity(), friendBubbles, "Invite your %s friends");
-        friendBubbles.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if (presenter != null)
-                {
-                    presenter.invite();
-                }
-            }
-        });
-
         initRecyclerView();
     }
 
@@ -211,9 +141,42 @@ public class EventDetailsFragment extends BaseFragment implements
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        menu.clear();
+        inflater.inflate(R.menu.action_details, menu);
+
+        edit = menu.findItem(R.id.action_edit);
+        delete = menu.findItem(R.id.action_delete);
+        loading = menu.findItem(R.id.action_refresh);
+
+        loading.setActionView(R.layout.view_action_refreshing);
+        ProgressBar pbRefreshing = (ProgressBar) loading.getActionView()
+                                                        .findViewById(R.id.pbRefreshing);
+        pbRefreshing.getIndeterminateDrawable()
+                    .setColorFilter(ContextCompat.getColor(getActivity(), R.color.white),
+                            android.graphics.PorterDuff.Mode.SRC_IN);
+
+        edit.setVisible(isEditVisible);
+        delete.setVisible(isDeleteVisible);
+        loading.setVisible(isLoadingVisible);
+    }
+
+    @Override
     public void onPrepareOptionsMenu(Menu menu)
     {
         super.onPrepareOptionsMenu(menu);
+
+        edit.setVisible(isEditVisible);
+        delete.setVisible(isDeleteVisible);
+        loading.setVisible(isLoadingVisible);
+
+        if (presenter != null)
+        {
+            screen.setTitle(presenter.getTitle());
+        }
 
         edit.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {
@@ -224,32 +187,23 @@ public class EventDetailsFragment extends BaseFragment implements
                 {
                     presenter.edit();
                 }
-
                 return true;
             }
         });
 
-        presenter.requestEditActionState();
-        screen.setTitle(presenter.getTitle());
-    }
+        delete.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                if (presenter != null)
+                {
+                    displayDeleteDialog();
+                }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        menu.clear();
-        inflater.inflate(R.menu.action_details, menu);
-
-        edit = menu.findItem(R.id.action_edit);
-
-        edit.setVisible(isEditVisible);
-        edit.setIcon(MaterialDrawableBuilder
-                .with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.PENCIL)
-                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
-                .setSizeDp(36)
-                .build());
+                return true;
+            }
+        });
     }
 
     /* Listeners */
@@ -286,210 +240,58 @@ public class EventDetailsFragment extends BaseFragment implements
         }
     }
 
-    /* View Methods */
     @Override
-    public void displayEventSummary(Event event)
+    public void onEdit()
     {
-        tvTitle.setText(event.getTitle());
-
-        EventCategory eventCategory = EventCategory.valueOf(event.getCategory());
-        llCategoryIconContainer.setBackground(CategoryIconFactory.getIconBackground(eventCategory));
-        ivCategoryIcon.setImageDrawable(CategoryIconFactory
-                .get(eventCategory, Dimensions.EVENT_DETAILS_ICON_SIZE));
-
-        switch (event.getType())
+        if (presenter != null)
         {
-            case INVITE_ONLY:
-                tvType.setText(R.string.event_type_secret);
-                break;
-
-            case PUBLIC:
-                tvType.setText(R.string.event_type_open);
-                break;
-        }
-
-        tvTime.setText(event.getStartTime().toString(DateTimeUtil.DATE_TIME_FORMATTER));
-
-        final Location location = event.getLocation();
-        if (location.getName() == null || location.getName().isEmpty())
-        {
-            tvLocation.setText(R.string.event_details_no_location);
-        }
-        else
-        {
-            tvLocation.setText(location.getName());
-        }
-
-        if (location.getLatitude() != null && location.getLongitude() != null)
-        {
-            mivGoogleMap.setVisibility(View.VISIBLE);
-            mivGoogleMap.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    startActivity(GoogleService_.getInstance().getGoogleMapsIntent(location));
-                }
-            });
-        }
-        else
-        {
-            mivGoogleMap.setVisibility(View.GONE);
+            presenter.edit();
         }
     }
 
     @Override
-    public void displayUserSummary(User user)
+    public void onRsvpToggled()
     {
-        tvName.setText(user.getName());
-
-        Drawable placeHolder =
-                MaterialDrawableBuilder
-                        .with(getActivity())
-                        .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
-                        .setColor(ContextCompat.getColor(getActivity(), R.color.light_grey))
-                        .setSizeDp(24)
-                        .build();
-
-        Picasso.with(getActivity())
-               .load(user.getProfilePicUrl())
-               .placeholder(placeHolder)
-               .transform(new CircleTransform())
-               .into(ivPic);
-    }
-
-    @Override
-    public void displayDescription(String description)
-    {
-        if (description != null && !description.isEmpty())
+        if (presenter != null)
         {
-            tvDescription.setText(description);
-        }
-        else
-        {
-            tvDescription.setText(R.string.event_details_no_description);
+            presenter.toggleRsvp();
         }
     }
 
     @Override
-    public void displayRsvp(boolean isGoing, boolean isInvited)
+    public void onStatusClicked(String oldStatus)
     {
-        tvRsvp.setVisibility(View.VISIBLE);
-        sRsvp.setVisibility(View.VISIBLE);
-
-        sRsvp.setOnCheckedChangeListener(null);
-
-        sRsvp.setChecked(isGoing);
-
-        if (isGoing)
-        {
-            tvRsvp.setText(R.string.rsvp_yes);
-            tvRsvp.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
-
-            if (llEventActionsContainerNay.getVisibility() != View.GONE)
-            {
-                VisibilityAnimationUtil.collapse(llEventActionsContainerNay, 200);
-            }
-
-            if (llEventActionsContainerYay.getVisibility() != View.VISIBLE)
-            {
-                VisibilityAnimationUtil.expand(llEventActionsContainerYay, 200);
-            }
-        }
-        else
-        {
-            tvRsvp.setText(R.string.rsvp_no);
-            tvRsvp.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_subtitle));
-
-            if (isInvited)
-            {
-                btnInvitationResponse.setVisibility(View.VISIBLE);
-            }
-            else
-            {
-                btnInvitationResponse.setVisibility(View.GONE);
-            }
-
-            if (llEventActionsContainerYay.getVisibility() != View.GONE)
-            {
-                VisibilityAnimationUtil.collapse(llEventActionsContainerYay, 200);
-            }
-
-            if (llEventActionsContainerNay.getVisibility() != View.VISIBLE)
-            {
-                VisibilityAnimationUtil.expand(llEventActionsContainerNay, 200);
-            }
-        }
-
-        sRsvp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        StatusDialog.show(getActivity(), oldStatus, new StatusDialog.Listener()
         {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            public void onStatusEntered(String status)
             {
                 if (presenter != null)
                 {
-                    presenter.toggleRsvp();
+                    presenter.setStatus(status);
                 }
+            }
+
+            @Override
+            public void onStatusCancelled()
+            {
             }
         });
     }
 
     @Override
-    public void displayRsvpError()
+    public void onLastMinuteStatusClicked(String oldStatus)
     {
-        SnackbarFactory.create(getActivity(), R.string.error_rsvp_update);
-    }
-
-    @Override
-    public void disableRsvp()
-    {
-        tvRsvp.setVisibility(View.GONE);
-        sRsvp.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void hideStatus()
-    {
-        ivStatus.setVisibility(View.GONE);
-        tvStatus.setVisibility(View.GONE);
-        tvStatus.setOnClickListener(null);
-    }
-
-    @Override
-    public void displayStatus(final String status)
-    {
-        ivStatus.setVisibility(View.VISIBLE);
-        tvStatus.setVisibility(View.VISIBLE);
-
-        Drawable drawable = MaterialDrawableBuilder
-                .with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.TOOLTIP_EDIT)
-                .setColor(ContextCompat.getColor(getActivity(), R.color.accent))
-                .setSizeDp(18)
-                .build();
-
-        ivStatus.setImageDrawable(drawable);
-
-        if (TextUtils.isEmpty(status))
-        {
-            tvStatus.setText(R.string.label_status);
-            tvStatus.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
-        }
-        else
-        {
-            tvStatus.setText(status);
-            tvStatus.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_subtitle));
-        }
-
-        tvStatus.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                StatusDialog.show(getActivity(), status, new StatusDialog.Listener()
+        LastMinuteStatusDialog
+                .show(getActivity(), oldStatus, new LastMinuteStatusDialog.Listener()
                 {
                     @Override
-                    public void onStatusEntered(String status)
+                    public void onLastMinuteStatusSuggestionSelected(String suggestion)
+                    {
+                    }
+
+                    @Override
+                    public void onLastMinuteStatusEntered(String status)
                     {
                         if (presenter != null)
                         {
@@ -498,147 +300,165 @@ public class EventDetailsFragment extends BaseFragment implements
                     }
 
                     @Override
-                    public void onStatusCancelled()
+                    public void onLastMinuteStatusCancelled()
                     {
                     }
                 });
 
-                /* Analytics */
-                AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_STATUS_DIALOG);
-                /* Analytics */
-            }
-        });
     }
 
     @Override
-    public void displayLastMinuteStatus(final String status)
+    public void onDescriptionClicked(String description)
     {
-        ivStatus.setVisibility(View.VISIBLE);
-        tvStatus.setVisibility(View.VISIBLE);
+        DefaultDialog.show(getActivity(),
+                "Description",
+                description,
+                DefaultDialog.BUTTON_DISABLED,
+                R.string.got_it,
+                true,
+                new DefaultDialog.Listener()
+                {
+                    @Override
+                    public void onPositiveButtonClicked()
+                    {
 
-        Drawable drawable = MaterialDrawableBuilder
-                .with(getActivity())
-                .setIcon(MaterialDrawableBuilder.IconValue.CLOCK_FAST)
-                .setColor(ContextCompat.getColor(getActivity(), R.color.accent))
-                .setSizeDp(18)
-                .build();
+                    }
 
-        ivStatus.setImageDrawable(drawable);
+                    @Override
+                    public void onNegativeButtonClicked()
+                    {
 
-        if (TextUtils.isEmpty(status))
-        {
-            tvStatus.setText(R.string.label_status_last_moment);
-            tvStatus.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
-        }
-        else
-        {
-            tvStatus.setText(status);
-            tvStatus.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
-        }
-
-        tvStatus.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                LastMinuteStatusDialog
-                        .show(getActivity(), status, new LastMinuteStatusDialog.Listener()
-                        {
-                            @Override
-                            public void onLastMinuteStatusSuggestionSelected(String suggestion)
-                            {
-                            }
-
-                            @Override
-                            public void onLastMinuteStatusEntered(String status)
-                            {
-                                if (presenter != null)
-                                {
-                                    presenter.setStatus(status);
-                                }
-                            }
-
-                            @Override
-                            public void onLastMinuteStatusCancelled()
-                            {
-                            }
-                        });
-
-                /* Analytics */
-                AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_LAST_MOMENT_STATUS_DIALOG);
-                /* Analytics */
-            }
-        });
+                    }
+                });
     }
 
     @Override
-    public void displayAttendeeList(List<EventDetails.Attendee> attendees)
+    public void onNavigationClicked(Location location)
     {
-        if (attendees.isEmpty())
+        startActivity(GoogleService_.getInstance().getGoogleMapsIntent(location));
+    }
+
+    /* View Methods */
+    @Override
+    public void init(User sessionUser, Event event, boolean isLastMinute)
+    {
+        adapter = new EventDetailsAdapter(getActivity(), this, sessionUser, event, isLastMinute);
+        rvEventDetails.setAdapter(adapter);
+    }
+
+    @Override
+    public void displayAttendees(List<EventDetails.Attendee> attendees)
+    {
+        adapter.setAttendees(attendees);
+    }
+
+    @Override
+    public void resetEvent(Event event)
+    {
+        adapter.resetEvent(event);
+    }
+
+    @Override
+    public void showLoading()
+    {
+        isLoadingVisible = true;
+        if (loading != null)
         {
-            llNoAttendees.setVisibility(View.VISIBLE);
-            rvAttendees.setVisibility(View.GONE);
-        }
-        else
-        {
-            rvAttendees.setAdapter(new EventAttendeesAdapter(attendees, getActivity()));
-            llNoAttendees.setVisibility(View.GONE);
-            rvAttendees.setVisibility(View.VISIBLE);
+            loading.setVisible(isLoadingVisible);
         }
     }
 
     @Override
-    public void showAttendeeLoading()
+    public void hideLoading()
     {
-        loading.setVisibility(View.VISIBLE);
-    }
-
-    public void hideAttendeeLoading()
-    {
-        loading.setVisibility(View.GONE);
+        isLoadingVisible = false;
+        if (loading != null)
+        {
+            loading.setVisible(isLoadingVisible);
+        }
     }
 
     @Override
-    public void setEditActionState(boolean isVisible)
+    public void setEditVisibility(boolean isVisible)
     {
+        isEditVisible = isVisible;
         if (edit != null)
         {
-            edit.setVisible(isVisible);
+            edit.setVisible(isEditVisible);
+        }
+    }
+
+    @Override
+    public void setDeleteVisibility(boolean isVisible)
+    {
+        isDeleteVisible = isVisible;
+        if (delete != null)
+        {
+            delete.setVisible(isDeleteVisible);
+        }
+    }
+
+    @Override
+    public void displayYayActions()
+    {
+        llEventActionsContainerNay.setVisibility(View.GONE);
+
+        if (llEventActionsContainerYay.getVisibility() != View.VISIBLE)
+        {
+            ivShadow.setVisibility(View.VISIBLE);
+            VisibilityAnimationUtil.expand(llEventActionsContainerYay, 200);
+        }
+    }
+
+    @Override
+    public void displayNayActions(boolean isInvited)
+    {
+        if (isInvited)
+        {
+            btnInvitationResponse.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            btnInvitationResponse.setVisibility(View.GONE);
         }
 
-        isEditVisible = isVisible;
+        llEventActionsContainerYay.setVisibility(View.GONE);
+
+        if (llEventActionsContainerNay.getVisibility() != View.VISIBLE)
+        {
+            ivShadow.setVisibility(View.VISIBLE);
+            VisibilityAnimationUtil.expand(llEventActionsContainerNay, 200);
+        }
     }
 
     @Override
-    public void displayEventFinalizedMessage()
-    {
-        SnackbarFactory.create(getActivity(), R.string.error_edit_finalized);
-    }
-
-    @Override
-    public void navigateToInviteScreen(String eventId)
+    public void navigateToInvite(String eventId)
     {
         screen.navigateToInviteScreen(eventId);
     }
 
     @Override
-    public void navigateToChatScreen(String eventId)
+    public void navigateToChat(String eventId)
     {
         screen.navigateToChatScreen(eventId);
     }
 
     @Override
-    public void navigateToEditScreen(Event event, EventDetails eventDetails)
+    public void navigateToEdit(Event event, EventDetails eventDetails)
     {
         screen.navigateToEditScreen(event, eventDetails);
+    }
+
+    @Override
+    public void navigateToHome()
+    {
+        screen.navigateToHomeScreen();
     }
 
     /* Helper Methods */
     private void initRecyclerView()
     {
-        rvAttendees.setLayoutManager(new LinearLayoutManager(getActivity()));
-        rvAttendees
-                .setAdapter(new EventAttendeesAdapter(new ArrayList<EventDetails.Attendee>(), getActivity()));
+        rvEventDetails.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     private void displayInvitationResponseDialog()
@@ -668,6 +488,38 @@ public class EventDetailsFragment extends BaseFragment implements
 
         /* Analytics */
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_INVITATION_RESPONSE_DIALOG);
+        /* Analytics */
+    }
+
+    private void displayDeleteDialog()
+    {
+        SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
+        DefaultDialog.show(getActivity(),
+                R.string.event_delete_title,
+                R.string.event_delete_message,
+                R.string.event_delete_positive_button,
+                R.string.event_delete_negative_button,
+                true,
+                new DefaultDialog.Listener()
+                {
+                    @Override
+                    public void onPositiveButtonClicked()
+                    {
+                        if (presenter != null)
+                        {
+                            presenter.delete();
+                        }
+                    }
+
+                    @Override
+                    public void onNegativeButtonClicked()
+                    {
+
+                    }
+                });
+
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_EDIT_DISMISS_DIALOG);
         /* Analytics */
     }
 }

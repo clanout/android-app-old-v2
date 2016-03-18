@@ -101,7 +101,7 @@ public class EventDetailsActivity extends BaseActivity implements
     {
         if (item.getItemId() == android.R.id.home)
         {
-            navigateToHome();
+            navigateToHomeScreen();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -138,7 +138,7 @@ public class EventDetailsActivity extends BaseActivity implements
     @Override
     public void handleError()
     {
-        navigateToHome();
+        navigateToHomeScreen();
     }
 
     /* Screen Methods */
@@ -162,13 +162,7 @@ public class EventDetailsActivity extends BaseActivity implements
     }
 
     @Override
-    public void setTitle(String title)
-    {
-        setScreenTitle(title);
-    }
-
-    /* Helper Method */
-    private void navigateToHome()
+    public void navigateToHomeScreen()
     {
         boolean isFromHome = getIntent().getBooleanExtra(ARG_IS_FROM_HOME, false);
         if (!isFromHome)
@@ -178,6 +172,13 @@ public class EventDetailsActivity extends BaseActivity implements
         finish();
     }
 
+    @Override
+    public void setTitle(String title)
+    {
+        setScreenTitle(title);
+    }
+
+    /* Helper Method */
     private void navigateBack()
     {
         if (isTaskRoot())

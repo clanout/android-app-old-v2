@@ -20,7 +20,6 @@ import reaper.android.app.api.event.request.EditEventApiRequest;
 import reaper.android.app.api.event.request.EventDetailsApiRequest;
 import reaper.android.app.api.event.request.EventsApiRequest;
 import reaper.android.app.api.event.request.FetchEventApiRequest;
-import reaper.android.app.api.event.request.FetchNewEventsAndUpdatesApiRequest;
 import reaper.android.app.api.event.request.FetchPendingInvitesApiRequest;
 import reaper.android.app.api.event.request.FinaliseEventApiRequest;
 import reaper.android.app.api.event.request.GetCreateEventSuggestionsApiRequest;
@@ -35,7 +34,6 @@ import reaper.android.app.api.event.response.EditEventApiResponse;
 import reaper.android.app.api.event.response.EventDetailsApiResponse;
 import reaper.android.app.api.event.response.EventsApiResponse;
 import reaper.android.app.api.event.response.FetchEventApiResponse;
-import reaper.android.app.api.event.response.FetchNewEventsAndUpdatesApiResponse;
 import reaper.android.app.api.event.response.FetchPendingInvitesApiResponse;
 import reaper.android.app.api.event.response.GetCreateEventSuggestionsApiResponse;
 import reaper.android.app.api.event.response.LocationSuggestionsApiResponse;
@@ -180,7 +178,7 @@ public class EventService
                 .subscribeOn(Schedulers.newThread());
     }
 
-    private Observable<List<Event>> _fetchEventsCache()
+    public Observable<List<Event>> _fetchEventsCache()
     {
         return eventCache
                 .getEvents()
@@ -206,7 +204,7 @@ public class EventService
                 .subscribeOn(Schedulers.newThread());
     }
 
-    private Observable<List<Event>> _fetchEventsNetwork()
+    public Observable<List<Event>> _fetchEventsNetwork()
     {
         String zone = locationService.getCurrentLocation().getZone();
         EventsApiRequest request = new EventsApiRequest(zone);
@@ -228,8 +226,6 @@ public class EventService
                     @Override
                     public void call(List<Event> events)
                     {
-                        genericCache
-                                .put(GenericCacheKeys.FEED_LAST_UPDATE_TIMESTAMP, DateTime.now());
                         eventCache.reset(events);
 
                         for (Event event : events)
@@ -306,6 +302,8 @@ public class EventService
                                     {
                                         List<String> friends = new ArrayList<>();
                                         int friendCount = 0;
+                                        int inviterCount = 0;
+
                                         for (EventDetails.Attendee attendee : eventDetails
                                                 .getAttendees())
                                         {
@@ -326,8 +324,14 @@ public class EventService
                                                     /* Analytics */
                                                 }
                                             }
+
+                                            if (attendee.isInviter())
+                                            {
+                                                inviterCount++;
+                                            }
                                         }
 
+                                        event.setInviterCount(inviterCount);
                                         event.setFriendCount(friendCount);
                                         event.setFriends(friends);
 
@@ -833,100 +837,6 @@ public class EventService
                     {
                         eventCache.save(event);
                         handleTopicSubscription(event);
-                    }
-                })
-                .subscribeOn(Schedulers.newThread());
-    }
-
-    /* Refresh */
-    public Observable<List<Event>> _refreshEvents()
-    {
-        final String zone = locationService.getCurrentLocation().getZone();
-        final DateTime lastUpdateTimestamp = genericCache
-                .get(GenericCacheKeys.FEED_LAST_UPDATE_TIMESTAMP, DateTime.class);
-
-        return _fetchEventsCache()
-                .flatMap(new Func1<List<Event>, Observable<List<Event>>>()
-                {
-                    @Override
-                    public Observable<List<Event>> call(final List<Event> events)
-                    {
-                        List<String> eventIds = new ArrayList<>();
-                        for (Event event : events)
-                        {
-                            eventIds.add(event.getId());
-                        }
-
-                        FetchNewEventsAndUpdatesApiRequest request =
-                                new FetchNewEventsAndUpdatesApiRequest(zone, eventIds,
-                                        lastUpdateTimestamp);
-                        return eventApi
-                                .fetchNewEventsAndUpdates(request)
-                                .map(new Func1<FetchNewEventsAndUpdatesApiResponse, List<Event>>()
-                                {
-                                    @Override
-                                    public List<Event> call(FetchNewEventsAndUpdatesApiResponse
-                                                                    response)
-                                    {
-                                        List<Event> newEventList = response.getNewEventsList();
-                                        List<String> deletedEventIdList = response
-                                                .getDeletedEventIdList();
-                                        List<Event> updatedEventList = response
-                                                .getUpdatedEventList();
-
-                                        for (String deletedEventId : deletedEventIdList)
-                                        {
-                                            Event deletedEvent = new Event();
-                                            deletedEvent.setId(deletedEventId);
-
-                                            if (events.contains(deletedEvent))
-                                            {
-                                                events.remove(deletedEvent);
-                                            }
-                                        }
-
-                                        for (Event updatedEvent : updatedEventList)
-                                        {
-                                            if (events.contains(updatedEvent))
-                                            {
-                                                int index = events.indexOf(updatedEvent);
-                                                if (index >= 0)
-                                                {
-                                                    if (!updatedEvent.isEqualTo(events.get(index)
-                                                    ))
-                                                    {
-                                                        events.set(index, updatedEvent);
-                                                    }
-                                                    else
-                                                    {
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        events.addAll(newEventList);
-                                        return filterExpiredEvents(events);
-                                    }
-                                });
-                    }
-                })
-                .doOnNext(new Action1<List<Event>>()
-                {
-                    @Override
-                    public void call(List<Event> events)
-                    {
-                        genericCache
-                                .put(GenericCacheKeys.FEED_LAST_UPDATE_TIMESTAMP, DateTime.now());
-                        eventCache.reset(events);
-                    }
-                })
-                .map(new Func1<List<Event>, List<Event>>()
-                {
-                    @Override
-                    public List<Event> call(List<Event> events)
-                    {
-                        Collections.sort(events, new EventComparator.Relevance(userService
-                                .getSessionUserId()));
-                        return events;
                     }
                 })
                 .subscribeOn(Schedulers.newThread());

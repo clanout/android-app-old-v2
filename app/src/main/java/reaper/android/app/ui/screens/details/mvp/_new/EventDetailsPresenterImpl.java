@@ -1,4 +1,4 @@
-package reaper.android.app.ui.screens.details.mvp;
+package reaper.android.app.ui.screens.details.mvp._new;
 
 import org.joda.time.DateTime;
 
@@ -12,7 +12,6 @@ import reaper.android.app.service.EventService;
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.ui.util.DateTimeUtil;
-import reaper.android.app.ui.util.EventUtils;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -32,11 +31,9 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     /* Data */
     private Event event;
     private EventDetails eventDetails;
-    private String status;
     private boolean isLastMinute;
 
     private boolean isRsvpUpdateInProgress;
-    private boolean isEditClicked;
 
     /* Subscriptions */
     private CompositeSubscription subscriptions;
@@ -70,35 +67,28 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     }
 
     @Override
-    public void invite()
+    public String getTitle()
     {
-        view.navigateToInviteScreen(event.getId());
-    }
-
-    @Override
-    public void chat()
-    {
-        view.navigateToChatScreen(event.getId());
+        return DateTimeUtil.getDetailsScreenTitle(event.getStartTime());
     }
 
     @Override
     public void toggleRsvp()
     {
-        final boolean oldRsvp = event.getRsvp() == Event.RSVP.YES;
-        if (isRsvpUpdateInProgress)
-        {
-            view.displayRsvp(oldRsvp, isInvited());
-            return;
-        }
-
         if (view == null)
         {
             return;
         }
 
+        final boolean oldRsvp = event.getRsvp() == Event.RSVP.YES;
+        if (isRsvpUpdateInProgress)
+        {
+            view.resetEvent(event);
+            return;
+        }
+
         isRsvpUpdateInProgress = true;
 
-        view.displayRsvp(!oldRsvp, isInvited());
         if (oldRsvp)
         {
             event.setRsvp(Event.RSVP.NO);
@@ -107,9 +97,9 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
         {
             event.setRsvp(Event.RSVP.YES);
         }
-
-        setEditAction();
-        displayStatus(status);
+        view.resetEvent(event);
+        processEditState();
+        processEventActions();
 
         Subscription subscription =
                 eventService
@@ -121,8 +111,6 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
                             public void onCompleted()
                             {
                                 isRsvpUpdateInProgress = false;
-                                setEditAction();
-                                displayStatus(status);
                             }
 
                             @Override
@@ -137,8 +125,9 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
                                     event.setRsvp(Event.RSVP.NO);
                                 }
 
-                                view.displayRsvp(oldRsvp, isInvited());
-                                view.displayRsvpError();
+                                view.resetEvent(event);
+                                processEditState();
+                                processEventActions();
                                 isRsvpUpdateInProgress = false;
                             }
 
@@ -156,30 +145,15 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
                                         event.setRsvp(Event.RSVP.NO);
                                     }
 
-                                    view.displayRsvp(oldRsvp, isInvited());
-                                    view.displayRsvpError();
+                                    view.resetEvent(event);
+                                    processEditState();
+                                    processEventActions();
+                                    isRsvpUpdateInProgress = false;
                                 }
                             }
                         });
 
         subscriptions.add(subscription);
-    }
-
-    @Override
-    public void edit()
-    {
-        isEditClicked = true;
-
-        if (eventDetails != null)
-        {
-            editEvent();
-        }
-    }
-
-    @Override
-    public void requestEditActionState()
-    {
-        setEditAction();
     }
 
     @Override
@@ -190,15 +164,19 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
             status = "";
         }
 
-        displayStatus(status);
+        if (!event.getStatus().equals(status))
+        {
+            event.setStatus(status);
+            view.resetEvent(event);
 
-        if (isLastMinute && !status.isEmpty())
-        {
-            eventService.updateStatus(event.getId(), status, true);
-        }
-        else
-        {
-            eventService.updateStatus(event.getId(), status, false);
+            if (isLastMinute && !status.isEmpty())
+            {
+                eventService.updateStatus(event.getId(), status, true);
+            }
+            else
+            {
+                eventService.updateStatus(event.getId(), status, false);
+            }
         }
     }
 
@@ -209,17 +187,60 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     }
 
     @Override
-    public String getTitle()
+    public void invite()
     {
-        return DateTimeUtil.getDetailsScreenTitle(event.getStartTime());
+        view.navigateToInvite(event.getId());
+    }
+
+    @Override
+    public void chat()
+    {
+        view.navigateToChat(event.getId());
+    }
+
+    @Override
+    public void edit()
+    {
+        view.navigateToEdit(event, eventDetails);
+    }
+
+    @Override
+    public void delete()
+    {
+        view.showLoading();
+        eventService
+                ._deleteEvent(event.getId())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Boolean>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+                        view.navigateToHome();
+                        view.hideLoading();
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                    }
+
+                    @Override
+                    public void onNext(Boolean isSuccessful)
+                    {
+                        view.navigateToHome();
+                        view.hideLoading();
+                    }
+                });
     }
 
     /* Helper Methods */
     private void initView()
     {
-        displaySummary(event);
+        view.init(userService.getSessionUser(), event, isLastMinute);
+        processEventActions();
 
-        view.showAttendeeLoading();
+        view.showLoading();
         Subscription subscription =
                 eventService
                         ._fetchDetailsCache(event.getId())
@@ -274,123 +295,56 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
                             public void onNext(EventDetails eventDetails)
                             {
                                 displayDetails(eventDetails);
-                                view.hideAttendeeLoading();
+                                view.hideLoading();
+
+                                processEditState();
+                                processDeleteVisibility();
                             }
                         });
 
         subscriptions.add(subscription);
     }
 
-    private void displaySummary(Event event)
+    private void processEventActions()
     {
-        if (view == null)
-        {
-            return;
-        }
-
-        view.displayEventSummary(event);
-        view.displayUserSummary(userService.getSessionUser());
-
         if (event.getRsvp() == Event.RSVP.YES)
         {
-            view.displayRsvp(true, isInvited());
+            view.displayYayActions();
         }
         else
         {
-            view.displayRsvp(false, isInvited());
+            view.displayNayActions(event.getInviterCount() > 0);
         }
+    }
 
-        if (event.getOrganizerId().equals(userService.getSessionUserId()))
-        {
-            view.disableRsvp();
-        }
+    private void processDeleteVisibility()
+    {
+        view.setDeleteVisibility(event.getOrganizerId().equals(userService.getSessionUserId()));
+    }
 
-        setEditAction();
+    private void processEditState()
+    {
+        view.setEditVisibility(event.getRsvp() == Event.RSVP.YES);
     }
 
     private void displayDetails(EventDetails eventDetails)
     {
         this.eventDetails = eventDetails;
-        view.displayDescription(eventDetails.getDescription());
-
         List<EventDetails.Attendee> attendees = eventDetails.getAttendees();
 
         if (event.getRsvp() == Event.RSVP.YES)
         {
             EventDetails.Attendee attendee = new EventDetails.Attendee();
             attendee.setId(userService.getSessionUserId());
-            if (attendees.contains(attendee))
-            {
-                EventDetails.Attendee self = attendees.remove(attendees.indexOf(attendee));
-                status = self.getStatus();
-            }
+            attendees.remove(attendee);
         }
-        else
-        {
-            status = null;
-        }
-        displayStatus(status);
 
         Collections.sort(attendees, new EventAttendeeComparator());
-        view.displayAttendeeList(attendees);
-
-        if (isEditClicked)
-        {
-            editEvent();
-        }
-    }
-
-    private void setEditAction()
-    {
-        if (event.getRsvp() == Event.RSVP.YES)
-        {
-            view.setEditActionState(true);
-        }
-        else
-        {
-            view.setEditActionState(false);
-        }
-    }
-
-    private void displayStatus(String status)
-    {
-        if (event.getRsvp() == Event.RSVP.YES)
-        {
-            if (isLastMinute)
-            {
-                view.displayLastMinuteStatus(status);
-            }
-            else
-            {
-                view.displayStatus(status);
-            }
-        }
-        else
-        {
-            view.hideStatus();
-        }
+        view.displayAttendees(attendees);
     }
 
     private void processIsLastMinute()
     {
         isLastMinute = DateTime.now().plusHours(1).isAfter(event.getStartTime());
-    }
-
-    private boolean isInvited()
-    {
-        return event.getInviterCount() > 0;
-    }
-
-    private void editEvent()
-    {
-        isEditClicked = false;
-        if (event.isFinalized() && !EventUtils.isOrganiser(event, userService.getSessionUserId()))
-        {
-            view.displayEventFinalizedMessage();
-        }
-        else
-        {
-            view.navigateToEditScreen(event, eventDetails);
-        }
     }
 }

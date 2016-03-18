@@ -95,7 +95,7 @@ public class EventFeedPresenterImpl implements EventFeedPresenter
     public void refreshEvents()
     {
         Subscription subscription = eventService
-                ._refreshEvents()
+                ._fetchEventsNetwork()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Event>>()
                 {

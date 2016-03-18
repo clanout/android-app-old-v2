@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="80dp"
     android:background="?android:attr/selectableItemBackground">
@@ -10,11 +9,9 @@
         android:id="@+id/llCategoryIconContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_margin="16dp"
         android:background="@color/category_icon_five"
-        android:gravity="center_vertical|center_horizontal"
+        android:gravity="center"
         android:padding="8dp">
 
         <ImageView
@@ -28,7 +25,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="16dp"
         android:layout_toRightOf="@id/llCategoryIconContainer">
 
         <TextView
@@ -65,7 +61,7 @@
             android:layout_marginTop="4dp"
             android:scaleType="center"
             app:materialIcon="checkbox_marked_circle_outline"
-            app:materialIconColor="@color/green"
+            app:materialIconColor="@color/rsvp_yes"
             app:materialIconSize="18dp"/>
 
     </RelativeLayout>
@@ -78,8 +74,8 @@
         android:layout_alignParentRight="true"
         android:background="@drawable/bg_accent_light"
         android:fontFamily="sans-serif-condensed"
-        android:paddingBottom="2dp"
         android:gravity="center_horizontal"
+        android:paddingBottom="2dp"
         android:paddingTop="2dp"
         android:text="TODAY"
         android:textColor="@color/white"
@@ -90,7 +86,6 @@
         android:layout_height="1dp"
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="80dp"
-        android:layout_marginTop="8dp"
         android:background="@color/divider"/>
 
 </RelativeLayout>

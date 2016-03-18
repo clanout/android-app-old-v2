@@ -118,7 +118,6 @@ public class CreateDetailsFragment extends BaseFragment implements
     View focusThief;
 
     ProgressDialog createProgressDialog;
-//    CreateEventLoadingDialog createProgressDialog;
 
     /* Data */
     DateTimeUtil dateTimeUtil;

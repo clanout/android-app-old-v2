@@ -97,7 +97,7 @@
                 android:layout_gravity="center"
                 android:scaleType="center"
                 app:materialIcon="alert"
-                app:materialIconColor="@color/yellow"
+                app:materialIconColor="@color/warning"
                 app:materialIconSize="36dp"/>
 
             <TextView

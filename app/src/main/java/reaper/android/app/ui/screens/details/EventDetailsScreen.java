@@ -11,5 +11,7 @@ public interface EventDetailsScreen
 
     void navigateToEditScreen(Event event, EventDetails eventDetails);
 
+    void navigateToHomeScreen();
+
     void setTitle(String title);
 }

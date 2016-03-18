@@ -137,7 +137,7 @@
                             android:layout_marginTop="8dp"
                             android:scaleType="center"
                             app:materialIcon="information_outline"
-                            app:materialIconColor="@color/dark_grey"
+                            app:materialIconColor="@color/grey"
                             app:materialIconSize="18dp"/>
 
                     </LinearLayout>

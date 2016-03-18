@@ -33,10 +33,11 @@
     <string name="action_account">Account</string>
     <string name="action_home">Home</string>
     <string name="action_edit_event">Edit</string>
-    <string name="action_finalize_event">Finalize Details</string>
+    <string name="action_finalize_event">Finalize</string>
+    <string name="action_unfinalize_event">Unfinalize</string>
     <string name="action_notification">Notifications</string>
     <string name="action_clear">Clear</string>
-    <string name="action_delete_event">Dismiss</string>
+    <string name="action_delete_event">Delete</string>
     <string name="action_save_event">Save</string>
     <string name="action_chat_load">Load</string>
 

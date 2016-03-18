@@ -6,36 +6,35 @@ import reaper.android.app.model.EventDetails;
 
 public class EventAttendeeComparator implements Comparator<EventDetails.Attendee>
 {
-    private String activeUser;
-
-    public EventAttendeeComparator(String activeUser)
-    {
-        this.activeUser = activeUser;
-    }
-
     @Override
-    public int compare(EventDetails.Attendee attendee, EventDetails.Attendee attendee2)
+    public int compare(EventDetails.Attendee first, EventDetails.Attendee second)
     {
-        if (attendee.getId().equals(activeUser))
+        if (first.isInviter() && second.isInviter())
+        {
+            if (first.isFriend() && !second.isFriend())
+            {
+                return -1;
+            }
+            else if (!first.isFriend() && second.isFriend())
+            {
+                return 1;
+            }
+            else
+            {
+                return first.getName().compareTo(second.getName());
+            }
+        }
+        else if (first.isInviter() && !second.isInviter())
         {
             return -1;
         }
-        else if (attendee2.getId().equals(activeUser))
-        {
-            return 1;
-        }
-
-        if (attendee.isFriend() && !attendee2.isFriend())
-        {
-            return -1;
-        }
-        else if (!attendee.isFriend() && attendee2.isFriend())
+        else if (!first.isInviter() && second.isInviter())
         {
             return 1;
         }
         else
         {
-            return attendee.getName().compareTo(attendee2.getName());
+            return first.getName().compareTo(second.getName());
         }
     }
 }

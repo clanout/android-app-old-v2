@@ -117,7 +117,7 @@
                     android:layout_marginLeft="16dp"
                     android:scaleType="center"
                     app:materialIcon="information_outline"
-                    app:materialIconColor="@color/dark_grey"
+                    app:materialIconColor="@color/grey"
                     app:materialIconSize="24dp"/>
 
                 <TextView

@@ -1,12 +1,8 @@
 package reaper.android.app.model;
 
-import com.google.gson.Gson;
-
 import org.joda.time.DateTime;
 
 import java.util.List;
-
-import reaper.android.app.api._core.GsonProvider;
 
 public class Event implements Model
 {
@@ -32,8 +28,9 @@ public class Event implements Model
     private DateTime endTime;
     private String organizerId;
     private Location location;
-    private String chatId;
     private DateTime lastUpdated;
+    private String description;
+    private String status;
 
     private RSVP rsvp;
     private int friendCount;
@@ -55,29 +52,14 @@ public class Event implements Model
         return title;
     }
 
-    public void setTitle(String title)
-    {
-        this.title = title;
-    }
-
     public Type getType()
     {
         return type;
     }
 
-    public void setType(Type type)
-    {
-        this.type = type;
-    }
-
     public String getCategory()
     {
         return category;
-    }
-
-    public void setCategory(String category)
-    {
-        this.category = category;
     }
 
     public List<String> getFriends()
@@ -92,7 +74,7 @@ public class Event implements Model
 
     public Boolean isFinalized()
     {
-        if(isFinalized == null)
+        if (isFinalized == null)
         {
             return false;
         }
@@ -104,19 +86,9 @@ public class Event implements Model
         return startTime;
     }
 
-    public void setStartTime(DateTime startTime)
-    {
-        this.startTime = startTime;
-    }
-
     public DateTime getEndTime()
     {
         return endTime;
-    }
-
-    public void setEndTime(DateTime endTime)
-    {
-        this.endTime = endTime;
     }
 
     public String getOrganizerId()
@@ -124,39 +96,14 @@ public class Event implements Model
         return organizerId;
     }
 
-    public void setOrganizerId(String organizerId)
-    {
-        this.organizerId = organizerId;
-    }
-
     public Location getLocation()
     {
         return location;
     }
 
-    public void setLocation(Location location)
-    {
-        this.location = location;
-    }
-
-    public String getChatId()
-    {
-        return chatId;
-    }
-
-    public void setChatId(String chatId)
-    {
-        this.chatId = chatId;
-    }
-
     public DateTime getLastUpdated()
     {
         return lastUpdated;
-    }
-
-    public void setLastUpdated(DateTime lastUpdated)
-    {
-        this.lastUpdated = lastUpdated;
     }
 
     public RSVP getRsvp()
@@ -194,6 +141,21 @@ public class Event implements Model
         this.isFinalized = isFinalized;
     }
 
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public String getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(String status)
+    {
+        this.status = status;
+    }
+
     @Override
     public int hashCode()
     {
@@ -211,16 +173,11 @@ public class Event implements Model
         if (!(o instanceof Event))
         {
             return false;
-        } else
+        }
+        else
         {
             Event other = (Event) o;
-            if (id.equals(other.id))
-            {
-                return true;
-            } else
-            {
-                return false;
-            }
+            return id.equals(other.id);
         }
     }
 
@@ -228,17 +185,5 @@ public class Event implements Model
     public String toString()
     {
         return title;
-    }
-
-    public boolean isEqualTo(Event event)
-    {
-        Gson gson = GsonProvider.getGson();
-        if (gson.toJson(event).equals(gson.toJson(this)))
-        {
-            return true;
-        } else
-        {
-            return false;
-        }
     }
 }

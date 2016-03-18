@@ -5,7 +5,8 @@ package reaper.android.app.config;
  */
 public class Dimensions
 {
-    public static final int EVENT_FEED_ICON_SIZE = 32;
+    public static final int DEFAULT_BUBBLE_SIZE = 32;
+
     public static final int EVENT_ICON_SIZE = 48;
     public static final int EVENT_DETAILS_ICON_SIZE = 36;
 }

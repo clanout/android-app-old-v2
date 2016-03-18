@@ -21,7 +21,7 @@
             android:layout_gravity="center"
             android:scaleType="center"
             app:materialIcon="alert"
-            app:materialIconColor="@color/dark_grey"
+            app:materialIconColor="@color/grey"
             app:materialIconSize="36dp"/>
 
         <TextView

@@ -12,8 +12,7 @@ public final class GenericCacheKeys
     public static final String CREATE_EVENT_SUGGESTIONS = "create_event_suggestions";
     public static final String CREATE_EVENT_SUGGESTIONS_UPDATE_TIMESTAMP = "create_event_suggestions_update_timestamp";
 
-    /* Feed */
-    public static final String FEED_LAST_UPDATE_TIMESTAMP = "last_update_timestamp";
+    /* Phonebook Contacts */
     public static final String PHONEBOOK_CONTACTS = "phonebook_contacts";
 
     private GenericCacheKeys()
