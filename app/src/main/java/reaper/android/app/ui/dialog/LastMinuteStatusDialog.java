@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import reaper.android.R;
@@ -40,11 +41,7 @@ public class LastMinuteStatusDialog
         final EditText status = (EditText) dialogView.findViewById(R.id.etStatus);
         ListView list = (ListView) dialogView.findViewById(R.id.lvStatus);
 
-        final List<String> statusList = new ArrayList<>();
-        statusList.add("On my way");
-        statusList.add("Running late");
-        statusList.add("Sorry, changed my mind");
-        statusList.add("Yippie-kai yay!");
+        final List<String> statusList = Arrays.asList(activity.getResources().getStringArray(R.array.last_moment_status));
 
         ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(activity, R.layout.item_text, statusList);
         list.setAdapter(statusAdapter);

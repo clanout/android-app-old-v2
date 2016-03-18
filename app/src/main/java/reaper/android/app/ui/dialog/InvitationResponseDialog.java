@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import reaper.android.R;
@@ -39,10 +40,7 @@ public class InvitationResponseDialog
                 .findViewById(R.id.etInvitationResponse);
         ListView list = (ListView) dialogView.findViewById(R.id.lvInvitationResponse);
 
-        final List<String> invitationResponses = new ArrayList<>();
-        invitationResponses.add("Not in mood");
-        invitationResponses.add("Sleeping");
-        invitationResponses.add("Fuck this clan and everyone in it");
+        final List<String> invitationResponses = Arrays.asList(activity.getResources().getStringArray(R.array.invitation_responses));
 
         ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(activity, R.layout.item_text, invitationResponses);
         list.setAdapter(statusAdapter);

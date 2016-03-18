@@ -28,7 +28,7 @@ public class WhatsappService_
         return instance;
     }
 
-    private static final String WHATSAPP_MESSAGE = "%s wants to clan out with you. Join %s at %s";
+    private static final String WHATSAPP_MESSAGE = "Let\'s plan our hangouts on ClanOut. Join me here @ %s";
     private static final String WHATSAPP_PACKAGE_NAME = "com.whatsapp";
 
     private UserService userService;
@@ -59,8 +59,7 @@ public class WhatsappService_
     public Intent getWhatsAppIntent()
     {
         String message = String
-                .format(WHATSAPP_MESSAGE, userService.getSessionUserName(), userService
-                        .getSessionUserName(), AppConstants.APP_LINK);
+                .format(WHATSAPP_MESSAGE, AppConstants.APP_LINK);
 
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
