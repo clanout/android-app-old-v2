@@ -608,7 +608,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
                         .setColor(ContextCompat
                                 .getColor(context, R.color.light_grey))
-                        .setSizeDp(24)
+                        .setSizeDp(Dimensions.PROFILE_PIC_DEFAULT)
                         .build();
             }
         }

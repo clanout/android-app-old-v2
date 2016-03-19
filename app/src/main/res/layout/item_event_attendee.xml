@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:background="@drawable/bg_accent_light"
+        android:background="@color/accent_light"
         android:fontFamily="sans-serif-condensed"
         android:gravity="center_horizontal"
         android:paddingBottom="2dp"

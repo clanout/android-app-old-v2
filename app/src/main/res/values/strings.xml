@@ -32,6 +32,7 @@
     <!-- Action Bar -->
     <string name="action_account">Account</string>
     <string name="action_home">Home</string>
+    <string name="action_create_event">Create</string>
     <string name="action_edit_event">Edit</string>
     <string name="action_finalize_event">Finalize</string>
     <string name="action_unfinalize_event">Unfinalize</string>
@@ -44,18 +45,18 @@
     <!-- Error Messages -->
     <string name="error_default">Looks like we messed up. While we fix this issue, go feed your dog.</string>
     <string name="error_facebook_login">Facebook login failed. Please try again.</string>
-    <string name="error_no_title">Please enter a plan name.</string>
-    <string name="error_invalid_start_time">Start time cannot be before the current time.</string>
+    <string name="error_no_title">Please enter a plan name</string>
+    <string name="error_invalid_start_time">Start time cannot be before the current time</string>
     <string name="error_rsvp_update">This action could not be completed. Please try again.</string>
     <string name="error_edit_finalized">You can no longer edit the plan. Creator has finalized the details.</string>
-    <string name="error_event_not_found">Unable to locate this plan.</string>
-    <string name="error_invalid_phone">Please enter a valid phone number.</string>
-    <string name="error_invite">Unable to show your friends.</string>
-    <string name="error_facebook_friends">Unable to show your friends. Refresh.</string>
+    <string name="error_event_not_found">Unable to locate this plan</string>
+    <string name="error_invalid_phone">Please enter a valid phone number</string>
+    <string name="error_invite">Unable to show your friends</string>
+    <string name="error_facebook_friends">Unable to show your friends</string>
     <string name="error_chat_not_sent"> Unable to send message. Resend.</string>
-    <string name="error_chat_not_fetched"> Unable to load conversations.</string>
-    <string name="error_no_whatsapp">WhatsApp is not installed on this device.</string>
-    <string name="error_notifications">Unable to load notifications.</string>
+    <string name="error_chat_not_fetched"> Unable to load conversations</string>
+    <string name="error_no_whatsapp">WhatsApp is not installed on this device</string>
+    <string name="error_notifications">Unable to load notifications</string>
 
     <!-- Common Strings -->
     <string name="retry">Retry</string>

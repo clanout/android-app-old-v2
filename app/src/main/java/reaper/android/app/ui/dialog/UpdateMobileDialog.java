@@ -38,6 +38,18 @@ public class UpdateMobileDialog
         final TextView tvInvalidPhoneError = (TextView) dialogView
                 .findViewById(R.id.tvInvalidPhoneError);
 
+        String mobileNumber = "";
+        try
+        {
+            mobileNumber = UserService.getInstance().getSessionUser().getMobileNumber()
+                                      .replace("+91", "");
+        }
+        catch (Exception e)
+        {
+        }
+        phoneNumber.setText(mobileNumber);
+        phoneNumber.setSelection(phoneNumber.length());
+
         phoneNumber.addTextChangedListener(new TextWatcher()
         {
             @Override

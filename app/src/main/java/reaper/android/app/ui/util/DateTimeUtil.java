@@ -99,15 +99,16 @@ public class DateTimeUtil
         return dayMap.get(name);
     }
 
-    public String formatTime(LocalTime time)
+    public static String formatTime(LocalTime time)
     {
         return time.toString(TIME_FORMATTER).toUpperCase();
     }
 
-    public String formatDate(LocalDate date)
+    public static String formatDate(LocalDate date)
     {
-        LocalDate today = now.toLocalDate();
+        LocalDate today = LocalDate.now();
         LocalDate tomorrow = today.plusDays(1);
+        LocalDate endOfWeek = today.plusDays(7);
         if (today.equals(date))
         {
             return TODAY;
@@ -116,13 +117,13 @@ public class DateTimeUtil
         {
             return TOMORROW;
         }
-        else if (date.isBefore(today))
+        else if (date.isBefore(endOfWeek))
         {
-            return date.toString(DATE_FORMATTER);
+            return date.toString(DAY_FORMATTER);
         }
         else
         {
-            return date.toString(DAY_FORMATTER);
+            return date.toString(DATE_FORMATTER);
         }
     }
 

@@ -326,7 +326,7 @@ public class InviteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 .with(Reaper.getReaperContext())
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
                 .setColor(ContextCompat.getColor(context, R.color.light_grey))
-                .setSizeDp(24)
+                .setSizeDp(Dimensions.PROFILE_PIC_DEFAULT)
                 .build();
     }
 }

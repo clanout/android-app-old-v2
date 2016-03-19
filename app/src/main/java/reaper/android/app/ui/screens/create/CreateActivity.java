@@ -52,12 +52,15 @@ public class CreateActivity extends BaseActivity implements CreateScreen
         setActionBar(appBarLayout);
         showActionBar();
         setScreenTitle(R.string.title_create);
-        setActionBarBackVisibility(true);
+
+        /* Close Action in toolbar */
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         /* Create View */
         EventCategory category = (EventCategory) getIntent().getSerializableExtra(ARG_CATEGORY);
 
-        CreateDetailsFragment fragment = CreateDetailsFragment.newInstance(category);
+        CreateFragment fragment = CreateFragment.newInstance(category);
 
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -79,7 +82,8 @@ public class CreateActivity extends BaseActivity implements CreateScreen
     public void onBackPressed()
     {
         /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE, GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_BACK);
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE, GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_BACK);
         /* Analytics */
 
         navigateToHomeScreen();

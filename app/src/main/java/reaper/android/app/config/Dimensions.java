@@ -10,6 +10,8 @@ public class Dimensions
     public static final int DP_TO_PX_MULTIPLIER = (int) (Resources.getSystem()
                                                                   .getDisplayMetrics().density);
 
+    public static final int ACTION_BAR_DP = 24;
+
     /*
      ** CATEGORY ICON
      */
@@ -19,6 +21,7 @@ public class Dimensions
 
     // Used in create screen
     public static final int CATEGORY_ICON_LARGE = 48;
+
 
     /*
      ** USER PROFILE PIC

@@ -82,7 +82,7 @@ public class AccountFragment extends BaseFragment
                 .with(getActivity())
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
                 .setColor(ContextCompat.getColor(getActivity(), R.color.light_grey))
-                .setSizeDp(36)
+                .setSizeDp(Dimensions.PROFILE_PIC_LARGE)
                 .build();
 
         Picasso.with(getActivity())
@@ -155,7 +155,8 @@ public class AccountFragment extends BaseFragment
                     .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_WHATSAPP_INVITE, GoogleAnalyticsConstants.LABEL_SUCCESS);
             /* Analytics */
 
-            startActivity(accountsService.getWhatsAppIntent());
+//            startActivity(accountsService.getWhatsAppIntent());
+            SnackbarFactory.create(getActivity(), R.string.disabled_for_beta);
         }
         else
         {
@@ -164,16 +165,9 @@ public class AccountFragment extends BaseFragment
                     .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_WHATSAPP_INVITE, GoogleAnalyticsConstants.LABEL_FAILURE);
             /* Analytics */
 
-            SnackbarFactory.create(getActivity(), R.string.error_no_whatsapp);
-        }
-        SnackbarFactory.create(getActivity(), R.string.disabled_for_beta);
-//        WhatsappService_ accountsService = WhatsappService_.getInstance();
-//        if (accountsService.isWhatsAppInstalled(getActivity())) {
-//            startActivity(accountsService.getWhatsAppIntent());
-//        }
-//        else {
 //            SnackbarFactory.create(getActivity(), R.string.error_no_whatsapp);
-//        }
+            SnackbarFactory.create(getActivity(), R.string.disabled_for_beta);
+        }
     }
 
     @OnClick(R.id.llFeedback)

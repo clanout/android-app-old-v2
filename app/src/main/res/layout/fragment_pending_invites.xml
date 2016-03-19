@@ -151,7 +151,7 @@
             android:layout_weight="1"
             android:text="Skip"
             android:textAlignment="center"
-            android:textColor="@drawable/text_btn_neutral"
+            android:textColor="@color/text_subtitle"
             android:textStyle="bold"/>
 
         <Button
@@ -162,7 +162,7 @@
             android:layout_weight="2"
             android:text="Fetch Invitations"
             android:textAlignment="center"
-            android:textColor="@drawable/text_btn_primary"
+            android:textColor="@color/primary"
             android:textStyle="bold"/>
 
         <Button
@@ -173,7 +173,7 @@
             android:layout_weight="2"
             android:text="Go To Home"
             android:textAlignment="center"
-            android:textColor="@drawable/text_btn_primary"
+            android:textColor="@color/primary"
             android:textStyle="bold"
             android:visibility="gone"/>
 

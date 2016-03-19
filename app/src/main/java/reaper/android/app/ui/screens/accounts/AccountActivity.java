@@ -17,6 +17,7 @@ import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui.screens.friends.FriendsActivity;
@@ -63,7 +64,8 @@ public class AccountActivity extends BaseActivity implements AccountScreen
     public void onBackPressed()
     {
         /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_BACK);
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_BACK);
         /* Analytics */
 
         super.onBackPressed();
@@ -80,7 +82,7 @@ public class AccountActivity extends BaseActivity implements AccountScreen
                 .with(this)
                 .setIcon(MaterialDrawableBuilder.IconValue.HOME)
                 .setColor(ContextCompat.getColor(this, R.color.white))
-                .setSizeDp(36)
+                .setSizeDp(Dimensions.ACTION_BAR_DP)
                 .build();
 
         menu.findItem(R.id.action_home).setIcon(homeDrawable);
@@ -91,7 +93,8 @@ public class AccountActivity extends BaseActivity implements AccountScreen
                 public boolean onMenuItemClick(MenuItem item)
                 {
                     /* Analytics */
-                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_BACK);
+                    AnalyticsHelper
+                            .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_BACK);
                     /* Analytics */
 
                     navigateToHomeScreen();

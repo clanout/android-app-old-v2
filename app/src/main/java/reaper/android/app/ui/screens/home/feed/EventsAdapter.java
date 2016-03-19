@@ -100,7 +100,9 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             });
 
             /* Analytics */
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_HOME, GoogleAnalyticsConstants.ACTION_OPEN_FEED_ITEM, String.valueOf(getAdapterPosition()));
+            AnalyticsHelper
+                    .sendEvents(GoogleAnalyticsConstants.CATEGORY_HOME, GoogleAnalyticsConstants.ACTION_OPEN_FEED_ITEM, String
+                            .valueOf(getAdapterPosition()));
             /* Analytics */
         }
 
@@ -123,13 +125,14 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 friends = new ArrayList<>();
             }
 
+            int friendsSize = friends.size();
             if (event.getFriendCount() == 0)
             {
                 tvFriendsGoing.setText(R.string.label_feed_no_friends);
             }
             else if (event.getFriendCount() == 1)
             {
-                if (friends.size() > 1)
+                if (friendsSize == 1)
                 {
                     tvFriendsGoing.setText(context
                             .getString(R.string.label_feed_one_friend, friends.get(0)));
@@ -141,20 +144,29 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             }
             else
             {
-                if (friends.size() > 0)
+                if (friendsSize > 0)
                 {
                     int otherCount = event.getFriendCount() - 1;
-                    if (otherCount > 1)
+                    if (otherCount == 1)
                     {
-                        tvFriendsGoing.setText(context
-                                .getString(R.string.label_feed_multiple_friend_multiple_other,
-                                        friends.get(0), otherCount));
+                        if (friendsSize == 2)
+                        {
+                            tvFriendsGoing.setText(context
+                                    .getString(R.string.label_feed_two_friend,
+                                            friends.get(0), friends.get(1)));
+                        }
+                        else
+                        {
+                            tvFriendsGoing.setText(context
+                                    .getString(R.string.label_feed_multiple_friend_one_other,
+                                            friends.get(0)));
+                        }
                     }
                     else
                     {
                         tvFriendsGoing.setText(context
-                                .getString(R.string.label_feed_multiple_friend_one_other,
-                                        friends.get(0)));
+                                .getString(R.string.label_feed_multiple_friend_multiple_other,
+                                        friends.get(0), otherCount));
                     }
                 }
                 else

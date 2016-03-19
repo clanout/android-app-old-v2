@@ -74,7 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Not Going?"
-            android:textColor="@drawable/text_btn_neutral"/>
+            android:textColor="@color/text_subtitle"/>
 
         <Button
             android:id="@+id/btnJoin"

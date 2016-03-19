@@ -23,6 +23,7 @@ import reaper.android.R;
 import reaper.android.app.communication.Communicator;
 import reaper.android.app.communication.NewNotificationReceivedTrigger;
 import reaper.android.app.communication.NewNotificationsAvailableTrigger;
+import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.service.NotificationService;
@@ -101,7 +102,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
                 .setIcon(MaterialDrawableBuilder.IconValue.BELL)
                 .setColor(ContextCompat
                         .getColor(this, R.color.white))
-                .setSizeDp(24)
+                .setSizeDp(Dimensions.ACTION_BAR_DP)
                 .build();
 
         if (notification != null)
@@ -136,7 +137,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
                     .setIcon(MaterialDrawableBuilder.IconValue.BELL)
                     .setColor(ContextCompat
                             .getColor(this, R.color.white))
-                    .setSizeDp(24)
+                    .setSizeDp(Dimensions.ACTION_BAR_DP)
                     .build();
         }
         notification.setIcon(notificationIcon);
@@ -146,7 +147,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
                     .with(this)
                     .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
                     .setColor(ContextCompat.getColor(this, R.color.white))
-                    .setSizeDp(24)
+                    .setSizeDp(Dimensions.ACTION_BAR_DP)
                     .build());
 
         notification
@@ -192,7 +193,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
                 .setIcon(MaterialDrawableBuilder.IconValue.BELL)
                 .setColor(ContextCompat
                         .getColor(this, R.color.accent))
-                .setSizeDp(24)
+                .setSizeDp(Dimensions.ACTION_BAR_DP)
                 .build();
 
         if (notification != null)
@@ -210,7 +211,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
                 .setIcon(MaterialDrawableBuilder.IconValue.BELL)
                 .setColor(ContextCompat
                         .getColor(HomeActivity.this, R.color.accent))
-                .setSizeDp(24)
+                .setSizeDp(Dimensions.ACTION_BAR_DP)
                 .build();
 
         if (notification != null)

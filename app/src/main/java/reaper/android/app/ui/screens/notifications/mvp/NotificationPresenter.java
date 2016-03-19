@@ -12,5 +12,5 @@ public interface NotificationPresenter
 
     void onNotificationDeleted(int position);
 
-    void onDeleteAll();
+    void deleteAll();
 }

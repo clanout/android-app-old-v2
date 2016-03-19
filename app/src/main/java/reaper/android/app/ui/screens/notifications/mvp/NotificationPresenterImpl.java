@@ -102,7 +102,7 @@ public class NotificationPresenterImpl implements NotificationPresenter
     }
 
     @Override
-    public void onDeleteAll()
+    public void deleteAll()
     {
         view.displayNoNotificationsMessage();
         notificationService.deleteAllNotificationsFromCache();

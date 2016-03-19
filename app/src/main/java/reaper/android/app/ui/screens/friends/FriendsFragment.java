@@ -133,7 +133,8 @@ public class FriendsFragment extends BaseFragment implements
     public void displayNoFriendsMessage()
     {
         /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_MANAGE_FRIENDS, GoogleAnalyticsConstants.ACTION_NO_FRIENDS, null);
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.CATEGORY_MANAGE_FRIENDS, GoogleAnalyticsConstants.ACTION_NO_FRIENDS, null);
         /* Analytics */
 
         tvMessage.setText(R.string.no_facebook_friends);
@@ -186,7 +187,8 @@ public class FriendsFragment extends BaseFragment implements
     private void initSearch()
     {
         /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_MANAGE_FRIENDS, GoogleAnalyticsConstants.ACTION_SEARCH, GoogleAnalyticsConstants.LABEL_ATTEMPT);
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.CATEGORY_MANAGE_FRIENDS, GoogleAnalyticsConstants.ACTION_SEARCH, GoogleAnalyticsConstants.LABEL_ATTEMPT);
         /* Analytics */
 
         search = new TextWatcher()
@@ -199,6 +201,8 @@ public class FriendsFragment extends BaseFragment implements
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count)
             {
+                String query = s.toString().toLowerCase();
+
                 List<Friend> visibleLocalFriends = new ArrayList<>();
                 List<Friend> visibleOtherFriends = new ArrayList<>();
 
@@ -207,18 +211,28 @@ public class FriendsFragment extends BaseFragment implements
                     visibleLocalFriends = new ArrayList<>();
                     for (Friend friend : localFriends)
                     {
-                        if (friend.getName().toLowerCase().contains(s.toString().toLowerCase()))
+                        String[] nameTokens = friend.getName().toLowerCase().split(" ");
+                        for (String nameToken : nameTokens)
                         {
-                            visibleLocalFriends.add(friend);
+                            if (nameToken.startsWith(query))
+                            {
+                                visibleLocalFriends.add(friend);
+                                break;
+                            }
                         }
                     }
 
                     visibleOtherFriends = new ArrayList<>();
                     for (Friend friend : otherFriends)
                     {
-                        if (friend.getName().toLowerCase().contains(s.toString().toLowerCase()))
+                        String[] nameTokens = friend.getName().toLowerCase().split(" ");
+                        for (String nameToken : nameTokens)
                         {
-                            visibleOtherFriends.add(friend);
+                            if (nameToken.startsWith(query))
+                            {
+                                visibleOtherFriends.add(friend);
+                                break;
+                            }
                         }
                     }
 

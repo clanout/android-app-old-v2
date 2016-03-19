@@ -365,6 +365,8 @@ public class EventDetailsFragment extends BaseFragment implements
         if (loading != null)
         {
             loading.setVisible(isLoadingVisible);
+            setEditVisibility(false);
+            setDeleteVisibility(false);
         }
     }
 

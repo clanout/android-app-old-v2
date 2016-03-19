@@ -14,9 +14,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:layout_marginRight="4dp"
             android:text="@string/event_type_open"
+            android:textAllCaps="true"
             android:textColor="@color/text_title"
             android:textSize="16sp"
             android:textStyle="bold"/>
@@ -24,25 +23,22 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/event_type_open_description"
-            android:textColor="@color/text_subtitle"
-            android:textSize="16sp"/>
+            android:layout_marginTop="8dp"
+            android:text="@string/event_type_open_description"/>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_margin="16dp"
         android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:layout_marginRight="4dp"
             android:text="@string/event_type_secret"
+            android:textAllCaps="true"
             android:textColor="@color/text_title"
             android:textSize="16sp"
             android:textStyle="bold"/>
@@ -50,9 +46,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/event_type_secret_description"
-            android:textColor="@color/text_subtitle"
-            android:textSize="16sp"/>
+            android:layout_marginTop="8dp"
+            android:text="@string/event_type_secret_description"/>
 
     </LinearLayout>
 

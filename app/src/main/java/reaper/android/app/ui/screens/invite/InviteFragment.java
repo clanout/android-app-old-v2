@@ -26,6 +26,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
@@ -40,7 +41,6 @@ import reaper.android.app.ui.screens.invite.mvp.InvitePresenterImpl;
 import reaper.android.app.ui.screens.invite.mvp.InviteView;
 import reaper.android.app.ui.screens.invite.mvp.PhonebookContactInviteWrapper;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
-import reaper.android.common._debugger.TraceDebugger;
 import reaper.android.common.analytics.AnalyticsHelper;
 
 public class InviteFragment extends BaseFragment implements
@@ -194,7 +194,7 @@ public class InviteFragment extends BaseFragment implements
                 .setIcon(MaterialDrawableBuilder.IconValue.CELLPHONE_ANDROID)
                 .setColor(ContextCompat
                         .getColor(getActivity(), R.color.white))
-                .setSizeDp(36)
+                .setSizeDp(Dimensions.ACTION_BAR_DP)
                 .build();
         addPhone.setIcon(addPhoneIcon);
 
@@ -203,7 +203,7 @@ public class InviteFragment extends BaseFragment implements
                 .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
                 .setColor(ContextCompat
                         .getColor(getActivity(), R.color.white))
-                .setSizeDp(36)
+                .setSizeDp(Dimensions.ACTION_BAR_DP)
                 .build();
         refresh.setIcon(refreshIcon);
 
@@ -235,7 +235,8 @@ public class InviteFragment extends BaseFragment implements
                 });
 
                 /* Analytics */
-                AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_UPDATE_PHONE_DIALOG_FROM_INVITE);
+                AnalyticsHelper
+                        .sendScreenNames(GoogleAnalyticsConstants.SCREEN_UPDATE_PHONE_DIALOG_FROM_INVITE);
                 /* Analytics */
 
                 return true;
@@ -446,7 +447,7 @@ public class InviteFragment extends BaseFragment implements
                 .setIcon(MaterialDrawableBuilder.IconValue.REFRESH)
                 .setColor(ContextCompat
                         .getColor(getActivity(), R.color.white))
-                .setSizeDp(36)
+                .setSizeDp(Dimensions.ACTION_BAR_DP)
                 .build();
         refresh.setIcon(refreshIcon);
     }
@@ -482,6 +483,8 @@ public class InviteFragment extends BaseFragment implements
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count)
             {
+                String query = s.toString().toLowerCase();
+
                 List<FriendInviteWrapper> visibleFriends = new ArrayList<>();
                 List<PhonebookContactInviteWrapper> visibleContacts = new ArrayList<>();
 
@@ -490,20 +493,28 @@ public class InviteFragment extends BaseFragment implements
                     visibleFriends = new ArrayList<>();
                     for (FriendInviteWrapper friend : friends)
                     {
-                        if (friend.getFriend().getName().toLowerCase()
-                                  .contains(s.toString().toLowerCase()))
+                        String[] nameTokens = friend.getFriend().getName().toLowerCase().split(" ");
+                        for (String nameToken : nameTokens)
                         {
-                            visibleFriends.add(friend);
+                            if (nameToken.startsWith(query))
+                            {
+                                visibleFriends.add(friend);
+                                break;
+                            }
                         }
                     }
 
                     visibleContacts = new ArrayList<>();
                     for (PhonebookContactInviteWrapper contact : contacts)
                     {
-                        if (contact.getPhonebookContact().getName().toLowerCase()
-                                   .contains(s.toString().toLowerCase()))
+                        String[] nameTokens = contact.getPhonebookContact().getName().toLowerCase().split(" ");
+                        for (String nameToken : nameTokens)
                         {
-                            visibleContacts.add(contact);
+                            if (nameToken.startsWith(query))
+                            {
+                                visibleContacts.add(contact);
+                                break;
+                            }
                         }
                     }
 

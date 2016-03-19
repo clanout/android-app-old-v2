@@ -1,7 +1,9 @@
 package reaper.android.app.ui.screens.notifications;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -14,22 +16,22 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.Dimensions;
 import reaper.android.app.model.NotificationWrapper;
-import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.dialog.DefaultDialog;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationPresenter;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationPresenterImpl;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationView;
-import reaper.android.app.model.Notification;
-import reaper.android.common.analytics.AnalyticsHelper;
 
 public class NotificationFragment extends BaseFragment implements
         NotificationView,
@@ -54,13 +56,17 @@ public class NotificationFragment extends BaseFragment implements
     @Bind(R.id.loading)
     ProgressBar loading;
 
-    /* Lifecycle Methds */
+    MenuItem clearAll;
+    boolean isClearAllVisible;
+
+    /* Lifecycle Methods */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
+        isClearAllVisible = true;
 
         /* Services */
         NotificationService notificationService = NotificationService.getInstance();
@@ -108,13 +114,25 @@ public class NotificationFragment extends BaseFragment implements
         menu.clear();
         inflater.inflate(R.menu.menu_notification, menu);
 
-        MenuItem clear = menu.findItem(R.id.action_clear);
-        clear.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        Drawable drawable = MaterialDrawableBuilder
+                .with(getActivity())
+                .setIcon(MaterialDrawableBuilder.IconValue.NOTIFICATION_CLEAR_ALL)
+                .setColor(ContextCompat.getColor(getActivity(), R.color.white))
+                .setSizeDp(Dimensions.ACTION_BAR_DP)
+                .build();
+
+        clearAll = menu.findItem(R.id.action_clear);
+        clearAll.setIcon(drawable);
+        clearAll.setVisible(isClearAllVisible);
+        clearAll.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
-                presenter.onDeleteAll();
+                if (presenter != null)
+                {
+                    presenter.deleteAll();
+                }
                 return true;
             }
         });
@@ -132,6 +150,12 @@ public class NotificationFragment extends BaseFragment implements
     @Override
     public void displayNotifications(List<NotificationWrapper> notifications)
     {
+        isClearAllVisible = true;
+        if (clearAll != null)
+        {
+            clearAll.setVisible(isClearAllVisible);
+        }
+
         rvNotifications.setAdapter(new NotificationAdapter(getActivity(), notifications, this));
 
         rvNotifications.setVisibility(View.VISIBLE);
@@ -163,6 +187,12 @@ public class NotificationFragment extends BaseFragment implements
     @Override
     public void displayNoNotificationsMessage()
     {
+        isClearAllVisible = false;
+        if (clearAll != null)
+        {
+            clearAll.setVisible(isClearAllVisible);
+        }
+
         tvNoNotifications.setVisibility(View.VISIBLE);
         loading.setVisibility(View.GONE);
         rvNotifications.setVisibility(View.GONE);
