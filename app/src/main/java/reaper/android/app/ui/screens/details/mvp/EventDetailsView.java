@@ -30,7 +30,7 @@ public interface EventDetailsView
 
     void navigateToChat(String eventId);
 
-    void navigateToEdit(Event event, EventDetails eventDetails);
+    void navigateToEdit(Event event);
 
     void navigateToHome();
 }

@@ -14,7 +14,6 @@ import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
-import reaper.android.app.model.EventDetails;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui.screens.details.EventDetailsActivity;
 import reaper.android.app.ui.screens.home.HomeActivity;
@@ -23,18 +22,16 @@ import reaper.android.common.analytics.AnalyticsHelper;
 public class EditEventActivity extends BaseActivity implements EditEventScreen
 {
     private static final String ARG_EVENT = "arg_event";
-    private static final String ARG_EVENT_DETAILS = "arg_event_details";
 
-    public static Intent callingIntent(Context context, Event event, EventDetails eventDetails)
+    public static Intent callingIntent(Context context, Event event)
     {
-        if (event == null || eventDetails == null)
+        if (event == null)
         {
-            throw new IllegalStateException("event/event_details is null");
+            throw new IllegalStateException("eventis null");
         }
 
         Intent intent = new Intent(context, EditEventActivity.class);
         intent.putExtra(ARG_EVENT, event);
-        intent.putExtra(ARG_EVENT_DETAILS, eventDetails);
         return intent;
     }
 
@@ -59,17 +56,17 @@ public class EditEventActivity extends BaseActivity implements EditEventScreen
         setActionBar(appBarLayout);
         showActionBar();
         setScreenTitle(R.string.title_edit);
-        setActionBarBackVisibility(true);
+
+        /* Close Action in toolbar */
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         /* Edit View */
         Event event = (Event) getIntent().getSerializableExtra(ARG_EVENT);
-        EventDetails eventDetails = (EventDetails) getIntent()
-                .getSerializableExtra(ARG_EVENT_DETAILS);
 
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content,
-                EditEventFragment.newInstance(event, eventDetails));
+        fragmentTransaction.replace(R.id.content, EditEventFragment.newInstance(event));
         fragmentTransaction.commit();
     }
 

@@ -10,6 +10,7 @@ import com.squareup.picasso.Picasso;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
+import java.util.Collections;
 import java.util.List;
 
 import reaper.android.R;
@@ -56,6 +57,8 @@ public class FriendBubbles
                        @Override
                        public void onNext(List<Friend> friends)
                        {
+                           Collections.shuffle(friends);
+
                            int i = 0;
                            for (Friend friend : friends)
                            {

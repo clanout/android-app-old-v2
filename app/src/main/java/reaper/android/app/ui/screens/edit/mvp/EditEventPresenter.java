@@ -2,7 +2,7 @@ package reaper.android.app.ui.screens.edit.mvp;
 
 import org.joda.time.DateTime;
 
-import reaper.android.app.model.LocationSuggestion;
+import reaper.android.app.model.Location;
 
 public interface EditEventPresenter
 {
@@ -10,23 +10,5 @@ public interface EditEventPresenter
 
     void detachView();
 
-    void finalizeEvent();
-
-    void unfinalizeEvent();
-
-    void delete();
-
-    void edit();
-
-    void updateTime(DateTime newTime);
-
-    void autocomplete(String s);
-
-    void fetchSuggestions();
-
-    void selectSuggestion(LocationSuggestion locationSuggestion);
-
-    void setLocationName(String locationName);
-
-    void setDescription(String description);
+    void edit(DateTime starTime, Location location, String description);
 }

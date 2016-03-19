@@ -20,7 +20,7 @@
     <!-- Screen Titles -->
     <string name="title_home">@string/app_name</string>
     <string name="title_create">Make a Plan</string>
-    <string name="title_edit">Edit Details</string>
+    <string name="title_edit">Edit Plan</string>
     <string name="title_details">Plan</string>
     <string name="title_account">Account</string>
     <string name="title_friends">Manage Friends</string>
@@ -210,9 +210,9 @@
     <string name="event_lock_positive_button">Finalize</string>
 
     <!-- Event Delete Dialog -->
-    <string name="event_delete_title">Dismiss Plan</string>
+    <string name="event_delete_title">Delete Plan</string>
     <string name="event_delete_message">This will delete all information related to this plan. And it will be removed from everyone\'s feed.</string>
-    <string name="event_delete_positive_button">Dismiss</string>
+    <string name="event_delete_positive_button">Delete</string>
     <string name="event_delete_negative_button">Cancel</string>
 
     <!-- Event Removed Dialog -->

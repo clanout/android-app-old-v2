@@ -201,7 +201,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     @Override
     public void edit()
     {
-        view.navigateToEdit(event, eventDetails);
+        view.navigateToEdit(event);
     }
 
     @Override

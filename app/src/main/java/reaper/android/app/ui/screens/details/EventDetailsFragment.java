@@ -446,9 +446,9 @@ public class EventDetailsFragment extends BaseFragment implements
     }
 
     @Override
-    public void navigateToEdit(Event event, EventDetails eventDetails)
+    public void navigateToEdit(Event event)
     {
-        screen.navigateToEditScreen(event, eventDetails);
+        screen.navigateToEditScreen(event);
     }
 
     @Override

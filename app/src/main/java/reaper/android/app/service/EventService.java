@@ -320,7 +320,8 @@ public class EventService
                                                 catch (Exception e)
                                                 {
                                                     /* Analytics */
-                                                    AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_P,null,false);
+                                                    AnalyticsHelper
+                                                            .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_P, null, false);
                                                     /* Analytics */
                                                 }
                                             }
@@ -414,9 +415,13 @@ public class EventService
 
     /* Edit */
     public Observable<Integer> _editEvent(final String eventId, DateTime startTime, DateTime
-            endTime,
-                                          Location placeLocation, String description)
+            endTime, Location placeLocation, String description)
     {
+        if (startTime == null && placeLocation.getZone() == null && description == null)
+        {
+            return Observable.just(0);
+        }
+
         final EditEventApiRequest request = new EditEventApiRequest(placeLocation
                 .getLongitude(), description, endTime, eventId, placeLocation
                 .getLatitude(), placeLocation.getName(), placeLocation
@@ -478,7 +483,8 @@ public class EventService
                                catch (Exception e)
                                {
                                    /* Analytics */
-                                   AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Q,null,false);
+                                   AnalyticsHelper
+                                           .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Q, null, false);
                                    /* Analytics */
 
                                    return -1;
@@ -643,7 +649,8 @@ public class EventService
                         catch (Exception e)
                         {
                             /* Analytics */
-                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_R,null,false);
+                            AnalyticsHelper
+                                    .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_R, null, false);
                             /* Analytics */
                         }
 

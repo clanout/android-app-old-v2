@@ -155,9 +155,9 @@ public class EventDetailsActivity extends BaseActivity implements
     }
 
     @Override
-    public void navigateToEditScreen(Event event, EventDetails eventDetails)
+    public void navigateToEditScreen(Event event)
     {
-        startActivity(EditEventActivity.callingIntent(this, event, eventDetails));
+        startActivity(EditEventActivity.callingIntent(this, event));
         finish();
     }
 

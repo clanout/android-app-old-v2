@@ -110,10 +110,8 @@ public class CreateFragment extends BaseFragment implements
     ProgressDialog createProgressDialog;
 
     /* Data */
-    DateTimeUtil dateTimeUtil;
     LocalTime startTime;
     LocalDate startDate;
-
     EventCategory selectedCategory;
 
     /* Lifecycle Methods */
@@ -294,14 +292,13 @@ public class CreateFragment extends BaseFragment implements
 
         if (presenter != null)
         {
+            // TODO : Location selection (create)
             presenter.create(eventTitle, type, selectedCategory, eventDescription, start, null);
         }
     }
 
     private void initView()
     {
-        dateTimeUtil = new DateTimeUtil();
-
         // Start Time
         startTime = LocalTime.now().plusHours(1).withMinuteOfHour(0);
         tvTime.setText(DateTimeUtil.formatTime(startTime));
