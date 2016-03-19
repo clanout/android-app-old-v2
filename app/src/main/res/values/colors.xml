@@ -4,14 +4,9 @@
     <color name="primary">#E53B4A</color>
     <color name="primary_dark">#B22E3A</color>
     <color name="primary_light">#BBE53B4A</color>
+
     <color name="accent">#048AFF</color>
     <color name="accent_light">#50ADFF</color>
-
-    <!--<color name="accent_light_blue">#04CDFF</color>-->
-    <!--<color name="accent_dark_blue">#1C7FB2</color>-->
-    <!--<color name="accent_yellow">#FFDC00</color>-->
-    <!--<color name="accent_cyan">#0097a7</color>-->
-    <!--<color name="accent_secondary">#EF9A9B</color>-->
 
     <!-- Fonts -->
     <color name="text_title">#444</color>
