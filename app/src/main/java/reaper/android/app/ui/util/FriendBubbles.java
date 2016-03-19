@@ -13,6 +13,7 @@ import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 import java.util.List;
 
 import reaper.android.R;
+import reaper.android.app.config.Dimensions;
 import reaper.android.app.model.Friend;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.FacebookService_;
@@ -63,7 +64,8 @@ public class FriendBubbles
                                    ivFriend1.setVisibility(View.VISIBLE);
 
                                    Picasso.with(context)
-                                          .load(FacebookService_.getFriendPicUrl(friend.getId()))
+                                          .load(FacebookService_.getProfilePicUrl(friend
+                                                  .getId(), Dimensions.PROFILE_PIC_DEFAULT))
                                           .placeholder(MaterialDrawableBuilder
                                                   .with(context)
                                                   .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
@@ -79,7 +81,8 @@ public class FriendBubbles
                                    ivFriend2.setVisibility(View.VISIBLE);
 
                                    Picasso.with(context)
-                                          .load(FacebookService_.getFriendPicUrl(friend.getId()))
+                                          .load(FacebookService_.getProfilePicUrl(friend
+                                                  .getId(), Dimensions.PROFILE_PIC_DEFAULT))
                                           .placeholder(MaterialDrawableBuilder
                                                   .with(context)
                                                   .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)
@@ -95,7 +98,8 @@ public class FriendBubbles
                                    ivFriend3.setVisibility(View.VISIBLE);
 
                                    Picasso.with(context)
-                                          .load(FacebookService_.getFriendPicUrl(friend.getId()))
+                                          .load(FacebookService_.getProfilePicUrl(friend
+                                                  .getId(), Dimensions.PROFILE_PIC_DEFAULT))
                                           .placeholder(MaterialDrawableBuilder
                                                   .with(context)
                                                   .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_CIRCLE)

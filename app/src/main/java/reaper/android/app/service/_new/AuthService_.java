@@ -174,7 +174,6 @@ public class AuthService_
                         user.setMobileNumber(response.getMobileNumber());
                         user.setGender(response.getGender());
 
-                        user.setProfilePicUrl(FacebookService_.getProfilePicUrl(user.getId()));
                         user.setCoverPicUrl(coverPicUrl);
 
                         return user;

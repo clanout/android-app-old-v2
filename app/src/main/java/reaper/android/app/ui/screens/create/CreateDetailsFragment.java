@@ -477,7 +477,7 @@ public class CreateDetailsFragment extends BaseFragment implements
     {
         selectedCategory = category;
         ivCategoryIcon.setImageDrawable(CategoryIconFactory
-                .get(selectedCategory, Dimensions.EVENT_ICON_SIZE));
+                .get(selectedCategory, Dimensions.CATEGORY_ICON_LARGE));
         llCategoryIconContainer
                 .setBackground(CategoryIconFactory.getIconBackground(selectedCategory));
 

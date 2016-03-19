@@ -1,7 +1,5 @@
 package reaper.android.app.model;
 
-import reaper.android.app.service._new.FacebookService_;
-
 public class Friend implements Model
 {
     private String id;
@@ -28,11 +26,6 @@ public class Friend implements Model
     public void setId(String id)
     {
         this.id = id;
-    }
-
-    public String getProfilePicUrl()
-    {
-        return FacebookService_.getFriendPicUrl(id);
     }
 
     public String getName()

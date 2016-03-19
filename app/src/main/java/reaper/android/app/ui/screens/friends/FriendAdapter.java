@@ -20,9 +20,11 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Friend;
 import reaper.android.app.root.Reaper;
+import reaper.android.app.service._new.FacebookService_;
 import reaper.android.app.ui.screens.friends.mvp.FriendsView;
 import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.common.analytics.AnalyticsHelper;
@@ -56,12 +58,12 @@ public class FriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         this.blockListener = blockListener;
 
         size = 0;
-        if(!localFriends.isEmpty())
+        if (!localFriends.isEmpty())
         {
             size += (localFriends.size() + 1);
         }
 
-        if(!otherFriends.isEmpty())
+        if (!otherFriends.isEmpty())
         {
             size += (otherFriends.size() + 1);
         }
@@ -190,7 +192,8 @@ public class FriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         public void render(final Friend friend)
         {
             Picasso.with(context)
-                   .load(friend.getProfilePicUrl())
+                   .load(FacebookService_
+                           .getProfilePicUrl(friend.getId(), Dimensions.PROFILE_PIC_DEFAULT))
                    .placeholder(personDrawable)
                    .transform(new CircleTransform())
                    .into(userPic);
@@ -214,7 +217,8 @@ public class FriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 {
 
                     /* Analytics */
-                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_MANAGE_FRIENDS,GoogleAnalyticsConstants.ACTION_BLOCK_OR_UNBLOCK, null);
+                    AnalyticsHelper
+                            .sendEvents(GoogleAnalyticsConstants.CATEGORY_MANAGE_FRIENDS, GoogleAnalyticsConstants.ACTION_BLOCK_OR_UNBLOCK, null);
                     /* Analytics */
 
 

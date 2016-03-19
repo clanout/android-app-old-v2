@@ -38,8 +38,7 @@ public class FacebookService_
     }
 
     public static List<String> PERMISSIONS = Arrays.asList("email", "user_friends");
-    private static final String PROFILE_PIC_URL = "https://graph.facebook.com/v2.4/$$$/picture?height=1000";
-    private static final String FRIEND_PIC_URL = "https://graph.facebook.com/v2.4/$$$/picture?width=500";
+    private static final String PROFILE_PIC_URL = "https://graph.facebook.com/v2.4/$$$/picture?width=^^^&height=^^^";
 
     private FacebookApi facebookApi;
 
@@ -97,14 +96,11 @@ public class FacebookService_
                 .subscribeOn(Schedulers.newThread());
     }
 
-    public static String getProfilePicUrl(String userId)
+    public static String getProfilePicUrl(String userId, int size)
     {
-        return PROFILE_PIC_URL.replace("$$$", userId);
-    }
-
-    public static String getFriendPicUrl(String userId)
-    {
-        return FRIEND_PIC_URL.replace("$$$", userId);
+        String profilePicUrl = PROFILE_PIC_URL.replace("$$$", userId);
+        profilePicUrl = profilePicUrl.replace("^^^", String.valueOf(size));
+        return profilePicUrl;
     }
 
     public Observable<List<String>> getFriends()
@@ -155,7 +151,8 @@ public class FacebookService_
                                                         {
 
                                                             /* Analytics */
-                                                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_F,null,false);
+                                                            AnalyticsHelper
+                                                                    .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_F, null, false);
                                                             /* Analytics */
 
                                                             subscriber.onNext(null);
@@ -202,7 +199,8 @@ public class FacebookService_
                                                                                 {
 
                                                                                     /* Analytics */
-                                                                                    AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_G,null,false);
+                                                                                    AnalyticsHelper
+                                                                                            .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_G, null, false);
                                                                                     /* Analytics */
 
                                                                                     subscriber.onNext(null);

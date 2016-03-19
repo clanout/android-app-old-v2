@@ -43,8 +43,8 @@
             android:layout_below="@+id/llProfilePicContainer"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="8dp"
-            android:textColor="@color/white"
             android:text="mdhjkshdk"
+            android:textColor="@color/white"
             android:textSize="22sp"
             android:textStyle="bold"/>
     </RelativeLayout>

@@ -21,7 +21,9 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.config.Dimensions;
 import reaper.android.app.root.Reaper;
+import reaper.android.app.service._new.FacebookService_;
 import reaper.android.app.ui.screens.invite.mvp.FriendInviteWrapper;
 import reaper.android.app.ui.screens.invite.mvp.PhonebookContactInviteWrapper;
 import reaper.android.app.ui.util.CircleTransform;
@@ -227,7 +229,8 @@ public class InviteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         public void render(final FriendInviteWrapper friend)
         {
             Picasso.with(context)
-                   .load(friend.getFriend().getProfilePicUrl())
+                   .load(FacebookService_.getProfilePicUrl(friend.getFriend()
+                                                                 .getId(), Dimensions.PROFILE_PIC_DEFAULT))
                    .placeholder(personDrawable)
                    .transform(new CircleTransform())
                    .into(ivProfilePic);

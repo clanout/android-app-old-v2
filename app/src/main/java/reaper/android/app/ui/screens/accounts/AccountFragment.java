@@ -18,10 +18,12 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import reaper.android.R;
+import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.User;
-import reaper.android.app.service._new.WhatsappService_;
 import reaper.android.app.service.UserService;
+import reaper.android.app.service._new.FacebookService_;
+import reaper.android.app.service._new.WhatsappService_;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.dialog.FeedbackDialog;
 import reaper.android.app.ui.dialog.UpdateMobileDialog;
@@ -92,7 +94,8 @@ public class AccountFragment extends BaseFragment
                .into(ivCoverPic);
 
         Picasso.with(getActivity())
-               .load(sessionUser.getProfilePicUrl())
+               .load(FacebookService_
+                       .getProfilePicUrl(sessionUser.getId(), Dimensions.PROFILE_PIC_LARGE))
                .placeholder(personDrawable)
                .fit()
                .centerCrop()
@@ -115,15 +118,20 @@ public class AccountFragment extends BaseFragment
     public void onUpdateMobileClicked()
     {
         /* Analytics */
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_UPDATE_PHONE_DIALOG_FROM_ACCOUNTS);
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_UPDATE_MOBILE);
+        AnalyticsHelper
+                .sendScreenNames(GoogleAnalyticsConstants.SCREEN_UPDATE_PHONE_DIALOG_FROM_ACCOUNTS);
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_UPDATE_MOBILE);
         /* Analytics */
 
-        UpdateMobileDialog.show(getActivity(), new UpdateMobileDialog.Listener() {
+        UpdateMobileDialog.show(getActivity(), new UpdateMobileDialog.Listener()
+        {
             @Override
-            public void onSuccess(String mobileNumber) {
+            public void onSuccess(String mobileNumber)
+            {
                 /* Analytics */
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_UPDATE_PHONE, GoogleAnalyticsConstants.LABEL_SUCCESS);
+                AnalyticsHelper
+                        .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_UPDATE_PHONE, GoogleAnalyticsConstants.LABEL_SUCCESS);
                 /* Analytics */
             }
         });
@@ -134,21 +142,26 @@ public class AccountFragment extends BaseFragment
     public void onWhatsAppInviteClicked()
     {
         /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_WHATSAPP_INVITE);
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_WHATSAPP_INVITE);
         /* Analytics */
 
 
         WhatsappService_ accountsService = WhatsappService_.getInstance();
-        if (accountsService.isWhatsAppInstalled(getActivity())) {
+        if (accountsService.isWhatsAppInstalled(getActivity()))
+        {
             /* Analytics */
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_WHATSAPP_INVITE, GoogleAnalyticsConstants.LABEL_SUCCESS);
+            AnalyticsHelper
+                    .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_WHATSAPP_INVITE, GoogleAnalyticsConstants.LABEL_SUCCESS);
             /* Analytics */
 
             startActivity(accountsService.getWhatsAppIntent());
         }
-        else {
+        else
+        {
             /* Analytics */
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_WHATSAPP_INVITE, GoogleAnalyticsConstants.LABEL_FAILURE);
+            AnalyticsHelper
+                    .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_WHATSAPP_INVITE, GoogleAnalyticsConstants.LABEL_FAILURE);
             /* Analytics */
 
             SnackbarFactory.create(getActivity(), R.string.error_no_whatsapp);
@@ -168,7 +181,8 @@ public class AccountFragment extends BaseFragment
     {
         /* Analytics */
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_FEEDBACK_DIALOG);
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_FEEDBACK);
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_FEEDBACK);
         /* Analytics */
 
         FeedbackDialog.show(getActivity(), new FeedbackDialog.Listener()
@@ -177,7 +191,9 @@ public class AccountFragment extends BaseFragment
             public void onSuccess(int feedbackType, String comment)
             {
                 /* Analytics */
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_FEEDBACK, GoogleAnalyticsConstants.LABEL_SUCCESS + "-" + String.valueOf(feedbackType));
+                AnalyticsHelper
+                        .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_FEEDBACK, GoogleAnalyticsConstants.LABEL_SUCCESS + "-" + String
+                                .valueOf(feedbackType));
                 /* Analytics */
 
             }
@@ -186,7 +202,8 @@ public class AccountFragment extends BaseFragment
             public void onCancel()
             {
                 /* Analytics */
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_FEEDBACK, GoogleAnalyticsConstants.LABEL_CANCEL);
+                AnalyticsHelper
+                        .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_FEEDBACK, GoogleAnalyticsConstants.LABEL_CANCEL);
                 /* Analytics */
             }
         });
@@ -196,7 +213,8 @@ public class AccountFragment extends BaseFragment
     public void onFaqClicked()
     {
         /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_FAQ);
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_FAQ);
         /* Analytics */
 
         SnackbarFactory.create(getActivity(), R.string.disabled_for_beta);

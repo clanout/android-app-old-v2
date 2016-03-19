@@ -13,7 +13,6 @@ public class User implements Model
     private String email;
     private String mobileNumber;
     private String gender;
-    private String profilePicUrl;
     private String coverPicUrl;
 
     public boolean isNewUser()
@@ -99,16 +98,6 @@ public class User implements Model
     public void setGender(String gender)
     {
         this.gender = gender;
-    }
-
-    public String getProfilePicUrl()
-    {
-        return profilePicUrl;
-    }
-
-    public void setProfilePicUrl(String profilePicUrl)
-    {
-        this.profilePicUrl = profilePicUrl;
     }
 
     public String getCoverPicUrl()

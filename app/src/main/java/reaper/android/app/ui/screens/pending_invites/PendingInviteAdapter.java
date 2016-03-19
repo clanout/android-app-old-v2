@@ -93,7 +93,7 @@ public class PendingInviteAdapter extends RecyclerView.Adapter<PendingInviteAdap
             // Icon
             EventCategory category = EventCategory.valueOf(event.getCategory());
             ivCategoryIcon.setImageDrawable(CategoryIconFactory
-                    .get(category, Dimensions.DEFAULT_BUBBLE_SIZE));
+                    .get(category, Dimensions.CATEGORY_ICON_DEFAULT));
             llCategoryIconContainer.setBackground(CategoryIconFactory.getIconBackground(category));
 
             // Inviter count

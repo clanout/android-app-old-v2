@@ -35,7 +35,6 @@ import reaper.android.app.service._new.FacebookService_;
 import reaper.android.app.ui.util.CategoryIconFactory;
 import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.DateTimeUtil;
-import timber.log.Timber;
 
 public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
@@ -228,7 +227,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             // Category Icon
             EventCategory category = EventCategory.valueOf(event.getCategory());
             ivCategoryIcon.setImageDrawable(CategoryIconFactory
-                    .get(category, Dimensions.DEFAULT_BUBBLE_SIZE));
+                    .get(category, Dimensions.CATEGORY_ICON_DEFAULT));
             llCategoryIconContainer
                     .setBackground(CategoryIconFactory.getIconBackground(category));
 
@@ -263,57 +262,58 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             String description = event.getDescription();
             if (!TextUtils.isEmpty(description))
             {
+                tvDescription.setText(description);
+
+                Layout l = tvDescription.getLayout();
+                if (l != null)
+                {
+                    int lines = l.getLineCount();
+                    if (lines > 0)
+                    {
+                        if (l.getEllipsisCount(lines - 1) > 0)
+                        {
+                            int start = l.getLineStart(0);
+                            int end = l.getLineEnd(1);
+
+                            String descStr = description.substring(start, end - 1);
+                            if (descStr.charAt(descStr.length() - 1) == '\n')
+                            {
+                                descStr = descStr.substring(0, descStr.length() - 1);
+                            }
+
+                            if (descStr.length() < 60)
+                            {
+                                descStr = descStr + "…" + "more";
+                            }
+                            else
+                            {
+                                descStr = descStr.substring(0, 56) + "more";
+                            }
+
+                            int spanStartIndex = descStr.length() - 4;
+                            int spanEndIndex = descStr.length();
+                            Spannable spannable = new SpannableString(descStr);
+                            spannable.setSpan(new ForegroundColorSpan(ContextCompat
+                                            .getColor(context, R.color.accent)), spanStartIndex, spanEndIndex,
+                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            tvDescription.setText(spannable);
+
+                            llDescription.setOnClickListener(new View.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(View v)
+                                {
+                                    if (listener != null)
+                                    {
+                                        listener.onDescriptionClicked(event.getDescription());
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+
                 llDescription.setVisibility(View.VISIBLE);
-
-                if (description.length() < 60 && !description.contains("\n"))
-                {
-                    tvDescription.setText(description);
-                }
-                else
-                {
-                    // TODO : fix for description containing \n
-
-                    Layout l = tvDescription.getLayout();
-                    if (l != null)
-                    {
-                        int lines = l.getLineCount();
-                        if (lines > 0)
-                        {
-                            if (l.getEllipsisCount(lines - 1) > 0)
-                            {
-
-                                Timber.v(">>>> Text is ellipsized : " + l.getEllipsisStart(lines-1));
-                            }
-                        }
-                    }
-
-                    int len = description.length() < 60 ? description.length() : 60;
-                    int lastIndex = description.substring(0, len).lastIndexOf(" ");
-                    if (lastIndex == -1)
-                    {
-                        lastIndex = description.substring(0, len).lastIndexOf("\n");
-                    }
-                    String descStr = description.substring(0, lastIndex) + "... more";
-                    int spanStartIndex = descStr.length() - 4;
-                    int spanEndIndex = descStr.length();
-                    Spannable spannable = new SpannableString(descStr);
-                    spannable.setSpan(new ForegroundColorSpan(ContextCompat
-                                    .getColor(context, R.color.accent)), spanStartIndex, spanEndIndex,
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    tvDescription.setText(spannable);
-
-                    llDescription.setOnClickListener(new View.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(View v)
-                        {
-                            if (listener != null)
-                            {
-                                listener.onDescriptionClicked(event.getDescription());
-                            }
-                        }
-                    });
-                }
             }
             else
             {
@@ -445,7 +445,8 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             .build();
 
             Picasso.with(context)
-                   .load(sessionUser.getProfilePicUrl())
+                   .load(FacebookService_
+                           .getProfilePicUrl(sessionUser.getId(), Dimensions.PROFILE_PIC_DEFAULT))
                    .placeholder(placeHolder)
                    .transform(new CircleTransform())
                    .into(ivProfilePic);
@@ -616,7 +617,8 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         {
             // Profile Pic
             Picasso.with(context)
-                   .load(FacebookService_.getFriendPicUrl(attendee.getId()))
+                   .load(FacebookService_
+                           .getProfilePicUrl(attendee.getId(), Dimensions.PROFILE_PIC_DEFAULT))
                    .placeholder(personDrawable)
                    .transform(new CircleTransform())
                    .into(ivPic);

@@ -356,7 +356,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView,
         // Category
         EventCategory category = EventCategory.valueOf(event.getCategory());
         ivCategoryIcon.setImageDrawable(CategoryIconFactory
-                .get(category, Dimensions.EVENT_ICON_SIZE));
+                .get(category, Dimensions.CATEGORY_ICON_DEFAULT));
         llCategoryIconContainer
                 .setBackground(CategoryIconFactory.getIconBackground(category));
 

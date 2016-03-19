@@ -28,7 +28,7 @@ public class CreateEventSuggestion implements Model
 
     public Drawable getIcon()
     {
-        return CategoryIconFactory.get(category, Dimensions.EVENT_ICON_SIZE);
+        return CategoryIconFactory.get(category, Dimensions.CATEGORY_ICON_DEFAULT);
     }
 
     public Drawable getIconBackground()
