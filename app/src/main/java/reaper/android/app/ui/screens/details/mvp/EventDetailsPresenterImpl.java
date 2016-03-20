@@ -7,11 +7,11 @@ import java.util.List;
 
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
+import reaper.android.app.model.util.DateTimeUtil;
 import reaper.android.app.model.util.EventAttendeeComparator;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
-import reaper.android.app.ui.util.DateTimeUtil;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -164,7 +164,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
             status = "";
         }
 
-        if (!event.getStatus().equals(status))
+        if (!status.equals(event.getStatus()))
         {
             event.setStatus(status);
             view.resetEvent(event);

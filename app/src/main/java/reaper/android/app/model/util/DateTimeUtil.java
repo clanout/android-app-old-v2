@@ -1,4 +1,4 @@
-package reaper.android.app.ui.util;
+package reaper.android.app.model.util;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;

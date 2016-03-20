@@ -176,7 +176,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="8dp"
             android:layout_toRightOf="@id/tvInvite"
-            android:background="@drawable/bg_accent_light"
+            android:background="@drawable/bg_invite_count"
             android:paddingBottom="2dp"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"

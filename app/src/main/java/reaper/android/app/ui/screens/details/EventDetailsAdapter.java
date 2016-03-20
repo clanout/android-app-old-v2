@@ -34,7 +34,7 @@ import reaper.android.app.model.User;
 import reaper.android.app.service._new.FacebookService_;
 import reaper.android.app.ui.util.CategoryIconFactory;
 import reaper.android.app.ui.util.CircleTransform;
-import reaper.android.app.ui.util.DateTimeUtil;
+import reaper.android.app.model.util.DateTimeUtil;
 
 public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {

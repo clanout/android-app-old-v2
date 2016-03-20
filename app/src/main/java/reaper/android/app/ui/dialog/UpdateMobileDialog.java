@@ -13,7 +13,7 @@ import android.widget.TextView;
 import reaper.android.R;
 import reaper.android.app.config.AppConstants;
 import reaper.android.app.service.UserService;
-import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.app.model.util.PhoneUtils;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 
 public class UpdateMobileDialog

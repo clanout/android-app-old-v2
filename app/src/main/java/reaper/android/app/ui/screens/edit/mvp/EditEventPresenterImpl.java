@@ -5,7 +5,7 @@ import org.joda.time.DateTime;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.Location;
 import reaper.android.app.service.EventService;
-import reaper.android.app.ui.util.DateTimeUtil;
+import reaper.android.app.model.util.DateTimeUtil;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;

@@ -5,7 +5,7 @@ import android.content.res.Resources;
 /**
  * Created by Aditya on 15-09-2015.
  */
-public class Dimensions
+public final class Dimensions
 {
     public static final int DP_TO_PX_MULTIPLIER = (int) (Resources.getSystem()
                                                                   .getDisplayMetrics().density);
@@ -32,4 +32,8 @@ public class Dimensions
 
     // Used in account screen
     public static final int PROFILE_PIC_LARGE = DP_TO_PX_MULTIPLIER * 100;
+
+    private Dimensions()
+    {
+    }
 }

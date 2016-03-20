@@ -7,7 +7,7 @@ import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.Location;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service._new.LocationService_;
-import reaper.android.app.ui.util.DateTimeUtil;
+import reaper.android.app.model.util.DateTimeUtil;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;

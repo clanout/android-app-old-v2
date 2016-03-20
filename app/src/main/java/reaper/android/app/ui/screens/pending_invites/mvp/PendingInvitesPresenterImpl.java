@@ -8,7 +8,7 @@ import reaper.android.app.config.AppConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
-import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.app.model.util.PhoneUtils;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;

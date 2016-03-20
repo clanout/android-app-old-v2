@@ -23,7 +23,7 @@ import reaper.android.app.model.ChatMessage;
 import reaper.android.app.model.Event;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
-import reaper.android.app.ui.util.DateTimeUtil;
+import reaper.android.app.model.util.DateTimeUtil;
 import reaper.android.common.analytics.AnalyticsHelper;
 import rx.Observable;
 import rx.Subscriber;

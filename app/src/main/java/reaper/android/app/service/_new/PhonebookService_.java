@@ -23,7 +23,7 @@ import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.PhonebookContact;
 import reaper.android.app.model.util.PhonebookContactComparator;
-import reaper.android.app.ui.util.PhoneUtils;
+import reaper.android.app.model.util.PhoneUtils;
 import reaper.android.common.analytics.AnalyticsHelper;
 import rx.Observable;
 import rx.Subscriber;

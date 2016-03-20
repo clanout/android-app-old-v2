@@ -41,7 +41,7 @@ import reaper.android.app.ui.screens.edit.mvp.EditEventPresenter;
 import reaper.android.app.ui.screens.edit.mvp.EditEventPresenterImpl;
 import reaper.android.app.ui.screens.edit.mvp.EditEventView;
 import reaper.android.app.ui.util.CategoryIconFactory;
-import reaper.android.app.ui.util.DateTimeUtil;
+import reaper.android.app.model.util.DateTimeUtil;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 

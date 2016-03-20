@@ -1,4 +1,4 @@
-package reaper.android.app.ui.util;
+package reaper.android.app.model.util;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
