@@ -83,13 +83,13 @@ public class AlarmReceiver extends BroadcastReceiver
 
                         cleanFriendsCache();
 
-                        clearSuggestions();
+                        cleanSuggestions();
 
                     }
                 });
     }
 
-    private void clearSuggestions()
+    private void cleanSuggestions()
     {
         GenericCache genericCache = CacheManager.getGenericCache();
         DateTime suggestionsClearedTimestamp = genericCache.get(GenericCacheKeys.CREATE_EVENT_SUGGESTIONS_UPDATE_TIMESTAMP, DateTime.class);
