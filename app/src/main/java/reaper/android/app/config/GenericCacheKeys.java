@@ -15,6 +15,9 @@ public final class GenericCacheKeys
     /* Phonebook Contacts */
     public static final String PHONEBOOK_CONTACTS = "phonebook_contacts";
 
+    /*Friends*/
+    public static final String FRIENDS_CACHE_CLEARED_TIMESTAMP = "friends_cache_cleared_timestamp";
+
     private GenericCacheKeys()
     {
     }

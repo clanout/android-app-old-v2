@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.joda.time.Minutes;
 
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ import java.util.List;
 import reaper.android.R;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.event.EventCache;
+import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.MemoryCacheKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.ui._core.FlowEntry;
@@ -77,8 +80,49 @@ public class AlarmReceiver extends BroadcastReceiver
                             }
                         }
                         buildNotification(eventsToStartShortly, context);
+
+                        cleanFriendsCache();
+
+                        clearSuggestions();
+
                     }
                 });
+    }
+
+    private void clearSuggestions()
+    {
+        GenericCache genericCache = CacheManager.getGenericCache();
+        DateTime suggestionsClearedTimestamp = genericCache.get(GenericCacheKeys.CREATE_EVENT_SUGGESTIONS_UPDATE_TIMESTAMP, DateTime.class);
+
+        if(suggestionsClearedTimestamp == null) {
+            genericCache.delete(GenericCacheKeys.CREATE_EVENT_SUGGESTIONS);
+            genericCache.put(GenericCacheKeys.CREATE_EVENT_SUGGESTIONS_UPDATE_TIMESTAMP, DateTime.now());
+        }else{
+
+            if(Days.daysBetween(suggestionsClearedTimestamp, DateTime.now()).isGreaterThan(Days.days(7)))
+            {
+                genericCache.delete(GenericCacheKeys.CREATE_EVENT_SUGGESTIONS);
+                genericCache.put(GenericCacheKeys.CREATE_EVENT_SUGGESTIONS_UPDATE_TIMESTAMP, DateTime.now());
+            }
+        }
+    }
+
+    private void cleanFriendsCache()
+    {
+        GenericCache genericCache = CacheManager.getGenericCache();
+        DateTime friendCacheClearedTimeStamp = genericCache.get(GenericCacheKeys.FRIENDS_CACHE_CLEARED_TIMESTAMP, DateTime.class);
+
+        if(friendCacheClearedTimeStamp == null) {
+            CacheManager.clearFriendsCache();
+            genericCache.put(GenericCacheKeys.FRIENDS_CACHE_CLEARED_TIMESTAMP, DateTime.now());
+        }else{
+
+            if(Days.daysBetween(friendCacheClearedTimeStamp, DateTime.now()).isGreaterThan(Days.days(15)))
+            {
+                CacheManager.clearFriendsCache();
+                genericCache.put(GenericCacheKeys.FRIENDS_CACHE_CLEARED_TIMESTAMP, DateTime.now());
+            }
+        }
     }
 
     private List<Event> filterEvents(List<Event> events)
