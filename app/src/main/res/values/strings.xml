@@ -6,6 +6,7 @@
 
     <!-- Facebook SDK -->
     <string name="facebook_app_id">711701748936592</string>
+    <string name="places_app_id">AIzaSyDBX362r-1isovteBR3tGN3QQtDcQn-jyg</string>
 
     <!-- Event Type -->
     <string name="event_type_open">Open</string>
