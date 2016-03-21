@@ -29,6 +29,15 @@ android {
         generatedDensities = []
     }
 
+    signingConfigs {
+        release {
+            storeFile file("/Users/harsh/Documents/AndroidKeyStore.jks")
+            storePassword "live_strong"
+            keyAlias "ReaperTestKey"
+            keyPassword "live_strong"
+        }
+    }
+
     aaptOptions {
         additionalParameters "--no-version-vectors"
     }
@@ -37,6 +46,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
@@ -59,8 +69,8 @@ dependencies {
     compile 'com.android.support:multidex:1.0.0'
 
     // Debug
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.3.1'
-    debugCompile 'com.facebook.stetho:stetho:1.2.0'
+    compile 'com.squareup.leakcanary:leakcanary-android:1.3.1'
+    compile 'com.facebook.stetho:stetho:1.2.0'
 
     // Support Libraries
     compile 'com.android.support:support-v4:23.2.0'
