@@ -39,6 +39,8 @@ import reaper.android.app.config.Dimensions;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
+import reaper.android.app.model.Location;
+import reaper.android.app.model.util.DateTimeUtil;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.ui._core.BaseFragment;
@@ -48,14 +50,13 @@ import reaper.android.app.ui.screens.create.mvp.CreateEventPresenter;
 import reaper.android.app.ui.screens.create.mvp.CreateEventPresenterImpl;
 import reaper.android.app.ui.screens.create.mvp.CreateEventView;
 import reaper.android.app.ui.util.CategoryIconFactory;
-import reaper.android.app.model.util.DateTimeUtil;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 import reaper.android.app.ui.util.VisibilityAnimationUtil;
 import reaper.android.common.analytics.AnalyticsHelper;
 
 public class CreateFragment extends BaseFragment implements
-        CreateEventView
+        CreateEventView, LocationSelectionListener
 {
     private static final String ARG_CATEGORY = "arg_category";
 
@@ -113,6 +114,7 @@ public class CreateFragment extends BaseFragment implements
     LocalTime startTime;
     LocalDate startDate;
     EventCategory selectedCategory;
+    Location location;
 
     /* Lifecycle Methods */
     @Override
@@ -148,6 +150,13 @@ public class CreateFragment extends BaseFragment implements
     }
 
     @Override
+    public void onStart()
+    {
+        super.onStart();
+        screen.setLocationSelectionListener(this);
+    }
+
+    @Override
     public void onResume()
     {
         super.onResume();
@@ -159,6 +168,13 @@ public class CreateFragment extends BaseFragment implements
     {
         super.onPause();
         presenter.detachView();
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        screen.setLocationSelectionListener(null);
     }
 
     @Override
@@ -223,6 +239,19 @@ public class CreateFragment extends BaseFragment implements
     public void onCategoryClicked()
     {
         displayCategorySelectionDialog();
+    }
+
+    @OnClick(R.id.llLocation)
+    public void onLocationClicked()
+    {
+        screen.navigateToLocationSelectionScreen();
+    }
+
+    @Override
+    public void onLocationSelected(Location location)
+    {
+        this.location = location;
+        tvLocation.setText(location.getName());
     }
 
     /* View Methods */
@@ -292,8 +321,7 @@ public class CreateFragment extends BaseFragment implements
 
         if (presenter != null)
         {
-            // TODO : Location selection (create)
-            presenter.create(eventTitle, type, selectedCategory, eventDescription, start, null);
+            presenter.create(eventTitle, type, selectedCategory, eventDescription, start, location);
         }
     }
 

@@ -4,8 +4,8 @@ import org.joda.time.DateTime;
 
 import reaper.android.app.model.Event;
 import reaper.android.app.model.Location;
-import reaper.android.app.service.EventService;
 import reaper.android.app.model.util.DateTimeUtil;
+import reaper.android.app.service.EventService;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -56,14 +56,7 @@ public class EditEventPresenterImpl implements EditEventPresenter
             endTime = null;
         }
 
-        // TODO : Location selection (edit)
-        Location originalLocation = originalEvent.getLocation();
-        location = new Location();
-        location.setZone(originalLocation.getZone());
-        location.setLatitude(originalLocation.getLatitude());
-        location.setLongitude(originalLocation.getLongitude());
-        location.setName(originalLocation.getName());
-        if (originalEvent.getLocation().equals(location))
+        if (originalEvent.getLocation().equals(location) || location == null)
         {
             location = new Location();
         }

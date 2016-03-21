@@ -35,17 +35,18 @@ import reaper.android.app.config.Dimensions;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.Location;
+import reaper.android.app.model.util.DateTimeUtil;
 import reaper.android.app.service.EventService;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.screens.edit.mvp.EditEventPresenter;
 import reaper.android.app.ui.screens.edit.mvp.EditEventPresenterImpl;
 import reaper.android.app.ui.screens.edit.mvp.EditEventView;
 import reaper.android.app.ui.util.CategoryIconFactory;
-import reaper.android.app.model.util.DateTimeUtil;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
 
-public class EditEventFragment extends BaseFragment implements EditEventView
+public class EditEventFragment extends BaseFragment implements
+        EditEventView, LocationSelectionListener
 {
     private static final String ARG_EVENT = "arg_event";
 
@@ -97,6 +98,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView
     /* Data */
     LocalTime startTime;
     LocalDate startDate;
+    Location location;
 
     /* Lifecycle Methods */
     @Override
@@ -133,6 +135,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView
     {
         super.onStart();
         presenter.attachView(this);
+        screen.setLocationSelectionListener(this);
     }
 
     @Override
@@ -140,6 +143,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView
     {
         super.onStop();
         presenter.detachView();
+        screen.setLocationSelectionListener(null);
     }
 
     @Override
@@ -173,6 +177,19 @@ public class EditEventFragment extends BaseFragment implements EditEventView
     }
 
     /* Listeners */
+    @OnClick(R.id.llLocation)
+    public void onLocationClicked()
+    {
+        screen.navigateToLocationSelectionScreen();
+    }
+
+    @Override
+    public void onLocationSelected(Location location)
+    {
+        this.location = location;
+        tvLocation.setText(location.getName());
+    }
+
     @OnClick(R.id.llTime)
     public void onTimeClicked()
     {
@@ -287,7 +304,7 @@ public class EditEventFragment extends BaseFragment implements EditEventView
 
         if (presenter != null)
         {
-            presenter.edit(start, null, description);
+            presenter.edit(start, location, description);
         }
     }
 
