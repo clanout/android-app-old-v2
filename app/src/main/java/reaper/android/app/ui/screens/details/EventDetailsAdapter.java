@@ -31,10 +31,11 @@ import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.User;
+import reaper.android.app.model.util.DateTimeUtil;
 import reaper.android.app.service._new.FacebookService_;
 import reaper.android.app.ui.util.CategoryIconFactory;
 import reaper.android.app.ui.util.CircleTransform;
-import reaper.android.app.model.util.DateTimeUtil;
+import reaper.android.app.ui.util.FriendBubbles;
 
 public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
@@ -43,6 +44,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int TYPE_DETAILS = 0;
     private static final int TYPE_ME = 1;
     private static final int TYPE_ATTENDEES = 2;
+    private static final int TYPE_NO_ATTENDEES = 3;
 
     private Context context;
     private EventDetailsListener listener;
@@ -72,8 +74,15 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public void setAttendees(List<EventDetails.Attendee> attendees)
     {
-        this.attendees = attendees;
-        size = 2 + attendees.size();
+        if (attendees == null || attendees.isEmpty())
+        {
+            size = 3;
+        }
+        else
+        {
+            this.attendees = attendees;
+            size = 2 + attendees.size();
+        }
         notifyDataSetChanged();
     }
 
@@ -95,8 +104,13 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             case TYPE_ATTENDEES:
                 view = LayoutInflater.from(context)
-                                     .inflate(R.layout.item_event_attendee, parent, false);
-                return new AttendeeHolder(view);
+                                     .inflate(R.layout.item_event_details_attendee, parent, false);
+                return new AttendeeViewHolder(view);
+
+            case TYPE_NO_ATTENDEES:
+                view = LayoutInflater.from(context)
+                                     .inflate(R.layout.item_event_details_no_attendee, parent, false);
+                return new NoAttendeeViewHolder(view);
         }
 
         return null;
@@ -120,8 +134,12 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 int index = position - 2;
                 if (index >= 0)
                 {
-                    ((AttendeeHolder) holder).render(attendees.get(index));
+                    ((AttendeeViewHolder) holder).render(attendees.get(index));
                 }
+                break;
+
+            case TYPE_NO_ATTENDEES:
+                ((NoAttendeeViewHolder) holder).render();
                 break;
         }
     }
@@ -143,6 +161,17 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         {
             return TYPE_ME;
         }
+        else if (position == 2)
+        {
+            if (attendees == null || attendees.isEmpty())
+            {
+                return TYPE_NO_ATTENDEES;
+            }
+            else
+            {
+                return TYPE_ATTENDEES;
+            }
+        }
         else
         {
             return TYPE_ATTENDEES;
@@ -162,6 +191,8 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         void onStatusClicked(String oldStatus);
 
         void onLastMinuteStatusClicked(String oldStatus);
+
+        void onFriendsBubbleClicked();
     }
 
     public class EventDetailsViewHolder extends RecyclerView.ViewHolder
@@ -582,7 +613,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
     }
 
-    public class AttendeeHolder extends RecyclerView.ViewHolder
+    public class AttendeeViewHolder extends RecyclerView.ViewHolder
     {
         @Bind(R.id.ivPic)
         ImageView ivPic;
@@ -596,7 +627,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         @Bind(R.id.tvInvite)
         TextView tvInvite;
 
-        public AttendeeHolder(View itemView)
+        public AttendeeViewHolder(View itemView)
         {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -646,6 +677,36 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             {
                 tvInvite.setVisibility(View.GONE);
             }
+        }
+    }
+
+    public class NoAttendeeViewHolder extends RecyclerView.ViewHolder
+    {
+        @Bind(R.id.friendBubbles)
+        View friendBubbles;
+
+        public NoAttendeeViewHolder(View itemView)
+        {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+
+            friendBubbles.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    if (listener != null)
+                    {
+                        listener.onFriendsBubbleClicked();
+                    }
+                }
+            });
+        }
+
+        public void render()
+        {
+            FriendBubbles
+                    .render(context, friendBubbles, "No Attendees yet. Invite your %s friends.");
         }
     }
 }

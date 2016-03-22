@@ -27,15 +27,16 @@ public class FriendBubbles
 {
     public static void render(final Context context, final View friendBubbles, final String title)
     {
-        friendBubbles.setVisibility(View.GONE);
-
         final TextView tvTitle = (TextView) friendBubbles.findViewById(R.id.tvTitle);
-        View friendBubblesContainer = friendBubbles.findViewById(R.id.bubblesContainer);
+        final View friendBubblesContainer = friendBubbles.findViewById(R.id.bubblesContainer);
         final TextView tvOtherFriends = (TextView) friendBubbles.findViewById(R.id.tvOtherFriends);
 
         final ImageView ivFriend1 = (ImageView) friendBubblesContainer.findViewById(R.id.ivFriend1);
         final ImageView ivFriend2 = (ImageView) friendBubblesContainer.findViewById(R.id.ivFriend2);
         final ImageView ivFriend3 = (ImageView) friendBubblesContainer.findViewById(R.id.ivFriend3);
+
+        friendBubblesContainer.setVisibility(View.GONE);
+        tvOtherFriends.setVisibility(View.GONE);
 
         UserService userService = UserService.getInstance();
         userService._fetchLocalFacebookFriendsCache()
@@ -124,17 +125,13 @@ public class FriendBubbles
                                String zone = LocationService_.getInstance().getCurrentLocation()
                                                              .getZone();
                                tvTitle.setText(String.format(title, zone));
-                               friendBubbles.setVisibility(View.VISIBLE);
+                               friendBubblesContainer.setVisibility(View.VISIBLE);
 
                                if (friends.size() > 3)
                                {
                                    int other = friends.size() - 3;
                                    tvOtherFriends.setText("+" + other + " other friends");
                                    tvOtherFriends.setVisibility(View.VISIBLE);
-                               }
-                               else
-                               {
-                                   tvOtherFriends.setVisibility(View.GONE);
                                }
                            }
                        }

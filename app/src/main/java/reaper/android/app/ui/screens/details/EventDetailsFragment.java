@@ -31,6 +31,7 @@ import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.ui._core.BaseFragment;
 import reaper.android.app.ui.dialog.DefaultDialog;
+import reaper.android.app.ui.dialog.DescriptionDialog;
 import reaper.android.app.ui.dialog.InvitationResponseDialog;
 import reaper.android.app.ui.dialog.LastMinuteStatusDialog;
 import reaper.android.app.ui.dialog.StatusDialog;
@@ -310,32 +311,22 @@ public class EventDetailsFragment extends BaseFragment implements
     @Override
     public void onDescriptionClicked(String description)
     {
-        DefaultDialog.show(getActivity(),
-                "Description",
-                description,
-                DefaultDialog.BUTTON_DISABLED,
-                R.string.got_it,
-                true,
-                new DefaultDialog.Listener()
-                {
-                    @Override
-                    public void onPositiveButtonClicked()
-                    {
-
-                    }
-
-                    @Override
-                    public void onNegativeButtonClicked()
-                    {
-
-                    }
-                });
+        DescriptionDialog.show(getActivity(), description);
     }
 
     @Override
     public void onNavigationClicked(Location location)
     {
         startActivity(GoogleService_.getInstance().getGoogleMapsIntent(location));
+    }
+
+    @Override
+    public void onFriendsBubbleClicked()
+    {
+        if (presenter != null)
+        {
+            presenter.invite();
+        }
     }
 
     /* View Methods */

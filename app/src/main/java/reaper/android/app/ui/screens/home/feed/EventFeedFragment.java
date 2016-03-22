@@ -86,7 +86,7 @@ public class EventFeedFragment extends BaseFragment implements
         super.onActivityCreated(savedInstanceState);
         screen = (HomeScreen) getActivity();
 
-        FriendBubbles.render(getActivity(), friendBubbles, "Create a plan with your %s friends");
+        FriendBubbles.render(getActivity(), friendBubbles, "Make a plan with your %s friends");
         friendBubbles.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -180,7 +180,8 @@ public class EventFeedFragment extends BaseFragment implements
     private void initSwipeRefresh()
     {
         /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_HOME, GoogleAnalyticsConstants.ACTION_SWIPE_TO_REFRESH, null);
+        AnalyticsHelper
+                .sendEvents(GoogleAnalyticsConstants.CATEGORY_HOME, GoogleAnalyticsConstants.ACTION_SWIPE_TO_REFRESH, null);
         /* Analytics */
 
         srlFeed.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
