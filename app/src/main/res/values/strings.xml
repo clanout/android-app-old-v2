@@ -91,11 +91,11 @@
 
     <!-- Pending Invites Screen-->
     <!-- Fetch Pending Invites Dialog -->
-    <string name="fetch_pending_invites_message">Did you get an SMS invite from a friend? Enter your phone number to get any pending invitations.</string>
+    <string name="fetch_pending_invites_message">Did you get an SMS invite from a friend? Enter your phone number to fetch any pending invitations.</string>
 
     <!-- Chat Screen -->
     <string name="chat_message_label">Write a Message</string>
-    <string name="listview_loading">Loading earlier messages …</string>
+    <string name="listview_loading">Loading earlier messages…</string>
 
 
     <!-- Home Screen -->

@@ -154,36 +154,39 @@
         android:clickable="true">
 
         <View
+            android:id="@+id/ivShadow"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/light_grey"/>
+            android:layout_height="2dp"
+            android:background="@drawable/bottombar_shadow"/>
 
-        <TextView
-            android:id="@+id/tvInvite"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_centerInParent="true"
-            android:text="INVITE"
-            android:textAlignment="center"
-            android:textColor="@color/primary"
-            android:textSize="14sp"
-            android:textStyle="bold"/>
+            android:gravity="center"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tvInviteCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="8dp"
-            android:layout_toRightOf="@id/tvInvite"
-            android:background="@drawable/bg_invite_count"
-            android:paddingBottom="2dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:paddingTop="2dp"
-            android:textSize="12sp"
-            android:text="7"
-            android:textColor="@color/text_title_inverse"/>
+            <TextView
+                android:id="@+id/tvInvite"
+                style="@style/ActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Invite"/>
+
+            <TextView
+                android:id="@+id/tvInviteCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:background="@drawable/bg_invite_count"
+                android:paddingBottom="2dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="2dp"
+                android:text="7"
+                android:textColor="@color/text_title_inverse"
+                android:textSize="12sp"/>
+        </LinearLayout>
     </RelativeLayout>
 
 </LinearLayout>

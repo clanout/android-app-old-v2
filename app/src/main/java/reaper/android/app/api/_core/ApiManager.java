@@ -82,7 +82,7 @@ public class ApiManager
                                                                          .getToken());
                     }
                 })
-//                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build();
     }
 
