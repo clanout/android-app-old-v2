@@ -31,7 +31,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("/Users/aditya/codeX/projects/reaper/keystore/AndroidKeyStore.jks")
+            storeFile file("/Users/harsh/Documents/AndroidKeyStore.jks")
             storePassword "live_strong"
             keyAlias "ReaperTestKey"
             keyPassword "live_strong"
