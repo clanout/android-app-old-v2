@@ -34,6 +34,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     private Drawable eventRemovedDrawable;
     private Drawable eventInvitationDrawable;
     private Drawable alertDrawable;
+    private Drawable chatDrawable;
+    private Drawable updateDrawable;
+    private Drawable friendJoinedEventDrawable;
 
     public NotificationAdapter(Context context, List<NotificationWrapper> notifications, NotificationClickListener notificationClickListener)
     {
@@ -135,25 +138,27 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             switch (type)
             {
                 case NotificationWrapper.Type.EVENT_ACTIVITY:
-                    notificationIcon.setImageDrawable(alertDrawable);
                     tvTitle.setText(notification.getTitle());
                     int size = notification.getNotificationItems().size();
                     if (size >= 1)
                     {
                         llItem1.setVisibility(View.VISIBLE);
                         item = notification.getNotificationItems().get(0);
+                        renderIcon(item, notificationIcon);
                         renderItem(item, tvMessage1);
                     }
                     if (size >= 2)
                     {
                         llItem2.setVisibility(View.VISIBLE);
                         item = notification.getNotificationItems().get(1);
+                        notificationIcon.setImageDrawable(alertDrawable);
                         renderItem(item, tvMessage2);
                     }
                     if (size >= 3)
                     {
                         llItem3.setVisibility(View.VISIBLE);
                         item = notification.getNotificationItems().get(2);
+                        notificationIcon.setImageDrawable(alertDrawable);
                         renderItem(item, tvMessage3);
                     }
                     break;
@@ -216,8 +221,49 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
     }
 
+    private void renderIcon(NotificationWrapper.NotificationItem notificationItem, ImageView
+            notificationIcon)
+    {
+        switch (notificationItem.getType())
+        {
+            case NotificationWrapper.NotificationItem.Type.NEW_CHAT:
+                notificationIcon.setImageDrawable(chatDrawable);
+                break;
+
+            case NotificationWrapper.NotificationItem.Type.EVENT_UPDATED:
+                notificationIcon.setImageDrawable(updateDrawable);
+                break;
+
+            case NotificationWrapper.NotificationItem.Type.FRIEND_JOINED_EVENT:
+                notificationIcon.setImageDrawable(friendJoinedEventDrawable);
+                break;
+        }
+    }
+
     private void generateDrawables()
     {
+        friendJoinedEventDrawable = MaterialDrawableBuilder
+                .with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_MULTIPLE_PLUS)
+                .setColor(ContextCompat
+                        .getColor(context, R.color.white))
+                .build();
+
+        updateDrawable = MaterialDrawableBuilder
+                .with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.TABLE_EDIT)
+                .setColor(ContextCompat
+                        .getColor(context, R.color.white))
+                .build();
+
+        chatDrawable = MaterialDrawableBuilder
+                .with(context)
+                .setIcon(MaterialDrawableBuilder.IconValue.MESSAGE_TEXT)
+                .setColor(ContextCompat
+                        .getColor(context, R.color.white))
+                .build();
+
+
         friendAddedDrawable = MaterialDrawableBuilder
                 .with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.ACCOUNT_PLUS)
@@ -241,7 +287,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         alertDrawable = MaterialDrawableBuilder
                 .with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.ALERT_CIRCLE)
+                .setIcon(MaterialDrawableBuilder.IconValue.CALENDAR_BLANK)
                 .setColor(ContextCompat
                         .getColor(context, R.color.white))
                 .build();
