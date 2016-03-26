@@ -181,6 +181,9 @@ public class ChatService_
                     @Override
                     public void call(Throwable throwable)
                     {
+                        /* Analytics */
+                        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z1,null,false);
+
                         throwable.printStackTrace();
                     }
                 })

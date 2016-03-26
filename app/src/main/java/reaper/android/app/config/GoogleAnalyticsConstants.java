@@ -144,7 +144,18 @@ public class GoogleAnalyticsConstants
     public static final String METHOD_R = "r";
     public static final String METHOD_S = "s";
     public static final String METHOD_T = "t";
-
+    public static final String METHOD_Z1 = "z01";
+    public static final String METHOD_Z2 = "z02";
+    public static final String METHOD_Z3 = "z03";
+    public static final String METHOD_Z4 = "z04";
+    public static final String METHOD_Z5 = "z05";
+    public static final String METHOD_Z6= "z06";
+    public static final String METHOD_Z7 = "z07";
+    public static final String METHOD_Z8 = "z08";
+    public static final String METHOD_Z9 = "z09";
+    public static final String METHOD_Z10 = "z10";
+    public static final String METHOD_Z11 = "z11";
+    public static final String METHOD_Z12 = "z12";
 
 
     // Exception Location
