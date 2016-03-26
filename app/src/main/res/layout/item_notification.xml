@@ -32,8 +32,8 @@
                     android:id="@+id/ivNotificationIcon"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/intro_1"
                     android:padding="4dp"
+                    android:src="@drawable/intro_1"
                     />
             </LinearLayout>
         </LinearLayout>
@@ -50,6 +50,7 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:maxLines="1"
                 android:ellipsize="end"
                 android:text="Hello, World!"
                 android:textColor="@color/text_title"
@@ -127,8 +128,6 @@
                 android:textColor="@color/text_subtitle"
                 android:textSize="14sp"/>
         </LinearLayout>
-
-
     </LinearLayout>
 
     <View
