@@ -109,6 +109,9 @@ public class GoogleAnalyticsConstants
     public static final String ACTION_DONE = "done";
     public static final String ACTION_CANCEL = "cancel";
     public static final String ACTION_EDIT_DESCRIPTION = "edit_description";
+    public static final String ACTION_LOCATION_PERMISSION = "location_permission";
+    public static final String ACTION_REQUEST_LOCATION_PERMISSION_AGAIN = "request_location_permission_again";
+    public static final String ACTION_GO_TO_SETTINGS = "go_to_settings";
 
 
 
@@ -160,6 +163,10 @@ public class GoogleAnalyticsConstants
     public static final String LABEL_NO_ACTIVE_PENDING_INVITES = "no_active_pending_invites";
     public static final String LABEL_PENDING_INVITES_FOUND = "pending_invites_found";
     public static final String LABEL_EXPIRED_INVITES_FOUND = "expired_events_found";
+    public static final String LABEL_FROM_HOME = "from_home";
+    public static final String LABEL_FROM_PUSH_NOTIFICATION = "from_push_notification";
+    public static final String LABEL_FROM_APP_LAUNCH = "from_app_launch";
+
 
     public static final String LABEL_INVALID_PHONE = "invalid_phone";
 

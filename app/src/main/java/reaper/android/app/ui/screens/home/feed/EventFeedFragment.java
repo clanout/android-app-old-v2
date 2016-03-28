@@ -146,6 +146,8 @@ public class EventFeedFragment extends BaseFragment implements
         srlFeed.setRefreshing(false);
         rvFeed.setAdapter(new EventsAdapter(getActivity(), events, this));
         rvFeed.setVisibility(View.VISIBLE);
+
+
     }
 
     @Override
@@ -157,6 +159,10 @@ public class EventFeedFragment extends BaseFragment implements
         rvFeed.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
         tvServerError.setVisibility(View.GONE);
+
+        /* Analytics */
+        AnalyticsHelper.sendCustomDimension(3, "0");
+        /* Analytics */
     }
 
     @Override

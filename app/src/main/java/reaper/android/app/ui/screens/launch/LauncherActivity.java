@@ -233,12 +233,20 @@ public class LauncherActivity extends BaseActivity implements
     @Override
     public void onPermissionGranted(@PermissionHandler.Permissions int permission)
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_LOCATION_PERMISSION,GoogleAnalyticsConstants.LABEL_GRANTED);
+        /* Analytics */
+
         bootstrapPresenter.attachView(this);
     }
 
     @Override
     public void onPermissionDenied(@PermissionHandler.Permissions int permission)
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_LOCATION_PERMISSION,GoogleAnalyticsConstants.LABEL_DENIED);
+        /* Analytics */
+
         showBootstrapAction();
 
         tvActionMessage.setText(R.string.permission_location_message);
@@ -246,6 +254,10 @@ public class LauncherActivity extends BaseActivity implements
         tvAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_REQUEST_LOCATION_PERMISSION_AGAIN,null);
+                /* Analytics */
+
                 PermissionHandler
                         .requestPermission(LauncherActivity.this, PermissionHandler.Permissions.LOCATION);
             }
@@ -255,6 +267,10 @@ public class LauncherActivity extends BaseActivity implements
     @Override
     public void onPermissionPermanentlyDenied(@PermissionHandler.Permissions int permission)
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_LOCATION_PERMISSION,GoogleAnalyticsConstants.LABEL_PERMANENTLY_DENIED);
+        /* Analytics */
+
         showBootstrapAction();
 
         tvActionMessage.setText(R.string.permission_location_message);
@@ -262,6 +278,11 @@ public class LauncherActivity extends BaseActivity implements
         tvAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_GO_TO_SETTINGS,null);
+                /* Analytics */
+
+
                 LauncherActivity.this.gotoAppSettings();
             }
         });
@@ -652,18 +673,34 @@ public class LauncherActivity extends BaseActivity implements
         switch (flowEntry)
         {
             case FlowEntry.HOME:
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_HOME,GoogleAnalyticsConstants.ACTION_OPEN,GoogleAnalyticsConstants.LABEL_FROM_APP_LAUNCH);
+                /* Analytics */
+
                 startActivity(HomeActivity.callingIntent(this));
                 break;
 
             case FlowEntry.DETAILS:
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_OPEN,GoogleAnalyticsConstants.LABEL_FROM_PUSH_NOTIFICATION);
+                /* Analytics */
+
                 startActivity(EventDetailsActivity.callingIntent(this, eventId, false));
                 break;
 
             case FlowEntry.CHAT:
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CHAT,GoogleAnalyticsConstants.ACTION_OPEN,GoogleAnalyticsConstants.LABEL_FROM_PUSH_NOTIFICATION);
+                /* Analytics */
+
                 startActivity(ChatActivity.callingIntent(this, eventId));
                 break;
 
             case FlowEntry.NOTIFICATIONS:
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION,GoogleAnalyticsConstants.ACTION_OPEN,GoogleAnalyticsConstants.LABEL_FROM_PUSH_NOTIFICATION);
+                /* Analytics */
+
                 startActivity(NotificationActivity.callingIntent(this));
                 break;
         }

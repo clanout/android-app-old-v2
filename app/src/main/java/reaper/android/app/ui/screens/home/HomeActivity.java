@@ -158,6 +158,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
                     {
                         /* Analytics */
                         AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_HOME, GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants.LABEL_NOTIFICATION);
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_FROM_HOME);
                         /* Analytics */
 
                         navigateToNotificationScreen();

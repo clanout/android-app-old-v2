@@ -66,3 +66,15 @@ public class AnalyticsHelper
     }
 
 }
+
+/*
+User Zone:
+AnalyticsHelper.sendCustomDimension(1, userZone);
+
+local Friends Count:
+AnalyticsHelper.sendCustomDimension(2, localFriendCount);
+
+No. of plans in feed:
+AnalyticsHelper.sendCustomDimension(3, String.valueOf(events.size()));
+
+*/
