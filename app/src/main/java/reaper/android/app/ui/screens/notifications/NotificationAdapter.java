@@ -84,9 +84,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         @Bind(R.id.tvTitle)
         TextView tvTitle;
 
-        @Bind(R.id.llItem1)
-        View llItem1;
-
         @Bind(R.id.tvMessage1)
         TextView tvMessage1;
 
@@ -113,8 +110,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         {
             int type = notification.getType();
 
-            llItem1.setVisibility(View.GONE);
-
             ShapeDrawable circle = new ShapeDrawable(new OvalShape());
             circle.getPaint()
                     .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R.color.primary_light));
@@ -128,20 +123,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     int size = notification.getNotificationItems().size();
                     if (size == 1)
                     {
-                        llItem1.setVisibility(View.VISIBLE);
                         item = notification.getNotificationItems().get(0);
                         renderIcon(item, notificationIcon);
                         renderItem(item, tvMessage1);
                     }
                     else if (size == 2)
                     {
-                        llItem1.setVisibility(View.VISIBLE);
                         notificationIcon.setImageDrawable(alertDrawable);
                         displayMessage(notification.getNotificationItems(), tvMessage1);
                     }
                     else if (size >= 3)
                     {
-                        llItem1.setVisibility(View.VISIBLE);
                         notificationIcon.setImageDrawable(alertDrawable);
                         displayMessage(notification.getNotificationItems(), tvMessage1);
                     }
@@ -150,7 +142,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 case NotificationWrapper.Type.EVENT_INVITATION:
                     notificationIcon.setImageDrawable(eventInvitationDrawable);
                     tvTitle.setText(notification.getTitle());
-                    llItem1.setVisibility(View.VISIBLE);
                     item = notification.getNotificationItems().get(0);
                     renderItem(item, tvMessage1);
                     break;
@@ -158,7 +149,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 case NotificationWrapper.Type.EVENT_REMOVED:
                     notificationIcon.setImageDrawable(eventRemovedDrawable);
                     tvTitle.setText(notification.getTitle());
-                    llItem1.setVisibility(View.VISIBLE);
                     item = notification.getNotificationItems().get(0);
                     renderItem(item, tvMessage1);
                     break;
@@ -166,7 +156,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 case NotificationWrapper.Type.NEW_FRIEND_JOINED_APP:
                     notificationIcon.setImageDrawable(friendAddedDrawable);
                     tvTitle.setText("New Friends");
-                    llItem1.setVisibility(View.VISIBLE);
                     item = notification.getNotificationItems().get(0);
                     renderItem(item, tvMessage1);
                     break;

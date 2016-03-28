@@ -1,97 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:layout_marginTop="8dp"
-    android:orientation="vertical"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp">
+    android:layout_height="80dp">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/llNotificationIconContainer"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_margin="16dp"
+        android:background="@color/primary_light"
+        android:gravity="center"
+        android:padding="8dp">
 
-        <LinearLayout
-            android:id="@+id/llNotificationIconBigContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="16dp">
-
-            <LinearLayout
-                android:id="@+id/llNotificationIconContainer"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center_vertical|center_horizontal"
-                android:gravity="center_vertical|center_horizontal"
-                >
-
-                <ImageView
-                    android:id="@+id/ivNotificationIcon"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:padding="4dp"
-                    android:src="@drawable/intro_1"
-                    />
-            </LinearLayout>
-        </LinearLayout>
-
-        <RelativeLayout
-            android:id="@+id/rlNotificationContentContainer"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_toRightOf="@+id/llNotificationIconBigContainer"
-            android:layout_weight="1"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:id="@+id/tvTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="Hello, World!"
-                android:textColor="@color/text_title"
-                android:textSize="16sp"/>
-
-        </RelativeLayout>
+        <ImageView
+            android:id="@+id/ivNotificationIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:src="@drawable/intro_1"/>
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="56dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="16dp"
+        android:layout_toRightOf="@id/llNotificationIconContainer"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/llItem1"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tvTitle"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Hello, World!"
+            android:textColor="@color/text_title"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tvMessage1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/tvMessage1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:fontFamily="sans-serif-light"
-                android:text="New Updates"
-                android:textColor="@color/text_subtitle"
-                android:textSize="14sp"/>
-        </LinearLayout>
-
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-light"
+            android:text="New Updates"
+            android:textColor="@color/text_subtitle"
+            android:textSize="14sp"/>
 
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
         android:layout_marginTop="16dp"
         android:background="@color/divider"/>
-</LinearLayout>
+</RelativeLayout>
