@@ -121,7 +121,7 @@ public class AccountFragment extends BaseFragment
         AnalyticsHelper
                 .sendScreenNames(GoogleAnalyticsConstants.SCREEN_UPDATE_PHONE_DIALOG_FROM_ACCOUNTS);
         AnalyticsHelper
-                .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_UPDATE_MOBILE);
+                .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants.LABEL_UPDATE_MOBILE);
         /* Analytics */
 
         UpdateMobileDialog.show(getActivity(), new UpdateMobileDialog.Listener()
@@ -143,7 +143,7 @@ public class AccountFragment extends BaseFragment
     {
         /* Analytics */
         AnalyticsHelper
-                .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_WHATSAPP_INVITE);
+                .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants.LABEL_WHATSAPP_INVITE);
         /* Analytics */
 
 
@@ -176,7 +176,7 @@ public class AccountFragment extends BaseFragment
         /* Analytics */
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_FEEDBACK_DIALOG);
         AnalyticsHelper
-                .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_FEEDBACK);
+                .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants.LABEL_FEEDBACK);
         /* Analytics */
 
         FeedbackDialog.show(getActivity(), new FeedbackDialog.Listener()
@@ -208,7 +208,7 @@ public class AccountFragment extends BaseFragment
     {
         /* Analytics */
         AnalyticsHelper
-                .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_FAQ);
+                .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants.LABEL_FAQ);
         /* Analytics */
 
         SnackbarFactory.create(getActivity(), R.string.disabled_for_beta);

@@ -2,10 +2,12 @@ package reaper.android.app.ui.screens.edit.mvp;
 
 import org.joda.time.DateTime;
 
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.util.DateTimeUtil;
 import reaper.android.app.service.EventService;
+import reaper.android.common.analytics.AnalyticsHelper;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -55,15 +57,34 @@ public class EditEventPresenterImpl implements EditEventPresenter
             startTime = null;
             endTime = null;
         }
+        else
+        {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_EDIT, GoogleAnalyticsConstants.ACTION_EDIT_TIME, GoogleAnalyticsConstants.LABEL_ATTEMPT);
+            /* Analytics */
+        }
 
         if (originalEvent.getLocation().equals(location) || location == null)
         {
             location = new Location();
         }
+        else
+        {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_EDIT, GoogleAnalyticsConstants.ACTION_EDIT_LOCATION, GoogleAnalyticsConstants.LABEL_ATTEMPT);
+            /* Analytics */
+        }
+
 
         if (description.equals(originalEvent.getDescription()))
         {
             description = null;
+        }
+        else
+        {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_EDIT, GoogleAnalyticsConstants.ACTION_EDIT_DESCRIPTION, GoogleAnalyticsConstants.LABEL_ATTEMPT);
+            /* Analytics */
         }
 
         Subscription subscription = eventService

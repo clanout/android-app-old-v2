@@ -93,6 +93,10 @@ public class EventDetailsActivity extends BaseActivity implements
     @Override
     public void onBackPressed()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_BACK,null);
+        /* Analytics */
+
         navigateBack();
     }
 
@@ -138,6 +142,10 @@ public class EventDetailsActivity extends BaseActivity implements
     @Override
     public void handleError()
     {
+        /* Analytics */
+        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z12,null,false);
+        /* Analytics */
+
         navigateToHomeScreen();
     }
 

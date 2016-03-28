@@ -214,6 +214,10 @@ public class InviteFragment extends BaseFragment implements
             {
                 if (presenter != null)
                 {
+                    /* Analytics */
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_REFRESH,null);
+                    /* Analytics */
+
                     presenter.refresh();
                 }
                 return true;
@@ -235,8 +239,8 @@ public class InviteFragment extends BaseFragment implements
                 });
 
                 /* Analytics */
-                AnalyticsHelper
-                        .sendScreenNames(GoogleAnalyticsConstants.SCREEN_UPDATE_PHONE_DIALOG_FROM_INVITE);
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_GO_TO,GoogleAnalyticsConstants.LABEL_UPDATE_MOBILE);
+                AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_UPDATE_PHONE_DIALOG_FROM_INVITE);
                 /* Analytics */
 
                 return true;
@@ -250,6 +254,10 @@ public class InviteFragment extends BaseFragment implements
     @Override
     public void onPermissionGranted(@PermissionHandler.Permissions int permission)
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_CONTACTS_PERMISSION,GoogleAnalyticsConstants.LABEL_GRANTED);
+        /* Analytics */
+
         llPermission.setOnClickListener(null);
         presenter.attachView(this);
 
@@ -262,6 +270,10 @@ public class InviteFragment extends BaseFragment implements
     @Override
     public void onPermissionDenied(@PermissionHandler.Permissions int permission)
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_CONTACTS_PERMISSION,GoogleAnalyticsConstants.LABEL_DENIED);
+        /* Analytics */
+
         llPermission.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -281,6 +293,10 @@ public class InviteFragment extends BaseFragment implements
     @Override
     public void onPermissionPermanentlyDenied(@PermissionHandler.Permissions int permission)
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_CONTACTS_PERMISSION,GoogleAnalyticsConstants.LABEL_PERMANENTLY_DENIED);
+        /* Analytics */
+
         llPermission.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -473,6 +489,10 @@ public class InviteFragment extends BaseFragment implements
 
     private void initSearch()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE, GoogleAnalyticsConstants.ACTION_SEARCH,null);
+        /* Analytics */
+
         search = new TextWatcher()
         {
             @Override

@@ -153,27 +153,27 @@ public class PendingInvitesFragment extends BaseFragment implements
     @OnClick(R.id.btnHome)
     public void onHomeClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_PENDING_INVITES,GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_AFTER_FETCH);
+        /* Analytics */
+
         if (presenter != null)
         {
             presenter.gotoHome();
         }
-
-        /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_PENDING_INVITES,GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_AFTER_FETCH);
-        /* Analytics */
     }
 
     @OnClick(R.id.btnSkip)
     public void onSkipClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_PENDING_INVITES,GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_ON_SKIP);
+        /* Analytics */
+
         if (presenter != null)
         {
             presenter.skip();
         }
-
-        /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_PENDING_INVITES,GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_ON_SKIP);
-        /* Analytics */
     }
 
     @OnClick(R.id.btnFetch)
@@ -231,6 +231,10 @@ public class PendingInvitesFragment extends BaseFragment implements
     @Override
     public void displayNoActivePendingInvitationsMessage()
     {
+       /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_PENDING_INVITES,GoogleAnalyticsConstants.ACTION_FETCH_INVITES, GoogleAnalyticsConstants.LABEL_NO_ACTIVE_PENDING_INVITES);
+        /* Analytics */
+
         rvInvites.setVisibility(View.GONE);
         llNoPendingInvites.setVisibility(View.VISIBLE);
     }
@@ -238,6 +242,10 @@ public class PendingInvitesFragment extends BaseFragment implements
     @Override
     public void displayActivePendingInvitation(List<Event> events)
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_PENDING_INVITES,GoogleAnalyticsConstants.ACTION_FETCH_INVITES, GoogleAnalyticsConstants.LABEL_PENDING_INVITES_FOUND,events.size());
+        /* Analytics */
+
         rvInvites.setAdapter(new PendingInviteAdapter(getActivity(), events, this));
 
         llNoPendingInvites.setVisibility(View.GONE);
@@ -247,6 +255,10 @@ public class PendingInvitesFragment extends BaseFragment implements
     @Override
     public void displayExpiredEventsMessage(int expiredEventsCount)
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_PENDING_INVITES,GoogleAnalyticsConstants.ACTION_FETCH_INVITES, GoogleAnalyticsConstants.LABEL_EXPIRED_INVITES_FOUND,expiredEventsCount);
+        /* Analytics */
+
         llExpiredInvites.setVisibility(View.VISIBLE);
         tvExpiredInvites
                 .setText("You have " + expiredEventsCount + " invitations for expired plans");

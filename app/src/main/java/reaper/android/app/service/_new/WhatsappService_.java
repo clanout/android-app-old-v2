@@ -22,6 +22,10 @@ public class WhatsappService_
     {
         if (instance == null)
         {
+            /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z8,null,true);
+            /* Analytics */
+
             throw new IllegalStateException("[AccountService Not Initialized]");
         }
 

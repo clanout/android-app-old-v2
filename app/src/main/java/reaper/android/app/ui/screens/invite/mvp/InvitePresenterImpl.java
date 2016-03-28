@@ -5,6 +5,7 @@ import android.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Friend;
 import reaper.android.app.model.PhonebookContact;
@@ -12,6 +13,7 @@ import reaper.android.app.service.EventService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.service._new.PhonebookService_;
+import reaper.android.common.analytics.AnalyticsHelper;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
@@ -150,11 +152,19 @@ public class InvitePresenterImpl implements InvitePresenter
 
         if (!invitedFriends.isEmpty())
         {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_PEOPLE_INVITED,GoogleAnalyticsConstants.LABEL_FRIENDS,invitedFriends.size());
+            /* Analytics */
+
             eventService._inviteAppFriends(eventId, invitedFriends);
         }
 
         if (!invitedContacts.isEmpty())
         {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_PEOPLE_INVITED,GoogleAnalyticsConstants.LABEL_FRIENDS,invitedContacts.size());
+            /* Analytics */
+
             eventService._invitePhonebookContacts(eventId, invitedContacts);
         }
     }

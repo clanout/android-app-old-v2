@@ -50,6 +50,10 @@ public class GoogleService_
     {
         if (googleApiClient == null)
         {
+            /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z2,null,true);
+            /* Analytics */
+
             throw new IllegalStateException("[GoogleApiClient not initialized]");
         }
 
@@ -60,10 +64,16 @@ public class GoogleService_
     {
         if (googleApiClient == null)
         {
+            /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z3,null,true);
+            /* Analytics */
             throw new IllegalStateException("[GoogleApiClient not initialized]");
         }
         else if (!googleApiClient.isConnected())
         {
+            /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z4,null,true);
+            /* Analytics */
             throw new IllegalStateException("[GoogleApiClient not connected]");
         }
 
@@ -74,6 +84,9 @@ public class GoogleService_
     {
         if (googleApiClient == null)
         {
+             /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z5,null,true);
+            /* Analytics */
             throw new IllegalStateException("[Cannot set null GoogleApiClient]");
         }
 

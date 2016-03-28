@@ -187,6 +187,10 @@ public class EventDetailsFragment extends BaseFragment implements
             {
                 if (presenter != null)
                 {
+                    /* Analytics */
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS, GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants.LABEL_EDIT);
+                    /* Analytics */
+
                     presenter.edit();
                 }
                 return true;
@@ -198,6 +202,10 @@ public class EventDetailsFragment extends BaseFragment implements
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS, GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants.LABEL_DELETE);
+                /* Analytics */
+
                 if (presenter != null)
                 {
                     displayDeleteDialog();
@@ -212,6 +220,11 @@ public class EventDetailsFragment extends BaseFragment implements
     @OnClick(R.id.btnInvite)
     public void onInviteClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_OPEN,GoogleAnalyticsConstants.LABEL_FROM_DETAILS);
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_GO_TO,GoogleAnalyticsConstants.LABEL_INVITE);
+        /* Analytics */
+
         if (presenter != null)
         {
             presenter.invite();
@@ -221,6 +234,10 @@ public class EventDetailsFragment extends BaseFragment implements
     @OnClick(R.id.btnChat)
     public void onChatClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_GO_TO,GoogleAnalyticsConstants.LABEL_INVITE);
+        /* Analytics */
+
         if (presenter != null)
         {
             presenter.chat();
@@ -230,12 +247,20 @@ public class EventDetailsFragment extends BaseFragment implements
     @OnClick(R.id.btnInvitationResponse)
     public void onInvitationResponseClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_INVITATION_RESPONSE_NOT_GOING,null);
+        /* Analytics */
+
         displayInvitationResponseDialog();
     }
 
     @OnClick(R.id.btnJoin)
     public void onJoinClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_JOIN,null);
+        /* Analytics */
+
         if (presenter != null)
         {
             presenter.toggleRsvp();
@@ -245,6 +270,10 @@ public class EventDetailsFragment extends BaseFragment implements
     @Override
     public void onEdit()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS, GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants.LABEL_EDIT);
+        /* Analytics */
+
         if (presenter != null)
         {
             presenter.edit();
@@ -254,6 +283,10 @@ public class EventDetailsFragment extends BaseFragment implements
     @Override
     public void onRsvpToggled()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS, GoogleAnalyticsConstants.ACTION_RSVP_TOGGLED, null);
+        /* Analytics */
+
         if (presenter != null)
         {
             presenter.toggleRsvp();
@@ -263,6 +296,10 @@ public class EventDetailsFragment extends BaseFragment implements
     @Override
     public void onStatusClicked(String oldStatus)
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS, GoogleAnalyticsConstants.ACTION_STATUS_ATTEMPT, GoogleAnalyticsConstants.LABEL_NORMAL);
+        /* Analytics */
+
         StatusDialog.show(getActivity(), oldStatus, new StatusDialog.Listener()
         {
             @Override
@@ -270,6 +307,10 @@ public class EventDetailsFragment extends BaseFragment implements
             {
                 if (presenter != null)
                 {
+                    /* Analytics */
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS, GoogleAnalyticsConstants.ACTION_STATUS_SUCCESS, GoogleAnalyticsConstants.LABEL_NORMAL);
+                    /* Analytics */
+
                     presenter.setStatus(status);
                 }
             }
@@ -284,17 +325,29 @@ public class EventDetailsFragment extends BaseFragment implements
     @Override
     public void onLastMinuteStatusClicked(String oldStatus)
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS, GoogleAnalyticsConstants.ACTION_STATUS_ATTEMPT, GoogleAnalyticsConstants.LABEL_LAST_MOMENT);
+        /* Analytics */
+
         LastMinuteStatusDialog
                 .show(getActivity(), oldStatus, new LastMinuteStatusDialog.Listener()
                 {
                     @Override
                     public void onLastMinuteStatusSuggestionSelected(String suggestion)
                     {
+                        /* Analytics */
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS, GoogleAnalyticsConstants.ACTION_STATUS_SUCCESS, GoogleAnalyticsConstants.LABEL_LAST_MOMENT_FROM_SUGGESTION);
+                        /* Analytics */
+
                     }
 
                     @Override
                     public void onLastMinuteStatusEntered(String status)
                     {
+                        /* Analytics */
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS, GoogleAnalyticsConstants.ACTION_STATUS_SUCCESS, GoogleAnalyticsConstants.LABEL_LAST_MOMENT_MANUAL);
+                        /* Analytics */
+
                         if (presenter != null)
                         {
                             presenter.setStatus(status);
@@ -312,18 +365,30 @@ public class EventDetailsFragment extends BaseFragment implements
     @Override
     public void onDescriptionClicked(String description)
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_SHOW_DESCRIPTION,null);
+        /* Analytics */
+
         DescriptionDialog.show(getActivity(), description);
     }
 
     @Override
     public void onNavigationClicked(Location location)
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_NAVIGATE,null);
+        /* Analytics */
+
         startActivity(GoogleService_.getInstance().getGoogleMapsIntent(location));
     }
 
     @Override
     public void onFriendsBubbleClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_OPEN,GoogleAnalyticsConstants.LABEL_FRIENDS_BUBBLE);
+        /* Analytics */
+
         if (presenter != null)
         {
             presenter.invite();
@@ -349,6 +414,7 @@ public class EventDetailsFragment extends BaseFragment implements
     {
         adapter.resetEvent(event);
     }
+
 
     @Override
     public void showLoading()
@@ -490,6 +556,10 @@ public class EventDetailsFragment extends BaseFragment implements
 
     private void displayDeleteDialog()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_DELETE,GoogleAnalyticsConstants.LABEL_ATTEMPT);
+        /* Analytics */
+
         SoftKeyboardHandler.hideKeyboard(getActivity(), getView());
         DefaultDialog.show(getActivity(),
                 R.string.event_delete_title,
@@ -502,6 +572,10 @@ public class EventDetailsFragment extends BaseFragment implements
                     @Override
                     public void onPositiveButtonClicked()
                     {
+                        /* Analytics */
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_DELETE,GoogleAnalyticsConstants.LABEL_SUCCESS);
+                        /* Analytics */
+
                         if (presenter != null)
                         {
                             presenter.delete();
@@ -511,7 +585,9 @@ public class EventDetailsFragment extends BaseFragment implements
                     @Override
                     public void onNegativeButtonClicked()
                     {
-
+                        /* Analytics */
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_DELETE,GoogleAnalyticsConstants.LABEL_CANCEL);
+                        /* Analytics */
                     }
                 });
 

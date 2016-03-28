@@ -45,6 +45,8 @@ public class GoogleAnalyticsConstants
     /* Event Category */
     public static final String CATEGORY_LOGIN = "login";
     public static final String CATEGORY_HOME = "home";
+
+
     public static final String CATEGORY_CREATE = "create";
     public static final String CATEGORY_CREATE_DETAIL = "create_details";
     public static final String CATEGORY_INVITE = "invite";
@@ -80,11 +82,35 @@ public class GoogleAnalyticsConstants
     public static final String ACTION_SEARCH = "search";
     public static final String ACTION_SEND = "send_chat";
     public static final String ACTION_DISPLAY_ERROR = "display_error";
-
-
-
+    public static final String ACTION_PLAN_CREATED = "plan_created";
+    public static final String ACTION_MORE_DETAILS = "add_more_details";
+    public static final String ACTION_EDIT_TIME = "edit_time";
+    public static final String ACTION_EDIT_DAY = "edit_day";
+    public static final String ACTION_EDIT_CATEGORY = "edit_category";
+    public static final String ACTION_ADD_LOCATION = "add_location";
+    public static final String ACTION_ADD_DESCRIPTION = "add_description";
     public static final String ACTION_NO_FRIENDS = "no_friends";
     public static final String ACTION_FACEBOOK_FRIENDS_NOT_FOUND = "facebook_friends_display_error";
+    public static final String ACTION_TYPE_INFO = "info_dialog_opened";
+    public static final String ACTION_DELETE = "delete_plan";
+    public static final String ACTION_USER_ERROR = "user_encountered_error";
+    public static final String ACTION_CONTACTS_PERMISSION_STATE = "contacts_permission_state";
+    public static final String ACTION_CONTACTS_PERMISSION = "contacts_permission";
+    public static final String ACTION_PEOPLE_INVITED = "people_invited";
+    public static final String ACTION_REFRESH = "refresh";
+    public static final String ACTION_JOIN = "join";
+    public static final String ACTION_INVITATION_RESPONSE_NOT_GOING = "invitation_response_not_going";
+    public static final String ACTION_STATUS_ATTEMPT = "status_attempt";
+    public static final String ACTION_RSVP_TOGGLED = "rsvp_toggled";
+    public static final String ACTION_STATUS_SUCCESS = "status_updated";
+    public static final String ACTION_SHOW_DESCRIPTION = "show_description";
+    public static final String ACTION_NAVIGATE = "navigate_to_location";
+    public static final String ACTION_EDIT_LOCATION = "edit_location";
+    public static final String ACTION_DONE = "done";
+    public static final String ACTION_CANCEL = "cancel";
+    public static final String ACTION_EDIT_DESCRIPTION = "edit_description";
+
+
 
     public static final String ACTION_VIEWED = "intro_viewed";
 
@@ -107,8 +133,37 @@ public class GoogleAnalyticsConstants
     public static final String LABEL_WHATSAPP_INVITE = "whatsapp_invite";
     public static final String LABEL_UPDATE_MOBILE = "update_mobile";
     public static final String LABEL_FAQ = "faq";
+    public static final String LABEL_MINI = "mini_view";
+    public static final String LABEL_FULL = "full_view";
+    public static final String LABEL_EMPTY_PLAN_TITLE = "empty_plan_title";
     public static final String LABEL_FRIENDS = "block_friends";
     public static final String LABEL_MANAGE_FRIENDS = "manage_friends";
+    public static final String LABEL_START_TIME_BEFORE_CURRENT_TIME = "start_time_before_current_time";
+    public static final String LABEL_FROM_CREATE = "from_create";
+    public static final String LABEL_FROM_DETAILS = "from_details";
+    public static final String LABEL_CHAT = "chat";
+    public static final String LABEL_INVITE = "invite";
+    public static final String LABEL_EDIT = "edit";
+    public static final String LABEL_DELETE = "delete";
+    public static final String LABEL_APP_SETTINGS = "app_settings";
+    public static final String LABEL_OTHERS = "others";
+    public static final String LABEL_CREATE_FLOW = "create_flow";
+    public static final String LABEL_GRANTED = "granted";
+    public static final String LABEL_DENIED = "denied";
+    public static final String LABEL_PERMANENTLY_DENIED = "permanently_denied";
+    public static final String LABEL_NORMAL = "normal_status";
+    public static final String LABEL_LAST_MOMENT = "last_moment_status";
+    public static final String LABEL_LAST_MOMENT_FROM_SUGGESTION = "last_moment_status_from_suggestion";
+    public static final String LABEL_LAST_MOMENT_MANUAL = "last_moment_status_manual";
+    public static final String LABEL_FRIENDS_BUBBLE = "from_friends_bubble";
+    public static final String LABEL_PLAN_EDITED = "plan_edited";
+    public static final String LABEL_NO_ACTIVE_PENDING_INVITES = "no_active_pending_invites";
+    public static final String LABEL_PENDING_INVITES_FOUND = "pending_invites_found";
+    public static final String LABEL_EXPIRED_INVITES_FOUND = "expired_events_found";
+
+    public static final String LABEL_INVALID_PHONE = "invalid_phone";
+
+
 
 
 
@@ -122,6 +177,7 @@ public class GoogleAnalyticsConstants
     public static final String METHOD_EVENT_SUBSCRIPTION_FAILED = "event_subscription_failed";
     public static final String METHOD_FAILED_TO_PUSH_UPDATED_LOCATION = "failed_to_push_updated_location";
     public static final String METHOD_CANNOT_CONVERT_TO_ENUM = "cannot_convert_to_enum";
+    public static final String METHOD_EXCEPTION_WHILE_SENDING_INTENT_TO_AUTOCOMPLETE = "exception_while_sending_intent_to_autocomplete";
 
 
     public static final String METHOD_A = "a";
@@ -156,7 +212,16 @@ public class GoogleAnalyticsConstants
     public static final String METHOD_Z10 = "z10";
     public static final String METHOD_Z11 = "z11";
     public static final String METHOD_Z12 = "z12";
-
+    public static final String METHOD_Z13 = "z13";
+    public static final String METHOD_Z14 = "z14";
+    public static final String METHOD_Z15 = "z15";
+    public static final String METHOD_Z16 = "z16";
+    public static final String METHOD_Z17 = "z17";
+    public static final String METHOD_Z18 = "z18";
+    public static final String METHOD_Z19 = "z19";
+    public static final String METHOD_Z20 = "z20";
+    public static final String METHOD_Z21 = "z21";
+    public static final String METHOD_Z22 = "z22";
 
     // Exception Location
     public static final String LOCATION_NOTIFICATION_SERVICE_EXCEPTION = "notification_service_exception";
@@ -252,10 +317,6 @@ public class GoogleAnalyticsConstants
     public static final String ON_CANCEL_FACEBOOK_CALLBACK = "on_cancel_facebook_callback";
     public static final String FACEBOOK_FRIENDS_NOT_FETCHED = "facebook_friends_not_fetched";
     public static final String FACEBOOK_PROFILE_NOT_FETCHED = "facebook_profile_not_fetched";
-
-
-    public static final String LABEL_INVALID_PHONE = "invalid_phone";
-
 
 
 }

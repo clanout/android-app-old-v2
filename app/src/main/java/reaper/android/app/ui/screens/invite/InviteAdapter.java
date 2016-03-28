@@ -22,11 +22,13 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.config.Dimensions;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.root.Reaper;
 import reaper.android.app.service._new.FacebookService_;
 import reaper.android.app.ui.screens.invite.mvp.FriendInviteWrapper;
 import reaper.android.app.ui.screens.invite.mvp.PhonebookContactInviteWrapper;
 import reaper.android.app.ui.util.CircleTransform;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class InviteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
@@ -94,6 +96,10 @@ public class InviteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 return new ContactViewHolder(view);
 
             default:
+                /* Analytics */
+                AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z10,null,false);
+                /* Analytics */
+
                 throw new IllegalStateException();
         }
     }

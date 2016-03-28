@@ -123,10 +123,11 @@ public class CreateSuggestionFragment extends BaseFragment implements CreateSugg
                 {
                     if (suggestions != null && activePosition >= 0)
                     {
-                        presenter.select(suggestions.get(activePosition).getCategory());
                         /* Analytics */
                         AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_HOME, GoogleAnalyticsConstants.ACTION_CREATE, String.valueOf(suggestions.get(activePosition)));
                         /* Analytics */
+
+                        presenter.select(suggestions.get(activePosition).getCategory());
                     }
                     else
                     {

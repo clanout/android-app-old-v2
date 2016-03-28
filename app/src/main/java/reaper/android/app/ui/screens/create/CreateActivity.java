@@ -84,6 +84,10 @@ public class CreateActivity extends BaseActivity implements CreateScreen
     {
         if (item.getItemId() == android.R.id.home)
         {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE,GoogleAnalyticsConstants.ACTION_CANCEL,null);
+            /* Analytics */
+
             navigateToHomeScreen();
         }
         return super.onOptionsItemSelected(item);
@@ -151,6 +155,10 @@ public class CreateActivity extends BaseActivity implements CreateScreen
         }
         catch (Exception e)
         {
+            /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_EXCEPTION_WHILE_SENDING_INTENT_TO_AUTOCOMPLETE,null,false);
+            /* Analytics */
+
             Timber.d("Exception while sending intent to PlaceAutocomplete " + e.getMessage());
         }
     }

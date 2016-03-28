@@ -371,6 +371,10 @@ public class EventService
                     @Override
                     public void onError(Throwable e)
                     {
+                        /* Analytics */
+                        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z9,null,true);
+                        /* Analytics */
+
 
                     }
 
@@ -402,7 +406,9 @@ public class EventService
 //                    @Override
 //                    public void onError(Throwable e)
 //                    {
-//
+//                          /* Analytics */
+//                          AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z10,null,true);
+//                          /* Analytics */
 //                    }
 //
 //                    @Override

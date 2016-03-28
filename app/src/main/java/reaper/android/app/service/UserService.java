@@ -21,11 +21,13 @@ import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.cache.user.UserCache;
 import reaper.android.app.config.GenericCacheKeys;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Friend;
 import reaper.android.app.model.User;
 import reaper.android.app.model.util.FriendsComparator;
 import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.service._new.PhonebookService_;
+import reaper.android.common.analytics.AnalyticsHelper;
 import retrofit.client.Response;
 import rx.Observable;
 import rx.Subscriber;
@@ -48,6 +50,10 @@ public class UserService
     {
         if (instance == null)
         {
+            /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z11,null,false);
+            /* Analytics */
+
             throw new IllegalStateException("[UserService Not Initialized]");
         }
 
@@ -78,6 +84,10 @@ public class UserService
     {
         if (user == null)
         {
+            /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z11,null,false);
+            /* Analytics */
+
             throw new IllegalStateException("[Session User null]");
         }
 

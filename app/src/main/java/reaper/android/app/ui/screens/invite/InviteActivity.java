@@ -82,11 +82,16 @@ public class InviteActivity extends BaseActivity implements InviteScreen
         {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED)
             {
+
                 if (PermissionHandler
                         .isRationalRequired(this, PermissionHandler.Permissions.READ_CONTACTS))
                 {
                     if (readContactsPermissionListener != null)
                     {
+                        /* Analytics */
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_CONTACTS_PERMISSION_STATE,GoogleAnalyticsConstants.LABEL_DENIED);
+                        /* Analytics */
+
                         readContactsPermissionListener
                                 .onPermissionDenied(PermissionHandler.Permissions.READ_CONTACTS);
                     }
@@ -95,6 +100,10 @@ public class InviteActivity extends BaseActivity implements InviteScreen
                 {
                     if (readContactsPermissionListener != null)
                     {
+                        /* Analytics */
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_CONTACTS_PERMISSION_STATE,GoogleAnalyticsConstants.LABEL_PERMANENTLY_DENIED);
+                        /* Analytics */
+
                         readContactsPermissionListener
                                 .onPermissionPermanentlyDenied(PermissionHandler.Permissions.READ_CONTACTS);
                     }
@@ -102,6 +111,10 @@ public class InviteActivity extends BaseActivity implements InviteScreen
             }
             else
             {
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_CONTACTS_PERMISSION_STATE,GoogleAnalyticsConstants.LABEL_GRANTED);
+                /* Analytics */
+
                 if (readContactsPermissionListener != null)
                 {
                     readContactsPermissionListener
@@ -113,7 +126,20 @@ public class InviteActivity extends BaseActivity implements InviteScreen
 
     @Override
     public void onBackPressed()
+
     {
+        if(getIntent().getBooleanExtra(ARG_IS_CREATE_FLOW,false))
+        {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE, GoogleAnalyticsConstants.ACTION_BACK, GoogleAnalyticsConstants.LABEL_CREATE_FLOW);
+            /* Analytics */
+        }
+        else
+        {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE, GoogleAnalyticsConstants.ACTION_BACK, GoogleAnalyticsConstants.LABEL_OTHERS);
+            /* Analytics */
+        }
         navigateToDetailsScreen();
     }
 
@@ -137,6 +163,10 @@ public class InviteActivity extends BaseActivity implements InviteScreen
     @Override
     public void navigateToAppSettings()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_GO_TO,GoogleAnalyticsConstants.LABEL_APP_SETTINGS);
+        /* Analytics */
+
         gotoAppSettings();
     }
 

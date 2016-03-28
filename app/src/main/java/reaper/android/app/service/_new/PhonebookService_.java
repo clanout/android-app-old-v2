@@ -44,6 +44,10 @@ public class PhonebookService_
     {
         if (instance == null)
         {
+            /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z7,null,true);
+            /* Analytics */
+
             throw new IllegalStateException("[PhonebookService Not Initialized]");
         }
 

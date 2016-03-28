@@ -34,6 +34,10 @@ public class EditEventActivity extends BaseActivity implements EditEventScreen
     {
         if (event == null)
         {
+            /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z13,null,false);
+            /* Analytics */
+
             throw new IllegalStateException("eventis null");
         }
 
@@ -86,6 +90,10 @@ public class EditEventActivity extends BaseActivity implements EditEventScreen
     {
         if (item.getItemId() == android.R.id.home)
         {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_EDIT,GoogleAnalyticsConstants.ACTION_CANCEL,null);
+            /* Analytics */
+
             String eventId = ((Event) getIntent().getSerializableExtra(ARG_EVENT)).getId();
             navigateToDetailsScreen(eventId);
         }
@@ -95,6 +103,10 @@ public class EditEventActivity extends BaseActivity implements EditEventScreen
     @Override
     public void onBackPressed()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_EDIT,GoogleAnalyticsConstants.ACTION_BACK,null);
+        /* Analytics */
+
         String eventId = ((Event) getIntent().getSerializableExtra(ARG_EVENT)).getId();
         navigateToDetailsScreen(eventId);
     }
@@ -149,6 +161,10 @@ public class EditEventActivity extends BaseActivity implements EditEventScreen
         }
         catch (Exception e)
         {
+           /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z14,null,false);
+            /* Analytics */
+
             Timber.d("Exception while sending intent to PlaceAutocomplete " + e.getMessage());
         }
     }

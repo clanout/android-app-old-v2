@@ -200,6 +200,19 @@ public class CreateFragment extends BaseFragment implements
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
+                if (llMoreDetailsContainer.getVisibility() == View.GONE)
+                {
+                    /* Analytics */
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE,GoogleAnalyticsConstants.ACTION_PLAN_CREATED,GoogleAnalyticsConstants.LABEL_FULL,etTitle.getText().toString().length());
+                    /* Analytics */
+                }
+                else
+                {
+                    /* Analytics */
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE,GoogleAnalyticsConstants.ACTION_PLAN_CREATED,GoogleAnalyticsConstants.LABEL_MINI,etTitle.getText().toString().length());
+                    /* Analytics */
+                }
+
                 createEvent();
                 return true;
             }
@@ -213,6 +226,10 @@ public class CreateFragment extends BaseFragment implements
         llMoreDetails.setVisibility(View.GONE);
         if (llMoreDetailsContainer.getVisibility() != View.VISIBLE)
         {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE,GoogleAnalyticsConstants.ACTION_MORE_DETAILS,null);
+            /* Analytics */
+
             VisibilityAnimationUtil.expand(llMoreDetailsContainer, 200);
         }
     }
@@ -220,36 +237,60 @@ public class CreateFragment extends BaseFragment implements
     @OnClick(R.id.llTime)
     public void onTimeClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE,GoogleAnalyticsConstants.ACTION_EDIT_TIME,GoogleAnalyticsConstants.LABEL_ATTEMPT);
+        /* Analytics */
+
         displayTimePicker();
     }
 
     @OnClick(R.id.llDay)
     public void onDayClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE,GoogleAnalyticsConstants.ACTION_EDIT_DAY,GoogleAnalyticsConstants.LABEL_ATTEMPT);
+        /* Analytics */
+
         displayDayPicker();
     }
 
     @OnClick(R.id.mivInfo)
     public void onTypeInfoClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE,GoogleAnalyticsConstants.ACTION_TYPE_INFO,null);
+        /* Analytics */
+
         displayEventTypeDescriptionDialog();
     }
 
     @OnClick(R.id.llCategoryIconContainer)
     public void onCategoryClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE,GoogleAnalyticsConstants.ACTION_EDIT_CATEGORY,GoogleAnalyticsConstants.LABEL_ATTEMPT);
+        /* Analytics */
+
         displayCategorySelectionDialog();
     }
 
     @OnClick(R.id.llLocation)
     public void onLocationClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE,GoogleAnalyticsConstants.ACTION_ADD_LOCATION,GoogleAnalyticsConstants.LABEL_ATTEMPT);
+        /* Analytics */
+
         screen.navigateToLocationSelectionScreen();
     }
 
     @Override
     public void onLocationSelected(Location location)
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE,GoogleAnalyticsConstants.ACTION_ADD_LOCATION,GoogleAnalyticsConstants.LABEL_SUCCESS);
+        /* Analytics */
+
         this.location = location;
         tvLocation.setText(location.getName());
     }
@@ -267,6 +308,10 @@ public class CreateFragment extends BaseFragment implements
     {
         if (createProgressDialog != null)
         {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE,GoogleAnalyticsConstants.ACTION_USER_ERROR,GoogleAnalyticsConstants.LABEL_EMPTY_PLAN_TITLE);
+            /* Analytics */
+
             createProgressDialog.dismiss();
         }
 
@@ -282,6 +327,10 @@ public class CreateFragment extends BaseFragment implements
             createProgressDialog.dismiss();
         }
 
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE,GoogleAnalyticsConstants.ACTION_USER_ERROR,GoogleAnalyticsConstants.LABEL_START_TIME_BEFORE_CURRENT_TIME);
+        /* Analytics */
+
         SnackbarFactory.create(getActivity(), R.string.error_invalid_start_time);
     }
 
@@ -292,6 +341,9 @@ public class CreateFragment extends BaseFragment implements
         {
             createProgressDialog.dismiss();
         }
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_OPEN,GoogleAnalyticsConstants.LABEL_FROM_CREATE);
+        /* Analytics */
 
         screen.navigateToInviteScreen(eventId);
     }
@@ -303,6 +355,10 @@ public class CreateFragment extends BaseFragment implements
         {
             createProgressDialog.dismiss();
         }
+
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE,GoogleAnalyticsConstants.ACTION_DISPLAY_ERROR,null);
+        /* Analytics */
 
         SnackbarFactory.create(getActivity(), R.string.error_default);
     }
@@ -432,19 +488,23 @@ public class CreateFragment extends BaseFragment implements
 
     private void displayCategorySelectionDialog()
     {
-        EventCategorySelectionDialog.show(getActivity(), new EventCategorySelectionDialog.Listener()
-        {
-            @Override
-            public void onCategorySelected(EventCategory category)
-            {
-                changeCategory(category);
-            }
-        });
-
         /* Analytics */
         AnalyticsHelper
                 .sendScreenNames(GoogleAnalyticsConstants.SCREEN_PLAN_CATEGORY_SELECTION_DIALOG);
         /* Analytics */
+
+        EventCategorySelectionDialog.show(getActivity(), new EventCategorySelectionDialog.Listener() {
+            @Override
+            public void onCategorySelected(EventCategory category) {
+
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE,GoogleAnalyticsConstants.ACTION_EDIT_CATEGORY,GoogleAnalyticsConstants.LABEL_SUCCESS);
+                /* Analytics */
+
+                changeCategory(category);
+            }
+        });
+
     }
 
     private void changeCategory(EventCategory category)

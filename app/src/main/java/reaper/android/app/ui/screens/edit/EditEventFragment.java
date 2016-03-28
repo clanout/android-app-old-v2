@@ -32,6 +32,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import reaper.android.R;
 import reaper.android.app.config.Dimensions;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.Location;
@@ -44,6 +45,7 @@ import reaper.android.app.ui.screens.edit.mvp.EditEventView;
 import reaper.android.app.ui.util.CategoryIconFactory;
 import reaper.android.app.ui.util.SnackbarFactory;
 import reaper.android.app.ui.util.SoftKeyboardHandler;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class EditEventFragment extends BaseFragment implements
         EditEventView, LocationSelectionListener
@@ -167,9 +169,13 @@ public class EditEventFragment extends BaseFragment implements
 
         edit.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
         {
+
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_EDIT,GoogleAnalyticsConstants.ACTION_DONE,GoogleAnalyticsConstants.LABEL_PLAN_EDITED);
+                /* Analytics */
                 edit();
                 return true;
             }
@@ -180,6 +186,10 @@ public class EditEventFragment extends BaseFragment implements
     @OnClick(R.id.llLocation)
     public void onLocationClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_EDIT,GoogleAnalyticsConstants.ACTION_EDIT_LOCATION,GoogleAnalyticsConstants.LABEL_ATTEMPT);
+        /* Analytics */
+
         screen.navigateToLocationSelectionScreen();
     }
 
@@ -193,12 +203,20 @@ public class EditEventFragment extends BaseFragment implements
     @OnClick(R.id.llTime)
     public void onTimeClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_EDIT,GoogleAnalyticsConstants.ACTION_EDIT_TIME,GoogleAnalyticsConstants.LABEL_ATTEMPT);
+        /* Analytics */
+
         displayTimePicker();
     }
 
     @OnClick(R.id.llDay)
     public void onDayClicked()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_EDIT,GoogleAnalyticsConstants.ACTION_EDIT_DAY,GoogleAnalyticsConstants.LABEL_ATTEMPT);
+        /* Analytics */
+
         displayDayPicker();
     }
 

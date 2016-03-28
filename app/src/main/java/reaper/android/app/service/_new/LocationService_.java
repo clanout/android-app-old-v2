@@ -287,6 +287,10 @@ public class LocationService_
     {
         if (location == null)
         {
+            /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z6,null,true);
+            /* Analytics */
+
             return Observable.error(new IllegalStateException("Location Null"));
         }
 
