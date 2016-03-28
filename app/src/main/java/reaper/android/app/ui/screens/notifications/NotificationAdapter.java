@@ -90,18 +90,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         @Bind(R.id.tvMessage1)
         TextView tvMessage1;
 
-        @Bind(R.id.llItem2)
-        View llItem2;
-
-        @Bind(R.id.tvMessage2)
-        TextView tvMessage2;
-
-        @Bind(R.id.llItem3)
-        View llItem3;
-
-        @Bind(R.id.tvMessage3)
-        TextView tvMessage3;
-
         public NotificationsViewHolder(View itemView)
         {
             super(itemView);
@@ -126,8 +114,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             int type = notification.getType();
 
             llItem1.setVisibility(View.GONE);
-            llItem2.setVisibility(View.GONE);
-            llItem3.setVisibility(View.GONE);
 
             ShapeDrawable circle = new ShapeDrawable(new OvalShape());
             circle.getPaint()
@@ -140,26 +126,24 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 case NotificationWrapper.Type.EVENT_ACTIVITY:
                     tvTitle.setText(notification.getTitle());
                     int size = notification.getNotificationItems().size();
-                    if (size >= 1)
+                    if (size == 1)
                     {
                         llItem1.setVisibility(View.VISIBLE);
                         item = notification.getNotificationItems().get(0);
                         renderIcon(item, notificationIcon);
                         renderItem(item, tvMessage1);
                     }
-                    if (size >= 2)
+                    else if (size == 2)
                     {
-                        llItem2.setVisibility(View.VISIBLE);
-                        item = notification.getNotificationItems().get(1);
+                        llItem1.setVisibility(View.VISIBLE);
                         notificationIcon.setImageDrawable(alertDrawable);
-                        renderItem(item, tvMessage2);
+                        displayMessage(notification.getNotificationItems(), tvMessage1);
                     }
-                    if (size >= 3)
+                    else if (size >= 3)
                     {
-                        llItem3.setVisibility(View.VISIBLE);
-                        item = notification.getNotificationItems().get(2);
+                        llItem1.setVisibility(View.VISIBLE);
                         notificationIcon.setImageDrawable(alertDrawable);
-                        renderItem(item, tvMessage3);
+                        displayMessage(notification.getNotificationItems(), tvMessage1);
                     }
                     break;
 
@@ -218,6 +202,40 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     tvMessage.setText("New friends have joined");
                     break;
             }
+        }
+    }
+
+    private void displayMessage(List<NotificationWrapper.NotificationItem> notificationItems,
+                                TextView tvMessage)
+    {
+        if(notificationItems.size() == 2)
+        {
+            tvMessage.setText(getMessage(notificationItems.get(0)) + " | " + getMessage(notificationItems.get(1)));
+        }else if(notificationItems.size() == 3)
+        {
+            if(notificationItems.size() == 2)
+            {
+                tvMessage.setText(getMessage(notificationItems.get(0)) + " | " + getMessage(notificationItems.get(1)) + " | " + getMessage(notificationItems.get(2)));
+            }
+        }
+    }
+
+    private String getMessage(NotificationWrapper.NotificationItem notificationItem)
+    {
+        int type = notificationItem.getType();
+        switch (type)
+        {
+            case NotificationWrapper.NotificationItem.Type.EVENT_UPDATED:
+                return "Details updated";
+
+            case NotificationWrapper.NotificationItem.Type.NEW_CHAT:
+                return "New Chat";
+
+            case NotificationWrapper.NotificationItem.Type.FRIEND_JOINED_EVENT:
+                return ("New joinees");
+
+            default:
+                return "New Notification";
         }
     }
 
