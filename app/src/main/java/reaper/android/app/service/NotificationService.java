@@ -1092,7 +1092,7 @@ public class NotificationService
                                 for (Notification noti : notifications) {
 
                                     bigTextMessage
-                                            .append(noti.getMessage().substring(0, Math.max(noti
+                                            .append(noti.getMessage().substring(0, Math.min(noti
                                                     .getMessage().length(), 40)));
                                     bigTextMessage.append("\n");
 
