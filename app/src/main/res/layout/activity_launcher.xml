@@ -62,13 +62,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="gone"
+        >
 
         <android.support.v4.view.ViewPager
             android:id="@+id/vpIntro"
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
-            android:layout_height="400dp"/>
+            android:layout_height="440dp"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -117,7 +118,28 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:layout_margin="16dp"/>
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="4dp"
+                android:paddingLeft="68dp"
+                android:paddingRight="68dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:textSize="16sp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/user_agreement"
+                android:layout_below="@id/btnFbLogin"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:textSize="10sp"
+                android:textColor="@color/text_subtitle"
+                />
 
         </RelativeLayout>
     </LinearLayout>
