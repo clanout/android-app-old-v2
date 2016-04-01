@@ -61,6 +61,10 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
     @Override
     public void onBackPressed()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION,GoogleAnalyticsConstants.ACTION_BACK,null);
+        /* Analytics */
+
         navigateToHomeScreen();
     }
 
@@ -69,6 +73,10 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
     {
         if (item.getItemId() == android.R.id.home)
         {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION,GoogleAnalyticsConstants.ACTION_UP,null);
+            /* Analytics */
+
             navigateToHomeScreen();
         }
         return super.onOptionsItemSelected(item);

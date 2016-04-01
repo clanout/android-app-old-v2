@@ -148,6 +148,10 @@ public class InviteActivity extends BaseActivity implements InviteScreen
     {
         if (item.getItemId() == android.R.id.home)
         {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_UP,null);
+            /* Analytics */
+
             navigateToDetailsScreen();
         }
         return super.onOptionsItemSelected(item);

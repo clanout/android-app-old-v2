@@ -65,7 +65,7 @@ public class AccountActivity extends BaseActivity implements AccountScreen
     {
         /* Analytics */
         AnalyticsHelper
-                .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_BACK);
+                .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_BACK, null);
         /* Analytics */
 
         super.onBackPressed();
@@ -94,7 +94,7 @@ public class AccountActivity extends BaseActivity implements AccountScreen
                 {
                     /* Analytics */
                     AnalyticsHelper
-                            .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_GO_TO_HOME, GoogleAnalyticsConstants.LABEL_BACK);
+                            .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_UP, GoogleAnalyticsConstants.LABEL_BACK);
                     /* Analytics */
 
                     navigateToHomeScreen();

@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.GoogleMapOptions;
+
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.config.Dimensions;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.NotificationWrapper;
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.ui._core.BaseFragment;
@@ -32,6 +35,7 @@ import reaper.android.app.ui.dialog.DefaultDialog;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationPresenter;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationPresenterImpl;
 import reaper.android.app.ui.screens.notifications.mvp.NotificationView;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class NotificationFragment extends BaseFragment implements
         NotificationView,
@@ -124,13 +128,13 @@ public class NotificationFragment extends BaseFragment implements
         clearAll = menu.findItem(R.id.action_clear);
         clearAll.setIcon(drawable);
         clearAll.setVisible(isClearAllVisible);
-        clearAll.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
+        clearAll.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item)
-            {
-                if (presenter != null)
-                {
+            public boolean onMenuItemClick(MenuItem item) {
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION, GoogleAnalyticsConstants.ACTION_CLEAR_ALL, null);
+                /* Analytics */
+                if (presenter != null) {
                     presenter.deleteAll();
                 }
                 return true;
@@ -174,6 +178,10 @@ public class NotificationFragment extends BaseFragment implements
                     @Override
                     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction)
                     {
+                        /* Analytics */
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION,GoogleAnalyticsConstants.ACTION_CLEAR_NOTIF, null);
+                        /* Analytics */
+
                         int position = viewHolder.getAdapterPosition();
                         presenter.onNotificationDeleted(position);
                         rvNotifications.getAdapter().notifyItemRemoved(position);
@@ -193,6 +201,10 @@ public class NotificationFragment extends BaseFragment implements
             clearAll.setVisible(isClearAllVisible);
         }
 
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION, GoogleAnalyticsConstants.ACTION_NO_NOTIFICATION, null);
+        /* Analytics */
+
         tvNoNotifications.setVisibility(View.VISIBLE);
         loading.setVisibility(View.GONE);
         rvNotifications.setVisibility(View.GONE);
@@ -201,23 +213,28 @@ public class NotificationFragment extends BaseFragment implements
     @Override
     public void displayEventRemovedMessage()
     {
+        /* Analytics  */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION, GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants.LABEL_DELETED_PLAN);
+        /* Analytics  */
+
         DefaultDialog.show(getActivity(),
                 R.string.event_removed_title,
                 R.string.event_removed_message,
                 R.string.event_removed_positive_button,
                 R.string.event_removed_negative_button,
                 true,
-                new DefaultDialog.Listener()
-                {
+                new DefaultDialog.Listener() {
                     @Override
-                    public void onPositiveButtonClicked()
-                    {
+                    public void onPositiveButtonClicked() {
+                        /* Analytics */
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE, GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants.LABEL_PLAN_DELETED_NOTIFICATION);
+                        /* Analytics */
+
                         screen.navigateToCreateScreen();
                     }
 
                     @Override
-                    public void onNegativeButtonClicked()
-                    {
+                    public void onNegativeButtonClicked() {
 
                     }
                 }
@@ -227,18 +244,30 @@ public class NotificationFragment extends BaseFragment implements
     @Override
     public void navigateToDetailsScreen(String eventId)
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION,GoogleAnalyticsConstants.ACTION_GO_TO,GoogleAnalyticsConstants.LABEL_DETAILS);
+        /* Analytics */
+
         screen.navigateToDetailsScreen(eventId);
     }
 
     @Override
     public void navigateToChatScreen(String eventId)
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION,GoogleAnalyticsConstants.ACTION_GO_TO,GoogleAnalyticsConstants.LABEL_CHAT);
+        /* Analytics */
+
         screen.navigateToChatScreen(eventId);
     }
 
     @Override
     public void navigateToFriendsScreen()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION,GoogleAnalyticsConstants.ACTION_GO_TO,GoogleAnalyticsConstants.LABEL_MANAGE_FRIENDS);
+        /* Analytics */
+
         screen.navigateToFriendsScreen();
     }
 

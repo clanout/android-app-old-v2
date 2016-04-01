@@ -68,6 +68,10 @@ public class FriendsActivity extends BaseActivity implements FriendsScreen
     {
         if (item.getItemId() == android.R.id.home)
         {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_MANAGE_FRIENDS,GoogleAnalyticsConstants.ACTION_UP,null);
+            /* Analytics */
+
             navigateToAccountScreen();
         }
         return super.onOptionsItemSelected(item);

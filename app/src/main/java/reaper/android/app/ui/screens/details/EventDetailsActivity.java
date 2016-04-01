@@ -105,6 +105,10 @@ public class EventDetailsActivity extends BaseActivity implements
     {
         if (item.getItemId() == android.R.id.home)
         {
+            /* Analytics */
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_UP,null);
+            /* Analytics */
+
             navigateToHomeScreen();
         }
         return super.onOptionsItemSelected(item);

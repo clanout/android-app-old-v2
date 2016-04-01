@@ -92,6 +92,10 @@ public class EventFeedFragment extends BaseFragment implements
             @Override
             public void onClick(View v)
             {
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CREATE,GoogleAnalyticsConstants.ACTION_OPEN,GoogleAnalyticsConstants.LABEL_HOME_FEED_FRIENDS_BUBBLE);
+                /* Analytics */
+
                 screen.navigateToCreateDetailsScreen(null);
             }
         });
@@ -160,9 +164,6 @@ public class EventFeedFragment extends BaseFragment implements
         loading.setVisibility(View.GONE);
         tvServerError.setVisibility(View.GONE);
 
-        /* Analytics */
-        AnalyticsHelper.sendCustomDimension(3, "0");
-        /* Analytics */
     }
 
     @Override

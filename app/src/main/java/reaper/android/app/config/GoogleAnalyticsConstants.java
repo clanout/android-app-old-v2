@@ -25,15 +25,11 @@ public class GoogleAnalyticsConstants
     public static final String SCREEN_NO_INTERNET = "dialog_no_internet";
     public static final String SCREEN_UPDATE_PHONE_DIALOG_FROM_ACCOUNTS = "dialog_update_phone_from_accounts";
     public static final String SCREEN_UPDATE_PHONE_DIALOG_FROM_INVITE = "dialog_update_phone_from_invite";
-    public static final String SCREEN_STATUS_DIALOG = "dialog_status";
-    public static final String SCREEN_LAST_MOMENT_STATUS_DIALOG = "dialog_last_moment_status";
     public static final String SCREEN_INVITATION_RESPONSE_DIALOG = "dialog_invitation_response";
     public static final String SCREEN_EVENT_TYPE_DIALOG = "dialog_event_type_dialog";
     public static final String SCREEN_PLAN_CATEGORY_SELECTION_DIALOG = "dialog_plan_categories";
     public static final String SCREEN_FEEDBACK_DIALOG = "dialog_feedback";
     public static final String SCREEN_EDIT_DISMISS_DIALOG = "dialog_edit_dismiss";
-    public static final String SCREEN_EDIT_FINALIZE_DIALOG = "dialog_edit_finalize";
-    public static final String SCREEN_EDIT_UNFINALIZE_DIALOG = "dialog_edit_unfinalize";
     public static final String SCREEN_GOOGLE_SERVICES_PERMISSION_DIALOG = "dialog_google_services_permission";
     public static final String SCREEN_FACEBOOK_PERMISSION_DIALOG = "dialog_facebook_permission";
 
@@ -45,10 +41,7 @@ public class GoogleAnalyticsConstants
     /* Event Category */
     public static final String CATEGORY_LOGIN = "login";
     public static final String CATEGORY_HOME = "home";
-
-
     public static final String CATEGORY_CREATE = "create";
-    public static final String CATEGORY_CREATE_DETAIL = "create_details";
     public static final String CATEGORY_INVITE = "invite";
     public static final String CATEGORY_DETAILS = "details";
     public static final String CATEGORY_EDIT = "edit";
@@ -59,8 +52,6 @@ public class GoogleAnalyticsConstants
     public static final String CATEGORY_CHAT = "chat";
 
 
-    public static final String CATEGORY_BACKGROUND = "background";
-    public static final String CATEGORY_ERROR = "error";
 
 
 
@@ -112,10 +103,13 @@ public class GoogleAnalyticsConstants
     public static final String ACTION_LOCATION_PERMISSION = "location_permission";
     public static final String ACTION_REQUEST_LOCATION_PERMISSION_AGAIN = "request_location_permission_again";
     public static final String ACTION_GO_TO_SETTINGS = "go_to_settings";
+    public static final String ACTION_UP = "up_button";
+    public static final String ACTION_CLEAR_ALL = "clear_all";
+    public static final String ACTION_CLEAR_NOTIF = "clear_notifiation_single";
+    public static final String ACTION_NO_NOTIFICATION = "no_notification";
 
 
 
-    public static final String ACTION_VIEWED = "intro_viewed";
 
 
 
@@ -166,9 +160,11 @@ public class GoogleAnalyticsConstants
     public static final String LABEL_FROM_HOME = "from_home";
     public static final String LABEL_FROM_PUSH_NOTIFICATION = "from_push_notification";
     public static final String LABEL_FROM_APP_LAUNCH = "from_app_launch";
+    public static final String LABEL_PLAN_DELETED_NOTIFICATION = "plan_deleted_notif_dialog";
+    public static final String LABEL_HOME_FEED_FRIENDS_BUBBLE = "home_feed_friends_bubble";
+    public static final String LABEL_DETAILS = "details";
+    public static final String LABEL_DELETED_PLAN = "deleted_plan_dialog";
 
-
-    public static final String LABEL_INVALID_PHONE = "invalid_phone";
 
 
 
@@ -222,13 +218,6 @@ public class GoogleAnalyticsConstants
     public static final String METHOD_Z13 = "z13";
     public static final String METHOD_Z14 = "z14";
     public static final String METHOD_Z15 = "z15";
-    public static final String METHOD_Z16 = "z16";
-    public static final String METHOD_Z17 = "z17";
-    public static final String METHOD_Z18 = "z18";
-    public static final String METHOD_Z19 = "z19";
-    public static final String METHOD_Z20 = "z20";
-    public static final String METHOD_Z21 = "z21";
-    public static final String METHOD_Z22 = "z22";
 
     // Exception Location
     public static final String LOCATION_NOTIFICATION_SERVICE_EXCEPTION = "notification_service_exception";
@@ -236,10 +225,6 @@ public class GoogleAnalyticsConstants
 
 
 
-    // Event CATEGORY
-    public static final String BUTTON_CLICK = "button_click";
-    public static final String LIST_ITEM_CLICK = "list_item_click";
-    public static final String GENERAL = "general";
 
     // Event Actions
     public static final String FACEBOOK_PERMISSION_GRANTED = "facebook_permission_granted";
@@ -324,6 +309,7 @@ public class GoogleAnalyticsConstants
     public static final String ON_CANCEL_FACEBOOK_CALLBACK = "on_cancel_facebook_callback";
     public static final String FACEBOOK_FRIENDS_NOT_FETCHED = "facebook_friends_not_fetched";
     public static final String FACEBOOK_PROFILE_NOT_FETCHED = "facebook_profile_not_fetched";
+
 
 
 }
