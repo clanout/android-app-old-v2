@@ -59,25 +59,25 @@ public class IntroFragment extends BaseFragment
         switch (position)
         {
             case 0:
-                rlIntroContainer.setBackgroundResource(R.color.intro_1);
+                rlIntroContainer.setBackgroundResource(R.color.white);
                 tvTitle.setText(R.string.intro_title_1);
                 ivIntroIcon.setImageResource(R.drawable.intro_1);
                 break;
 
             case 1:
-                rlIntroContainer.setBackgroundResource(R.color.intro_2);
+                rlIntroContainer.setBackgroundResource(R.color.white);
                 tvTitle.setText(R.string.intro_title_2);
                 ivIntroIcon.setImageResource(R.drawable.intro_2);
                 break;
 
             case 2:
-                rlIntroContainer.setBackgroundResource(R.color.intro_3);
+                rlIntroContainer.setBackgroundResource(R.color.white);
                 tvTitle.setText(R.string.intro_title_3);
                 ivIntroIcon.setImageResource(R.drawable.intro_3);
                 break;
 
             case 3:
-                rlIntroContainer.setBackgroundResource(R.color.intro_4);
+                rlIntroContainer.setBackgroundResource(R.color.white);
                 tvTitle.setText(R.string.intro_title_4);
                 ivIntroIcon.setImageResource(R.drawable.intro_4);
                 break;

@@ -31,7 +31,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("C:/Users/Zuko/Documents/Keys/ClanOut/Android_Release_Key/AndroidKeyStore.jks")
+            storeFile file("/Users/harsh/Documents/AndroidKeyStore.jks")
             storePassword "live_strong"
             keyAlias "ReaperTestKey"
             keyPassword "live_strong"
