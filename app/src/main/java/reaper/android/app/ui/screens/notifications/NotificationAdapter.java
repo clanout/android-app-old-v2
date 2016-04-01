@@ -132,10 +132,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                         notificationIcon.setImageDrawable(alertDrawable);
                         displayMessage(notification.getNotificationItems(), tvMessage1);
                     }
-                    else if (size >= 3)
+                    else if (size == 3)
                     {
                         notificationIcon.setImageDrawable(alertDrawable);
-                        displayMessage(notification.getNotificationItems(), tvMessage1);
+                        tvMessage1.setText("Details Updated | New Joinees | New Chat");
                     }
                     break;
 

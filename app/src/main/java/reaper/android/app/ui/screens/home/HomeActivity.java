@@ -130,17 +130,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
 
         notification = menu.findItem(R.id.action_notifications);
 
-        if (notificationIcon == null)
-        {
-            notificationIcon = MaterialDrawableBuilder
-                    .with(this)
-                    .setIcon(MaterialDrawableBuilder.IconValue.BELL)
-                    .setColor(ContextCompat
-                            .getColor(this, R.color.white))
-                    .setSizeDp(Dimensions.ACTION_BAR_DP)
-                    .build();
-        }
-        notification.setIcon(notificationIcon);
+        notification.setIcon(R.drawable.ab_notification_icon);
 
         menu.findItem(R.id.action_account)
             .setIcon(MaterialDrawableBuilder
@@ -189,17 +179,9 @@ public class HomeActivity extends BaseActivity implements HomeScreen
     @Subscribe
     public void newNotificationsAvailable(NewNotificationsAvailableTrigger trigger)
     {
-        notificationIcon = MaterialDrawableBuilder
-                .with(this)
-                .setIcon(MaterialDrawableBuilder.IconValue.BELL)
-                .setColor(ContextCompat
-                        .getColor(this, R.color.accent))
-                .setSizeDp(Dimensions.ACTION_BAR_DP)
-                .build();
-
         if (notification != null)
         {
-            notification.setIcon(notificationIcon);
+            notification.setIcon(R.drawable.ab_notification_icon_active);
         }
     }
 
@@ -207,17 +189,9 @@ public class HomeActivity extends BaseActivity implements HomeScreen
     @Subscribe
     public void newNotificationReceived(NewNotificationReceivedTrigger trigger)
     {
-        notificationIcon = MaterialDrawableBuilder
-                .with(this)
-                .setIcon(MaterialDrawableBuilder.IconValue.BELL)
-                .setColor(ContextCompat
-                        .getColor(HomeActivity.this, R.color.accent))
-                .setSizeDp(Dimensions.ACTION_BAR_DP)
-                .build();
-
         if (notification != null)
         {
-            notification.setIcon(notificationIcon);
+            notification.setIcon(R.drawable.ab_notification_icon_active);
         }
     }
 

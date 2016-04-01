@@ -1055,7 +1055,7 @@ public class NotificationService
                         NotificationCompat.Builder notificationBuilder = new NotificationCompat
                                 .Builder(Reaper
                                 .getReaperContext())
-                                .setSmallIcon(R.mipmap.app_icon)
+                                .setSmallIcon(R.drawable.notification_icon)
                                 .setAutoCancel(true)
                                 .setSound(defaultSoundUri)
                                 .setContentIntent(pendingIntent);

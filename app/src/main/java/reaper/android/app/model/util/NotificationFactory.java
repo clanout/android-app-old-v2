@@ -427,6 +427,9 @@ public class NotificationFactory
                     @Override
                     public Observable<Boolean> call(List<Notification> notifications)
                     {
+
+                        Log.d("NOTIFICATION", "size ---- " + notifications.size());
+
                         List<Integer> notificationIds = getNotificationIdsList(notifications);
                         return notificationCache.clear(notificationIds);
                     }
@@ -436,6 +439,8 @@ public class NotificationFactory
                     @Override
                     public Observable<Notification> call(Boolean isDeleteSuccessful)
                     {
+
+                        Log.d("NOTIFICATION", "isDeleteSuccessful ---- " + isDeleteSuccessful);
 
                         String message = NotificationHelper.getMessage(Notification.CHAT, args);
 
