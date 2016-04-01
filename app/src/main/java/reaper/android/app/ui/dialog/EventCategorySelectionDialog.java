@@ -23,7 +23,7 @@ public class EventCategorySelectionDialog
     public static void show(Activity activity, final Listener listener)
     {
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setCancelable(false);
+        builder.setCancelable(true);
 
         LayoutInflater layoutInflater = activity.getLayoutInflater();
         final View dialogView = layoutInflater.inflate(R.layout.dialog_event_category, null);
