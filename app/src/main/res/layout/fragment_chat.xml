@@ -110,8 +110,8 @@
                 android:layout_marginTop="16dp"
                 android:background="@android:color/transparent"
                 android:hint="@string/chat_message_label"
-                android:inputType="textAutoComplete"
-                android:maxLines="2"/>
+                android:inputType="textMultiLine"
+                android:maxLines="8"/>
 
             <net.steamcrafted.materialiconlib.MaterialIconView
                 android:id="@+id/mivSend"
