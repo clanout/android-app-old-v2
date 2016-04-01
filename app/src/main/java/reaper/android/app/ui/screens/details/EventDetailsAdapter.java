@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -32,7 +33,9 @@ import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.Location;
 import reaper.android.app.model.User;
 import reaper.android.app.model.util.DateTimeUtil;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.service._new.FacebookService_;
+import reaper.android.app.ui.dialog.AttendeeDialog;
 import reaper.android.app.ui.util.CategoryIconFactory;
 import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.FriendBubbles;
@@ -615,6 +618,9 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public class AttendeeViewHolder extends RecyclerView.ViewHolder
     {
+        @Bind(R.id.rlAttendeeContainer)
+        RelativeLayout attendeeContainer;
+
         @Bind(R.id.ivPic)
         ImageView ivPic;
 
@@ -644,7 +650,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             }
         }
 
-        public void render(EventDetails.Attendee attendee)
+        public void render(final EventDetails.Attendee attendee)
         {
             // Profile Pic
             Picasso.with(context)
@@ -677,6 +683,15 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             {
                 tvInvite.setVisibility(View.GONE);
             }
+
+            attendeeContainer.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    AttendeeDialog.show(context, attendee, personDrawable);
+                }
+            });
         }
     }
 

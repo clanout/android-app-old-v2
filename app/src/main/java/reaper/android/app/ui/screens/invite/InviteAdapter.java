@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -226,6 +227,9 @@ public class InviteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         @Bind(R.id.cbInvite)
         CheckBox cbInvite;
 
+        @Bind(R.id.rlFriendContainer)
+        RelativeLayout friendContainer;
+
         public FriendViewHolder(View itemView)
         {
             super(itemView);
@@ -272,6 +276,16 @@ public class InviteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                             inviteListener.onFriendSelected(friend, cbInvite.isChecked());
                         }
                     });
+
+                    friendContainer.setOnClickListener(new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            cbInvite.setChecked(!friend.isSelected());
+                            inviteListener.onFriendSelected(friend, cbInvite.isChecked());
+                        }
+                    });
                 }
             }
         }
@@ -302,6 +316,9 @@ public class InviteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         @Bind(R.id.cbInvite)
         CheckBox cbInvite;
 
+        @Bind(R.id.rlContactContainer)
+        RelativeLayout contactContainer;
+
         public ContactViewHolder(View itemView)
         {
             super(itemView);
@@ -315,6 +332,16 @@ public class InviteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             cbInvite.setChecked(contact.isSelected());
 
             cbInvite.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    cbInvite.setChecked(!contact.isSelected());
+                    inviteListener.onContactSelected(contact, cbInvite.isChecked());
+                }
+            });
+
+            contactContainer.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)

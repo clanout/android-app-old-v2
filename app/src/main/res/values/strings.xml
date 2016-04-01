@@ -125,6 +125,7 @@
 
 
     <!-- Status Labels -->
+    <string name="no_status">No Status</string>
     <string name="status_default"></string>
     <string name="label_status">Share your mood</string>
     <string name="label_status_last_moment">Last moment status</string>
