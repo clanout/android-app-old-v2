@@ -3,16 +3,26 @@ package reaper.android.app.ui.screens.launch;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -122,6 +132,9 @@ public class LauncherActivity extends BaseActivity implements
 
     @Bind(R.id.tvAction)
     TextView tvAction;
+
+    @Bind(R.id.tvuserAgreement)
+    TextView userAgreement;
 
     /* Fields */
     CallbackManager facebookCallbackManager;
@@ -251,15 +264,19 @@ public class LauncherActivity extends BaseActivity implements
 
         tvActionMessage.setText(R.string.permission_location_message);
         tvAction.setText(R.string.permission_request_again);
-        tvAction.setOnClickListener(new View.OnClickListener() {
+        tvAction.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 /* Analytics */
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_REQUEST_LOCATION_PERMISSION_AGAIN,null);
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,
+                        GoogleAnalyticsConstants.ACTION_REQUEST_LOCATION_PERMISSION_AGAIN, null);
                 /* Analytics */
 
                 PermissionHandler
-                        .requestPermission(LauncherActivity.this, PermissionHandler.Permissions.LOCATION);
+                        .requestPermission(LauncherActivity.this, PermissionHandler.Permissions
+                                .LOCATION);
             }
         });
     }
@@ -520,30 +537,36 @@ public class LauncherActivity extends BaseActivity implements
 
         Observable.interval(2, TimeUnit.SECONDS)
                   .observeOn(AndroidSchedulers.mainThread())
-                  .subscribe(new Subscriber<Long>() {
+                  .subscribe(new Subscriber<Long>()
+                             {
                                  @Override
-                                 public void onCompleted() {
+                                 public void onCompleted()
+                                 {
 
                                  }
 
                                  @Override
-                                 public void onError(Throwable e) {
+                                 public void onError(Throwable e)
+                                 {
 
                                  }
 
                                  @Override
-                                 public void onNext(Long aLong) {
+                                 public void onNext(Long aLong)
+                                 {
                                      if (!introScrolled) {
                                          int position = vpIntro.getCurrentItem();
                                          if (position == 3) {
                                              position = 0;
-                                         } else {
+                                         }
+                                         else {
                                              position++;
                                          }
 
                                          setIntroMarker(position);
                                          vpIntro.setCurrentItem(position);
-                                     } else {
+                                     }
+                                     else {
                                          introScrolled = false;
                                      }
                                  }
@@ -596,11 +619,46 @@ public class LauncherActivity extends BaseActivity implements
         llFb.setVisibility(View.VISIBLE);
         rlBootstrap.setVisibility(View.GONE);
 
+        renderUserAgreementMessage();
+
         /* Analytics */
         AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_LOGIN_FRAGMENT);
         /* Analytics */
 
         setupIntroViewPager();
+    }
+
+    private void renderUserAgreementMessage()
+    {
+        SpannableString ss = new SpannableString(getResources().getString(R.string.user_agreement));
+
+        ClickableSpan span1 = new ClickableSpan() {
+            @Override
+            public void onClick(View textView) {
+
+                String url = "http://www.clanout.com/terms.html";
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                startActivity(intent);
+            }
+        };
+
+        ClickableSpan span2 = new ClickableSpan() {
+            @Override
+            public void onClick(View textView) {
+
+                String url = "http://www.clanout.com/privacy.html";
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                startActivity(intent);
+            }
+        };
+
+        ss.setSpan(span1, 32, 48, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(span2, 53, 67, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        userAgreement.setText(ss);
+        userAgreement.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     private void showBootstrapAction()

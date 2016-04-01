@@ -74,7 +74,7 @@
     <string name="intro_title_2">Keep your plan open or secret</string>
     <string name="intro_title_3">Invite friends to your plan</string>
     <string name="intro_title_4">Chat, finalize and clan out!</string>
-    <string name="user_agreement">By continuing, you agree to our Terms of service and Privacy Policy</string>
+    <string name="user_agreement">By continuing, you agree to our <b>Terms of service</b> and <b>Privacy Policy</b></string>
 
     <!-- Account Screen -->
     <string name="account_menu_friends">Manage Friends</string>

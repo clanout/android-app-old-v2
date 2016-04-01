@@ -1,6 +1,8 @@
 package reaper.android.app.ui.screens.accounts;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -211,6 +213,9 @@ public class AccountFragment extends BaseFragment
                 .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants.LABEL_FAQ);
         /* Analytics */
 
-        SnackbarFactory.create(getActivity(), R.string.disabled_for_beta);
+        String url = "http://www.clanout.com/faq.html";
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        startActivity(intent);
     }
 }

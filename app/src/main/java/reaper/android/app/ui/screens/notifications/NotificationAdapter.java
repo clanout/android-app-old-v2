@@ -33,7 +33,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     private Drawable friendAddedDrawable;
     private Drawable eventRemovedDrawable;
     private Drawable eventInvitationDrawable;
-    private Drawable alertDrawable;
     private Drawable chatDrawable;
     private Drawable updateDrawable;
     private Drawable friendJoinedEventDrawable;
@@ -129,12 +128,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     }
                     else if (size == 2)
                     {
-                        notificationIcon.setImageDrawable(alertDrawable);
+                        notificationIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.calendar_alert));
                         displayMessage(notification.getNotificationItems(), tvMessage1);
                     }
                     else if (size == 3)
                     {
-                        notificationIcon.setImageDrawable(alertDrawable);
+                        notificationIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.calendar_alert));
                         tvMessage1.setText("Details Updated | New Joinees | New Chat");
                     }
                     break;
@@ -149,7 +148,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 case NotificationWrapper.Type.EVENT_REMOVED:
                     notificationIcon.setImageDrawable(eventRemovedDrawable);
                     tvTitle.setText(notification.getTitle());
-                    item = notification.getNotificationItems().get(0);
+                    item = notification.getNotificationItems().get(0) ;
                     renderItem(item, tvMessage1);
                     break;
 
@@ -288,13 +287,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         eventInvitationDrawable = MaterialDrawableBuilder
                 .with(context)
                 .setIcon(MaterialDrawableBuilder.IconValue.EMAIL_OPEN)
-                .setColor(ContextCompat
-                        .getColor(context, R.color.white))
-                .build();
-
-        alertDrawable = MaterialDrawableBuilder
-                .with(context)
-                .setIcon(MaterialDrawableBuilder.IconValue.CALENDAR_BLANK)
                 .setColor(ContextCompat
                         .getColor(context, R.color.white))
                 .build();
