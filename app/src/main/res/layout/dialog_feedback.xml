@@ -49,7 +49,7 @@
             android:id="@+id/etComment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textAutoComplete"
+            android:inputType="textMultiLine"
             android:maxLines="3"/>
 
     </android.support.design.widget.TextInputLayout>
