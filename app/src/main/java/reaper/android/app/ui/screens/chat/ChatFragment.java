@@ -155,7 +155,7 @@ public class ChatFragment extends BaseFragment implements ChatView
         boolean shouldScroll = chatAdapter.addMessage(chatMessage);
         if (shouldScroll)
         {
-            linearLayoutManager.scrollToPosition(0);
+            linearLayoutManager.scrollToPositionWithOffset(linearLayoutManager.findFirstCompletelyVisibleItemPosition() - 1, 4);
         }
 
         llChat.setVisibility(View.VISIBLE);
