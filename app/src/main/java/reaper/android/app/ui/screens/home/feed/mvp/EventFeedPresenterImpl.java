@@ -16,9 +16,6 @@ public class EventFeedPresenterImpl implements EventFeedPresenter
     /* Services */
     private EventService eventService;
 
-    /* Data */
-    private List<Event> events;
-
     /* View */
     private EventFeedView view;
 
@@ -30,7 +27,6 @@ public class EventFeedPresenterImpl implements EventFeedPresenter
         this.eventService = eventService;
 
         subscriptions = new CompositeSubscription();
-        events = new ArrayList<>();
     }
 
     @Override
@@ -40,48 +36,40 @@ public class EventFeedPresenterImpl implements EventFeedPresenter
 
         this.view.showLoading();
 
-        if (events.isEmpty())
-        {
-            Subscription subscription = eventService
-                    ._fetchEvents()
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Subscriber<List<Event>>()
+
+        Subscription subscription = eventService
+                ._fetchEvents()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Event>>()
+                {
+                    @Override
+                    public void onCompleted()
                     {
-                        @Override
-                        public void onCompleted()
-                        {
 
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        view.showError();
+                    }
+
+                    @Override
+                    public void onNext(List<Event> events)
+                    {
+                        if (events.isEmpty()) {
+                            view.showNoEventsMessage();
                         }
-
-                        @Override
-                        public void onError(Throwable e)
-                        {
-                            view.showError();
+                        else {
+                            view.showEvents(events);
                         }
+                    }
+                });
 
-                        @Override
-                        public void onNext(List<Event> events)
-                        {
-                            EventFeedPresenterImpl.this.events = events;
+        subscriptions.add(subscription);
 
-                            if (events.isEmpty())
-                            {
-                                view.showNoEventsMessage();
-                            }
-                            else
-                            {
-                                view.showEvents(events);
-                            }
-                        }
-                    });
 
-            subscriptions.add(subscription);
-        }
-        else
-        {
-            view.showEvents(events);
-        }
     }
 
     @Override
@@ -114,14 +102,10 @@ public class EventFeedPresenterImpl implements EventFeedPresenter
                     @Override
                     public void onNext(List<Event> events)
                     {
-                        EventFeedPresenterImpl.this.events = events;
-
-                        if (events.isEmpty())
-                        {
+                        if (events.isEmpty()) {
                             view.showNoEventsMessage();
                         }
-                        else
-                        {
+                        else {
                             view.showEvents(events);
                         }
                     }

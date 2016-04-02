@@ -161,7 +161,7 @@ public class AlarmReceiver extends BroadcastReceiver
                         .getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder
                         (context)
-                        .setSmallIcon(R.mipmap.app_icon)
+                        .setSmallIcon(R.drawable.notification_icon)
                         .setContentTitle(event.getTitle())
                         .setContentText(context.getResources()
                                 .getString(R.string.reminder_notification_message))

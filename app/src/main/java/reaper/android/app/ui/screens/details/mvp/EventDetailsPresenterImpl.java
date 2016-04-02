@@ -176,10 +176,10 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
             view.resetEvent(event);
 
             if (isLastMinute && !status.isEmpty()) {
-                eventService.updateStatus(event.getId(), status, true);
+                eventService.updateStatus(event, true);
             }
             else {
-                eventService.updateStatus(event.getId(), status, false);
+                eventService.updateStatus(event, false);
             }
         }
     }

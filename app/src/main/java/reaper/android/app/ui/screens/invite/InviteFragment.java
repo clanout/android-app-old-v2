@@ -448,6 +448,8 @@ public class InviteFragment extends BaseFragment implements
     @Override
     public void showRefreshing()
     {
+        refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
         refresh.setActionView(R.layout.view_action_refreshing);
         pbRefreshing = (ProgressBar) refresh.getActionView().findViewById(R.id.pbRefreshing);
         pbRefreshing.getIndeterminateDrawable()
@@ -458,6 +460,8 @@ public class InviteFragment extends BaseFragment implements
     @Override
     public void hideRefreshing()
     {
+        refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
         refresh.setActionView(null);
         Drawable refreshIcon = MaterialDrawableBuilder
                 .with(getActivity())

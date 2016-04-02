@@ -795,10 +795,10 @@ public class EventService
     }
 
     /* Status */
-    public void updateStatus(String eventId, String status, boolean shouldNotifyOthers)
+    public void updateStatus(final Event updatedEvent, boolean shouldNotifyOthers)
     {
 
-        UpdateStatusApiRequest request = new UpdateStatusApiRequest(eventId, status,
+        UpdateStatusApiRequest request = new UpdateStatusApiRequest(updatedEvent.getId(), updatedEvent.getStatus(),
                 shouldNotifyOthers);
 
         eventApi.updateStatus(request).subscribeOn(Schedulers.newThread())
@@ -818,6 +818,8 @@ public class EventService
             @Override
             public void onNext(Response response)
             {
+                eventCache.deleteCompletely(updatedEvent.getId());
+                eventCache.save(updatedEvent);
             }
         });
     }
