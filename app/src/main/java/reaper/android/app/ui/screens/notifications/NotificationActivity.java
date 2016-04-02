@@ -9,9 +9,18 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.view.MenuItem;
 
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.HashSet;
+import java.util.Set;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
+import reaper.android.app.api._core.GsonProvider;
+import reaper.android.app.cache._core.CacheManager;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.ui._core.BaseActivity;
 import reaper.android.app.ui.screens.chat.ChatActivity;
@@ -62,7 +71,8 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
     public void onBackPressed()
     {
         /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION,GoogleAnalyticsConstants.ACTION_BACK,null);
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION,
+                GoogleAnalyticsConstants.ACTION_BACK, null);
         /* Analytics */
 
         navigateToHomeScreen();
@@ -71,10 +81,10 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        if (item.getItemId() == android.R.id.home)
-        {
+        if (item.getItemId() == android.R.id.home) {
             /* Analytics */
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION,GoogleAnalyticsConstants.ACTION_UP,null);
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION,
+                    GoogleAnalyticsConstants.ACTION_UP, null);
             /* Analytics */
 
             navigateToHomeScreen();
@@ -86,8 +96,7 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
     @Override
     public void navigateToHomeScreen()
     {
-        if (isTaskRoot())
-        {
+        if (isTaskRoot()) {
             startActivity(HomeActivity.callingIntent(this));
         }
         finish();
@@ -108,12 +117,35 @@ public class NotificationActivity extends BaseActivity implements NotificationSc
     @Override
     public void navigateToFriendsScreen()
     {
-        startActivity(FriendsActivity.callingIntent(this));
+        Set<String> newFriends = getNewFriends();
+
+        if (newFriends == null) {
+            startActivity(FriendsActivity.callingIntent(this, new HashSet<String>()));
+        }
+        else if (newFriends.isEmpty()) {
+            startActivity(FriendsActivity.callingIntent(this, new HashSet<String>()));
+        }
+        else {
+
+            startActivity(FriendsActivity.callingIntent(this, newFriends));
+        }
     }
 
     @Override
     public void navigateToCreateScreen()
     {
         startActivity(CreateActivity.callingIntent(this, null));
+    }
+
+    private static Set<String> getNewFriends()
+    {
+        Type type = new TypeToken<Set<String>>()
+        {
+        }.getType();
+        Set<String> newFriends = GsonProvider.getGson().fromJson(CacheManager.getGenericCache
+                ().get
+                (GenericCacheKeys.NEW_FRIENDS_LIST), type);
+
+        return newFriends;
     }
 }

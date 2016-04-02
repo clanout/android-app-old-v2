@@ -15,11 +15,14 @@ public final class GenericCacheKeys
     /* Phonebook Contacts */
     public static final String PHONEBOOK_CONTACTS = "phonebook_contacts";
 
-    /*Friends*/
+    /* Friends */
     public static final String FRIENDS_CACHE_CLEARED_TIMESTAMP = "friends_cache_cleared_timestamp";
 
     /* Not Going Events */
     public static final String NOT_GOING_EVENT_LIST = "not_going_event_list";
+
+    /* New Friends */
+    public static final java.lang.String NEW_FRIENDS_LIST = "new_friends_list";
 
     private GenericCacheKeys()
     {

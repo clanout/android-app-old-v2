@@ -14,6 +14,8 @@ import android.view.MenuItem;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
+import java.util.HashSet;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
@@ -116,6 +118,6 @@ public class AccountActivity extends BaseActivity implements AccountScreen
     @Override
     public void navigateToFriendsScreen()
     {
-        startActivity(FriendsActivity.callingIntent(this));
+        startActivity(FriendsActivity.callingIntent(this, new HashSet<String>()));
     }
 }

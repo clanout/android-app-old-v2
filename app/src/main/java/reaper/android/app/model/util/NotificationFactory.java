@@ -11,6 +11,7 @@ import org.joda.time.DateTime;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -381,6 +382,18 @@ public class NotificationFactory
     private static Observable<Notification> buildNewFriendJoinedAppNotification(final Map<String,
             String> args)
     {
+        Set<String> newFriends = getNewFriends();
+
+        if (newFriends == null) {
+            Set<String> newFriendsSet = new HashSet<>();
+            newFriendsSet.add(args.get("user_id"));
+            CacheManager.getGenericCache().put(GenericCacheKeys.NEW_FRIENDS_LIST, newFriendsSet);
+        }
+        else {
+
+            newFriends.add(args.get("user_id"));
+            CacheManager.getGenericCache().put(GenericCacheKeys.NEW_FRIENDS_LIST, newFriends);
+        }
 
         return notificationCache.getAllForType(Notification.NEW_FRIEND_ADDED)
                 .flatMap(new Func1<List<Notification>, Observable<Integer>>()
@@ -713,6 +726,18 @@ public class NotificationFactory
                 (GenericCacheKeys.NOT_GOING_EVENT_LIST), type);
 
         return notGoingEvents;
+    }
+
+    private static Set<String> getNewFriends()
+    {
+        Type type = new TypeToken<Set<String>>()
+        {
+        }.getType();
+        Set<String> newFriends = GsonProvider.getGson().fromJson(CacheManager.getGenericCache
+                ().get
+                (GenericCacheKeys.NEW_FRIENDS_LIST), type);
+
+        return newFriends;
     }
 
 }

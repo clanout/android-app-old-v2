@@ -15,6 +15,7 @@ import com.squareup.picasso.Picasso;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
+import java.util.HashSet;
 import java.util.List;
 
 import butterknife.Bind;
@@ -48,23 +49,25 @@ public class FriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private Drawable unblockedDrawable;
     private Drawable personDrawable;
 
+    private HashSet<String> newFriends;
+
     public FriendAdapter(Context context, List<Friend> localFriends, List<Friend> otherFriends,
-                         String locationZone, BlockListener blockListener)
+                         String locationZone, BlockListener blockListener, HashSet<String>
+                                 newFriends)
     {
         this.context = context;
         this.localFriends = localFriends;
         this.otherFriends = otherFriends;
         this.locationZone = locationZone;
         this.blockListener = blockListener;
+        this.newFriends = newFriends;
 
         size = 0;
-        if (!localFriends.isEmpty())
-        {
+        if (!localFriends.isEmpty()) {
             size += (localFriends.size() + 1);
         }
 
-        if (!otherFriends.isEmpty())
-        {
+        if (!otherFriends.isEmpty()) {
             size += (otherFriends.size() + 1);
         }
 
@@ -74,18 +77,17 @@ public class FriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        switch (viewType)
-        {
+        switch (viewType) {
             case TYPE_HEADER_LOCAL_FRIENDS:
             case TYPE_HEADER_OTHER_FRIENDS:
                 View headerView = LayoutInflater.from(context)
-                                                .inflate(R.layout.item_friend_header, parent, false);
+                        .inflate(R.layout.item_friend_header, parent, false);
                 return new FriendHeaderViewHolder(headerView);
 
             case TYPE_LOCAL_FRIENDS:
             case TYPE_OTHER_FRIENDS:
                 View friendView = LayoutInflater.from(context)
-                                                .inflate(R.layout.item_friend, parent, false);
+                        .inflate(R.layout.item_friend, parent, false);
                 return new FriendViewHolder(friendView);
 
             default:
@@ -97,8 +99,7 @@ public class FriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position)
     {
         int type = getItemViewType(position);
-        switch (type)
-        {
+        switch (type) {
             case TYPE_HEADER_LOCAL_FRIENDS:
                 ((FriendHeaderViewHolder) holder).render(true);
                 break;
@@ -113,13 +114,11 @@ public class FriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 break;
 
             case TYPE_OTHER_FRIENDS:
-                if (localFriends.isEmpty())
-                {
+                if (localFriends.isEmpty()) {
                     int otherFriendIndex = position - 1;
                     ((FriendViewHolder) holder).render(otherFriends.get(otherFriendIndex));
                 }
-                else
-                {
+                else {
                     int otherFriendIndex = position - (localFriends.size() + 2);
                     ((FriendViewHolder) holder).render(otherFriends.get(otherFriendIndex));
                 }
@@ -136,33 +135,25 @@ public class FriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public int getItemViewType(int position)
     {
-        if (!localFriends.isEmpty())
-        {
-            if (position == 0)
-            {
+        if (!localFriends.isEmpty()) {
+            if (position == 0) {
                 return TYPE_HEADER_LOCAL_FRIENDS;
             }
-            else if (position <= localFriends.size())
-            {
+            else if (position <= localFriends.size()) {
                 return TYPE_LOCAL_FRIENDS;
             }
-            else if (position == (localFriends.size() + 1))
-            {
+            else if (position == (localFriends.size() + 1)) {
                 return TYPE_HEADER_OTHER_FRIENDS;
             }
-            else
-            {
+            else {
                 return TYPE_OTHER_FRIENDS;
             }
         }
-        else
-        {
-            if (position == 0)
-            {
+        else {
+            if (position == 0) {
                 return TYPE_HEADER_OTHER_FRIENDS;
             }
-            else
-            {
+            else {
                 return TYPE_OTHER_FRIENDS;
             }
         }
@@ -177,6 +168,7 @@ public class FriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     {
         ImageView userPic;
         TextView username;
+        TextView isNew;
         ImageView blockIcon;
 
         public FriendViewHolder(View itemView)
@@ -186,27 +178,36 @@ public class FriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             username = (TextView) itemView.findViewById(R.id.tvName);
             userPic = (ImageView) itemView.findViewById(R.id.ivProfilePic);
             blockIcon = (ImageView) itemView.findViewById(R.id.ivBlock);
+            isNew = (TextView) itemView.findViewById(R.id.tvNew);
         }
 
         @Override
         public void render(final Friend friend)
         {
             Picasso.with(context)
-                   .load(FacebookService_
-                           .getProfilePicUrl(friend.getId(), Dimensions.PROFILE_PIC_DEFAULT))
-                   .placeholder(personDrawable)
-                   .transform(new CircleTransform())
-                   .into(userPic);
+                    .load(FacebookService_
+                            .getProfilePicUrl(friend.getId(), Dimensions.PROFILE_PIC_DEFAULT))
+                    .placeholder(personDrawable)
+                    .transform(new CircleTransform())
+                    .into(userPic);
 
             username.setText(friend.getName());
 
-            if (friend.isBlocked())
-            {
+            if (friend.isBlocked()) {
                 blockIcon.setImageDrawable(blockedDrawable);
             }
-            else
-            {
+            else {
                 blockIcon.setImageDrawable(unblockedDrawable);
+            }
+
+            if (newFriends != null) {
+                if (newFriends.contains(friend.getId())) {
+
+                    isNew.setVisibility(View.VISIBLE);
+                }else{
+
+                    isNew.setVisibility(View.INVISIBLE);
+                }
             }
 
             blockIcon.setOnClickListener(new View.OnClickListener()
@@ -218,7 +219,8 @@ public class FriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
                     /* Analytics */
                     AnalyticsHelper
-                            .sendEvents(GoogleAnalyticsConstants.CATEGORY_MANAGE_FRIENDS, GoogleAnalyticsConstants.ACTION_BLOCK_OR_UNBLOCK, null);
+                            .sendEvents(GoogleAnalyticsConstants.CATEGORY_MANAGE_FRIENDS,
+                                    GoogleAnalyticsConstants.ACTION_BLOCK_OR_UNBLOCK, null);
                     /* Analytics */
 
 
@@ -241,12 +243,10 @@ public class FriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         public void render(boolean isLocalFriendsHeader)
         {
-            if (!isLocalFriendsHeader)
-            {
+            if (!isLocalFriendsHeader) {
                 tvTitle.setText("Other Friends");
             }
-            else
-            {
+            else {
                 tvTitle.setText("Friends in " + locationZone);
             }
         }

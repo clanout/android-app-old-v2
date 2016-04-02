@@ -19,12 +19,26 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="32dp"
+        android:layout_marginRight="8dp"
         android:layout_toRightOf="@id/ivProfilePic"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="Aditya Prasad"
         android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/tvNew"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NEW"
+        android:padding="4dp"
+        android:layout_toRightOf="@id/tvName"
+        android:layout_centerVertical="true"
+        android:background="@color/accent"
+        android:textColor="@color/white"
+        android:layout_marginRight="24dp"
+        android:textSize="10sp"
+        android:fontFamily="sans-serif-condensed"/>
 
     <ImageView
         android:id="@+id/ivBlock"

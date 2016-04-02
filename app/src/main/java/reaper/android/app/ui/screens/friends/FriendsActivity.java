@@ -9,6 +9,9 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.view.MenuItem;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
@@ -18,9 +21,14 @@ import reaper.android.common.analytics.AnalyticsHelper;
 
 public class FriendsActivity extends BaseActivity implements FriendsScreen
 {
-    public static Intent callingIntent(Context context)
+    private static final String ARG_NEW_FRIENDS = "arg_new_friends";
+
+    public static Intent callingIntent(Context context, Set<String> newFriends)
     {
-        return new Intent(context, FriendsActivity.class);
+        Intent intent = new Intent(context, FriendsActivity.class);
+        HashSet<String> newFriendsHashSet = (HashSet<String>) newFriends;
+        intent.putExtra(ARG_NEW_FRIENDS, newFriendsHashSet);
+        return intent;
     }
 
     /* UI Elements */
@@ -47,9 +55,12 @@ public class FriendsActivity extends BaseActivity implements FriendsScreen
         setActionBarBackVisibility(true);
 
         /* Notification View */
+
+        HashSet<String> newFriends = (HashSet<String>) getIntent().getExtras().get(ARG_NEW_FRIENDS);
+
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content, FriendsFragment.newInstance());
+        fragmentTransaction.replace(R.id.content, FriendsFragment.newInstance(newFriends));
         fragmentTransaction.commit();
     }
 

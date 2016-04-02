@@ -14,6 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import butterknife.Bind;
@@ -33,9 +34,14 @@ public class FriendsFragment extends BaseFragment implements
         FriendsView,
         FriendAdapter.BlockListener
 {
-    public static FriendsFragment newInstance()
+    private static final String ARG_NEW_FRIENDS = "arg_new_friends";
+
+    public static FriendsFragment newInstance(HashSet<String> newFriendsSet)
     {
-        return new FriendsFragment();
+        FriendsFragment friendsFragment = new FriendsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(ARG_NEW_FRIENDS, newFriendsSet);
+        return friendsFragment;
     }
 
     FriendsScreen screen;
@@ -61,6 +67,8 @@ public class FriendsFragment extends BaseFragment implements
     List<Friend> otherFriends;
     String locationZone;
 
+    HashSet<String> newFriends;
+
     /* Lifecycle Methods */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -72,6 +80,8 @@ public class FriendsFragment extends BaseFragment implements
 
         /* Location Service */
         LocationService_ locationService = LocationService_.getInstance();
+
+        newFriends = (HashSet<String>) getArguments().get(ARG_NEW_FRIENDS);
 
         /* Presenter */
         presenter = new FriendsPresenterImpl(userService, locationService);
@@ -181,7 +191,7 @@ public class FriendsFragment extends BaseFragment implements
     private void refreshRecyclerView(List<Friend> visibleLocalFriends, List<Friend> visibleOtherFriends, String locationZone)
     {
         rvFriends
-                .setAdapter(new FriendAdapter(getActivity(), visibleLocalFriends, visibleOtherFriends, locationZone, this));
+                .setAdapter(new FriendAdapter(getActivity(), visibleLocalFriends, visibleOtherFriends, locationZone, this, newFriends));
 
         rvFriends.setVisibility(View.VISIBLE);
         tvMessage.setVisibility(View.GONE);
