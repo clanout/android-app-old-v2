@@ -21,6 +21,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import reaper.android.R;
+import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
@@ -108,7 +109,8 @@ public class EventDetailsFragment extends BaseFragment implements
         UserService userService = UserService.getInstance();
         NotificationService notificationService = NotificationService.getInstance();
         Event event = (Event) getArguments().getSerializable(ARG_EVENT);
-        presenter = new EventDetailsPresenterImpl(eventService, userService, notificationService, event);
+        presenter = new EventDetailsPresenterImpl(eventService, userService, notificationService,
+                CacheManager.getGenericCache(), event);
     }
 
     @Nullable

@@ -13,10 +13,12 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import reaper.android.app.api._core.GsonProvider;
 import reaper.android.app.cache._core.CacheManager;
 import reaper.android.app.cache.notification.NotificationCache;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.NotificationMessages;
 import reaper.android.app.model.Notification;
 import rx.Observable;
@@ -45,12 +47,55 @@ public class NotificationFactory
 
             Log.d("NOTIFICATION", "typeCode" + typeCode);
 
-            return buildNotification(typeCode, args);
+            if (shouldBuildNotification(typeCode, args)) {
+                return buildNotification(typeCode, args);
+            }
+            else {
+
+                return Observable.just(null);
+            }
 
         }
         catch (Exception e) {
             Timber.e("Unable to create notification [" + e.getMessage() + "]");
             throw new IllegalStateException("Exception in NotificationFactory.create()");
+        }
+    }
+
+    private static boolean shouldBuildNotification(int typeCode, Map<String, String> args)
+    {
+        Set<String> notGoingEvents = getNotGoingEvents();
+
+        if (args.get("event_id") == null) {
+
+            Log.d("NOTIFICATION", "event ID is null");
+            return true;
+        }
+        else {
+
+            Log.d("NOTIFICATION", "event ID is not null");
+            if (notGoingEvents == null) {
+
+                Log.d("NOTIFICATION", "set is null");
+                return true;
+            }
+            else {
+
+                Log.d("NOTIFICATION", "set is not null");
+
+                if (typeCode == Notification.EVENT_INVITATION) {
+
+                    Log.d("NOTIFICATION", "invitation type");
+
+                    return true;
+                }
+                else {
+
+                    Log.d("NOTIFICATION", "boolean ---- " + !notGoingEvents.contains(args.get("event_id")));
+
+                    return !notGoingEvents.contains(args.get("event_id"));
+                }
+            }
         }
     }
 
@@ -594,7 +639,8 @@ public class NotificationFactory
 
     }
 
-    private static Observable<Integer> calculateNumberOfNewFriendsInApp(List<Notification> notifications)
+    private static Observable<Integer> calculateNumberOfNewFriendsInApp(List<Notification>
+                                                                                notifications)
     {
         if (notifications.size() != 0) {
 
@@ -644,7 +690,8 @@ public class NotificationFactory
         }
     }
 
-    private static String getNewFriendJoinedAppMessage(Integer newFriendsAlreadyOnApp, Map<String, String> args)
+    private static String getNewFriendJoinedAppMessage(Integer newFriendsAlreadyOnApp,
+                                                       Map<String, String> args)
 
     {
         String message = "";
@@ -664,4 +711,17 @@ public class NotificationFactory
 
         return message;
     }
+
+    private static Set<String> getNotGoingEvents()
+    {
+        Type type = new TypeToken<Set<String>>()
+        {
+        }.getType();
+        Set<String> notGoingEvents = GsonProvider.getGson().fromJson(CacheManager.getGenericCache
+                ().get
+                (GenericCacheKeys.NOT_GOING_EVENT_LIST), type);
+
+        return notGoingEvents;
+    }
+
 }

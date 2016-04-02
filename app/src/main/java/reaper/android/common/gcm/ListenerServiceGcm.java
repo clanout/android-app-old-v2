@@ -65,7 +65,9 @@ public class ListenerServiceGcm extends GcmListenerService
                     @Override
                     public void onNext(Notification notification)
                     {
-                        notificationService.handleNotification(notification);
+                        if(notification != null) {
+                            notificationService.handleNotification(notification);
+                        }
                     }
                 });
     }

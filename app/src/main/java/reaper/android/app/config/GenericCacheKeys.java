@@ -18,6 +18,9 @@ public final class GenericCacheKeys
     /*Friends*/
     public static final String FRIENDS_CACHE_CLEARED_TIMESTAMP = "friends_cache_cleared_timestamp";
 
+    /* Not Going Events */
+    public static final String NOT_GOING_EVENT_LIST = "not_going_event_list";
+
     private GenericCacheKeys()
     {
     }

@@ -1,10 +1,19 @@
 package reaper.android.app.ui.screens.details.mvp;
 
+import com.google.gson.reflect.TypeToken;
+
 import org.joda.time.DateTime;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import reaper.android.app.api._core.GsonProvider;
+import reaper.android.app.cache.generic.GenericCache;
+import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
 import reaper.android.app.model.util.DateTimeUtil;
@@ -27,6 +36,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     private EventService eventService;
     private UserService userService;
     private NotificationService notificationService;
+    private GenericCache genericCache;
 
     /* Data */
     private Event event;
@@ -39,11 +49,13 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     private CompositeSubscription subscriptions;
 
     public EventDetailsPresenterImpl(EventService eventService, UserService userService,
-                                     NotificationService notificationService, Event event)
+                                     NotificationService notificationService, GenericCache
+                                             genericCache, Event event)
     {
         this.eventService = eventService;
         this.userService = userService;
         this.notificationService = notificationService;
+        this.genericCache = genericCache;
 
         this.event = event;
         processIsLastMinute();
@@ -75,26 +87,23 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     @Override
     public void toggleRsvp()
     {
-        if (view == null)
-        {
+        if (view == null) {
             return;
         }
 
+
         final boolean oldRsvp = event.getRsvp() == Event.RSVP.YES;
-        if (isRsvpUpdateInProgress)
-        {
+        if (isRsvpUpdateInProgress) {
             view.resetEvent(event);
             return;
         }
 
         isRsvpUpdateInProgress = true;
 
-        if (oldRsvp)
-        {
+        if (oldRsvp) {
             event.setRsvp(Event.RSVP.NO);
         }
-        else
-        {
+        else {
             event.setRsvp(Event.RSVP.YES);
         }
         view.resetEvent(event);
@@ -116,12 +125,10 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
                             @Override
                             public void onError(Throwable e)
                             {
-                                if (oldRsvp)
-                                {
+                                if (oldRsvp) {
                                     event.setRsvp(Event.RSVP.YES);
                                 }
-                                else
-                                {
+                                else {
                                     event.setRsvp(Event.RSVP.NO);
                                 }
 
@@ -134,14 +141,11 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
                             @Override
                             public void onNext(Boolean isSuccess)
                             {
-                                if (!isSuccess)
-                                {
-                                    if (oldRsvp)
-                                    {
+                                if (!isSuccess) {
+                                    if (oldRsvp) {
                                         event.setRsvp(Event.RSVP.YES);
                                     }
-                                    else
-                                    {
+                                    else {
                                         event.setRsvp(Event.RSVP.NO);
                                     }
 
@@ -149,6 +153,10 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
                                     processEditState();
                                     processEventActions();
                                     isRsvpUpdateInProgress = false;
+                                }
+                                else {
+
+                                    removeEventFromNotGoingList();
                                 }
                             }
                         });
@@ -159,22 +167,18 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     @Override
     public void setStatus(String status)
     {
-        if (status == null)
-        {
+        if (status == null) {
             status = "";
         }
 
-        if (!status.equals(event.getStatus()))
-        {
+        if (!status.equals(event.getStatus())) {
             event.setStatus(status);
             view.resetEvent(event);
 
-            if (isLastMinute && !status.isEmpty())
-            {
+            if (isLastMinute && !status.isEmpty()) {
                 eventService.updateStatus(event.getId(), status, true);
             }
-            else
-            {
+            else {
                 eventService.updateStatus(event.getId(), status, false);
             }
         }
@@ -183,6 +187,9 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     @Override
     public void sendInvitationResponse(String invitationResponse)
     {
+        addEventToNotGoingList();
+        processEventActions();
+
         eventService.sendInvitationResponse(event.getId(), invitationResponse);
     }
 
@@ -263,8 +270,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
                             @Override
                             public void onNext(EventDetails eventDetails)
                             {
-                                if (eventDetails != null)
-                                {
+                                if (eventDetails != null) {
                                     displayDetails(eventDetails);
                                 }
                             }
@@ -307,13 +313,12 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
 
     private void processEventActions()
     {
-        if (event.getRsvp() == Event.RSVP.YES)
-        {
+        if (event.getRsvp() == Event.RSVP.YES) {
             view.displayYayActions();
         }
-        else
-        {
-            view.displayNayActions(event.getInviterCount() > 0);
+        else {
+
+            view.displayNayActions((event.getInviterCount() > 0) && !hasDeclinedInvitation());
         }
     }
 
@@ -332,8 +337,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
         this.eventDetails = eventDetails;
         List<EventDetails.Attendee> attendees = eventDetails.getAttendees();
 
-        if (event.getRsvp() == Event.RSVP.YES)
-        {
+        if (event.getRsvp() == Event.RSVP.YES) {
             EventDetails.Attendee attendee = new EventDetails.Attendee();
             attendee.setId(userService.getSessionUserId());
             attendees.remove(attendee);
@@ -347,4 +351,56 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
     {
         isLastMinute = DateTime.now().plusHours(1).isAfter(event.getStartTime());
     }
+
+    private void addEventToNotGoingList()
+    {
+        Set<String> notGoingEvents = getNotGoingEvents();
+
+        if (notGoingEvents == null) {
+            Set<String> notGoingEventsSet = new HashSet<>();
+            notGoingEventsSet.add(event.getId());
+            genericCache.put(GenericCacheKeys.NOT_GOING_EVENT_LIST, notGoingEventsSet);
+        }
+        else {
+
+            notGoingEvents.add(event.getId());
+            genericCache.put(GenericCacheKeys.NOT_GOING_EVENT_LIST, notGoingEvents);
+        }
+    }
+
+    private void removeEventFromNotGoingList()
+    {
+        Set<String> notGoingEvents = getNotGoingEvents();
+
+        if (notGoingEvents != null) {
+            notGoingEvents.remove(event.getId());
+
+            genericCache.put(GenericCacheKeys.NOT_GOING_EVENT_LIST, notGoingEvents);
+        }
+    }
+
+    private Set<String> getNotGoingEvents()
+    {
+        Type type = new TypeToken<Set<String>>()
+        {
+        }.getType();
+        Set<String> notGoingEvents = GsonProvider.getGson().fromJson(genericCache.get
+                (GenericCacheKeys.NOT_GOING_EVENT_LIST), type);
+
+        return notGoingEvents;
+    }
+
+    private boolean hasDeclinedInvitation()
+    {
+        Set<String> notGoingEvents = getNotGoingEvents();
+
+        if(notGoingEvents != null) {
+            boolean hasDeclinedInvitation = notGoingEvents.contains(event.getId());
+            return hasDeclinedInvitation;
+        }else{
+
+            return false;
+        }
+    }
+
 }
