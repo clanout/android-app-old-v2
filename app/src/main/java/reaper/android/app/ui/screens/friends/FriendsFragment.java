@@ -2,16 +2,21 @@ package reaper.android.app.ui.screens.friends;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,7 +37,7 @@ import reaper.android.common.analytics.AnalyticsHelper;
 
 public class FriendsFragment extends BaseFragment implements
         FriendsView,
-        FriendAdapter.BlockListener
+        FriendAdapter.BlockListener, SearchView.OnQueryTextListener
 {
     private static final String ARG_NEW_FRIENDS = "arg_new_friends";
 
@@ -41,6 +46,7 @@ public class FriendsFragment extends BaseFragment implements
         FriendsFragment friendsFragment = new FriendsFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable(ARG_NEW_FRIENDS, newFriendsSet);
+        friendsFragment.setArguments(bundle);
         return friendsFragment;
     }
 
@@ -58,11 +64,6 @@ public class FriendsFragment extends BaseFragment implements
     @Bind(R.id.loading)
     ProgressBar loading;
 
-    @Bind(R.id.etSearch)
-    EditText etSearch;
-
-    TextWatcher search;
-
     List<Friend> localFriends;
     List<Friend> otherFriends;
     String locationZone;
@@ -74,6 +75,8 @@ public class FriendsFragment extends BaseFragment implements
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
 
         /* User Service */
         UserService userService = UserService.getInstance();
@@ -117,10 +120,21 @@ public class FriendsFragment extends BaseFragment implements
     {
         super.onStop();
 
-        etSearch.removeTextChangedListener(search);
-        search = null;
-
         presenter.detachView();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        menu.clear();
+        inflater.inflate(R.menu.menu_friends, menu);
+
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id
+                .action_search));
+        searchView.setOnQueryTextListener(this);
+
     }
 
     /* Listeners */
@@ -175,9 +189,6 @@ public class FriendsFragment extends BaseFragment implements
         this.otherFriends = otherFriends;
         this.locationZone = locationZone;
 
-        initSearch();
-        etSearch.addTextChangedListener(search);
-
         refreshRecyclerView(localFriends, otherFriends, locationZone);
     }
 
@@ -198,77 +209,63 @@ public class FriendsFragment extends BaseFragment implements
         loading.setVisibility(View.GONE);
     }
 
-    private void initSearch()
+    @Override
+    public boolean onQueryTextSubmit(String query)
     {
-        /* Analytics */
-        AnalyticsHelper
-                .sendEvents(GoogleAnalyticsConstants.CATEGORY_MANAGE_FRIENDS, GoogleAnalyticsConstants.ACTION_SEARCH, GoogleAnalyticsConstants.LABEL_ATTEMPT);
-        /* Analytics */
+        return false;
+    }
 
-        search = new TextWatcher()
+    @Override
+    public boolean onQueryTextChange(String newText)
+    {
+        String query = newText.toLowerCase();
+
+        List<Friend> visibleLocalFriends = new ArrayList<>();
+        List<Friend> visibleOtherFriends = new ArrayList<>();
+
+        if (newText.length() >= 1)
         {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            visibleLocalFriends = new ArrayList<>();
+            for (Friend friend : localFriends)
             {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count)
-            {
-                String query = s.toString().toLowerCase();
-
-                List<Friend> visibleLocalFriends = new ArrayList<>();
-                List<Friend> visibleOtherFriends = new ArrayList<>();
-
-                if (s.length() >= 1)
+                String[] nameTokens = friend.getName().toLowerCase().split(" ");
+                for (String nameToken : nameTokens)
                 {
-                    visibleLocalFriends = new ArrayList<>();
-                    for (Friend friend : localFriends)
+                    if (nameToken.startsWith(query))
                     {
-                        String[] nameTokens = friend.getName().toLowerCase().split(" ");
-                        for (String nameToken : nameTokens)
-                        {
-                            if (nameToken.startsWith(query))
-                            {
-                                visibleLocalFriends.add(friend);
-                                break;
-                            }
-                        }
+                        visibleLocalFriends.add(friend);
+                        break;
                     }
-
-                    visibleOtherFriends = new ArrayList<>();
-                    for (Friend friend : otherFriends)
-                    {
-                        String[] nameTokens = friend.getName().toLowerCase().split(" ");
-                        for (String nameToken : nameTokens)
-                        {
-                            if (nameToken.startsWith(query))
-                            {
-                                visibleOtherFriends.add(friend);
-                                break;
-                            }
-                        }
-                    }
-
-                    if (visibleLocalFriends.isEmpty() && visibleOtherFriends.isEmpty())
-                    {
-                        displayNoFriendsMessage();
-                    }
-                    else
-                    {
-                        refreshRecyclerView(visibleLocalFriends, visibleOtherFriends, locationZone);
-                    }
-                }
-                else if (s.length() == 0)
-                {
-                    refreshRecyclerView(localFriends, otherFriends, locationZone);
                 }
             }
 
-            @Override
-            public void afterTextChanged(Editable s)
+            visibleOtherFriends = new ArrayList<>();
+            for (Friend friend : otherFriends)
             {
+                String[] nameTokens = friend.getName().toLowerCase().split(" ");
+                for (String nameToken : nameTokens)
+                {
+                    if (nameToken.startsWith(query))
+                    {
+                        visibleOtherFriends.add(friend);
+                        break;
+                    }
+                }
             }
-        };
+
+            if (visibleLocalFriends.isEmpty() && visibleOtherFriends.isEmpty())
+            {
+                displayNoFriendsMessage();
+            }
+            else
+            {
+                refreshRecyclerView(visibleLocalFriends, visibleOtherFriends, locationZone);
+            }
+        }
+        else if (newText.length() == 0)
+        {
+            refreshRecyclerView(localFriends, otherFriends, locationZone);
+        }
+        return false;
     }
 }

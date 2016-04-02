@@ -37,55 +37,9 @@
 
     </LinearLayout>
 
-    <!-- Search -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/light_grey"/>
-
-    <View
-        android:id="@+id/focus_thief"
-        android:layout_width="match_parent"
-        android:layout_height="0.1dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"/>
-
-    <LinearLayout
-        android:id="@+id/ll_fragment_manage_friends_search"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:gravity="center_horizontal|center_vertical"
-        android:orientation="horizontal"
-        android:paddingTop="8dp">
-
-        <net.steamcrafted.materialiconlib.MaterialIconView
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleType="center"
-            app:materialIcon="magnify"
-            app:materialIconColor="@color/light_grey"
-            app:materialIconSize="36dp"/>
-
-        <EditText
-            android:id="@+id/etSearch"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:hint="@string/search_friends"
-            android:inputType="textPersonName"
-            android:textSize="14sp"/>
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="8dp"
         android:background="@color/light_grey"/>
 
     <!-- Friends -->
