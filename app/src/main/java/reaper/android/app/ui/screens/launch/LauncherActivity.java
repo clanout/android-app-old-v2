@@ -41,6 +41,7 @@ import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.EventService;
+import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
 import reaper.android.app.service._new.AuthService_;
 import reaper.android.app.service._new.FacebookService_;
@@ -740,8 +741,12 @@ public class LauncherActivity extends BaseActivity implements
 
             case FlowEntry.DETAILS:
                 /* Analytics */
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_OPEN,GoogleAnalyticsConstants.LABEL_FROM_PUSH_NOTIFICATION);
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,
+                        GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants
+                                .LABEL_FROM_PUSH_NOTIFICATION);
                 /* Analytics */
+
+                NotificationService.getInstance().deleteAllNotificationsFromCache();
 
                 startActivity(EventDetailsActivity.callingIntent(this, eventId, false));
                 break;
@@ -750,6 +755,8 @@ public class LauncherActivity extends BaseActivity implements
                 /* Analytics */
                 AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CHAT,GoogleAnalyticsConstants.ACTION_OPEN,GoogleAnalyticsConstants.LABEL_FROM_PUSH_NOTIFICATION);
                 /* Analytics */
+
+                NotificationService.getInstance().deleteAllNotificationsFromCache();
 
                 startActivity(ChatActivity.callingIntent(this, eventId));
                 break;
