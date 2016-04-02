@@ -1,11 +1,15 @@
 package reaper.android.app.ui.screens.invite;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -17,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
@@ -46,7 +51,7 @@ import reaper.android.common.analytics.AnalyticsHelper;
 public class InviteFragment extends BaseFragment implements
         InviteView,
         InviteAdapter.InviteListener,
-        PermissionHandler.Listener
+        PermissionHandler.Listener, SearchView.OnQueryTextListener
 {
     private static final String ARG_EVENT_ID = "arg_event_id";
 
@@ -72,9 +77,6 @@ public class InviteFragment extends BaseFragment implements
     @Bind(R.id.tvRetry)
     View tvRetry;
 
-    @Bind(R.id.etSearch)
-    EditText etSearch;
-
     @Bind(R.id.llPermission)
     View llPermission;
 
@@ -99,7 +101,7 @@ public class InviteFragment extends BaseFragment implements
     MenuItem addPhone;
     boolean isAddPhoneVisible;
 
-    TextWatcher search;
+//    TextWatcher search;
     String locationZone;
     List<FriendInviteWrapper> friends;
     List<PhonebookContactInviteWrapper> contacts;
@@ -167,9 +169,6 @@ public class InviteFragment extends BaseFragment implements
     public void onStop()
     {
         super.onStop();
-
-        etSearch.removeTextChangedListener(search);
-        search = null;
 
         rlInvite.setOnClickListener(null);
         llPermission.setOnClickListener(null);
@@ -248,6 +247,10 @@ public class InviteFragment extends BaseFragment implements
         });
 
         addPhone.setVisible(isAddPhoneVisible);
+
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id
+                .action_search));
+        searchView.setOnQueryTextListener(this);
     }
 
     /* Permission Handling */
@@ -419,8 +422,6 @@ public class InviteFragment extends BaseFragment implements
         this.locationZone = locationZone;
         this.friends = friends;
         this.contacts = phonebookContacts;
-        initSearch();
-        etSearch.addTextChangedListener(search);
 
         refreshRecyclerView(locationZone, friends, phonebookContacts);
     }
@@ -487,76 +488,63 @@ public class InviteFragment extends BaseFragment implements
         tvMessage.setVisibility(View.GONE);
     }
 
-    private void initSearch()
+    @Override
+    public boolean onQueryTextSubmit(String query)
     {
-        /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE, GoogleAnalyticsConstants.ACTION_SEARCH,null);
-        /* Analytics */
+        return false;
+    }
 
-        search = new TextWatcher()
+    @Override
+    public boolean onQueryTextChange(String newText)
+    {
+        String query = newText.toLowerCase();
+
+        List<FriendInviteWrapper> visibleFriends = new ArrayList<>();
+        List<PhonebookContactInviteWrapper> visibleContacts = new ArrayList<>();
+
+        if (newText.length() >= 1)
         {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            visibleFriends = new ArrayList<>();
+            for (FriendInviteWrapper friend : friends)
             {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count)
-            {
-                String query = s.toString().toLowerCase();
-
-                List<FriendInviteWrapper> visibleFriends = new ArrayList<>();
-                List<PhonebookContactInviteWrapper> visibleContacts = new ArrayList<>();
-
-                if (s.length() >= 1)
+                String[] nameTokens = friend.getFriend().getName().toLowerCase().split(" ");
+                for (String nameToken : nameTokens)
                 {
-                    visibleFriends = new ArrayList<>();
-                    for (FriendInviteWrapper friend : friends)
+                    if (nameToken.startsWith(query))
                     {
-                        String[] nameTokens = friend.getFriend().getName().toLowerCase().split(" ");
-                        for (String nameToken : nameTokens)
-                        {
-                            if (nameToken.startsWith(query))
-                            {
-                                visibleFriends.add(friend);
-                                break;
-                            }
-                        }
+                        visibleFriends.add(friend);
+                        break;
                     }
-
-                    visibleContacts = new ArrayList<>();
-                    for (PhonebookContactInviteWrapper contact : contacts)
-                    {
-                        String[] nameTokens = contact.getPhonebookContact().getName().toLowerCase().split(" ");
-                        for (String nameToken : nameTokens)
-                        {
-                            if (nameToken.startsWith(query))
-                            {
-                                visibleContacts.add(contact);
-                                break;
-                            }
-                        }
-                    }
-
-                    if (visibleFriends.isEmpty() && visibleContacts.isEmpty())
-                    {
-                        displayNoFriendOrContactMessage();
-                    }
-                    else
-                    {
-                        refreshRecyclerView(locationZone, visibleFriends, visibleContacts);
-                    }
-                }
-                else if (s.length() == 0)
-                {
-                    refreshRecyclerView(locationZone, friends, contacts);
                 }
             }
 
-            @Override
-            public void afterTextChanged(Editable s)
+            visibleContacts = new ArrayList<>();
+            for (PhonebookContactInviteWrapper contact : contacts)
             {
+                String[] nameTokens = contact.getPhonebookContact().getName().toLowerCase().split(" ");
+                for (String nameToken : nameTokens)
+                {
+                    if (nameToken.startsWith(query))
+                    {
+                        visibleContacts.add(contact);
+                        break;
+                    }
+                }
             }
-        };
+
+            if (visibleFriends.isEmpty() && visibleContacts.isEmpty())
+            {
+                displayNoFriendOrContactMessage();
+            }
+            else
+            {
+                refreshRecyclerView(locationZone, visibleFriends, visibleContacts);
+            }
+        }
+        else if (newText.length() == 0)
+        {
+            refreshRecyclerView(locationZone, friends, contacts);
+        }
+        return false;
     }
 }
