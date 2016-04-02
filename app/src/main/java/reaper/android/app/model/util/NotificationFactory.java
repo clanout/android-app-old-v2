@@ -68,30 +68,21 @@ public class NotificationFactory
 
         if (args.get("event_id") == null) {
 
-            Log.d("NOTIFICATION", "event ID is null");
             return true;
         }
         else {
 
-            Log.d("NOTIFICATION", "event ID is not null");
             if (notGoingEvents == null) {
 
-                Log.d("NOTIFICATION", "set is null");
                 return true;
             }
             else {
 
-                Log.d("NOTIFICATION", "set is not null");
-
                 if (typeCode == Notification.EVENT_INVITATION) {
-
-                    Log.d("NOTIFICATION", "invitation type");
 
                     return true;
                 }
                 else {
-
-                    Log.d("NOTIFICATION", "boolean ---- " + !notGoingEvents.contains(args.get("event_id")));
 
                     return !notGoingEvents.contains(args.get("event_id"));
                 }
