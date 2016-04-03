@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.squareup.otto.Bus;
@@ -100,7 +101,7 @@ public class NotificationService
                                             new NotificationWrapper.NotificationItem
                                                     (NotificationWrapper.NotificationItem.Type
                                                             .EVENT_REMOVED,
-                                                    notification.getMessage());
+                                                            notification.getMessage());
 
                                     NotificationWrapper notificationWrapper =
                                             new NotificationWrapper(NotificationWrapper.Type
@@ -131,7 +132,7 @@ public class NotificationService
                                             new NotificationWrapper.NotificationItem
                                                     (NotificationWrapper.NotificationItem.Type
                                                             .INVITATION,
-                                                    notification.getMessage());
+                                                            notification.getMessage());
 
                                     NotificationWrapper notificationWrapper =
                                             new NotificationWrapper(NotificationWrapper.Type
@@ -162,7 +163,7 @@ public class NotificationService
                                             new NotificationWrapper.NotificationItem
                                                     (NotificationWrapper.NotificationItem.Type
                                                             .NEW_FRIEND_JOINED_APP,
-                                                    notification.getMessage());
+                                                            notification.getMessage());
 
                                     NotificationWrapper notificationWrapper =
                                             new NotificationWrapper(NotificationWrapper.Type
@@ -198,19 +199,19 @@ public class NotificationService
                                             item = new NotificationWrapper.NotificationItem
                                                     (NotificationWrapper.NotificationItem.Type
                                                             .EVENT_UPDATED, notification
-                                                    .getMessage());
+                                                            .getMessage());
                                         }
                                         else if (type == Notification.CHAT) {
                                             item = new NotificationWrapper.NotificationItem
                                                     (NotificationWrapper.NotificationItem.Type
                                                             .NEW_CHAT, notification
-                                                    .getMessage());
+                                                            .getMessage());
                                         }
                                         else {
                                             item = new NotificationWrapper.NotificationItem
                                                     (NotificationWrapper.NotificationItem.Type
                                                             .FRIEND_JOINED_EVENT, notification
-                                                    .getMessage());
+                                                            .getMessage());
                                         }
 
                                         String eventId = notification.getEventId();
@@ -1057,9 +1058,8 @@ public class NotificationService
                                 .Builder(Reaper
                                 .getReaperContext())
                                 .setSmallIcon(R.drawable.notification_icon_small)
-                                .setLargeIcon(BitmapFactory.decodeResource(Reaper
-                                        .getReaperContext().getResources(), R.drawable
-                                        .notification_icon_large))
+                                .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R
+                                        .color.primary))
                                 .setAutoCancel(true)
                                 .setSound(defaultSoundUri)
                                 .setContentIntent(pendingIntent);
