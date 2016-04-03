@@ -93,6 +93,7 @@ public class NotificationPresenterImpl implements NotificationPresenter
     public void onNotificationDeleted(int position)
     {
         NotificationWrapper deletedNotification = notifications.remove(position);
+
         if (notifications.isEmpty())
         {
             view.displayNoNotificationsMessage();
