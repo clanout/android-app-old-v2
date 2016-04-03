@@ -144,6 +144,7 @@ public class AuthService_
                         List<String> friends = facebookData.first;
                         final String coverPicUrl = facebookData.second;
                         String accessToken = facebookService.getAccessToken();
+                        Timber.v("ACCESS_TOKEN = " + accessToken);
 
                         CreateNewSessionApiRequest request = new CreateNewSessionApiRequest(accessToken, friends);
                         return authApi
