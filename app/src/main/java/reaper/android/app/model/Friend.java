@@ -7,6 +7,7 @@ public class Friend implements Model
     private boolean isFavourite;
     private boolean isBlocked;
     private boolean isChecked;
+    private boolean isNew;
 
     public boolean isChecked()
     {
@@ -88,6 +89,16 @@ public class Friend implements Model
                 return false;
             }
         }
+    }
+
+    public boolean isNew()
+    {
+        return isNew;
+    }
+
+    public void setIsNew(boolean isNew)
+    {
+        this.isNew = isNew;
     }
 }
 

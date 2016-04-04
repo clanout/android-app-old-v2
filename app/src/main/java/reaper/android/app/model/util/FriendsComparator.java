@@ -12,6 +12,14 @@ public class FriendsComparator implements Comparator<Friend>
     @Override
     public int compare(Friend lhs, Friend rhs)
     {
-        return lhs.getName().toLowerCase().compareTo(rhs.getName().toLowerCase());
+        if (lhs.isNew() && !rhs.isNew()) {
+            return -1;
+        }
+        else if (!lhs.isNew() && rhs.isNew()) {
+            return 1;
+        }
+        else {
+            return lhs.getName().toLowerCase().compareTo(rhs.getName().toLowerCase());
+        }
     }
 }
