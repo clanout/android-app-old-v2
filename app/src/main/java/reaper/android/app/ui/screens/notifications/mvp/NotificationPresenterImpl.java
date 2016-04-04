@@ -3,11 +3,13 @@ package reaper.android.app.ui.screens.notifications.mvp;
 import java.util.ArrayList;
 import java.util.List;
 
+import reaper.android.app.model.Notification;
 import reaper.android.app.model.NotificationWrapper;
 import reaper.android.app.service.NotificationService;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 
@@ -62,7 +64,7 @@ public class NotificationPresenterImpl implements NotificationPresenter
                 break;
 
             case NotificationWrapper.Type.EVENT_REMOVED:
-                view.displayEventRemovedMessage();
+                view.displayEventRemovedMessage(notification);
                 break;
 
             case NotificationWrapper.Type.EVENT_ACTIVITY:

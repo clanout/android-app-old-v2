@@ -63,12 +63,12 @@ public class Reaper extends Application
     {
         super.onCreate();
 
+        /* Static reference */
+        instance = this;
+
         /* Analytics */
         AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_APP_LAUNCH,null);
         /* Analytics */
-
-        /* Static reference */
-        instance = this;
 
         /* Facebook SDK */
         FacebookSdk.sdkInitialize(this);

@@ -4,13 +4,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import com.facebook.stetho.common.ArrayListAccumulator;
 import com.squareup.otto.Bus;
 
 import org.joda.time.DateTime;
@@ -51,7 +51,7 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
-import rx.functions.Func4;
+import rx.functions.Func5;
 import rx.schedulers.Schedulers;
 
 /**
@@ -245,14 +245,33 @@ public class NotificationService
                             }
                         });
 
+        Observable<List<Event>> getAllEventsObservable = eventCache.getEvents()
+                .map(new Func1<List<Event>, List<Event>>()
+                {
+                    List<Event> filteredEvents = new ArrayList<Event>();
+
+                    @Override
+                    public List<Event> call(List<Event> events)
+                    {
+                        for (Event event : events) {
+                            if (!event.isExpired()) {
+                                filteredEvents.add(event);
+                            }
+                        }
+
+                        return filteredEvents;
+                    }
+                });
+
         return Observable
                 .zip(deleteNotifications,
                         invitationNotifications,
                         newFriendsNotifications,
                         activityNotifications,
-                        new Func4<List<NotificationWrapper>, List<NotificationWrapper>,
+                        getAllEventsObservable,
+                        new Func5<List<NotificationWrapper>, List<NotificationWrapper>,
                                 List<NotificationWrapper>,
-                                List<NotificationWrapper>, List<NotificationWrapper>>()
+                                List<NotificationWrapper>, List<Event>, List<NotificationWrapper>>()
                         {
                             @Override
                             public List<NotificationWrapper> call(List<NotificationWrapper>
@@ -262,7 +281,8 @@ public class NotificationService
                                                                   List<NotificationWrapper>
                                                                           newFriendsNotifications,
                                                                   List<NotificationWrapper>
-                                                                          activityNotifications)
+                                                                          activityNotifications,
+                                                                  List<Event> events)
                             {
                                 Set<NotificationWrapper> notificationSet = new HashSet<>();
                                 notificationSet.addAll(deleteNotifications);
@@ -272,11 +292,47 @@ public class NotificationService
 
                                 List<NotificationWrapper> notifications = new ArrayList<>
                                         (notificationSet);
-                                Collections.sort(notifications, new NotificationComparator());
-                                return notifications;
+
+                                List<NotificationWrapper> filteredNotifications = new
+                                        ArrayListAccumulator<NotificationWrapper>();
+
+                                for (NotificationWrapper notificationWrapper : notifications) {
+                                    if (!isNotificationExpired(notificationWrapper, events)) {
+                                        filteredNotifications.add(notificationWrapper);
+                                    }
+                                }
+
+                                Collections.sort(filteredNotifications, new
+                                        NotificationComparator());
+                                return filteredNotifications;
                             }
                         })
                 .subscribeOn(Schedulers.newThread());
+    }
+
+    private boolean isNotificationExpired(NotificationWrapper notificationWrapper, List<Event>
+            events)
+
+    {
+        Event event;
+        boolean isExpired = false;
+
+        if (notificationWrapper.getEventId() == null) {
+            return false;
+        }
+        else {
+
+            event = new Event();
+            event.setId(notificationWrapper.getEventId());
+
+            if (events.contains(event)) {
+                return false;
+            }
+            else {
+
+                return true;
+            }
+        }
     }
 
     public void handleNotification(Notification notification)
@@ -633,7 +689,8 @@ public class NotificationService
                             catch (Exception e) {
                                   /* Analytics */
                                 AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants
-                                        .METHOD_CANNOT_CONVERT_TO_ENUM_IN_NOTIFICATION_SERVICE, false);
+                                                .METHOD_CANNOT_CONVERT_TO_ENUM_IN_NOTIFICATION_SERVICE,
+                                        false);
                                   /* Analytics */
 
                                 Log.d("APP", "exception in notification service ---- can't " +

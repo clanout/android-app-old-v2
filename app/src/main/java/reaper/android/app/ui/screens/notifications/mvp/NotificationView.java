@@ -12,7 +12,7 @@ public interface NotificationView
 
     void displayNoNotificationsMessage();
 
-    void displayEventRemovedMessage();
+    void displayEventRemovedMessage(NotificationWrapper notification);
 
     void navigateToDetailsScreen(String eventId);
 

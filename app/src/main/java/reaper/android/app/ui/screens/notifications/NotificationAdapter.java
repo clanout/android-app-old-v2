@@ -68,6 +68,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return notifications.size();
     }
 
+    public void removeNotification(NotificationWrapper notification)
+    {
+        int index = notifications.indexOf(notification);
+        notifications.remove(notification);
+        notifyItemRemoved(index);
+    }
+
     public interface NotificationClickListener
     {
         void onNotificationClicked(NotificationWrapper notification);

@@ -186,4 +186,15 @@ public class Event implements Model
     {
         return title;
     }
+
+    public boolean isExpired()
+    {
+        if(DateTime.now().isAfter(endTime))
+        {
+            return true;
+        }else{
+
+            return false;
+        }
+    }
 }

@@ -211,7 +211,7 @@ public class NotificationFragment extends BaseFragment implements
     }
 
     @Override
-    public void displayEventRemovedMessage()
+    public void displayEventRemovedMessage(final NotificationWrapper notification)
     {
         /* Analytics  */
         AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION, GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants.LABEL_DELETED_PLAN);
@@ -236,6 +236,7 @@ public class NotificationFragment extends BaseFragment implements
                     @Override
                     public void onNegativeButtonClicked() {
 
+                        ((NotificationAdapter)rvNotifications.getAdapter()).removeNotification(notification);
                     }
                 }
         );
