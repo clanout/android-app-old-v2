@@ -147,7 +147,7 @@ public class EventDetailsActivity extends BaseActivity implements
     public void handleError()
     {
         /* Analytics */
-        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z12,null,false);
+        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z12, false);
         /* Analytics */
 
         navigateToHomeScreen();

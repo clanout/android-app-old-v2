@@ -172,7 +172,7 @@ public class FriendsFragment extends BaseFragment implements
     public void displayError()
     {
         /* Analytics */
-        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z15,null,false);
+        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z15, false);
         /* Analytics */
 
         tvMessage.setText(R.string.error_facebook_friends);

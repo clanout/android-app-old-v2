@@ -185,7 +185,7 @@ public class AuthService_
                     public User call(Throwable e) {
 
                         /* Analytics */
-                        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_UNABLE_TO_CREATE_SESSION,null,true);
+                        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_UNABLE_TO_CREATE_SESSION, true);
                         /* Analytics */
 
                         Timber.e("[Unable to create session] " + e.getMessage());

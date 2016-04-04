@@ -152,7 +152,7 @@ public class FacebookService_
 
                                                             /* Analytics */
                                                             AnalyticsHelper
-                                                                    .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_F, null, false);
+                                                                    .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_F, false);
                                                             /* Analytics */
 
                                                             subscriber.onNext(null);
@@ -200,7 +200,7 @@ public class FacebookService_
 
                                                                                     /* Analytics */
                                                                                     AnalyticsHelper
-                                                                                            .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_G, null, false);
+                                                                                            .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_G, false);
                                                                                     /* Analytics */
 
                                                                                     subscriber.onNext(null);

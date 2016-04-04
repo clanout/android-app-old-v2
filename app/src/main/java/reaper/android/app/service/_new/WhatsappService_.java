@@ -23,7 +23,7 @@ public class WhatsappService_
         if (instance == null)
         {
             /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z8,null,true);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z8, true);
             /* Analytics */
 
             throw new IllegalStateException("[AccountService Not Initialized]");
@@ -52,10 +52,6 @@ public class WhatsappService_
         }
         catch (PackageManager.NameNotFoundException e)
         {
-            /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_O,null,false);
-            /* Analytics */
-            
             return false;
         }
     }

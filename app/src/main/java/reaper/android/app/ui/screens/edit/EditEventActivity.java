@@ -35,7 +35,7 @@ public class EditEventActivity extends BaseActivity implements EditEventScreen
         if (event == null)
         {
             /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z13,null,false);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z13, false);
             /* Analytics */
 
             throw new IllegalStateException("eventis null");
@@ -162,7 +162,7 @@ public class EditEventActivity extends BaseActivity implements EditEventScreen
         catch (Exception e)
         {
            /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z14,null,false);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z14, false);
             /* Analytics */
 
             Timber.d("Exception while sending intent to PlaceAutocomplete " + e.getMessage());

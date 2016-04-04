@@ -61,7 +61,7 @@ public class GcmService_
                         {
 
                             /* Analytics */
-                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_H,null,false);
+                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_H, false);
                             /* Analytics */
 
                             subscriber.onError(e);
@@ -79,11 +79,6 @@ public class GcmService_
 
                     @Override
                     public void onError(Throwable e) {
-
-                        /* Analytics */
-                        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_EVENT_SUBSCRIPTION_FAILED,null,false);
-                        /* Analytics */
-
                         Timber.e("[Event Subscription Failed] " + e.getMessage());
                     }
 
@@ -111,7 +106,7 @@ public class GcmService_
                         catch (IOException e)
                         {
                             /* Analytics */
-                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_E,null,false);
+                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_E, false);
                             /* Analytics */
 
                             subscriber.onError(e);
@@ -129,9 +124,7 @@ public class GcmService_
 
                     @Override
                     public void onError(Throwable e) {
-                        /* Analytics */
-                        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_I,null,false);
-                        /* Analytics */
+
                     }
 
                     @Override

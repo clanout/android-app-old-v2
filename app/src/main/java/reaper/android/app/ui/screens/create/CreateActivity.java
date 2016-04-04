@@ -156,7 +156,7 @@ public class CreateActivity extends BaseActivity implements CreateScreen
         catch (Exception e)
         {
             /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_EXCEPTION_WHILE_SENDING_INTENT_TO_AUTOCOMPLETE,null,false);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_EXCEPTION_WHILE_SENDING_INTENT_TO_AUTOCOMPLETE, false);
             /* Analytics */
 
             Timber.d("Exception while sending intent to PlaceAutocomplete " + e.getMessage());

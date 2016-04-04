@@ -51,7 +51,7 @@ public class UserService
         if (instance == null)
         {
             /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z11,null,false);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z11, false);
             /* Analytics */
 
             throw new IllegalStateException("[UserService Not Initialized]");
@@ -85,7 +85,7 @@ public class UserService
         if (user == null)
         {
             /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z11,null,false);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z11, false);
             /* Analytics */
 
             throw new IllegalStateException("[Session User null]");

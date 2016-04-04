@@ -115,7 +115,7 @@ public class ChatService_
 
                                 /* Analytics */
                                 AnalyticsHelper
-                                        .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_XMPP_CONNECTION_FAILED, null, false);
+                                        .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_XMPP_CONNECTION_FAILED, false);
                                 /* Analytics */
 
                                 Timber.v("[XmppConnection Connection Failed] " + e.getMessage());
@@ -167,7 +167,7 @@ public class ChatService_
 
                             /* Analytics */
                             AnalyticsHelper
-                                    .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_UNABLE_TO_JOIN_CHAT, null, false);
+                                    .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_UNABLE_TO_JOIN_CHAT, false);
                             /* Analytics */
 
                             subscriber
@@ -182,7 +182,7 @@ public class ChatService_
                     public void call(Throwable throwable)
                     {
                         /* Analytics */
-                        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z1,null,false);
+                        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z1, false);
 
                         throwable.printStackTrace();
                     }
@@ -246,7 +246,7 @@ public class ChatService_
                             {
                                 /* Analytics */
                                 AnalyticsHelper
-                                        .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_A, null, false);
+                                        .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_A, false);
                                 /* Analytics */
 
                                 subscriber.onError(e);
@@ -290,7 +290,7 @@ public class ChatService_
         {
 
             /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_B, null, false);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_B, false);
             /* Analytics */
             return Observable.error(e);
         }
@@ -312,7 +312,7 @@ public class ChatService_
 
                 /* Analytics */
                 AnalyticsHelper
-                        .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_LEAVE_CHAT_FAILED, null, false);
+                        .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_LEAVE_CHAT_FAILED, false);
                 /* Analytics */
 
                 Timber.e("[Leave Chat Failed] " + e.getMessage());
@@ -348,7 +348,7 @@ public class ChatService_
 
                         /* Analytics */
                         AnalyticsHelper
-                                .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_CHAT_NOTIFICATION_FAILED, null, false);
+                                .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_CHAT_NOTIFICATION_FAILED, false);
                         /* Analytics */
 
                         Timber.e("[Chat Notification Failed] " + e.getMessage());
@@ -406,7 +406,7 @@ public class ChatService_
                     {
                             /* Analytics */
                         AnalyticsHelper
-                                .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_CHAT_CONNECT_FAILED, null, false);
+                                .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_CHAT_CONNECT_FAILED, false);
                             /* Analytics */
                     }
 
@@ -445,7 +445,7 @@ public class ChatService_
         {
 
             /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_C, null, false);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_C, false);
             /* Analytics */
 
             return null;
@@ -539,7 +539,7 @@ public class ChatService_
         {
 
             /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_D, null, false);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_D, false);
             /* Analytics */
 
             return null;

@@ -43,7 +43,7 @@ public class LocationService_
         if (instance == null)
         {
             /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z16,null,false);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z16, false);
             /* Analytics */
 
             throw new IllegalStateException("[LocationService Not Initialized]");
@@ -140,7 +140,7 @@ public class LocationService_
 //                            {
 //
 //                                /* Analytics */
-//                                AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_K,null,false);
+//                                AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_K, false);
 //                                /* Analytics */
 //                                subscriber.onError(e);
 //                            }
@@ -257,7 +257,7 @@ public class LocationService_
 //                            catch (Exception e)
 //                            {
 //                                /* Analytics */
-//                                AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_L,null,false);
+//                                AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_L, false);
 //                                /* Analytics */
 //
 //                                Timber.e("[Location fetch error] " + e.getMessage());
@@ -292,7 +292,7 @@ public class LocationService_
         if (location == null)
         {
             /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z6,null,true);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z6, true);
             /* Analytics */
 
             return Observable.error(new IllegalStateException("Location Null"));
@@ -324,7 +324,7 @@ public class LocationService_
                           @Override
                           public Boolean call(Throwable e) {
                               /* Analytics */
-                              AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_FAILED_TO_PUSH_UPDATED_LOCATION,null,false);
+                              AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_FAILED_TO_PUSH_UPDATED_LOCATION, false);
                               /* Analytics */
 
                               Timber.v("[Failed to push updated location] " + e.getMessage());

@@ -45,7 +45,7 @@ public class PhonebookService_
         if (instance == null)
         {
             /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z7,null,true);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z7, true);
             /* Analytics */
 
             throw new IllegalStateException("[PhonebookService Not Initialized]");
@@ -106,7 +106,7 @@ public class PhonebookService_
                         catch (Exception e)
                         {
                             /* Analytics */
-                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_M,null,false);
+                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_M, false);
                             /* Analytics */
 
                             subscriber.onError(e);
@@ -234,7 +234,7 @@ public class PhonebookService_
                         catch (Exception e)
                         {
                             /* Analytics */
-                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_N,null,false);
+                            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_N, false);
                             /* Analytics */
 
                             subscriber.onError(e);

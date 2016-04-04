@@ -237,7 +237,7 @@ public class EventDetailsFragment extends BaseFragment implements
     public void onChatClicked()
     {
         /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_GO_TO,GoogleAnalyticsConstants.LABEL_INVITE);
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_GO_TO,GoogleAnalyticsConstants.LABEL_CHAT);
         /* Analytics */
 
         if (presenter != null)

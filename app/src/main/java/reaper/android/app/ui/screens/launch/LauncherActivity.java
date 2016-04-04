@@ -741,9 +741,6 @@ public class LauncherActivity extends BaseActivity implements
         switch (flowEntry)
         {
             case FlowEntry.HOME:
-                /* Analytics */
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_HOME,GoogleAnalyticsConstants.ACTION_OPEN,GoogleAnalyticsConstants.LABEL_FROM_APP_LAUNCH);
-                /* Analytics */
 
                 startActivity(HomeActivity.callingIntent(this));
                 break;

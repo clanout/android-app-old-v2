@@ -321,7 +321,7 @@ public class EventService
                                                 {
                                                     /* Analytics */
                                                     AnalyticsHelper
-                                                            .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_P, null, false);
+                                                            .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_P, false);
                                                     /* Analytics */
                                                 }
                                             }
@@ -372,7 +372,7 @@ public class EventService
                     public void onError(Throwable e)
                     {
                         /* Analytics */
-                        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z9,null,true);
+                        AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z9, true);
                         /* Analytics */
 
 
@@ -407,7 +407,7 @@ public class EventService
 //                    public void onError(Throwable e)
 //                    {
 //                          /* Analytics */
-//                          AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z10,null,true);
+//                          AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z10, true);
 //                          /* Analytics */
 //                    }
 //
@@ -490,7 +490,7 @@ public class EventService
                                {
                                    /* Analytics */
                                    AnalyticsHelper
-                                           .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Q, null, false);
+                                           .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Q, false);
                                    /* Analytics */
 
                                    return -1;
@@ -654,10 +654,7 @@ public class EventService
                         }
                         catch (Exception e)
                         {
-                            /* Analytics */
-                            AnalyticsHelper
-                                    .sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_R, null, false);
-                            /* Analytics */
+
                         }
 
                         if (isSuggestionsAvailable && !isExpired)

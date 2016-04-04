@@ -49,6 +49,14 @@ public class AnalyticsHelper
                 .build());
     }
 
+    public static void sendCaughtExceptions(String exceptionMethod, boolean isFatal)
+    {
+        googleAnalyticsTracker.send(new HitBuilders.ExceptionBuilder()
+                .setDescription(exceptionMethod)
+                .setFatal(isFatal)
+                .build());
+    }
+
     public static void sendCustomDimension(int index, String dimension)
     {
         googleAnalyticsTracker.send(new HitBuilders.ScreenViewBuilder()
@@ -64,5 +72,4 @@ public class AnalyticsHelper
                         .build()
         );
     }
-
 }

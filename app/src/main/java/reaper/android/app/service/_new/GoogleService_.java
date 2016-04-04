@@ -39,7 +39,7 @@ public class GoogleService_
         catch (Exception e)
         {
             /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_J,null,false);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_J, false);
             /* Analytics */
 
             return false;
@@ -51,7 +51,7 @@ public class GoogleService_
         if (googleApiClient == null)
         {
             /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z2,null,true);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z2, true);
             /* Analytics */
 
             throw new IllegalStateException("[GoogleApiClient not initialized]");
@@ -65,14 +65,14 @@ public class GoogleService_
         if (googleApiClient == null)
         {
             /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z3,null,true);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z3, true);
             /* Analytics */
             throw new IllegalStateException("[GoogleApiClient not initialized]");
         }
         else if (!googleApiClient.isConnected())
         {
             /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z4,null,true);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z4, true);
             /* Analytics */
             throw new IllegalStateException("[GoogleApiClient not connected]");
         }
@@ -85,7 +85,7 @@ public class GoogleService_
         if (googleApiClient == null)
         {
              /* Analytics */
-            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z5,null,true);
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z5, true);
             /* Analytics */
             throw new IllegalStateException("[Cannot set null GoogleApiClient]");
         }

@@ -98,7 +98,7 @@ public class InviteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             default:
                 /* Analytics */
-                AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z10,null,false);
+                AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z10, false);
                 /* Analytics */
 
                 throw new IllegalStateException();
