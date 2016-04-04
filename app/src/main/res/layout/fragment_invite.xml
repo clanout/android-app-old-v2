@@ -17,7 +17,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/error_chat_not_fetched"/>
+            android:text="@string/error_friends_not_loaded"/>
 
         <TextView
             android:id="@+id/tvRetry"

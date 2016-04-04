@@ -58,12 +58,13 @@
     <string name="error_chat_not_fetched"> Unable to load conversations</string>
     <string name="error_no_whatsapp">WhatsApp is not installed on this device</string>
     <string name="error_notifications">Unable to load notifications</string>
+    <string name="error_friends_not_loaded">Could not load your friends.</string>
 
     <!-- Common Strings -->
     <string name="retry">Retry</string>
     <string name="try_again">Try Again</string>
     <string name="search_friends">Search</string>
-    <string name="no_facebook_friends">Nothing to show here :)</string>
+    <string name="no_facebook_friends">No results found</string>
     <string name="ok">OK</string>
     <string name="got_it">Got It</string>
 
