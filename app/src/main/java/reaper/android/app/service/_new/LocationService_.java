@@ -42,6 +42,10 @@ public class LocationService_
     {
         if (instance == null)
         {
+            /* Analytics */
+            AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants.METHOD_Z16,null,false);
+            /* Analytics */
+
             throw new IllegalStateException("[LocationService Not Initialized]");
         }
 

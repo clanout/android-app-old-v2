@@ -27,6 +27,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
 import reaper.android.app.config.Dimensions;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventCategory;
 import reaper.android.app.model.EventDetails;
@@ -39,6 +40,7 @@ import reaper.android.app.ui.dialog.AttendeeDialog;
 import reaper.android.app.ui.util.CategoryIconFactory;
 import reaper.android.app.ui.util.CircleTransform;
 import reaper.android.app.ui.util.FriendBubbles;
+import reaper.android.common.analytics.AnalyticsHelper;
 
 public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
@@ -403,6 +405,25 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     {
                         if (listener != null)
                         {
+                            if (tvEdit.getText().toString() == "Add Location and Description")
+                            {
+                                /* Analytics */
+                                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_ADD_LOCATION_AND_DESCRIPTION,null);
+                                /* Analytics */
+                            }
+                            else if (tvEdit.getText().toString() == "Add Location")
+                            {
+                                /* Analytics */
+                                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_ADD_LOCATION,null);
+                                /* Analytics */
+                            }
+                            else if (tvEdit.getText().toString() == "Add Description")
+                            {
+                                /* Analytics */
+                                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_ADD_DESCRIPTION,null);
+                                /* Analytics */
+                            }
+
                             listener.onEdit();
                         }
                     }

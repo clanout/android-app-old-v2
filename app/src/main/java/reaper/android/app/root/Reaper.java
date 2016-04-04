@@ -16,6 +16,7 @@ import reaper.android.BuildConfig;
 import reaper.android.app.cache._core.DatabaseManager;
 import reaper.android.app.communication.Communicator;
 import reaper.android.app.config.AppConstants;
+import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.service.EventService;
 import reaper.android.app.service.NotificationService;
 import reaper.android.app.service.UserService;
@@ -25,6 +26,7 @@ import reaper.android.app.service._new.GoogleService_;
 import reaper.android.app.service._new.LocationService_;
 import reaper.android.app.service._new.PhonebookService_;
 import reaper.android.app.service._new.WhatsappService_;
+import reaper.android.common.analytics.AnalyticsHelper;
 import timber.log.Timber;
 
 public class Reaper extends Application
@@ -60,6 +62,10 @@ public class Reaper extends Application
     public void onCreate()
     {
         super.onCreate();
+
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_APP_LAUNCH,null);
+        /* Analytics */
 
         /* Static reference */
         instance = this;

@@ -633,8 +633,7 @@ public class NotificationService
                             catch (Exception e) {
                                   /* Analytics */
                                 AnalyticsHelper.sendCaughtExceptions(GoogleAnalyticsConstants
-                                        .METHOD_CANNOT_CONVERT_TO_ENUM, GoogleAnalyticsConstants
-                                        .LOCATION_NOTIFICATION_SERVICE_EXCEPTION, false);
+                                        .METHOD_CANNOT_CONVERT_TO_ENUM_IN_NOTIFICATION_SERVICE, null, false);
                                   /* Analytics */
 
                                 Log.d("APP", "exception in notification service ---- can't " +

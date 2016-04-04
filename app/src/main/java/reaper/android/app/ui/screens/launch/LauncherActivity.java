@@ -229,15 +229,27 @@ public class LauncherActivity extends BaseActivity implements
                 if (PermissionHandler
                         .isRationalRequired(this, PermissionHandler.Permissions.LOCATION))
                 {
+                    /* Analytics */
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_LOCATION_PERMISSION,GoogleAnalyticsConstants.LABEL_DENIED);
+                    /* Analytics */
+
                     onPermissionDenied(PermissionHandler.Permissions.LOCATION);
                 }
                 else
                 {
+                    /* Analytics */
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_LOCATION_PERMISSION,GoogleAnalyticsConstants.LABEL_PERMANENTLY_DENIED);
+                    /* Analytics */
+
                     onPermissionPermanentlyDenied(PermissionHandler.Permissions.LOCATION);
                 }
             }
             else
             {
+                /* Analytics */
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_LOCATION_PERMISSION,GoogleAnalyticsConstants.LABEL_GRANTED);
+                /* Analytics */
+
                 onPermissionGranted(PermissionHandler.Permissions.LOCATION);
             }
         }
@@ -247,20 +259,12 @@ public class LauncherActivity extends BaseActivity implements
     @Override
     public void onPermissionGranted(@PermissionHandler.Permissions int permission)
     {
-        /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_LOCATION_PERMISSION,GoogleAnalyticsConstants.LABEL_GRANTED);
-        /* Analytics */
-
         bootstrapPresenter.attachView(this);
     }
 
     @Override
     public void onPermissionDenied(@PermissionHandler.Permissions int permission)
     {
-        /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_LOCATION_PERMISSION,GoogleAnalyticsConstants.LABEL_DENIED);
-        /* Analytics */
-
         showBootstrapAction();
 
         tvActionMessage.setText(R.string.permission_location_message);
@@ -285,10 +289,6 @@ public class LauncherActivity extends BaseActivity implements
     @Override
     public void onPermissionPermanentlyDenied(@PermissionHandler.Permissions int permission)
     {
-        /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_LOCATION_PERMISSION,GoogleAnalyticsConstants.LABEL_PERMANENTLY_DENIED);
-        /* Analytics */
-
         showBootstrapAction();
 
         tvActionMessage.setText(R.string.permission_location_message);
@@ -670,6 +670,10 @@ public class LauncherActivity extends BaseActivity implements
 
     private void displayPlayServicesErrorDialog()
     {
+        /* Analytics */
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_PLAY_SERVICES_ERROR,null);
+        /* Analytics */
+
         DefaultDialog.show(this,
                 R.string.play_services_error_dialog_title,
                 R.string.play_services_error_dialog_message,
@@ -694,32 +698,37 @@ public class LauncherActivity extends BaseActivity implements
 
     private void displayFacebookPermissionsDialog()
     {
+        /* Analytics */
+        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_FACEBOOK_PERMISSION_DIALOG);
+        /* Analytics */
+
         DefaultDialog.show(this,
                 R.string.facebook_permission_dialog_title,
                 R.string.facebook_permission_dialog_message,
                 R.string.facebook_permission_dialog_positive_button,
                 R.string.facebook_permission_dialog_negative_button,
                 false,
-                new DefaultDialog.Listener()
-                {
+                new DefaultDialog.Listener() {
                     @Override
-                    public void onPositiveButtonClicked()
-                    {
+                    public void onPositiveButtonClicked() {
+                        /* Analytics */
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_FACEBOOK_PERMISSIONS,GoogleAnalyticsConstants.LABEL_GRANTED);
+                        /* Analytics */
+
                         LoginManager
                                 .getInstance()
                                 .logInWithReadPermissions(LauncherActivity.this, FacebookService_.PERMISSIONS);
                     }
 
                     @Override
-                    public void onNegativeButtonClicked()
-                    {
+                    public void onNegativeButtonClicked() {
+                        /* Analytics */
+                        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_FACEBOOK_PERMISSIONS,GoogleAnalyticsConstants.LABEL_DENIED);
+                        /* Analytics */
+
                         closeApp();
                     }
                 });
-
-        /* Analytics */
-        AnalyticsHelper.sendScreenNames(GoogleAnalyticsConstants.SCREEN_FACEBOOK_PERMISSION_DIALOG);
-        /* Analytics */
     }
 
     private void handleIntent()
@@ -741,9 +750,8 @@ public class LauncherActivity extends BaseActivity implements
 
             case FlowEntry.DETAILS:
                 /* Analytics */
-                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,
-                        GoogleAnalyticsConstants.ACTION_OPEN, GoogleAnalyticsConstants
-                                .LABEL_FROM_PUSH_NOTIFICATION);
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_OPEN,GoogleAnalyticsConstants.LABEL_FROM_PUSH_NOTIFICATION);
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_LAUNCH_FROM_NOTIF,GoogleAnalyticsConstants.LABEL_TO_DETAILS);
                 /* Analytics */
 
                 NotificationService.getInstance().deleteAllNotificationsFromCache();
@@ -754,6 +762,7 @@ public class LauncherActivity extends BaseActivity implements
             case FlowEntry.CHAT:
                 /* Analytics */
                 AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CHAT,GoogleAnalyticsConstants.ACTION_OPEN,GoogleAnalyticsConstants.LABEL_FROM_PUSH_NOTIFICATION);
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_LAUNCH_FROM_NOTIF,GoogleAnalyticsConstants.LABEL_TO_CHAT);
                 /* Analytics */
 
                 NotificationService.getInstance().deleteAllNotificationsFromCache();
@@ -764,6 +773,7 @@ public class LauncherActivity extends BaseActivity implements
             case FlowEntry.NOTIFICATIONS:
                 /* Analytics */
                 AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_NOTIFICATION,GoogleAnalyticsConstants.ACTION_OPEN,GoogleAnalyticsConstants.LABEL_FROM_PUSH_NOTIFICATION);
+                AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,GoogleAnalyticsConstants.ACTION_LAUNCH_FROM_NOTIF,GoogleAnalyticsConstants.LABEL_TO_NOTIFICATION);
                 /* Analytics */
 
                 startActivity(NotificationActivity.callingIntent(this));
