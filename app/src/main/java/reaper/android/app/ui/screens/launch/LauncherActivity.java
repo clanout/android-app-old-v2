@@ -20,6 +20,7 @@ import android.text.style.ClickableSpan;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -123,7 +124,7 @@ public class LauncherActivity extends BaseActivity implements
     ImageView ivIntro4;
 
     @Bind(R.id.loading)
-    ProgressBar loading;
+    LinearLayout loading;
 
     @Bind(R.id.llAction)
     View llAction;

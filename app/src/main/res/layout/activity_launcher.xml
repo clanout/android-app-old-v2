@@ -24,11 +24,51 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="72dp">
 
-            <ProgressBar
+            <LinearLayout
                 android:id="@+id/loading"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"/>
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        android:text="@string/launcher_message_first_part"
+                        android:textColor="@color/text_subtitle"
+                        android:layout_marginRight="2dp"/>
+
+                    <net.steamcrafted.materialiconlib.MaterialIconView
+                        xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        android:scaleType="center"
+                        app:materialIcon="heart"
+                        app:materialIconColor="@color/grey"
+                        app:materialIconSize="16dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        android:text="@string/launcher_message_second_part"
+                        android:textColor="@color/text_subtitle"
+                        android:layout_marginLeft="2dp"/>
+                </LinearLayout>
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/llAction"
@@ -118,14 +158,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:layout_marginBottom="4dp"
+                android:layout_marginTop="16dp"
+                android:paddingBottom="16dp"
                 android:paddingLeft="68dp"
                 android:paddingRight="68dp"
                 android:paddingTop="16dp"
-                android:paddingBottom="16dp"
                 android:textSize="16sp"
                 />
 
@@ -137,8 +177,8 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:textSize="10sp"
                 android:textColor="@color/text_subtitle"
+                android:textSize="10sp"
                 />
 
         </RelativeLayout>
