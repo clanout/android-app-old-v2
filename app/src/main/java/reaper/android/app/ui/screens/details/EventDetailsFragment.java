@@ -238,6 +238,7 @@ public class EventDetailsFragment extends BaseFragment implements
     {
         /* Analytics */
         AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,GoogleAnalyticsConstants.ACTION_GO_TO,GoogleAnalyticsConstants.LABEL_CHAT);
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_CHAT,GoogleAnalyticsConstants.ACTION_OPEN,GoogleAnalyticsConstants.LABEL_FROM_DETAILS);
         /* Analytics */
 
         if (presenter != null)

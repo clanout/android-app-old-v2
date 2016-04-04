@@ -110,6 +110,11 @@ public class AccountFragment extends BaseFragment
             @Override
             public void onClick(View v)
             {
+                        /* Analytics */
+                AnalyticsHelper
+                        .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants.LABEL_FRIENDS);
+                /* Analytics */
+
                 screen.navigateToFriendsScreen();
             }
         });

@@ -154,7 +154,7 @@ public class InvitePresenterImpl implements InvitePresenter
         if (!invitedFriends.isEmpty())
         {
             /* Analytics */
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_PEOPLE_INVITED,GoogleAnalyticsConstants.LABEL_FRIENDS,invitedFriends.size());
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_PEOPLE_INVITED,GoogleAnalyticsConstants.LABEL_FB_FRIENDS,invitedFriends.size());
             /* Analytics */
 
             eventService._inviteAppFriends(eventId, invitedFriends);
@@ -163,7 +163,7 @@ public class InvitePresenterImpl implements InvitePresenter
         if (!invitedContacts.isEmpty())
         {
             /* Analytics */
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_PEOPLE_INVITED,GoogleAnalyticsConstants.LABEL_FRIENDS,invitedContacts.size());
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_INVITE,GoogleAnalyticsConstants.ACTION_PEOPLE_INVITED,GoogleAnalyticsConstants.LABEL_PB_CONTACTS,invitedContacts.size());
             /* Analytics */
 
             eventService._invitePhonebookContacts(eventId, invitedContacts);

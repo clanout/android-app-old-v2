@@ -169,6 +169,9 @@ public class GoogleAnalyticsConstants
     public static final String LABEL_TO_DETAILS = "to_details";
     public static final String LABEL_TO_CHAT = "to_chat";
     public static final String LABEL_TO_NOTIFICATION = "to_notification";
+    public static final String LABEL_PB_CONTACTS = "pb_contacts";
+    public static final String LABEL_FB_FRIENDS = "friends";
+
 
 
 

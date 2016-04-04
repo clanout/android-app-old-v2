@@ -60,7 +60,7 @@ public class EditEventPresenterImpl implements EditEventPresenter
         else
         {
             /* Analytics */
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_EDIT, GoogleAnalyticsConstants.ACTION_EDIT_TIME, GoogleAnalyticsConstants.LABEL_ATTEMPT);
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_EDIT, GoogleAnalyticsConstants.ACTION_EDIT_TIME, GoogleAnalyticsConstants.LABEL_SUCCESS);
             /* Analytics */
         }
 
@@ -71,7 +71,7 @@ public class EditEventPresenterImpl implements EditEventPresenter
         else
         {
             /* Analytics */
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_EDIT, GoogleAnalyticsConstants.ACTION_EDIT_LOCATION, GoogleAnalyticsConstants.LABEL_ATTEMPT);
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_EDIT, GoogleAnalyticsConstants.ACTION_EDIT_LOCATION, GoogleAnalyticsConstants.LABEL_SUCCESS);
             /* Analytics */
         }
 
@@ -83,7 +83,7 @@ public class EditEventPresenterImpl implements EditEventPresenter
         else
         {
             /* Analytics */
-            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_EDIT, GoogleAnalyticsConstants.ACTION_EDIT_DESCRIPTION, GoogleAnalyticsConstants.LABEL_ATTEMPT);
+            AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_EDIT, GoogleAnalyticsConstants.ACTION_EDIT_DESCRIPTION, GoogleAnalyticsConstants.LABEL_SUCCESS);
             /* Analytics */
         }
 
