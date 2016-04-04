@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -23,6 +24,7 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.config.MemoryCacheKeys;
 import reaper.android.app.model.Event;
+import reaper.android.app.root.Reaper;
 import reaper.android.app.ui._core.FlowEntry;
 import reaper.android.app.ui.screens.launch.LauncherActivity;
 import rx.Subscriber;
@@ -161,7 +163,9 @@ public class AlarmReceiver extends BroadcastReceiver
                         .getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder
                         (context)
-                        .setSmallIcon(R.drawable.notification_icon_large)
+                        .setSmallIcon(R.drawable.notification_icon_small)
+                        .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R
+                                .color.primary))
                         .setContentTitle(event.getTitle())
                         .setContentText(context.getResources()
                                 .getString(R.string.reminder_notification_message))
