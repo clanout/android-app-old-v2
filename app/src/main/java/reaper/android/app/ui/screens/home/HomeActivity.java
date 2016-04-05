@@ -98,13 +98,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
         notificationCommunicator.register(this);
 
         /* Notification */
-        notificationIcon = MaterialDrawableBuilder
-                .with(this)
-                .setIcon(MaterialDrawableBuilder.IconValue.BELL)
-                .setColor(ContextCompat
-                        .getColor(this, R.color.white))
-                .setSizeDp(Dimensions.ACTION_BAR_DP)
-                .build();
+        notificationIcon = ContextCompat.getDrawable(this, R.drawable.ab_notification_icon);
 
         if (notification != null)
         {
@@ -131,7 +125,7 @@ public class HomeActivity extends BaseActivity implements HomeScreen
 
         notification = menu.findItem(R.id.action_notifications);
 
-        notification.setIcon(R.drawable.ab_notification_icon);
+        notification.setIcon(notificationIcon);
 
         menu.findItem(R.id.action_account)
             .setIcon(MaterialDrawableBuilder
@@ -180,9 +174,10 @@ public class HomeActivity extends BaseActivity implements HomeScreen
     @Subscribe
     public void newNotificationsAvailable(NewNotificationsAvailableTrigger trigger)
     {
+        notificationIcon = ContextCompat.getDrawable(this, R.drawable.ab_notification_icon_active);
         if (notification != null)
         {
-            notification.setIcon(R.drawable.ab_notification_icon_active);
+            notification.setIcon(notificationIcon);
         }
     }
 
@@ -190,9 +185,10 @@ public class HomeActivity extends BaseActivity implements HomeScreen
     @Subscribe
     public void newNotificationReceived(NewNotificationReceivedTrigger trigger)
     {
+        notificationIcon = ContextCompat.getDrawable(this, R.drawable.ab_notification_icon_active);
         if (notification != null)
         {
-            notification.setIcon(R.drawable.ab_notification_icon_active);
+            notification.setIcon(notificationIcon);
         }
     }
 

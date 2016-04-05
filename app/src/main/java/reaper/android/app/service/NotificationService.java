@@ -1046,7 +1046,6 @@ public class NotificationService
                     @Override
                     public void onError(Throwable e)
                     {
-                        bus.post(new NewNotificationsAvailableTrigger());
                     }
 
                     @Override
