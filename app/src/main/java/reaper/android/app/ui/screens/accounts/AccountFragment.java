@@ -162,8 +162,7 @@ public class AccountFragment extends BaseFragment
                     .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_WHATSAPP_INVITE, GoogleAnalyticsConstants.LABEL_SUCCESS);
             /* Analytics */
 
-//            startActivity(accountsService.getWhatsAppIntent());
-            SnackbarFactory.create(getActivity(), R.string.disabled_for_beta);
+            startActivity(accountsService.getWhatsAppIntent());
         }
         else
         {
@@ -172,8 +171,7 @@ public class AccountFragment extends BaseFragment
                     .sendEvents(GoogleAnalyticsConstants.CATEGORY_ACCOUNT, GoogleAnalyticsConstants.ACTION_WHATSAPP_INVITE, GoogleAnalyticsConstants.LABEL_FAILURE);
             /* Analytics */
 
-//            SnackbarFactory.create(getActivity(), R.string.error_no_whatsapp);
-            SnackbarFactory.create(getActivity(), R.string.disabled_for_beta);
+            SnackbarFactory.create(getActivity(), R.string.error_no_whatsapp);
         }
     }
 
