@@ -23,7 +23,8 @@
             android:id="@+id/rvEventDetails"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="vertical"/>
+            android:scrollbars="vertical"
+            />
 
     </LinearLayout>
 
@@ -40,7 +41,7 @@
         style="?attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone">
+        >
 
         <Button
             android:id="@+id/btnInvite"
@@ -50,13 +51,33 @@
             android:layout_weight="1"
             android:text="Invite"/>
 
-        <Button
-            android:id="@+id/btnChat"
-            style="@style/ActionButton"
+        <RelativeLayout
+            android:id="@+id/rlChat"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Chat"/>
+            android:background="?android:attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/tvChat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Chat"
+                style="@style/ActionButton"/>
+
+            <ImageView
+                android:id="@+id/ivChat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/tvChat"
+                android:src="@drawable/icon_chat_notification"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="4dp"
+                android:visibility="gone"/>
+
+        </RelativeLayout>
+
 
     </LinearLayout>
 

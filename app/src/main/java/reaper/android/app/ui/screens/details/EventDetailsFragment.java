@@ -13,7 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -86,6 +89,12 @@ public class EventDetailsFragment extends BaseFragment implements
 
     @Bind(R.id.ivShadow)
     View ivShadow;
+
+    @Bind(R.id.ivChat)
+    ImageView chatMarker;
+
+    @Bind(R.id.rlChat)
+    RelativeLayout chatContainer;
 
     MenuItem loading;
     MenuItem edit;
@@ -187,10 +196,11 @@ public class EventDetailsFragment extends BaseFragment implements
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
-                if (presenter != null)
-                {
+                if (presenter != null) {
                     /* Analytics */
-                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS, GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants.LABEL_EDIT);
+                    AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_DETAILS,
+                            GoogleAnalyticsConstants.ACTION_GO_TO, GoogleAnalyticsConstants
+                                    .LABEL_EDIT);
                     /* Analytics */
 
                     presenter.edit();
@@ -233,7 +243,7 @@ public class EventDetailsFragment extends BaseFragment implements
         }
     }
 
-    @OnClick(R.id.btnChat)
+    @OnClick(R.id.rlChat)
     public void onChatClicked()
     {
         /* Analytics */
@@ -516,6 +526,18 @@ public class EventDetailsFragment extends BaseFragment implements
     public void navigateToHome()
     {
         screen.navigateToHomeScreen();
+    }
+
+    @Override
+    public void displayChatMarker()
+    {
+        chatMarker.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideChatMarker()
+    {
+        chatMarker.setVisibility(View.GONE);
     }
 
     /* Helper Methods */

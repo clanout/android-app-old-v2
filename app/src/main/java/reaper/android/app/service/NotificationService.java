@@ -49,6 +49,7 @@ import reaper.android.app.ui.screens.launch.LauncherActivity;
 import reaper.android.common.analytics.AnalyticsHelper;
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.functions.Func5;
@@ -1389,5 +1390,11 @@ public class NotificationService
 
                     }
                 });
+    }
+
+    public Observable<List<Notification>> getNotifications(int type, String eventId)
+    {
+        return notificationCache.getAll(type, eventId)
+                .subscribeOn(Schedulers.newThread());
     }
 }

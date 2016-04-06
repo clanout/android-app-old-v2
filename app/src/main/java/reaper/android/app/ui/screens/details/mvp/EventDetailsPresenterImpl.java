@@ -1,5 +1,7 @@
 package reaper.android.app.ui.screens.details.mvp;
 
+import android.util.Log;
+
 import com.google.gson.reflect.TypeToken;
 
 import org.joda.time.DateTime;
@@ -16,6 +18,7 @@ import reaper.android.app.cache.generic.GenericCache;
 import reaper.android.app.config.GenericCacheKeys;
 import reaper.android.app.model.Event;
 import reaper.android.app.model.EventDetails;
+import reaper.android.app.model.Notification;
 import reaper.android.app.model.util.DateTimeUtil;
 import reaper.android.app.model.util.EventAttendeeComparator;
 import reaper.android.app.service.EventService;
@@ -259,6 +262,7 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
                             public void onCompleted()
                             {
                                 fetchEventDetailsFromNetwork();
+                                fetchChatNotifications();
                             }
 
                             @Override
@@ -277,6 +281,42 @@ public class EventDetailsPresenterImpl implements EventDetailsPresenter
                         });
 
         subscriptions.add(subscription);
+    }
+
+    private void fetchChatNotifications()
+    {
+        Subscription subscription = notificationService.getNotifications(Notification.CHAT, event.getId())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Notification>>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        Log.d("CHAT", "Marker Error");
+                    }
+
+                    @Override
+                    public void onNext(List<Notification> notifications)
+                    {
+                        if(notifications.size() > 0)
+                        {
+                            Log.d("CHAT", "Marker Shown");
+                            view.displayChatMarker();
+                        }else{
+
+                            view.hideChatMarker();
+                        }
+                    }
+                });
+
+        subscriptions.add(subscription);
+
     }
 
     private void fetchEventDetailsFromNetwork()

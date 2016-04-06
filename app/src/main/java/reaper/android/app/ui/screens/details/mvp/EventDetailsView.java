@@ -33,4 +33,8 @@ public interface EventDetailsView
     void navigateToEdit(Event event);
 
     void navigateToHome();
+
+    void displayChatMarker();
+
+    void hideChatMarker();
 }
