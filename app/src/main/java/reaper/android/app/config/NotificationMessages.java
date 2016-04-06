@@ -14,6 +14,6 @@ public class NotificationMessages
     public static final String EVENT_UPDATED = "Update : '%s'.";
     public static final String EVENT_REMOVED = "Update : %s deleted '%s'.";
     public static final String RSVP_CHANGED = "RSVP : New friends joined '%s'.";
-    public static final String EVENT_INVITATION = "Invitation : Join %s for '%s'.";
+    public static final String EVENT_INVITATION = "Invite : Join %s for '%s'.";
     public static final String EVENT_CREATED = "New Clan : %s created '%s'.";
 }

@@ -398,8 +398,9 @@ public class NotificationService
                         .getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder
                         (Reaper.getReaperContext())
-                        .setSmallIcon(R.mipmap.app_icon)
-                        .setContentTitle(notification.getTitle())
+                        .setSmallIcon(R.drawable.notification_icon_small)
+                        .setColor(ContextCompat.getColor(Reaper.getReaperContext(), R
+                                .color.primary))
                         .setContentText(Reaper.getReaperContext().getResources()
                                 .getString(R.string.reminder_notification_message))
                         .setAutoCancel(true)
@@ -1195,7 +1196,7 @@ public class NotificationService
             }
         }
 
-        String message = "You have ";
+        String message = "";
         if (invitationCount != 0) {
             if (invitationCount == 1) {
                 message = message + invitationCount + " invitation";
@@ -1243,13 +1244,13 @@ public class NotificationService
         if (chatCount == 0 && updateCount == 0 && invitationCount == 0) {
 
             if (notifications.size() == 1) {
-                message = "You have " + notifications
+                message = notifications
                         .size() + " new notification";
 
             }
             else {
 
-                message = "You have " + notifications
+                message = notifications
                         .size() + " new notifications";
             }
         }
