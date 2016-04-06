@@ -11,7 +11,7 @@
     <!-- Event Type -->
     <string name="event_type_open">Open</string>
     <string name="event_type_secret">Secret</string>
-    <string name="event_type_open_description">All your nearby friends can see this plan. If any of your friends joins this plan, their friends can also see it. You can still send personal invites.</string>
+    <string name="event_type_open_description">All your friends in your city can see this plan. If any of your friends join the plan, their friends can also see it.</string>
     <string name="event_type_secret_description">Only the friends, you have invited, can see this plan. Once they join, they can also invite their friends.</string>
 
     <!-- RSVP -->
