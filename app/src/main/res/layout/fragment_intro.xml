@@ -12,7 +12,7 @@
         android:layout_height="160dp"
         android:layout_above="@id/tvTitle"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/intro_4"/>
+        android:src="@drawable/intro_1"/>
 
     <TextView
         android:id="@+id/tvTitle"

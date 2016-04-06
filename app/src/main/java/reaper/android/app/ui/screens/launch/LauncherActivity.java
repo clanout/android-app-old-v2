@@ -163,7 +163,7 @@ public class LauncherActivity extends BaseActivity implements
         }
 
         /* Init View */
-        displayBootstrapView();
+        displayBlankView();
 
         facebookCallbackManager = CallbackManager.Factory.create();
 
@@ -429,7 +429,9 @@ public class LauncherActivity extends BaseActivity implements
         }
 
         /* Analytics */
-        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN, GoogleAnalyticsConstants.ACTION_LOGIN_ATTEMPT, GoogleAnalyticsConstants.LABEL_SUCCESS);
+        AnalyticsHelper.sendEvents(GoogleAnalyticsConstants.CATEGORY_LOGIN,
+                GoogleAnalyticsConstants.ACTION_LOGIN_ATTEMPT, GoogleAnalyticsConstants
+                        .LABEL_SUCCESS);
         /* Analytics */
     }
 
@@ -537,7 +539,7 @@ public class LauncherActivity extends BaseActivity implements
             }
         });
 
-        Observable.interval(2, TimeUnit.SECONDS)
+        Observable.interval(4, TimeUnit.SECONDS)
                   .observeOn(AndroidSchedulers.mainThread())
                   .subscribe(new Subscriber<Long>()
                              {
@@ -614,6 +616,12 @@ public class LauncherActivity extends BaseActivity implements
     {
         llFb.setVisibility(View.GONE);
         rlBootstrap.setVisibility(View.VISIBLE);
+    }
+
+    private void displayBlankView()
+    {
+        llFb.setVisibility(View.GONE);
+        rlBootstrap.setVisibility(View.GONE);
     }
 
     private void displayFbLoginView()

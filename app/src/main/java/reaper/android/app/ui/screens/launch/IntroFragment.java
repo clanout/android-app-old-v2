@@ -11,9 +11,7 @@ import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import reaper.android.R;
-import reaper.android.app.config.GoogleAnalyticsConstants;
 import reaper.android.app.ui._core.BaseFragment;
-import reaper.android.common.analytics.AnalyticsHelper;
 
 public class IntroFragment extends BaseFragment
 {
@@ -61,7 +59,7 @@ public class IntroFragment extends BaseFragment
             case 0:
                 rlIntroContainer.setBackgroundResource(R.color.white);
                 tvTitle.setText(R.string.intro_title_1);
-                ivIntroIcon.setImageResource(R.drawable.intro_1);
+                ivIntroIcon.setImageResource(R.mipmap.app_icon);
                 break;
 
             case 1:
